@@ -1,0 +1,11 @@
+{
+  "name": "crabcode-setup",
+  "description": "Analyze a repository and recommend CrabCode-native automations such as skills, hooks, agents, plugins, and MCP servers.",
+  "version": "0.1.0",
+  "author": {
+    "name": "CrabCode"
+  },
+  "source": "./plugins/crabcode-setup",
+  "category": "productivity",
+  "skills": "./skills"
+}

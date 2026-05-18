@@ -1,0 +1,8 @@
+node_modules/
+coverage/
+yuanma/
+docs/2026-05-18-crabcode-setup-plugin-ts-rebrand-implementation-plan.md
+docs/legal/
+.DS_Store
+*.log
+*.tmp

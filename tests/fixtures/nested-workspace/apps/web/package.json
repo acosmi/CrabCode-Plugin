@@ -1,0 +1,16 @@
+{
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "react": "latest"
+  },
+  "devDependencies": {
+    "@playwright/test": "latest",
+    "typescript": "latest",
+    "vite": "latest",
+    "vitest": "latest"
+  }
+}
+

@@ -1,0 +1,9 @@
+{
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "test": "echo root"
+  }
+}
+

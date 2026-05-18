@@ -1,0 +1,10 @@
+{
+  "name": "crabcode-setup",
+  "description": "Analyze repositories and recommend CrabCode-native automations such as skills, hooks, agents, plugins, and MCP servers.",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "keywords": ["automation", "recommendations", "setup", "analysis"],
+  "author": {
+    "name": "CrabCode"
+  }
+}

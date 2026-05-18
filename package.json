@@ -1,0 +1,21 @@
+{
+  "name": "crabcode-setup",
+  "version": "0.1.0",
+  "description": "Analyze a repository and recommend CrabCode-native automations such as skills, hooks, agents, plugins, and MCP servers.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "crabcode-setup": "./dist/cli.js"
+  },
+  "scripts": {
+    "analyze": "bun run src/cli.ts",
+    "build": "bun build src/cli.ts --outdir dist --target node --format esm --banner '#!/usr/bin/env node'",
+    "lint:brand": "bun run scripts/lint-brand.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.2",
+    "typescript": "^5.9.3"
+  }
+}
