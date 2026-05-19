@@ -1,0 +1,16 @@
+{
+  "name": "jdtls-lsp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Java language server (Eclipse JDT.LS) bridge for CrabCode, providing code intelligence and refactoring.",
+  "license": "MIT",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lsp:run": "bun run src/lsp-wrapper.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.2",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "gopls-lsp",
+  "version": "0.1.0",
+  "description": "Go language server (gopls) bridge for CrabCode, providing code intelligence, refactoring, and analysis.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": [
+    "lsp",
+    "language-server",
+    "go",
+    "gopls"
+  ],
+  "metadata": {
+    "lsp": {
+      "language": "Go",
+      "serverBinary": "gopls",
+      "serverArgs": [],
+      "extensions": [
+        ".go"
+      ]
+    },
+    "upstream": {
+      "name": "gopls",
+      "url": "https://pkg.go.dev/golang.org/x/tools/gopls",
+      "license": "BSD-3-Clause"
+    }
+  }
+}

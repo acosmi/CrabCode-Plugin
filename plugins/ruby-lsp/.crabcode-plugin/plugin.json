@@ -1,0 +1,33 @@
+{
+  "name": "ruby-lsp",
+  "version": "0.1.0",
+  "description": "Ruby language server bridge for CrabCode, providing code intelligence and analysis.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": [
+    "lsp",
+    "language-server",
+    "ruby"
+  ],
+  "metadata": {
+    "lsp": {
+      "language": "Ruby",
+      "serverBinary": "ruby-lsp",
+      "serverArgs": [],
+      "extensions": [
+        ".rb",
+        ".rake",
+        ".gemspec",
+        ".ru",
+        ".erb"
+      ]
+    },
+    "upstream": {
+      "name": "ruby-lsp",
+      "url": "https://github.com/Shopify/ruby-lsp",
+      "license": "MIT"
+    }
+  }
+}

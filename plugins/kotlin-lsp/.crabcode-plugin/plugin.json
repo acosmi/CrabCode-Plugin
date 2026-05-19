@@ -1,0 +1,30 @@
+{
+  "name": "kotlin-lsp",
+  "version": "0.1.0",
+  "description": "Kotlin language server bridge for CrabCode, providing code intelligence, refactoring, and analysis.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": [
+    "lsp",
+    "language-server",
+    "kotlin"
+  ],
+  "metadata": {
+    "lsp": {
+      "language": "Kotlin",
+      "serverBinary": "kotlin-lsp",
+      "serverArgs": [],
+      "extensions": [
+        ".kt",
+        ".kts"
+      ]
+    },
+    "upstream": {
+      "name": "kotlin-lsp",
+      "url": "https://github.com/Kotlin/kotlin-lsp",
+      "license": "Apache-2.0"
+    }
+  }
+}

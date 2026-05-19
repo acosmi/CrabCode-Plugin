@@ -1,0 +1,39 @@
+{
+  "name": "typescript-lsp",
+  "version": "0.1.0",
+  "description": "TypeScript/JavaScript language server bridge for CrabCode, providing code intelligence, go-to-definition, find references, and error checking.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": [
+    "lsp",
+    "language-server",
+    "typescript",
+    "javascript"
+  ],
+  "metadata": {
+    "lsp": {
+      "language": "TypeScript/JavaScript",
+      "serverBinary": "typescript-language-server",
+      "serverArgs": [
+        "--stdio"
+      ],
+      "extensions": [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+        ".mts",
+        ".cts",
+        ".mjs",
+        ".cjs"
+      ]
+    },
+    "upstream": {
+      "name": "typescript-language-server",
+      "url": "https://github.com/typescript-language-server/typescript-language-server",
+      "license": "Apache-2.0"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "ruby-lsp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Ruby language server bridge for CrabCode, providing code intelligence and analysis.",
+  "license": "MIT",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lsp:run": "bun run src/lsp-wrapper.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.2",
+    "typescript": "^5.9.3"
+  }
+}

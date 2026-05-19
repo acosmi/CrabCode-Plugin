@@ -1,0 +1,30 @@
+{
+  "name": "jdtls-lsp",
+  "version": "0.1.0",
+  "description": "Java language server (Eclipse JDT.LS) bridge for CrabCode, providing code intelligence and refactoring.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": [
+    "lsp",
+    "language-server",
+    "java",
+    "jdtls"
+  ],
+  "metadata": {
+    "lsp": {
+      "language": "Java",
+      "serverBinary": "jdtls",
+      "serverArgs": [],
+      "extensions": [
+        ".java"
+      ]
+    },
+    "upstream": {
+      "name": "Eclipse JDT Language Server",
+      "url": "https://github.com/eclipse-jdtls/eclipse.jdt.ls",
+      "license": "EPL-2.0"
+    }
+  }
+}

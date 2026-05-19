@@ -1,0 +1,10 @@
+{
+  "clangd-lsp": {
+    "type": "stdio",
+    "command": "bun",
+    "args": [
+      "run",
+      "src/lsp-wrapper.ts"
+    ]
+  }
+}

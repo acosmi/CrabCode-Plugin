@@ -1,0 +1,30 @@
+{
+  "name": "swift-lsp",
+  "version": "0.1.0",
+  "description": "Swift language server (SourceKit-LSP) bridge for CrabCode, providing code intelligence for Swift projects.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": [
+    "lsp",
+    "language-server",
+    "swift",
+    "sourcekit"
+  ],
+  "metadata": {
+    "lsp": {
+      "language": "Swift",
+      "serverBinary": "sourcekit-lsp",
+      "serverArgs": [],
+      "extensions": [
+        ".swift"
+      ]
+    },
+    "upstream": {
+      "name": "SourceKit-LSP",
+      "url": "https://github.com/apple/sourcekit-lsp",
+      "license": "Apache-2.0 WITH Runtime Library Exception"
+    }
+  }
+}

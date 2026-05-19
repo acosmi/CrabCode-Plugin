@@ -1,0 +1,30 @@
+{
+  "name": "csharp-lsp",
+  "version": "0.1.0",
+  "description": "C# language server bridge for CrabCode, providing code intelligence and diagnostics.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": [
+    "lsp",
+    "language-server",
+    "csharp",
+    "dotnet"
+  ],
+  "metadata": {
+    "lsp": {
+      "language": "C#",
+      "serverBinary": "csharp-ls",
+      "serverArgs": [],
+      "extensions": [
+        ".cs"
+      ]
+    },
+    "upstream": {
+      "name": "csharp-language-server",
+      "url": "https://github.com/razzmatazz/csharp-language-server",
+      "license": "MIT"
+    }
+  }
+}

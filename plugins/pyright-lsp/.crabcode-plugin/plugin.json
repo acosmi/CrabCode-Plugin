@@ -1,0 +1,33 @@
+{
+  "name": "pyright-lsp",
+  "version": "0.1.0",
+  "description": "Python language server (Pyright) bridge for CrabCode, providing static type checking and code intelligence.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": [
+    "lsp",
+    "language-server",
+    "python",
+    "pyright"
+  ],
+  "metadata": {
+    "lsp": {
+      "language": "Python",
+      "serverBinary": "pyright-langserver",
+      "serverArgs": [
+        "--stdio"
+      ],
+      "extensions": [
+        ".py",
+        ".pyi"
+      ]
+    },
+    "upstream": {
+      "name": "Pyright",
+      "url": "https://github.com/microsoft/pyright",
+      "license": "MIT"
+    }
+  }
+}

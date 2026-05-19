@@ -1,0 +1,39 @@
+{
+  "name": "clangd-lsp",
+  "version": "0.1.0",
+  "description": "C/C++ language server (clangd) bridge for CrabCode, providing code intelligence, diagnostics, and formatting.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": [
+    "lsp",
+    "language-server",
+    "c",
+    "cpp",
+    "clangd"
+  ],
+  "metadata": {
+    "lsp": {
+      "language": "C/C++",
+      "serverBinary": "clangd",
+      "serverArgs": [],
+      "extensions": [
+        ".c",
+        ".h",
+        ".cpp",
+        ".cc",
+        ".cxx",
+        ".hpp",
+        ".hxx",
+        ".C",
+        ".H"
+      ]
+    },
+    "upstream": {
+      "name": "clangd",
+      "url": "https://clangd.llvm.org/",
+      "license": "Apache-2.0 WITH LLVM-exception"
+    }
+  }
+}

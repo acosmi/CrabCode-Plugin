@@ -1,0 +1,16 @@
+{
+  "name": "clangd-lsp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "C/C++ language server (clangd) bridge for CrabCode, providing code intelligence, diagnostics, and formatting.",
+  "license": "MIT",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lsp:run": "bun run src/lsp-wrapper.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.2",
+    "typescript": "^5.9.3"
+  }
+}

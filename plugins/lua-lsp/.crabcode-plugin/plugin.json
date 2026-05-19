@@ -1,0 +1,29 @@
+{
+  "name": "lua-lsp",
+  "version": "0.1.0",
+  "description": "Lua language server bridge for CrabCode, providing code intelligence and diagnostics.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": [
+    "lsp",
+    "language-server",
+    "lua"
+  ],
+  "metadata": {
+    "lsp": {
+      "language": "Lua",
+      "serverBinary": "lua-language-server",
+      "serverArgs": [],
+      "extensions": [
+        ".lua"
+      ]
+    },
+    "upstream": {
+      "name": "lua-language-server",
+      "url": "https://github.com/LuaLS/lua-language-server",
+      "license": "MIT"
+    }
+  }
+}

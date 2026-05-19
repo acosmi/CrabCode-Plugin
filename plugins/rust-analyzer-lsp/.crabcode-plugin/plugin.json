@@ -1,0 +1,30 @@
+{
+  "name": "rust-analyzer-lsp",
+  "version": "0.1.0",
+  "description": "Rust language server (rust-analyzer) bridge for CrabCode, providing code intelligence and analysis.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": [
+    "lsp",
+    "language-server",
+    "rust",
+    "rust-analyzer"
+  ],
+  "metadata": {
+    "lsp": {
+      "language": "Rust",
+      "serverBinary": "rust-analyzer",
+      "serverArgs": [],
+      "extensions": [
+        ".rs"
+      ]
+    },
+    "upstream": {
+      "name": "rust-analyzer",
+      "url": "https://github.com/rust-lang/rust-analyzer",
+      "license": "MIT OR Apache-2.0"
+    }
+  }
+}
