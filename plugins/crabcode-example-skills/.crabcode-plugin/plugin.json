@@ -1,0 +1,31 @@
+{
+  "name": "crabcode-example-skills",
+  "version": "0.1.0",
+  "description": "A collection of example CrabCode skills demonstrating capabilities such as algorithmic art, visual design, brand styling, document co-authoring, internal communications, MCP server authoring, skill authoring, GIF creation, theme styling, web artifact bundling, and Playwright-based web app testing.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "examples",
+    "skills",
+    "design",
+    "documentation",
+    "mcp",
+    "playwright"
+  ],
+  "skills": [
+    "./skills/algorithmic-art",
+    "./skills/brand-guidelines",
+    "./skills/canvas-design",
+    "./skills/doc-coauthoring",
+    "./skills/frontend-design",
+    "./skills/internal-comms",
+    "./skills/mcp-builder",
+    "./skills/skill-creator",
+    "./skills/slack-gif-creator",
+    "./skills/theme-factory",
+    "./skills/web-artifacts-builder",
+    "./skills/webapp-testing"
+  ]
+}
