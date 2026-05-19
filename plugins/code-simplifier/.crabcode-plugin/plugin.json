@@ -1,0 +1,14 @@
+{
+  "name": "code-simplifier",
+  "version": "0.1.0",
+  "description": "Agent that simplifies and refines code for clarity, consistency, and maintainability while preserving functionality.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "simplify",
+    "refactor",
+    "code-quality"
+  ]
+}

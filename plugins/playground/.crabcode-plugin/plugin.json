@@ -1,0 +1,15 @@
+{
+  "name": "playground",
+  "version": "0.1.0",
+  "description": "Create interactive HTML playgrounds: self-contained single-file explorers with visual controls, live preview, and copy-to-clipboard prompt output.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "playground",
+    "html",
+    "interactive",
+    "exploration"
+  ]
+}

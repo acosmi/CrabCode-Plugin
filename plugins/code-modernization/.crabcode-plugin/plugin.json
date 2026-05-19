@@ -1,0 +1,15 @@
+{
+  "name": "code-modernization",
+  "version": "0.1.0",
+  "description": "Modernize legacy codebases (COBOL, legacy Java/C++, monolith web apps) via assess → map → extract-rules → brief → reimagine → transform → harden, with specialist review agents.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "modernization",
+    "legacy",
+    "refactor",
+    "agents"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "crabcode-md-management",
+  "description": "Tools to maintain and improve CRABCODE.md files - audit quality, capture session learnings, and keep project memory current.",
+  "version": "1.0.0",
+  "author": {
+    "name": "CrabCode",
+    "email": "support@crabcode.dev"
+  }
+}

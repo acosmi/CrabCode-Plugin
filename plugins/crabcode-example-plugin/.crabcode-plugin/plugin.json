@@ -1,0 +1,15 @@
+{
+  "name": "crabcode-example-plugin",
+  "version": "0.1.0",
+  "description": "Reference CrabCode plugin demonstrating commands, agents, skills, hooks, and MCP server configuration.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "example",
+    "reference",
+    "scaffold",
+    "documentation"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "code-review",
+  "version": "0.1.0",
+  "description": "Automated code review for pull requests with multi-agent specialists and confidence-based scoring.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "code-review",
+    "pull-request",
+    "agents",
+    "confidence"
+  ]
+}

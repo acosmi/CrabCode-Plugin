@@ -1,0 +1,14 @@
+{
+  "name": "skill-creator",
+  "version": "0.1.0",
+  "description": "Create, improve, and evaluate CrabCode skills with analyzer/grader/comparator helper agents.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "skill-creation",
+    "evaluation",
+    "agents"
+  ]
+}

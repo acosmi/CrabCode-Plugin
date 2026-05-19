@@ -1,0 +1,16 @@
+{
+  "name": "cwc-makers",
+  "version": "0.1.0",
+  "description": "Onboarding for the Code-with-CrabCode Makers M5Stack Cardputer: one /maker-setup command flashes firmware and installs the device skills.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "cardputer",
+    "m5stack",
+    "esp32",
+    "hardware",
+    "maker"
+  ]
+}

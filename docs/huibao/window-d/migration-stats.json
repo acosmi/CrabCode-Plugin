@@ -1,0 +1,107 @@
+{
+  "source_commit": "4bf08583c37e04f764806ea7a96ca74fb80ced1d",
+  "report": [
+    {
+      "worker": "WF-01",
+      "target": "agent-sdk-dev",
+      "copied": 5,
+      "bytes": 24558
+    },
+    {
+      "worker": "WF-02",
+      "target": "crabcode-memory-management",
+      "copied": 7,
+      "bytes": 18395
+    },
+    {
+      "worker": "WF-03",
+      "target": "code-modernization",
+      "copied": 14,
+      "bytes": 46375
+    },
+    {
+      "worker": "WF-04",
+      "target": "code-review",
+      "copied": 3,
+      "bytes": 14827
+    },
+    {
+      "worker": "WF-05",
+      "target": "code-simplifier",
+      "copied": 2,
+      "bytes": 3388
+    },
+    {
+      "worker": "WF-06",
+      "target": "commit-commands",
+      "copied": 5,
+      "bytes": 9425
+    },
+    {
+      "worker": "WF-07",
+      "target": "cwc-makers",
+      "copied": 5,
+      "bytes": 29628
+    },
+    {
+      "worker": "WF-08",
+      "target": "crabcode-example-plugin",
+      "copied": 6,
+      "bytes": 7316
+    },
+    {
+      "worker": "WF-09",
+      "target": "feature-dev",
+      "copied": 6,
+      "bytes": 24371
+    },
+    {
+      "worker": "WF-10",
+      "target": "frontend-design",
+      "copied": 3,
+      "bytes": 5355
+    },
+    {
+      "worker": "WF-11",
+      "target": "math-olympiad",
+      "copied": 13,
+      "bytes": 64625
+    },
+    {
+      "worker": "WF-12",
+      "target": "mcp-server-dev",
+      "copied": 21,
+      "bytes": 117541
+    },
+    {
+      "worker": "WF-13",
+      "target": "playground",
+      "copied": 9,
+      "bytes": 31478
+    },
+    {
+      "worker": "WF-14",
+      "target": "plugin-dev",
+      "copied": 59,
+      "bytes": 534958
+    },
+    {
+      "worker": "WF-15",
+      "target": "pr-review-toolkit",
+      "copied": 9,
+      "bytes": 43990
+    },
+    {
+      "worker": "WF-16",
+      "target": "session-report",
+      "copied": 2,
+      "bytes": 28864
+    },
+    {
+      "worker": "WF-17",
+      "target": "skill-creator",
+      "copied": 11,
+      "bytes": 135748
+    }
+  ]
+}

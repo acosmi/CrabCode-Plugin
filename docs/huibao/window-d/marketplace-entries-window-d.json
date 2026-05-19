@@ -1,0 +1,227 @@
+{
+  "note": "Window D marketplace entry draft. Integration window owns the merge into .crabcode-plugin/marketplace.json.",
+  "source_commit": "4bf08583c37e04f764806ea7a96ca74fb80ced1d",
+  "entries": [
+    {
+      "name": "agent-sdk-dev",
+      "source": "./plugins/agent-sdk-dev",
+      "version": "0.1.0",
+      "description": "Agent SDK development guidance, verifier agents, and project bootstrap command (genericized for CrabCode product surface).",
+      "category": "agent-dev",
+      "tags": [
+        "agent-sdk",
+        "scaffolding",
+        "verifier",
+        "python",
+        "typescript"
+      ]
+    },
+    {
+      "name": "crabcode-memory-management",
+      "source": "./plugins/crabcode-memory-management",
+      "version": "0.1.0",
+      "description": "Maintain and improve CRABCODE.md project memory files: audit quality, capture session learnings, and keep guidance current.",
+      "category": "memory",
+      "tags": [
+        "memory",
+        "crabcode-md",
+        "project-memory",
+        "session-learnings"
+      ]
+    },
+    {
+      "name": "code-modernization",
+      "source": "./plugins/code-modernization",
+      "version": "0.1.0",
+      "description": "Modernize legacy codebases (COBOL, legacy Java/C++, monolith web apps) via assess → map → extract-rules → brief → reimagine → transform → harden, with specialist review agents.",
+      "category": "workflow",
+      "tags": [
+        "modernization",
+        "legacy",
+        "refactor",
+        "agents"
+      ]
+    },
+    {
+      "name": "code-review",
+      "source": "./plugins/code-review",
+      "version": "0.1.0",
+      "description": "Automated code review for pull requests with multi-agent specialists and confidence-based scoring.",
+      "category": "code-review",
+      "tags": [
+        "code-review",
+        "pull-request",
+        "agents",
+        "confidence"
+      ]
+    },
+    {
+      "name": "code-simplifier",
+      "source": "./plugins/code-simplifier",
+      "version": "0.1.0",
+      "description": "Agent that simplifies and refines code for clarity, consistency, and maintainability while preserving functionality.",
+      "category": "code-quality",
+      "tags": [
+        "simplify",
+        "refactor",
+        "code-quality"
+      ]
+    },
+    {
+      "name": "commit-commands",
+      "source": "./plugins/commit-commands",
+      "version": "0.1.0",
+      "description": "Streamline git workflows with commit, push, PR creation, and stale-branch cleanup commands.",
+      "category": "workflow",
+      "tags": [
+        "git",
+        "commit",
+        "pull-request",
+        "branch-cleanup"
+      ]
+    },
+    {
+      "name": "cwc-makers",
+      "source": "./plugins/cwc-makers",
+      "version": "0.1.0",
+      "description": "Onboarding for the Code-with-CrabCode Makers M5Stack Cardputer: one /maker-setup command flashes firmware and installs the device skills.",
+      "category": "hardware",
+      "tags": [
+        "cardputer",
+        "m5stack",
+        "esp32",
+        "hardware",
+        "maker"
+      ]
+    },
+    {
+      "name": "crabcode-example-plugin",
+      "source": "./plugins/crabcode-example-plugin",
+      "version": "0.1.0",
+      "description": "Reference CrabCode plugin demonstrating commands, agents, skills, hooks, and MCP server configuration.",
+      "category": "example",
+      "tags": [
+        "example",
+        "reference",
+        "scaffold",
+        "documentation"
+      ]
+    },
+    {
+      "name": "feature-dev",
+      "source": "./plugins/feature-dev",
+      "version": "0.1.0",
+      "description": "Feature development workflow with specialized agents for codebase exploration, architecture design, and quality review.",
+      "category": "workflow",
+      "tags": [
+        "feature-dev",
+        "architecture",
+        "review",
+        "agents"
+      ]
+    },
+    {
+      "name": "frontend-design",
+      "source": "./plugins/frontend-design",
+      "version": "0.1.0",
+      "description": "Frontend design skill for UI/UX implementation with production-grade aesthetics.",
+      "category": "skills",
+      "tags": [
+        "frontend",
+        "design",
+        "ui",
+        "ux"
+      ]
+    },
+    {
+      "name": "math-olympiad",
+      "source": "./plugins/math-olympiad",
+      "version": "0.1.0",
+      "description": "Solve competition math (IMO, Putnam, USAMO) with adversarial verification by fresh-context verifiers; calibrated abstention over bluffing.",
+      "category": "skills",
+      "tags": [
+        "math",
+        "olympiad",
+        "verification",
+        "reasoning"
+      ]
+    },
+    {
+      "name": "mcp-server-dev",
+      "source": "./plugins/mcp-server-dev",
+      "version": "0.1.0",
+      "description": "Skills for designing and building MCP servers: deployment models (remote HTTP, MCPB, local), tool design patterns, auth, and interactive MCP apps.",
+      "category": "agent-dev",
+      "tags": [
+        "mcp",
+        "server-development",
+        "tool-design",
+        "auth"
+      ]
+    },
+    {
+      "name": "playground",
+      "source": "./plugins/playground",
+      "version": "0.1.0",
+      "description": "Create interactive HTML playgrounds: self-contained single-file explorers with visual controls, live preview, and copy-to-clipboard prompt output.",
+      "category": "skills",
+      "tags": [
+        "playground",
+        "html",
+        "interactive",
+        "exploration"
+      ]
+    },
+    {
+      "name": "plugin-dev",
+      "source": "./plugins/plugin-dev",
+      "version": "0.1.0",
+      "description": "Plugin development toolkit with skills for creating agents, commands, hooks, MCP integrations, and plugin structure guidance for CrabCode.",
+      "category": "agent-dev",
+      "tags": [
+        "plugin-development",
+        "agents",
+        "commands",
+        "hooks",
+        "mcp"
+      ]
+    },
+    {
+      "name": "pr-review-toolkit",
+      "source": "./plugins/pr-review-toolkit",
+      "version": "0.1.0",
+      "description": "Pull request review agents specializing in comments, tests, error handling, type design, code quality, and code simplification.",
+      "category": "code-review",
+      "tags": [
+        "pr-review",
+        "agents",
+        "tests",
+        "type-design"
+      ]
+    },
+    {
+      "name": "session-report",
+      "source": "./plugins/session-report",
+      "version": "0.1.0",
+      "description": "Generate a styled HTML report of a CrabCode session from local transcript files for sharing and post-mortem.",
+      "category": "workflow",
+      "tags": [
+        "session-report",
+        "transcript",
+        "html-report"
+      ]
+    },
+    {
+      "name": "skill-creator",
+      "source": "./plugins/skill-creator",
+      "version": "0.1.0",
+      "description": "Create, improve, and evaluate CrabCode skills with analyzer/grader/comparator helper agents.",
+      "category": "skills",
+      "tags": [
+        "skill-creation",
+        "evaluation",
+        "agents"
+      ]
+    }
+  ]
+}

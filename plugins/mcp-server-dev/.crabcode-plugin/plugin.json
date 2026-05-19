@@ -1,0 +1,15 @@
+{
+  "name": "mcp-server-dev",
+  "version": "0.1.0",
+  "description": "Skills for designing and building MCP servers: deployment models (remote HTTP, MCPB, local), tool design patterns, auth, and interactive MCP apps.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "mcp",
+    "server-development",
+    "tool-design",
+    "auth"
+  ]
+}

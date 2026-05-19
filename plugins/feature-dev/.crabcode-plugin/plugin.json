@@ -1,0 +1,15 @@
+{
+  "name": "feature-dev",
+  "version": "0.1.0",
+  "description": "Feature development workflow with specialized agents for codebase exploration, architecture design, and quality review.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "feature-dev",
+    "architecture",
+    "review",
+    "agents"
+  ]
+}

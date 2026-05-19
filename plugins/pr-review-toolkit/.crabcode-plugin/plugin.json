@@ -1,0 +1,15 @@
+{
+  "name": "pr-review-toolkit",
+  "version": "0.1.0",
+  "description": "Pull request review agents specializing in comments, tests, error handling, type design, code quality, and code simplification.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "pr-review",
+    "agents",
+    "tests",
+    "type-design"
+  ]
+}

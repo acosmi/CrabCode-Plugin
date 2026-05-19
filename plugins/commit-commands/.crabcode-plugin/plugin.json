@@ -1,0 +1,15 @@
+{
+  "name": "commit-commands",
+  "version": "0.1.0",
+  "description": "Streamline git workflows with commit, push, PR creation, and stale-branch cleanup commands.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "git",
+    "commit",
+    "pull-request",
+    "branch-cleanup"
+  ]
+}

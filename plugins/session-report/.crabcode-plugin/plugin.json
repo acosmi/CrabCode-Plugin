@@ -1,0 +1,14 @@
+{
+  "name": "session-report",
+  "version": "0.1.0",
+  "description": "Generate a styled HTML report of a CrabCode session from local transcript files for sharing and post-mortem.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "session-report",
+    "transcript",
+    "html-report"
+  ]
+}

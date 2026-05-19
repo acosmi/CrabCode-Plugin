@@ -1,0 +1,15 @@
+{
+  "name": "frontend-design",
+  "version": "0.1.0",
+  "description": "Frontend design skill for UI/UX implementation with production-grade aesthetics.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "frontend",
+    "design",
+    "ui",
+    "ux"
+  ]
+}
