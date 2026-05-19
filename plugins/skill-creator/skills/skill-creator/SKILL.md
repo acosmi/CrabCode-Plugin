@@ -13,9 +13,7 @@ At a high level, the process of creating a skill goes like this:
 - Write a draft of the skill
 - Create a few test prompts and run crabcode-with-access-to-the-skill on them
 - Help the user evaluate the results both qualitatively and quantitatively
-  - While the runs happen in the background, draft some quantitative evals if there aren't any (if there are some, you can either use as is or modify if you feel something needs to change about them). Then explain them to the user (or if they already existed, explain the ones that already exist)
-  - Use the `eval-viewer/generate_review.py` script to show the user the results for them to look at, and also let them look at the quantitative metrics
-- Rewrite the skill based on feedback from the user's evaluation of the results (and also if there are any glaring flaws that become apparent from the quantitative benchmarks)
+  - While the runs happen in the background, draft some quantitative evals if there aren't any (if there are some, you can either use as is or modify if you feel something needs to change about them). Then explain them to the user (or if they already existed, explain the ones that already exist)- Rewrite the skill based on feedback from the user's evaluation of the results (and also if there are any glaring flaws that become apparent from the quantitative benchmarks)
 - Repeat until you're satisfied
 - Expand the test set and try again at larger scale
 
@@ -235,7 +233,6 @@ Put each with_skill version before its baseline counterpart.
 
 4. **Launch the viewer** with both qualitative outputs and quantitative data:
    ```bash
-   nohup python <skill-creator-path>/eval-viewer/generate_review.py \
      <workspace>/iteration-N \
      --skill-name "my-skill" \
      --benchmark <workspace>/iteration-N/benchmark.json \
@@ -246,7 +243,6 @@ Put each with_skill version before its baseline counterpart.
 
    **Cowork / headless environments:** If `webbrowser.open()` is not available or the environment has no display, use `--static <output_path>` to write a standalone HTML file instead of starting a server. Feedback will be downloaded as a `feedback.json` file when the user clicks "Submit All Reviews". After download, copy `feedback.json` into the workspace directory for the next iteration to pick up.
 
-Note: please use generate_review.py to create the viewer; there's no need to write custom HTML.
 
 5. **Tell the user** something like: "I've opened the results in your browser. There are two tabs — 'Outputs' lets you click through each test case and leave feedback, 'Benchmark' shows the quantitative comparison. When you're done, come back here and let me know."
 
@@ -372,26 +368,10 @@ Present the eval set to the user for review using the HTML template:
 
 This step matters — bad eval queries lead to bad descriptions.
 
-### Step 3: Run the optimization loop
+### Step 3: Optimization loop (deferred to CrabCode-native tooling)
 
-Tell the user: "This will take some time — I'll run the optimization loop in the background and check on it periodically."
+The upstream Python optimization helpers are out of scope for this migration. A CrabCode-native iteration loop (TypeScript) is on the roadmap. Until then, manually iterate on the description: write candidate descriptions, score them against the eval set by running the skill yourself with each candidate, keep whichever scores best on the held-out subset.
 
-Save the eval set to the workspace, then run in the background:
-
-```bash
-python -m scripts.run_loop \
-  --eval-set <path-to-trigger-eval.json> \
-  --skill-path <path-to-skill> \
-  --model <model-id-powering-this-session> \
-  --max-iterations 5 \
-  --verbose
-```
-
-Use the model ID from your system prompt (the one powering the current session) so the triggering test matches what the user actually experiences.
-
-While it runs, periodically tail the output to give the user updates on which iteration it's on and what the scores look like.
-
-This handles the full optimization loop automatically. It splits the eval set into 60% train and 40% held-out test, evaluates the current description (running each query 3 times to get a reliable trigger rate), then calls CrabCode to propose improvements based on what failed. It re-evaluates each new description on both train and test, iterating up to 5 times. When it's done, it opens an HTML report in the browser showing the results per iteration and returns JSON with `best_description` — selected by test score rather than train score to avoid overfitting.
 
 ### How skill triggering works
 
@@ -433,7 +413,6 @@ In CrabCode.ai, the core workflow is the same (draft → test → review → imp
 
 **Blind comparison**: Requires agents. Skip it.
 
-**Packaging**: The `package_skill.py` script works anywhere with Python and a filesystem. On CrabCode.ai, you can run it and the user can download the resulting `.skill` file.
 
 **Updating an existing skill**: The user might be asking you to update an existing skill, not create a new one. In this case:
 - **Preserve the original name.** Note the skill's directory name and `name` frontmatter field -- use them unchanged. E.g., if the installed skill is `research-helper`, output `research-helper.skill` (not `research-helper-v2`).
@@ -448,10 +427,7 @@ If you're in Cowork, the main things to know are:
 
 - You have agents, so the main workflow (spawn test cases in parallel, run baselines, grade, etc.) all works. (However, if you run into severe problems with timeouts, it's OK to run the test prompts in series rather than parallel.)
 - You don't have a browser or display, so when generating the eval viewer, use `--static <output_path>` to write a standalone HTML file instead of starting a server. Then proffer a link that the user can click to open the HTML in their browser.
-- For whatever reason, the Cowork setup seems to disincline CrabCode from generating the eval viewer after running the tests, so just to reiterate: whether you're in Cowork or in CrabCode, after running tests, you should always generate the eval viewer for the human to look at examples before revising the skill yourself and trying to make corrections, using `generate_review.py` (not writing your own boutique html code). Sorry in advance but I'm gonna go all caps here: GENERATE THE EVAL VIEWER *BEFORE* evaluating inputs yourself. You want to get them in front of the human ASAP!
 - Feedback works differently: since there's no running server, the viewer's "Submit All Reviews" button will download `feedback.json` as a file. You can then read it from there (you may have to request access first).
-- Packaging works — `package_skill.py` just needs Python and a filesystem.
-- Description optimization (`run_loop.py` / `run_eval.py`) should work in Cowork just fine since it uses `crabcode -p` via subprocess, not a browser, but please save it until you've fully finished making the skill and the user agrees it's in good shape.
 - **Updating an existing skill**: The user might be asking you to update an existing skill, not create a new one. Follow the update guidance in the crabcode.ai section above.
 
 ---
@@ -475,11 +451,9 @@ Repeating one more time the core loop here for emphasis:
 - Draft or edit the skill
 - Run crabcode-with-access-to-the-skill on test prompts
 - With the user, evaluate the outputs:
-  - Create benchmark.json and run `eval-viewer/generate_review.py` to help the user review them
   - Run quantitative evals
 - Repeat until you and the user are satisfied
 - Package the final skill and return it to the user.
 
-Please add steps to your TodoList, if you have such a thing, to make sure you don't forget. If you're in Cowork, please specifically put "Create evals JSON and run `eval-viewer/generate_review.py` so human can review test cases" in your TodoList to make sure it happens.
 
 Good luck!

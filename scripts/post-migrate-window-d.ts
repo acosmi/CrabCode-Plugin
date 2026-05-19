@@ -51,6 +51,63 @@ async function patchExamplePluginReadme() {
   await writeFile(p, txt, "utf8");
 }
 
+async function patchSkillCreatorSkillMd() {
+  const p = path.join(plugins, "skill-creator/skills/skill-creator/SKILL.md");
+  if (!existsSync(p)) return;
+  let txt = await readFile(p, "utf8");
+  // Strip all references to the dropped Python eval viewer. The
+  // assets/eval_review.html + `open` flow already exists in the upstream
+  // SKILL.md and is the supported CrabCode path going forward.
+  txt = txt.replace(
+    /\s*-\s*Use the `eval-viewer\/generate_review\.py`[^\n]*\n/g,
+    "",
+  );
+  txt = txt.replace(
+    /```sh\s*nohup python <skill-creator-path>\/eval-viewer\/generate_review\.py[\s\S]*?```\n?/g,
+    "",
+  );
+  txt = txt.replace(
+    /Note: please use generate_review\.py[^\n]*\n/g,
+    "",
+  );
+  txt = txt.replace(
+    /\.\s*Eval results\s*\|\s*Use generate_review\.py[^\n]*\n/g,
+    "",
+  );
+  txt = txt.replace(
+    /[^\n]*generate_review\.py[^\n]*\n/g,
+    "",
+  );
+  txt = txt.replace(
+    /[^\n]*run_loop\.py[^\n]*\n/g,
+    "",
+  );
+  txt = txt.replace(
+    /[^\n]*run_eval\.py[^\n]*\n/g,
+    "",
+  );
+  txt = txt.replace(
+    /[^\n]*improve_description\.py[^\n]*\n/g,
+    "",
+  );
+  txt = txt.replace(
+    /[^\n]*package_skill\.py[^\n]*\n/g,
+    "",
+  );
+  txt = txt.replace(
+    /[^\n]*aggregate_benchmark\.py[^\n]*\n/g,
+    "",
+  );
+  // Strip the entire "Run the optimization loop" step block — it depends on
+  // dropped Python helpers (scripts/run_loop). Replace with a one-paragraph
+  // note pointing forward to a future CrabCode-native equivalent.
+  txt = txt.replace(
+    /### Step 3: Run the optimization loop[\s\S]*?(?=\n### |\n## |\Z)/,
+    "### Step 3: Optimization loop (deferred to CrabCode-native tooling)\n\nThe upstream Python optimization helpers are out of scope for this migration. A CrabCode-native iteration loop (TypeScript) is on the roadmap. Until then, manually iterate on the description: write candidate descriptions, score them against the eval set by running the skill yourself with each candidate, keep whichever scores best on the held-out subset.\n\n",
+  );
+  await writeFile(p, txt, "utf8");
+}
+
 async function patchSessionReportSkill() {
   const p = path.join(plugins, "session-report/skills/session-report/SKILL.md");
   if (!existsSync(p)) return;
@@ -115,6 +172,7 @@ async function main() {
   await renameSkillDir();
   await patchMemoryManagementReadme();
   await patchExamplePluginReadme();
+  await patchSkillCreatorSkillMd();
   await patchSessionReportSkill();
   await patchAuthorSections();
   await dropEmptyDirs();

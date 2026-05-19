@@ -398,7 +398,13 @@ const SKIP_TOP_FILES = new Set(["LICENSE"]);
 // Per-plugin path skips. Upstream runtime files that must be re-implemented
 // in TypeScript or are intentionally dropped (see plan §"TypeScript Rules").
 const SKIP_REL_PATHS: Record<string, string[]> = {
-  "skill-creator": ["skills/skill-creator/scripts"],
+  "skill-creator": [
+    "skills/skill-creator/scripts",
+    // Python HTTP server + viewer for eval review. Out of scope per plan
+    // §TypeScript Rules. SKILL.md is rewritten to use the static HTML
+    // template + `open` command path instead (already supported upstream).
+    "skills/skill-creator/eval-viewer",
+  ],
   "session-report": ["skills/session-report/analyze-sessions.mjs"],
 };
 
