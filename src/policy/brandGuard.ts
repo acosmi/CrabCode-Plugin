@@ -22,7 +22,9 @@ const TERM_PARTS = [
   ["son", "net"],
   ["op", "us"],
   ["hai", "ku"],
+  ["co", "dex"],
   [".", "c", "la", "ude"],
+  [".", "co", "dex"],
   ["@", "anth", "ropic"],
 ];
 
