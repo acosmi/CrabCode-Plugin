@@ -1,0 +1,10 @@
+{
+  "name": "terraform",
+  "version": "0.1.0",
+  "description": "HashiCorp Terraform MCP integration for CrabCode. Plan, inspect, and reason about Infrastructure-as-Code with explicit human approval for any apply.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": ["terraform", "iac", "hashicorp", "infrastructure", "mcp"]
+}

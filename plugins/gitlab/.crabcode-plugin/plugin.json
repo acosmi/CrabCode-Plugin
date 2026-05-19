@@ -1,0 +1,10 @@
+{
+  "name": "gitlab",
+  "version": "0.1.0",
+  "description": "GitLab MCP integration for CrabCode. Manage repositories, merge requests, CI/CD pipelines, issues, and wikis from your CrabCode session.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": ["gitlab", "git", "merge-requests", "ci-cd", "mcp"]
+}

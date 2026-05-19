@@ -1,0 +1,10 @@
+{
+  "name": "imessage",
+  "version": "0.1.0",
+  "description": "iMessage channel bridge for CrabCode (macOS). Reads chat.db directly and sends via AppleScript; allowlist-based access control governs who can reach the assistant.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": ["imessage", "macos", "messaging", "bridge", "mcp"]
+}

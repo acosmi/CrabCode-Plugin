@@ -1,0 +1,10 @@
+{
+  "name": "laravel-boost",
+  "version": "0.1.0",
+  "description": "Laravel Boost MCP integration for CrabCode. Exposes Artisan commands, Eloquent queries, routing, migrations, and framework-aware code generation through the project's local Boost server.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": ["laravel", "php", "artisan", "eloquent", "mcp"]
+}

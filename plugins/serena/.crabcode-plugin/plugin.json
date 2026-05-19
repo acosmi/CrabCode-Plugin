@@ -1,0 +1,10 @@
+{
+  "name": "serena",
+  "version": "0.1.0",
+  "description": "Serena MCP integration for CrabCode. Semantic code navigation, refactoring suggestions, and codebase understanding via language-server integration.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": ["serena", "code-navigation", "refactoring", "lsp", "mcp"]
+}

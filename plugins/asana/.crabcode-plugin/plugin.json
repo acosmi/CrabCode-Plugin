@@ -1,0 +1,10 @@
+{
+  "name": "asana",
+  "version": "0.1.0",
+  "description": "Asana work management integration packaged for CrabCode. Create and manage tasks, search projects, update assignments, and track progress alongside your engineering workflow.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": ["asana", "tasks", "project-management", "productivity", "mcp"]
+}

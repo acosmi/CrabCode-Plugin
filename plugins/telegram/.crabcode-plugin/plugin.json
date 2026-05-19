@@ -1,0 +1,10 @@
+{
+  "name": "telegram",
+  "version": "0.1.0",
+  "description": "Telegram channel bridge for CrabCode. Messaging bridge with built-in access control; pairing, allowlist, and policy are managed by the bridge's access skill.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": ["telegram", "messaging", "channel", "bridge", "mcp"]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "fakechat",
+  "version": "0.1.0",
+  "description": "Localhost chat test surface for CrabCode. Loopback channel for exercising the bridge notification flow without a real third-party service.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": ["fakechat", "localhost", "testing", "bridge", "mcp"]
+}

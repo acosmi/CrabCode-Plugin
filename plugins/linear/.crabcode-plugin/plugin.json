@@ -1,0 +1,10 @@
+{
+  "name": "linear",
+  "version": "0.1.0",
+  "description": "Linear MCP integration for CrabCode. Create issues, manage projects, update statuses, and search across Linear workspaces from the CrabCode session.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": ["linear", "issue-tracking", "project-management", "productivity", "mcp"]
+}

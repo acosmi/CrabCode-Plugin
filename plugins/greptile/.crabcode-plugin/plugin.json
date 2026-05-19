@@ -1,0 +1,10 @@
+{
+  "name": "greptile",
+  "version": "0.1.0",
+  "description": "Greptile MCP integration for CrabCode. View and resolve Greptile pull-request review comments from your CrabCode session.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": ["greptile", "code-review", "pull-requests", "ai-review", "mcp"]
+}

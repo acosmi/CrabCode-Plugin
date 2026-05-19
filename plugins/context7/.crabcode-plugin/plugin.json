@@ -1,0 +1,10 @@
+{
+  "name": "context7",
+  "version": "0.1.0",
+  "description": "Upstash Context7 MCP server for up-to-date documentation lookup. Pull version-specific docs and code examples directly from source repositories into the CrabCode session.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": ["context7", "documentation", "upstash", "code-search", "mcp"]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "playwright",
+  "version": "0.1.0",
+  "description": "Microsoft Playwright MCP integration for CrabCode. Drive headless and headed browsers for end-to-end testing, page inspection, and automated screenshots.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": ["playwright", "browser", "e2e", "testing", "mcp"]
+}

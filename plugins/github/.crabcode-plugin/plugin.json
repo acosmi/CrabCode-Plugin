@@ -1,0 +1,10 @@
+{
+  "name": "github",
+  "version": "0.1.0",
+  "description": "GitHub MCP integration for CrabCode. Create issues, manage pull requests, review code, and search repositories against GitHub's hosted MCP endpoint.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": ["github", "git", "pull-requests", "issues", "mcp"]
+}
