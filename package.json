@@ -11,7 +11,11 @@
     "analyze": "bun run src/cli.ts",
     "build": "bun build src/cli.ts --outdir dist --target node --format esm --banner '#!/usr/bin/env node'",
     "lint:brand": "bun run scripts/lint-brand.ts",
-    "test": "bun test",
+    "lint:manifest": "bun run scripts/validate-manifest.ts",
+    "lint:marketplace": "bun run scripts/validate-marketplace.ts",
+    "lint:layout": "bun run scripts/validate-layout.ts",
+    "validate": "bun run scripts/validate-all.ts",
+    "test": "bun test ./tests/",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

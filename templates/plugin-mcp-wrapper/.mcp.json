@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "__PLUGIN_NAME__": {
+      "command": "npx",
+      "args": ["-y", "@vendor/server-binary@latest"],
+      "env": {}
+    }
+  }
+}

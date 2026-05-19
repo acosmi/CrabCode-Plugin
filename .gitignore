@@ -1,6 +1,7 @@
 node_modules/
 coverage/
 yuanma/
+bangong/
 docs/2026-05-18-crabcode-setup-plugin-ts-rebrand-implementation-plan.md
 docs/legal/
 .DS_Store

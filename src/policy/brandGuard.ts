@@ -28,6 +28,8 @@ const TERM_PARTS = [
 
 const DEFAULT_IGNORES = [
   ".git/**",
+  ".window-*-workdir/**",
+  "bangong/**",
   "coverage/**",
   "dist/**",
   "docs/legal/**",
@@ -130,7 +132,12 @@ function isIgnored(relativePath: string, patterns: string[]): boolean {
 
 function matchesPattern(relativePath: string, pattern: string): boolean {
   if (pattern.endsWith("/**")) {
-    return relativePath === pattern.slice(0, -3) || relativePath.startsWith(pattern.slice(0, -2));
+    const head = pattern.slice(0, -3);
+    if (head.includes("*")) {
+      const prefixRegex = new RegExp(`^${head.split("*").map(escapeRegex).join("[^/]*")}(/|$)`);
+      return prefixRegex.test(relativePath);
+    }
+    return relativePath === head || relativePath.startsWith(`${head}/`);
   }
   if (pattern.includes("**") && pattern.includes("*")) {
     const [prefix, suffix] = pattern.split("**");
@@ -140,6 +147,10 @@ function matchesPattern(relativePath: string, pattern: string): boolean {
     return wildcardMatch(relativePath, pattern);
   }
   return relativePath === pattern || relativePath.startsWith(`${pattern}/`);
+}
+
+function escapeRegex(value: string): string {
+  return value.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function wildcardMatch(value: string, pattern: string): boolean {
