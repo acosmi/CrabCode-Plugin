@@ -2,7 +2,7 @@
 
 Date: 2026-05-19
 Parallelism: 12 workers
-Source root: `bangong/claude-plugins-official/plugins`
+Source root: `bangong/legacy-plugins-official/plugins`
 
 ## Scope
 

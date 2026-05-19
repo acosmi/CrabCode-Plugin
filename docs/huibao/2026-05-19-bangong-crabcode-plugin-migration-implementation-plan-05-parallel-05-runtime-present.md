@@ -4,8 +4,8 @@ Date: 2026-05-19
 Parallelism: 5 workers
 Source roots:
 
-- `bangong/claude-plugins-official/plugins`
-- `bangong/claude-plugins-official/external_plugins`
+- `bangong/legacy-plugins-official/plugins`
+- `bangong/legacy-plugins-official/external_plugins`
 
 ## Scope
 
@@ -78,7 +78,7 @@ Use separate packages only when a plugin has enough runtime code to justify isol
 ## Bridge Server Plan
 
 1. Keep transport-specific vendors: Discord, iMessage, Telegram.
-2. Replace Claude channel phrasing with CrabCode channel phrasing.
+2. Replace legacy assistant channel phrasing with CrabCode channel phrasing.
 3. Rewrite access control skills and commands.
 4. Store credentials only through the approved MCP/server mechanism.
 5. Test allowlist, denylist, pairing, and unauthenticated access.

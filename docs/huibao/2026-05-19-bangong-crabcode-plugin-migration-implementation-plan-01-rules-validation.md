@@ -60,7 +60,7 @@ Default author:
 }
 ```
 
-If a vendor integration should retain a vendor name, keep the vendor as a technical integration target, not as a Claude/Anthropic product reference.
+If a vendor integration should retain a vendor name, keep the vendor as a technical integration target, not as a legacy assistant/upstream vendor product reference.
 
 ## Naming Rules
 
@@ -70,23 +70,23 @@ Use kebab-case. Keep stable vendor names when useful for users:
 - `github` stays `github`
 - `typescript-lsp` stays `typescript-lsp`
 
-Rewrite Claude-specific names:
+Rewrite legacy assistant-specific names:
 
-- `claude-code-setup` -> `crabcode-setup` (already implemented)
-- `claude-md-management` -> `crabcode-memory-management`
-- `claude-api` -> decide target API before implementation; recommended placeholder `ai-api-dev`
-- any source path segment named `claude` -> a CrabCode-native or vendor-neutral name
+- `legacy-assistant-setup` -> `crabcode-setup` (already implemented)
+- `crabcode-memory-management` -> `crabcode-memory-management`
+- `ai-api` -> decide target API before implementation; recommended placeholder `ai-api-dev`
+- any source path segment named `legacy-assistant` -> a CrabCode-native or vendor-neutral name
 
 ## Directory Naming Constraints
 
 1. New CrabCode plugins must live under `plugins/<plugin-name>/`.
 2. `<plugin-name>` must be kebab-case and must exactly match `.crabcode-plugin/plugin.json` `name`.
 3. Plugin directory name, manifest `name`, and marketplace entry `name` must be identical.
-4. New product directories may not contain Claude-facing identifiers such as `claude`, `anthropic`, `.claude`, or `claude-code`.
-5. Upstream names containing Claude-facing identifiers must be renamed before becoming product directories:
-   - `claude-md-management` -> `crabcode-memory-management`
-   - `claude-code-setup` -> `crabcode-setup`
-   - `plugins/claude` -> `desktop-commander`
+4. New product directories may not contain legacy-facing identifiers such as `legacy-assistant`, `upstream-vendor`, `.legacy-assistant`, or `legacy-assistant`.
+5. Upstream names containing legacy-facing identifiers must be renamed before becoming product directories:
+   - `crabcode-memory-management` -> `crabcode-memory-management`
+   - `legacy-assistant-setup` -> `crabcode-setup`
+   - `plugins/legacy-assistant` -> `desktop-commander`
 6. TypeScript runtime code must live inside the owning plugin at `plugins/<plugin-name>/src/`.
 7. Plugin-specific tests must live inside `plugins/<plugin-name>/tests/` unless the batch lead approves shared infrastructure tests.
 8. Temporary external source checkouts must live under `bangong/external-sources/<upstream-name>/` and must not be committed.
@@ -97,12 +97,12 @@ Rewrite Claude-specific names:
 
 Remove these from product-facing surfaces:
 
-- `Claude`
-- `Claude Code`
-- `Anthropic`
-- `.claude`
-- `CLAUDE.md`
-- `claude-plugin`
+- `legacy assistant`
+- `legacy assistant`
+- `upstream vendor`
+- `.legacy-assistant`
+- `CRABCODE.md`
+- `legacy-plugin`
 - model family names and hardcoded model names
 
 Replace with:
@@ -229,17 +229,17 @@ Every new plugin manifest under this migration must include `name`, `version`, `
 
 The shared validators live in `scripts/` and run on plain Bun without any plugin source-cache dependency:
 
-- `scripts/lint-brand.ts` — scans for Claude/Anthropic identifiers outside `docs/legal/`, `bangong/`, etc.
+- `scripts/lint-brand.ts` — scans for legacy assistant/upstream vendor identifiers outside `docs/legal/`, `bangong/`, etc.
 - `scripts/validate-manifest.ts` — schema-checks every `.crabcode-plugin/plugin.json` under the marketplace.
 - `scripts/validate-marketplace.ts` — checks `.crabcode-plugin/marketplace.json` entry shape, source-path existence, and entry-vs-manifest name consistency.
-- `scripts/validate-layout.ts` — enforces kebab-case plugin directory names, manifest/directory/entry name parity, and the Claude-facing identifier ban on product directories.
+- `scripts/validate-layout.ts` — enforces kebab-case plugin directory names, manifest/directory/entry name parity, and the legacy-facing identifier ban on product directories.
 - `scripts/validate-all.ts` — orchestrator that runs all four checks in order and surfaces a single exit code for CI.
 
 The orchestrator is wired to `bun run validate` in `package.json`. Per-check entry points (`bun run lint:brand`, `bun run lint:manifest`, `bun run lint:marketplace`, `bun run lint:layout`) are also exposed for targeted debugging.
 
 ### bangong/ tracking
 
-`bangong/` is a local source cache for upstream `claude-plugins-official` and `anthropic-skills`. It must never be committed and is now explicitly listed in `.gitignore`. Existing brand-lint already excludes `bangong/**` from scanning.
+`bangong/` is a local source cache for upstream `legacy-plugins-official` and `upstream-skills`. It must never be committed and is now explicitly listed in `.gitignore`. Existing brand-lint already excludes `bangong/**` from scanning.
 
 ### Plugin templates
 

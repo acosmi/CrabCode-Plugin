@@ -25,7 +25,7 @@ Plan: `docs/huibao/2026-05-19-bangong-crabcode-plugin-migration-implementation-p
 | WF-15 | `pr-review-toolkit` | `pr-review-toolkit` | 11 | done |
 | WF-16 | `session-report` | `session-report` | 5 | done; `analyze-sessions.mjs` ported to TS, SKILL.md updated |
 | WF-17 | `skill-creator` | `skill-creator` | 13 | done; upstream Python scripts dropped (out of scope per §TypeScript Rules) |
-| WF-18 | `c-ude-code-setup` | `crabcode-setup` (root plugin) | n/a | no regression — see `wf-18-regression-claude-code-setup.md` |
+| WF-18 | `c-ude-code-setup` | `crabcode-setup` (root plugin) | n/a | no regression — see `wf-18-regression-legacy-assistant-setup.md` |
 
 Total: 17 new plugins migrated + 1 regression report.
 
@@ -43,7 +43,7 @@ markdown across 142 files) and produced a deterministic, auditable diff.
    THIRD_PARTY_NOTICES.md`, and writes a marketplace entry draft.
 2. `scripts/port-session-report.ts` — one-shot port of the upstream
    `analyze-sessions.mjs` (875 LOC) to TypeScript with
-   `~/.claude/projects` remapped to `~/.crabcode/projects`. Bun runs the
+   `~/.legacy-assistant/projects` remapped to `~/.crabcode/projects`. Bun runs the
    TS file natively.
 3. `scripts/post-migrate-window-d.ts` — idempotent hand-curated patches
    the mechanical step cannot derive: skill subdirectory rename
@@ -80,7 +80,7 @@ The substitution map handles, beyond a literal token strip:
 - `subagent` → `agent` (lowercase) and `Subagent` → `Agent`
 - Model family mentions (the three retired family names) stripped from
   frontmatter `model:` lines and replaced with `<model-id>` placeholder
-  in prose (CrabCode plugins do not pin a model family per CLAUDE.md
+  in prose (CrabCode plugins do not pin a model family per CRABCODE.md
   §硬约束 #1)
 - The `.<vendor>` dotfile folder remapped to `.crabcode`
 
@@ -96,7 +96,7 @@ Two upstream plugins had runtime code:
   `bun run`.
 - `skill-creator` — upstream shipped Python evaluation helpers under
   `skills/skill-creator/scripts/*.py`. These call out to the
-  Anthropic CLI (`claude -p`) and are out of scope per plan §TypeScript
+  upstream vendor CLI (`legacy-assistant -p`) and are out of scope per plan §TypeScript
   Rules. Window D drops them and notes the deletion in the plugin's
   THIRD_PARTY_NOTICES.
 
@@ -107,7 +107,7 @@ They are kept with the same brand substitutions applied.
 
 ## Deliberate drops
 
-- All `.png`/`.jpg` screenshots from upstream — they show Claude-branded
+- All `.png`/`.jpg` screenshots from upstream — they show legacy-branded
   UI. CrabCode renders need to be produced separately.
 - `LICENSE` at each upstream plugin root — preserved verbatim in
   `docs/legal/THIRD_PARTY_NOTICES.md` rather than at the plugin root, so
@@ -220,7 +220,7 @@ scripts/migrate-window-d.ts                       (new, ~430 LOC)
 scripts/port-session-report.ts                    (new, ~80 LOC)
 scripts/post-migrate-window-d.ts                  (new, ~100 LOC)
 docs/huibao/window-d/window-d-completion-report.md      (this file)
-docs/huibao/window-d/wf-18-regression-claude-code-setup.md
+docs/huibao/window-d/wf-18-regression-legacy-assistant-setup.md
 docs/huibao/window-d/marketplace-entries-window-d.json
 docs/huibao/window-d/migration-stats.json
 docs/huibao/window-d/brand-scan-report.md

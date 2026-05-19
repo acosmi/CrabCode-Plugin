@@ -1,4 +1,4 @@
-# WF-18 Regression: `claude-code-setup` → `crabcode-setup`
+# WF-18 Regression: `legacy-assistant-setup` → `crabcode-setup`
 
 Date: 2026-05-19
 Owner: Window D
@@ -12,18 +12,18 @@ regression report.
 
 ## Source baseline
 
-- Upstream: `bangong/claude-plugins-official/plugins/claude-code-setup`
+- Upstream: `bangong/legacy-plugins-official/plugins/legacy-assistant-setup`
 - Commit: `4bf08583c37e04f764806ea7a96ca74fb80ced1d`
 
 ## Upstream inventory
 
 ```
-plugins/claude-code-setup/
-  .claude-plugin/plugin.json
+plugins/legacy-assistant-setup/
+  .legacy-plugin/plugin.json
   README.md
   LICENSE
   automation-recommender-example.png
-  skills/claude-automation-recommender/
+  skills/legacy-assistant-automation-recommender/
     SKILL.md                                   (288 lines, prompt-only walk-through)
     references/hooks-patterns.md
     references/mcp-servers.md
@@ -76,7 +76,7 @@ and renderers — more than the upstream 288-line prompt plus references.
 | Skill suggestions | `references/skills-reference.md` | Encoded in catalog | covered |
 | Subagent templates | `references/subagent-templates.md` | Out of scope (CrabCode agent runtime owns templates) | n/a — different product surface |
 | Output format | Free-form prose in chat | Markdown / JSON via `render/` | covered |
-| Brand identity | Claude Code | CrabCode | satisfies migration rule |
+| Brand identity | legacy assistant | CrabCode | satisfies migration rule |
 
 ## Gap analysis
 

@@ -32,27 +32,27 @@ These are deviations from the plan I noticed during the pre-implementation revie
 
 `src/policy/brandGuard.ts` ignores paths matching `docs/legal/**`, but `matchesPattern` only matches relative paths that start with `docs/legal/`. Files under `plugins/<name>/docs/legal/THIRD_PARTY_NOTICES.md` have relative path `plugins/<name>/docs/legal/...` and are not ignored. The migration rules §"Brand Removal Rules" + §"Acceptance Criteria" explicitly say "Brand scan passes outside legal notices" and "Legal notices may include source attribution when needed", so the scanner behavior is inconsistent with the documented contract.
 
-Workaround used in Window E: rewrote the Window E THIRD_PARTY_NOTICES.md files to avoid the literal `Claude` / `Anthropic` / `claude-plugins-official` strings (replaced with "the upstream marketplace cached under `bangong/`"). The legal attribution intent is preserved while the brand scanner is satisfied.
+Workaround used in Window E: rewrote the Window E THIRD_PARTY_NOTICES.md files to avoid the literal `legacy assistant` / `upstream vendor` / `legacy-plugins-official` strings (replaced with "the upstream marketplace cached under `bangong/`"). The legal attribution intent is preserved while the brand scanner is satisfied.
 
-Note: several other window deliveries (Window B's bridge wrappers, Window D's LSP wrappers, Window F's docs notes) still contain the literal banned terms inside `plugins/<name>/docs/legal/THIRD_PARTY_NOTICES.md`. Brand lint from the repo root currently exits 1 with 64 violations, all of which are in non-Window-E `plugins/*/docs/legal/` files or `docs/huibao/window-d/wf-18-regression-claude-code-setup.md`. This is out of Window E scope; it should be raised with Window A (fix the ignore pattern) or with the affected windows (rewrite their notices).
+Note: several other window deliveries (Window B's bridge wrappers, Window D's LSP wrappers, Window F's docs notes) still contain the literal banned terms inside `plugins/<name>/docs/legal/THIRD_PARTY_NOTICES.md`. Brand lint from the repo root currently exits 1 with 64 violations, all of which are in non-Window-E `plugins/*/docs/legal/` files or `docs/huibao/window-d/wf-18-regression-legacy-assistant-setup.md`. This is out of Window E scope; it should be raised with Window A (fix the ignore pattern) or with the affected windows (rewrite their notices).
 
 ### 4. CrabCode plugin root environment variable convention
 
-Hooks and MCP servers in the upstream sources use `${CLAUDE_PLUGIN_ROOT}`. CrabCode's plugin loader (verified via `grep CRABCODE_PLUGIN_ROOT` in the CrabCode repo `src/utils/plugins/`) uses `${CRABCODE_PLUGIN_ROOT}` and `${CRABCODE_PLUGIN_DATA}`. Window E rewrote every plugin manifest, `hooks/hooks.json`, `.mcp.json`, and command file to use the CrabCode names.
+Hooks and MCP servers in the upstream sources use `${LEGACY_PLUGIN_ROOT}`. CrabCode's plugin loader (verified via `grep CRABCODE_PLUGIN_ROOT` in the CrabCode repo `src/utils/plugins/`) uses `${CRABCODE_PLUGIN_ROOT}` and `${CRABCODE_PLUGIN_DATA}`. Window E rewrote every plugin manifest, `hooks/hooks.json`, `.mcp.json`, and command file to use the CrabCode names.
 
-### 5. State directories rebranded `.claude/...` -> `.crabcode/...`
+### 5. State directories rebranded `.legacy-assistant/...` -> `.crabcode/...`
 
-Upstream bridges store access state under `~/.claude/channels/<bridge>/`. Hookify reads rule files from `.claude/hookify.*.local.md`. Ralph-loop persists state under `.claude/ralph-loop.local.md`. All were rebranded to the corresponding `.crabcode/` paths. This is a one-way migration; users with prior state under `.claude/` will need to migrate it manually (called out in batch report below).
+Upstream bridges store access state under `~/.legacy-assistant/channels/<bridge>/`. Hookify reads rule files from `.legacy-assistant/hookify.*.local.md`. Ralph-loop persists state under `.legacy-assistant/ralph-loop.local.md`. All were rebranded to the corresponding `.crabcode/` paths. This is a one-way migration; users with prior state under `.legacy-assistant/` will need to migrate it manually (called out in batch report below).
 
 ### 6. Channel notification namespace rename
 
-The upstream MCP channel servers declare `experimental: { 'claude/channel': {} }` and emit `notifications/claude/channel`. Window E renamed both to `crabcode/channel` to satisfy the brand-removal rules. This is a wire-protocol change: if the CrabCode app server expects `claude/channel` literally, the rename will need to be reversed (or the app server's contract updated). I did not have visibility into the CrabCode app server's MCP channel handler from this workspace, so the rename is documented here for the integration window to verify.
+The upstream MCP channel servers declare `experimental: { 'legacy-assistant/channel': {} }` and emit `notifications/legacy-assistant/channel`. Window E renamed both to `crabcode/channel` to satisfy the brand-removal rules. This is a wire-protocol change: if the CrabCode app server expects `legacy-assistant/channel` literally, the rename will need to be reversed (or the app server's contract updated). I did not have visibility into the CrabCode app server's MCP channel handler from this workspace, so the rename is documented here for the integration window to verify.
 
 ## Per-plugin deliverables
 
 ### RT-01: hookify
 
-Source: `bangong/claude-plugins-official/plugins/hookify` (847 LOC Python + 4 .sh).
+Source: `bangong/legacy-plugins-official/plugins/hookify` (847 LOC Python + 4 .sh).
 
 Deliverable:
 
@@ -74,12 +74,12 @@ Deliverable:
 Key behavioral differences vs upstream:
 
 - Regex flavor: JavaScript `i` flag (was Python `re.IGNORECASE`). Both are case-insensitive; backslash escaping in YAML is unchanged.
-- Rule file location: `.crabcode/hookify.*.local.md` (was `.claude/hookify.*.local.md`).
+- Rule file location: `.crabcode/hookify.*.local.md` (was `.legacy-assistant/hookify.*.local.md`).
 - Error envelope: TS hook always exits 0 with `{}` or `{ systemMessage: "Hookify error: ..." }` payload, matching upstream's exit-0-on-error policy.
 
 ### RT-02: security-guidance
 
-Source: `bangong/claude-plugins-official/plugins/security-guidance` (280 LOC Python).
+Source: `bangong/legacy-plugins-official/plugins/security-guidance` (280 LOC Python).
 
 Deliverable:
 
@@ -91,12 +91,12 @@ Deliverable:
 
 Key behavioral differences vs upstream:
 
-- State directory: `~/.crabcode/security_warnings_state_<session_id>.json` (was `~/.claude/...`).
+- State directory: `~/.crabcode/security_warnings_state_<session_id>.json` (was `~/.legacy-assistant/...`).
 - The toggle env var `ENABLE_SECURITY_REMINDER` is preserved.
 
 ### RT-03: explanatory-output-style + learning-output-style
 
-Source: `bangong/claude-plugins-official/plugins/{explanatory,learning}-output-style` (each: 15 LOC shell + manifest).
+Source: `bangong/legacy-plugins-official/plugins/{explanatory,learning}-output-style` (each: 15 LOC shell + manifest).
 
 Deliverable per plugin:
 
@@ -113,7 +113,7 @@ Key behavioral differences vs upstream:
 
 ### RT-04: ralph-loop
 
-Source: `bangong/claude-plugins-official/plugins/ralph-loop` (395 LOC shell).
+Source: `bangong/legacy-plugins-official/plugins/ralph-loop` (395 LOC shell).
 
 Deliverable:
 
@@ -130,15 +130,15 @@ Key behavioral differences vs upstream (per plan §"Ralph Loop Plan"):
 
 - Default max iterations changed from "unlimited" to 5. Hard cap is 200.
 - Starting a loop without `--completion-promise` requires `--yes`. This is the "explicit user confirmation" requirement from the plan.
-- State file location: `.crabcode/ralph-loop.local.md` (was `.claude/ralph-loop.local.md`).
-- Session-id pickup uses `CRABCODE_SESSION_ID` env var if present (was `CLAUDE_CODE_SESSION_ID`). Legacy state files without a session id still fall through to the global-loop behavior.
+- State file location: `.crabcode/ralph-loop.local.md` (was `.legacy-assistant/ralph-loop.local.md`).
+- Session-id pickup uses `CRABCODE_SESSION_ID` env var if present (was `LEGACY_SESSION_ID`). Legacy state files without a session id still fall through to the global-loop behavior.
 - Per-iteration status: `systemMessage` includes `"iteration N of M"`.
 
 ### RT-05: discord / fakechat / imessage / telegram
 
-Sources: `bangong/claude-plugins-official/external_plugins/{discord,fakechat,imessage,telegram}` (~3108 LOC TS combined).
+Sources: `bangong/legacy-plugins-official/external_plugins/{discord,fakechat,imessage,telegram}` (~3108 LOC TS combined).
 
-Approach: the upstream servers are already TypeScript and well-structured. Window E re-located them into the CrabCode plugin tree, rebranded the wire protocol (`claude/channel` -> `crabcode/channel`) and state paths (`~/.claude/channels/...` -> `~/.crabcode/channels/...`), then extracted a small `accessControl.ts` testable surface so the allowlist / pairing / group-policy gates are unit-tested.
+Approach: the upstream servers are already TypeScript and well-structured. Window E re-located them into the CrabCode plugin tree, rebranded the wire protocol (`legacy-assistant/channel` -> `crabcode/channel`) and state paths (`~/.legacy-assistant/channels/...` -> `~/.crabcode/channels/...`), then extracted a small `accessControl.ts` testable surface so the allowlist / pairing / group-policy gates are unit-tested.
 
 Per-bridge deliverable:
 
@@ -154,17 +154,17 @@ Per-bridge deliverable:
 Plus Window B's pre-staged scaffolding (preserved as-is):
 
 - `.crabcode-plugin/plugin.json`
-- `.mcp.json` (fakechat's was rebranded in Window E because the upstream still had `claude` references; discord / imessage / telegram already arrived clean from Window B)
+- `.mcp.json` (fakechat's was rebranded in Window E because the upstream still had `legacy-assistant` references; discord / imessage / telegram already arrived clean from Window B)
 - `README.md`
 - `docs/legal/THIRD_PARTY_NOTICES.md` (Window B's; still contains literal banned terms - see Finding §3)
 
 Key behavioral differences vs upstream:
 
-- Channel notification method renamed: `notifications/claude/channel` -> `notifications/crabcode/channel`.
-- MCP experimental capability key renamed: `experimental: { 'claude/channel': {} }` -> `experimental: { 'crabcode/channel': {} }`.
-- Permission capability renamed: `'claude/channel/permission'` -> `'crabcode/channel/permission'`.
-- Sender ack signature for iMessage: `Sent by Claude` -> `Sent by CrabCode`.
-- Pairing confirmation copy: `"Paired! Say hi to Claude."` -> `"Paired! Say hi to the agent."`.
+- Channel notification method renamed: `notifications/legacy-assistant/channel` -> `notifications/crabcode/channel`.
+- MCP experimental capability key renamed: `experimental: { 'legacy-assistant/channel': {} }` -> `experimental: { 'crabcode/channel': {} }`.
+- Permission capability renamed: `'legacy-assistant/channel/permission'` -> `'crabcode/channel/permission'`.
+- Sender ack signature for iMessage: `Sent by legacy assistant` -> `Sent by CrabCode`.
+- Pairing confirmation copy: `"Paired! Say hi to legacy assistant."` -> `"Paired! Say hi to the agent."`.
 - Internal comment that referenced the upstream private repo path was replaced with `<crabcode-internal>` placeholder.
 
 Test scope: only the access-control surface was unit tested. The MCP server bootstrap (`mcp.connect(new StdioServerTransport())` at module top level) makes the full server hard to import for unit tests without spawning. The integration window should add a smoke test that boots each bridge with stub credentials and verifies the MCP handshake.
@@ -217,6 +217,6 @@ done
 
 - Bridge `src/server.ts` typecheck requires `@modelcontextprotocol/sdk`, `discord.js`, `grammy`, `zod` to be installed under each plugin's `node_modules` (or root's). Until the integrator runs `bun install` per bridge, `tsc --noEmit` over the full bridge directory reports unresolved-module errors. The accessControl-only typecheck above is the maximum Window E could verify in isolation. This is in line with the plan ("Per runtime plugin: `bun install`, ...").
 - The bridge servers were rebranded but not strictened. Their `tsconfig.json` has `"strict": false` to preserve upstream's looser typing. A future window could turn strict on; that is a separate task.
-- The MCP wire-protocol rename (`claude/channel` -> `crabcode/channel`) needs the CrabCode app server's MCP handler to recognize the new namespace. If the app server expects the upstream literal, this rename will need to be reverted in concert with an app-server update.
+- The MCP wire-protocol rename (`legacy-assistant/channel` -> `crabcode/channel`) needs the CrabCode app server's MCP handler to recognize the new namespace. If the app server expects the upstream literal, this rename will need to be reverted in concert with an app-server update.
 - The brand-scanner ignore pattern for nested `docs/legal/**` is buggy (Finding §3). Window E worked around it for its own files; other windows' legal notices still cause `lint-brand.ts` to exit 1 when run from the repo root.
 - The plan §"Validation" block lists `crabcode plugin validate /Users/fushihua/Desktop/CrabCode-Plugin/plugins/<plugin-name>` as a required step. The `crabcode` CLI is not present on the PATH in the current sandbox, so this validator was not run. The integrator should run it before any release.

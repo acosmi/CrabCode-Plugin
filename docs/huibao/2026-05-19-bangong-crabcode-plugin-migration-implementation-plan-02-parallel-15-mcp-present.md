@@ -2,7 +2,7 @@
 
 Date: 2026-05-19
 Parallelism: 15 workers
-Source root: `bangong/claude-plugins-official/external_plugins`
+Source root: `bangong/legacy-plugins-official/external_plugins`
 
 ## Scope
 
@@ -31,13 +31,13 @@ plugins/<plugin-name>/
 | Worker | Source | Target | Components | Notes |
 |---|---|---|---|---|
 | MCP-01 | `external_plugins/asana` | `plugins/asana` | `.mcp.json` | Replace product copy with CrabCode integration language. |
-| MCP-02 | `external_plugins/context7` | `plugins/context7` | `.mcp.json` | Keep docs lookup semantics; remove Claude command references. |
+| MCP-02 | `external_plugins/context7` | `plugins/context7` | `.mcp.json` | Keep docs lookup semantics; remove legacy assistant command references. |
 | MCP-03 | `external_plugins/discord` | `plugins/discord` | wrapper scaffold only (`.crabcode-plugin/plugin.json`, `.mcp.json`, README, ACCESS, legal notice) | Skills and `src/server.ts` are owned by Window E RT-05 (runtime). Window B must not author runtime code or rebrand access-control skills. |
 | MCP-04 | `external_plugins/fakechat` | `plugins/fakechat` | wrapper scaffold only | Treat as local test bridge; CrabCode-native wrapper copy. `src/server.ts` is RT-05's responsibility. |
 | MCP-05 | `external_plugins/firebase` | `plugins/firebase` | `.mcp.json` | Keep Firebase naming; rewrite assistant/product wording. |
 | MCP-06 | `external_plugins/github` | `plugins/github` | `.mcp.json` | Preserve GitHub MCP details; avoid claiming official CrabCode ownership unless confirmed. |
 | MCP-07 | `external_plugins/gitlab` | `plugins/gitlab` | `.mcp.json` | Same pattern as GitHub. |
-| MCP-08 | `external_plugins/greptile` | `plugins/greptile` | `.mcp.json`, README | Keep vendor name; clean Claude copy. |
+| MCP-08 | `external_plugins/greptile` | `plugins/greptile` | `.mcp.json`, README | Keep vendor name; clean legacy assistant copy. |
 | MCP-09 | `external_plugins/imessage` | `plugins/imessage` | wrapper scaffold only | Skills and `src/server.ts` owned by Window E RT-05. Window B preserves macOS permission language in the README only. |
 | MCP-10 | `external_plugins/laravel-boost` | `plugins/laravel-boost` | `.mcp.json` | Vendor/framework language can remain. |
 | MCP-11 | `external_plugins/linear` | `plugins/linear` | `.mcp.json` | Keep Linear semantics. |
@@ -100,6 +100,6 @@ plugin scaffold (manifest, `.mcp.json`, wrapper docs, legal notice). Concretely:
 Upstream `.mcp.json` files use two inconsistent shapes (top-level key vs
 `{"mcpServers": {...}}` wrapper). Window B normalizes every emitted
 `.mcp.json` to the `{"mcpServers": {"<name>": {...}}}` form so CrabCode and
-standard MCP clients parse them uniformly. The Claude Code-specific token
-`${CLAUDE_PLUGIN_ROOT}` is replaced with `${CRABCODE_PLUGIN_ROOT}` for any
+standard MCP clients parse them uniformly. The legacy assistant-specific token
+`${LEGACY_PLUGIN_ROOT}` is replaced with `${CRABCODE_PLUGIN_ROOT}` for any
 command that referenced it; pure-vendor endpoints are emitted unchanged.

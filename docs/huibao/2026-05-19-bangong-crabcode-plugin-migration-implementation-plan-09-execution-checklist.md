@@ -11,8 +11,8 @@ This checklist controls execution across all parallel migration documents. Use i
 
 - [ ] Confirm `bangong/` is ignored by git.
 - [ ] Confirm current source commits:
-  - `bangong/claude-plugins-official`: `4bf08583c37e04f764806ea7a96ca74fb80ced1d`
-  - `bangong/anthropic-skills`: `6a5bb06904ab164a345e41c381fc9097954b83da`
+  - `bangong/legacy-plugins-official`: `4bf08583c37e04f764806ea7a96ca74fb80ced1d`
+  - `bangong/upstream-skills`: `6a5bb06904ab164a345e41c381fc9097954b83da`
 - [ ] Freeze the migration inventory.
 - [ ] Assign one batch lead per plan document.
 - [ ] Assign one worker per row inside each batch document.
@@ -32,7 +32,7 @@ This checklist controls execution across all parallel migration documents. Use i
 3. LSP plugins.
 4. Workflow and skill plugins.
 5. Runtime, hook, and bridge plugins.
-6. Anthropic skills marketplace suites.
+6. upstream vendor skills marketplace suites.
 7. Missing local-path marketplace entries.
 8. External source marketplace entries.
 
@@ -49,7 +49,7 @@ This checklist controls execution across all parallel migration documents. Use i
   - [ ] `hooks/`
   - [ ] `src/`
 - [ ] Runtime code is TypeScript or plugin is declarative.
-- [ ] Product-facing Claude/Anthropic identifiers removed.
+- [ ] Product-facing legacy assistant/upstream vendor identifiers removed.
 - [ ] Marketplace entry added or explicitly deferred.
 - [ ] Legal/source notice added.
 - [ ] Validation commands run.
@@ -112,10 +112,10 @@ Before merge:
 
 The final migration inventory must account for:
 
-- [ ] 178 `claude-plugins-official` marketplace entries.
-- [ ] 3 `anthropic-skills` marketplace entries.
-- [ ] 17 `anthropic-skills` component skills.
-- [ ] Existing `crabcode-setup` coverage of `claude-code-setup`.
+- [ ] 178 `legacy-plugins-official` marketplace entries.
+- [ ] 3 `upstream-skills` marketplace entries.
+- [ ] 17 `upstream-skills` component skills.
+- [ ] Existing `crabcode-setup` coverage of `legacy-assistant-setup`.
 - [ ] All missing local-path entries classified.
 - [ ] All external source entries classified.
 

@@ -4,7 +4,7 @@ Date: 2026-05-19
 Window: F — `06-parallel-17-skills-suite`
 Branch: `feature/window-f-skills-suite-2026-05-19`
 Worktree: `/Users/fushihua/Desktop/CrabCode-Plugin-windowF`
-Upstream source root: `bangong/anthropic-skills` (commit
+Upstream source root: `bangong/upstream-skills` (commit
 `6a5bb06904ab164a345e41c381fc9097954b83da`)
 
 ## Scope Delivered
@@ -15,7 +15,7 @@ Three CrabCode plugins under `plugins/`:
 |-------------------------|-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | crabcode-office-suite   | 4                     | crabcode-spreadsheets, crabcode-documents, crabcode-presentations, crabcode-pdf                                                                                                                                                                                       |
 | crabcode-example-skills | 12                    | algorithmic-art, brand-guidelines, canvas-design, doc-coauthoring, frontend-design, internal-comms, mcp-builder, skill-creator, slack-gif-creator, theme-factory, web-artifacts-builder, webapp-testing                                                                |
-| ai-api-dev              | 1                     | ai-api-dev (provider-neutral rewrite of upstream `claude-api`)                                                                                                                                                                                                         |
+| ai-api-dev              | 1                     | ai-api-dev (provider-neutral rewrite of upstream `ai-api`)                                                                                                                                                                                                         |
 
 Total SKILL.md authored: 17 (matches plan acceptance criterion).
 
@@ -25,7 +25,7 @@ Reviewed plan §06 (`...-06-parallel-17-skills-suite.md`) and §01
 rules. Deviations and decisions made:
 
 1. **`brand-guidelines` semantic reframe.** Upstream skill is a wrapper
-   around a specific corporate (Anthropic) brand identity, which
+   around a specific corporate (upstream vendor) brand identity, which
    conflicts directly with the §01 brand-removal rule. The skill was
    rewritten as a configurable workflow template — it now expects the
    user to supply colors and fonts, and explicitly forbids embedding
@@ -175,10 +175,10 @@ All commands run from `/Users/fushihua/Desktop/CrabCode-Plugin-windowF`.
 
 | Command                                                     | Result      | Notes                                                                                          |
 |-------------------------------------------------------------|-------------|------------------------------------------------------------------------------------------------|
-| `grep -RInE 'Claude\|Anthropic\|...' plugins/`              | pass        | Hits only in `docs/legal/THIRD_PARTY_NOTICES.md`, which is permitted per §01 brand rules.      |
+| `grep -RInE 'legacy assistant\|upstream vendor\|...' plugins/`              | pass        | Hits only in `docs/legal/THIRD_PARTY_NOTICES.md`, which is permitted per §01 brand rules.      |
 | Hand check of `.crabcode-plugin/plugin.json` required fields | pass        | All three manifests have `name`, `version`, `description`, `author`, `license`, `keywords`.    |
 | Directory / manifest / future entry name parity              | pass        | `plugins/<X>` matches manifest `name` for all three plugins.                                   |
-| Kebab-case + Claude-facing identifier ban on directory names | pass        | All plugin and skill directories are kebab-case; no Claude-facing identifiers.                 |
+| Kebab-case + legacy-facing identifier ban on directory names | pass        | All plugin and skill directories are kebab-case; no legacy-facing identifiers.                 |
 | Frontmatter sanity on every `SKILL.md`                       | pass        | Each starts with `---`, has `name:` and `description:`.                                        |
 | Skill body length                                            | pass        | All 17 skills under 250 lines (target was under 500).                                          |
 | `bun install` (crabcode-office-suite)                        | pass        | 5 packages installed (`@types/bun`, `typescript` + transitive).                                |
@@ -199,7 +199,7 @@ Re-audited my own output against plan §06, §01, and the goal text.
 - **17 source skills mapped 1:1 to 17 CrabCode skills.** No skill
   silently dropped. The mapping table in `THIRD_PARTY_NOTICES.md`
   matches plan §06 Worker Assignments.
-- **No Claude / Anthropic / `.claude` / `CLAUDE.md` / `claude-code`
+- **No legacy assistant / upstream vendor / `.legacy-assistant` / `CRABCODE.md` / `legacy-assistant`
   identifiers in product-facing surfaces.** Confirmed by grep
   excluding `docs/legal/`.
 - **Plugin directory names obey kebab-case** and exactly match

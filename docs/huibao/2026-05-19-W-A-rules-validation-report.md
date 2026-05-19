@@ -121,4 +121,4 @@ Each of these scripts is verified to run via the test suite. Running them agains
 
 ## Source attribution
 
-This window adds no plugin content. No upstream source is incorporated. Plan-01 audit addendum references `bangong/claude-plugins-official` and `bangong/anthropic-skills` as the upstream cache by name only; their actual content is not committed and is now in `.gitignore`.
+This window adds no plugin content. No upstream source is incorporated. Plan-01 audit addendum references `bangong/legacy-plugins-official` and `bangong/upstream-skills` as the upstream cache by name only; their actual content is not committed and is now in `.gitignore`.

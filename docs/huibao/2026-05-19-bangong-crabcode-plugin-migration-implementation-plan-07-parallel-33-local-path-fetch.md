@@ -2,11 +2,11 @@
 
 Date: 2026-05-19
 Parallelism: 33 workers
-Source root: `bangong/claude-plugins-official/.claude-plugin/marketplace.json`
+Source root: `bangong/legacy-plugins-official/.legacy-plugin/marketplace.json`
 
 ## Scope
 
-These marketplace entries point to local-looking paths such as `plugins/...`, but those paths are not present in the current `bangong/claude-plugins-official` clone. Each worker must first acquire or locate the missing source, then produce a CrabCode migration plan or implementation in a later phase.
+These marketplace entries point to local-looking paths such as `plugins/...`, but those paths are not present in the current `bangong/legacy-plugins-official` clone. Each worker must first acquire or locate the missing source, then produce a CrabCode migration plan or implementation in a later phase.
 
 ## Worker Assignments
 
@@ -30,7 +30,7 @@ These marketplace entries point to local-looking paths such as `plugins/...`, bu
 | LP-16 | `carta-investors` | `plugins/carta-investors` | `plugins/carta-investors` | productivity |
 | LP-17 | `databases-on-aws` | `plugins/databases-on-aws` | `plugins/databases-on-aws` | database |
 | LP-18 | `deploy-on-aws` | `plugins/deploy-on-aws` | `plugins/deploy-on-aws` | deployment |
-| LP-19 | `desktop-commander` | `plugins/claude` | `plugins/desktop-commander` | productivity |
+| LP-19 | `desktop-commander` | `plugins/legacy-assistant` | `plugins/desktop-commander` | productivity |
 | LP-20 | `expo` | `plugins/expo` | `plugins/expo` | development |
 | LP-21 | `legalzoom` | `plugins/legalzoom` | `plugins/legalzoom` | productivity |
 | LP-22 | `liquid-lsp` | `plugins/liquid-lsp` | `plugins/liquid-lsp` | development |
@@ -64,8 +64,8 @@ For each entry:
 
 ## Conversion Defaults
 
-- Use target plugin name equal to marketplace name unless the source path contains a Claude-specific segment.
-- `desktop-commander` must not keep a target path named `plugins/claude`.
+- Use target plugin name equal to marketplace name unless the source path contains a legacy assistant-specific segment.
+- `desktop-commander` must not keep a target path named `plugins/legacy-assistant`.
 - Vendor names remain where they identify an external product.
 - All runtime code must be TypeScript.
 
@@ -83,7 +83,7 @@ Audit driven by Window G during source acquisition. Original scope above remains
 
 ### Terminology correction: "missing local-path" is misleading
 
-Every one of the 33 rows in this batch resolves to an external repository via `source.source = "git-subdir"` (32 entries) or `source.source = "url"` (1 entry, `zilliz`). The `.path` field within that record happens to read `plugins/...`, which is the path **inside the upstream repository** — not a local directory in the `claude-plugins-official` clone.
+Every one of the 33 rows in this batch resolves to an external repository via `source.source = "git-subdir"` (32 entries) or `source.source = "url"` (1 entry, `zilliz`). The `.path` field within that record happens to read `plugins/...`, which is the path **inside the upstream repository** — not a local directory in the `legacy-plugins-official` clone.
 
 In other words, the 33 entries were never expected to live inside this clone in the first place; they look "missing" only because their nested `path` resembles a local plugin directory. They are categorically the same as the entries handled by [08-parallel-96-external-source-fetch](2026-05-19-bangong-crabcode-plugin-migration-implementation-plan-08-parallel-96-external-source-fetch.md).
 
@@ -101,4 +101,4 @@ Most upstream subdirectories ship without a top-level `LICENSE` (the license fil
 
 ### Conversion default refinement: `desktop-commander` source path is correct
 
-Plan row LP-19 says `plugins/claude` → `plugins/desktop-commander`. Verified: upstream `wonderwhy-er/DesktopCommanderMCP.git` at sha `9c44119` does contain `plugins/claude/` with a single `.claude-plugin/plugin.json` + `description.md`. Renaming to `plugins/desktop-commander` correctly removes the Claude-facing path segment per Directory Naming Constraints rule 5.
+Plan row LP-19 says `plugins/legacy-assistant` → `plugins/desktop-commander`. Verified: upstream `wonderwhy-er/DesktopCommanderMCP.git` at sha `9c44119` does contain `plugins/legacy-assistant/` with a single `.legacy-plugin/plugin.json` + `description.md`. Renaming to `plugins/desktop-commander` correctly removes the legacy-facing path segment per Directory Naming Constraints rule 5.

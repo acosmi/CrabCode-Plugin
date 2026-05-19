@@ -1,25 +1,25 @@
-# Parallel 17: Anthropic Skills Marketplace Suites
+# Parallel 17: upstream vendor Skills Marketplace Suites
 
 Date: 2026-05-19
 Parallelism: 17 workers
-Source root: `bangong/anthropic-skills`
+Source root: `bangong/upstream-skills`
 
 ## Scope
 
-This batch covers the three marketplace entries and seventeen skill folders under `bangong/anthropic-skills`.
+This batch covers the three marketplace entries and seventeen skill folders under `bangong/upstream-skills`.
 
 Marketplace entries:
 
 - `document-skills`
 - `example-skills`
-- `claude-api`
+- `ai-api`
 
 Skill folders:
 
 - `algorithmic-art`
 - `brand-guidelines`
 - `canvas-design`
-- `claude-api`
+- `ai-api`
 - `doc-coauthoring`
 - `docx`
 - `frontend-design`
@@ -59,7 +59,7 @@ Use three CrabCode plugins:
    - `webapp-testing`
 
 3. `ai-api-dev`
-   - `claude-api`, rewritten for the target API surface chosen by CrabCode maintainers.
+   - `ai-api`, rewritten for the target API surface chosen by CrabCode maintainers.
 
 ## Worker Assignments
 
@@ -81,7 +81,7 @@ Use three CrabCode plugins:
 | SK-14 | `skills/theme-factory` | `crabcode-example-skills` | `theme-factory` |
 | SK-15 | `skills/web-artifacts-builder` | `crabcode-example-skills` | `web-artifacts-builder` |
 | SK-16 | `skills/webapp-testing` | `crabcode-example-skills` | `webapp-testing` |
-| SK-17 | `skills/claude-api` | `ai-api-dev` | `ai-api-dev` |
+| SK-17 | `skills/ai-api` | `ai-api-dev` | `ai-api-dev` |
 
 ## Office Suite TypeScript Runtime
 
@@ -124,13 +124,13 @@ Suggested libraries:
 
 ## `ai-api-dev` Decision Gate
 
-Before converting `claude-api`, the maintainer must choose the target:
+Before converting `ai-api`, the maintainer must choose the target:
 
 - CrabCode API docs
 - OpenAI API docs
 - provider-neutral LLM application guidance
 
-Do not ship a product-facing API skill that points users back to Claude-branded SDKs.
+Do not ship a product-facing API skill that points users back to legacy-branded SDKs.
 
 ## Validation
 

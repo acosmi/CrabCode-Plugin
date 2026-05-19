@@ -9,8 +9,8 @@ Plan doc: `docs/huibao/2026-05-19-bangong-crabcode-plugin-migration-implementati
 1. Plan §"Worker Assignments" lists 15 plugins (asana / context7 / discord /
    fakechat / firebase / github / gitlab / greptile / imessage /
    laravel-boost / linear / playwright / serena / telegram / terraform).
-   All 15 source folders exist under `bangong/claude-plugins-official/external_plugins/<name>/`.
-   Confirmed via `ls bangong/claude-plugins-official/external_plugins`.
+   All 15 source folders exist under `bangong/legacy-plugins-official/external_plugins/<name>/`.
+   Confirmed via `ls bangong/legacy-plugins-official/external_plugins`.
 
 2. Plan §"Shared Implementation Shape" expects
    `plugins/<plugin-name>/.crabcode-plugin/plugin.json`, `.mcp.json`, and
@@ -48,7 +48,7 @@ Plan doc: `docs/huibao/2026-05-19-bangong-crabcode-plugin-migration-implementati
    Both are not interchangeable for standard MCP clients. Plan doc was
    amended with a §"MCP Config Format Normalization" section: all 15
    `.mcp.json` files emitted by this window use the wrapped shape, and any
-   `${CLAUDE_PLUGIN_ROOT}` reference is rewritten to `${CRABCODE_PLUGIN_ROOT}`.
+   `${LEGACY_PLUGIN_ROOT}` reference is rewritten to `${CRABCODE_PLUGIN_ROOT}`.
 
 6. **Worktree state.** Worktree was on `main` with no window-B branch
    pre-created. Window-C precedent (`feature/window-c-12-lsp-present`) +
@@ -327,8 +327,8 @@ None blocking. Notes for the integration window:
    launch shape, that is a coordinated revision, not a wrapper change.
 
 2. **Path constant rebrand expected from RT-05.** The upstream bridge servers
-   and skills hardcode `~/.claude/channels/<plugin>/...` and a
-   `<PLUGIN>_STATE_DIR` env var pointing into `.claude`. RT-05 must remap
+   and skills hardcode `~/.legacy-assistant/channels/<plugin>/...` and a
+   `<PLUGIN>_STATE_DIR` env var pointing into `.legacy-assistant`. RT-05 must remap
    those to `~/.crabcode/channels/<plugin>/...`. Window B's wrapper README
    already speaks in CrabCode terms and does not name a state dir, so the
    wrapper is compatible with whichever path RT-05 picks.

@@ -3,7 +3,7 @@
 Date: 2026-05-19
 Window: H — `08-parallel-96-external-source-fetch`
 Owning plan: [`2026-05-19-bangong-crabcode-plugin-migration-implementation-plan-08-parallel-96-external-source-fetch.md`](./2026-05-19-bangong-crabcode-plugin-migration-implementation-plan-08-parallel-96-external-source-fetch.md)
-Marketplace baseline: `bangong/claude-plugins-official` @ `4bf08583c37e04f764806ea7a96ca74fb80ced1d` (matches plan-00-index).
+Marketplace baseline: `bangong/legacy-plugins-official` @ `4bf08583c37e04f764806ea7a96ca74fb80ced1d` (matches plan-00-index).
 
 ## Outcome Summary
 
@@ -19,7 +19,7 @@ All 96 declared entries are accounted for; the batch acceptance criterion in pla
 
 ## Plan-08 Audit Notes (read before consuming this report)
 
-The plan-08 "Worker Assignments" table renders each `source` field as a single string. The actual `bangong/claude-plugins-official/.claude-plugin/marketplace.json` stores each `source` as a typed object that already pins a commit `sha`, a ref (sometimes), and an optional sub-path inside the upstream repo. Concretely:
+The plan-08 "Worker Assignments" table renders each `source` field as a single string. The actual `bangong/legacy-plugins-official/.legacy-plugin/marketplace.json` stores each `source` as a typed object that already pins a commit `sha`, a ref (sometimes), and an optional sub-path inside the upstream repo. Concretely:
 
 - 84 entries use `{"source":"url", "url":..., "sha":..., "path"?:...}`.
 - 10 entries use `{"source":"git-subdir", "url":..., "ref":..., "sha":..., "path":...}`.
@@ -27,7 +27,7 @@ The plan-08 "Worker Assignments" table renders each `source` field as a single s
 
 Implications:
 
-1. The "Source" column in plan-08 §"Worker Assignments" sometimes shows the `url` and sometimes shows the `path` (e.g. `atomic-agents` → `claude-plugin/atomic-agents` is the path, not the URL). This report uses the full structured record from the marketplace as authoritative.
+1. The "Source" column in plan-08 §"Worker Assignments" sometimes shows the `url` and sometimes shows the `path` (e.g. `atomic-agents` → `legacy-plugin/atomic-agents` is the path, not the URL). This report uses the full structured record from the marketplace as authoritative.
 2. The pinned `sha` already exists in the marketplace baseline; no separate re-pinning step is needed for the migration ticket — quoting the marketplace `sha` is enough.
 3. Several upstream URLs are reused by multiple entries (same `url+path+sha`), which makes the entries true duplicates. These are reported below in the "duplicate-of-existing-source" section.
 
@@ -37,7 +37,7 @@ Implications:
 2. Used `git clone --depth=1 --no-tags`, then `git fetch --depth=1 origin <sha-pinned>` followed by `git checkout <sha-pinned>` to pin every clone to the exact sha the marketplace entry references. **All 92 clones successfully pinned to the marketplace-pinned sha** (no fallback to HEAD was required).
 3. `bangong/` is gitignored at the repo root (see plan-01 §"Audit Addendum (Window A) → `bangong/` tracking"); none of these external clones are committed.
 4. URL reachability was probed via `git ls-remote --heads --quiet` for all 92 unique upstreams in parallel before cloning. All 92 returned `OK`.
-5. Classification scanned the path-pinned subtree (if `path` was set in the marketplace entry) or the repository root, skipping non-Claude-IDE plugin manifest dirs (`.cursor-plugin`, `.codex-plugin`, `.zed-plugin`, `.copilot-plugin`, `.continue-plugin`, `.windsurf-plugin`, `.cline-plugin`, `.aider-plugin`) so that mirrored IDE plugin manifests do not inflate `plugin.json` counts.
+5. Classification scanned the path-pinned subtree (if `path` was set in the marketplace entry) or the repository root, skipping non-legacy assistant-IDE plugin manifest dirs (`.cursor-plugin`, `.legacy-assistant-plugin`, `.zed-plugin`, `.copilot-plugin`, `.continue-plugin`, `.windsurf-plugin`, `.cline-plugin`, `.aider-plugin`) so that mirrored IDE plugin manifests do not inflate `plugin.json` counts.
 
 ## Component Classification
 
@@ -57,7 +57,7 @@ Heuristic notes:
 - `command-workflow`: contains a `commands/` directory (often with `agents/` or `skills/`) and no MCP server.
 - `mixed-plugin`: combines an MCP server with commands/agents/skills (or has both `commands/` and `skills/` plus extra runtime).
 - `hook-runtime`: contains a `hooks/` directory with TypeScript/Python/JS/shell handlers — Python/shell must be rewritten in TypeScript per plan-01 §"TypeScript Rules".
-- `multi-plugin-monorepo`: the upstream repo contains more than one `.claude-plugin/plugin.json`; a slicing decision is required before the conversion ticket can run cleanly.
+- `multi-plugin-monorepo`: the upstream repo contains more than one `.legacy-plugin/plugin.json`; a slicing decision is required before the conversion ticket can run cleanly.
 
 ## License Inventory
 
@@ -121,14 +121,14 @@ Four upstream entries reuse the exact same `url + path + sha` triple as another 
 |---|---|---|
 | `data` | `astronomer-data-agents` | `https://github.com/astronomer/agents.git` @ `535a040c` |
 | `data-engineering` | `astronomer-data-agents` | `https://github.com/astronomer/agents.git` @ `535a040c` |
-| `rc` | `revenuecat` | `https://github.com/RevenueCat/rc-claude-code-plugin.git` @ `407e4651` |
+| `rc` | `revenuecat` | `https://github.com/RevenueCat/rc-legacy-assistant-plugin.git` @ `407e4651` |
 | `sap-cds-mcp` | `cds-mcp` | `https://github.com/cap-js/mcp-server.git` @ `ef840d43` |
 
 ## Multi-Plugin Monorepo Entries (require slicing decision)
 
-These upstream repos contain more than one `.claude-plugin/plugin.json` at or under the marketplace-pinned root. Before the conversion ticket runs, an integration decision must pick which sub-plugin(s) the CrabCode entry should mirror.
+These upstream repos contain more than one `.legacy-plugin/plugin.json` at or under the marketplace-pinned root. Before the conversion ticket runs, an integration decision must pick which sub-plugin(s) the CrabCode entry should mirror.
 
-| Entry | Upstream | Pinned sha | claude-plugin/plugin.json count | Hint |
+| Entry | Upstream | Pinned sha | legacy-plugin/plugin.json count | Hint |
 |---|---|---|---|---|
 | `azure` | `https://github.com/microsoft/azure-skills.git` | `350e050c` | 2 | `bangong/external-sources/microsoft__azure-skills` |
 | `huggingface-skills` | `https://github.com/huggingface/skills.git` | `7c71cfb2` | 2 | `bangong/external-sources/huggingface__skills` |
@@ -152,26 +152,26 @@ Columns: status, classification, target batch, upstream url, upstream sub-path, 
 |---|---|---|---|---|---|---|---|---|---|
 | EX-001 | `agentforce-adlc` | fetched | `hook-runtime` | `parallel-05-runtime-present` | `https://github.com/SalesforceAIResearch/agentforce-adlc.git` | `.` | `d645d2c8` | `CC-BY-NC-4.0` | `noncommercial-blocker` |
 | EX-002 | `ai-plugins` | fetched | `skill-suite` | `parallel-17-skills-suite` | `https://github.com/endorlabs/ai-plugins.git` | `.` | `975f0ce4` | `MIT` | `—` |
-| EX-003 | `aikido` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/AikidoSec/aikido-claude-plugin.git` | `.` | `79ac524f` | `NONE_DETECTED` | `missing-license-file` |
+| EX-003 | `aikido` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/AikidoSec/aikido-legacy-plugin.git` | `.` | `79ac524f` | `NONE_DETECTED` | `missing-license-file` |
 | EX-004 | `alloydb` | fetched | `skill-suite` | `parallel-17-skills-suite` | `https://github.com/gemini-cli-extensions/alloydb.git` | `.` | `4a756532` | `Apache-2.0` | `—` |
 | EX-005 | `apollo` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/apolloio/apollo-mcp-plugin.git` | `.` | `79577f93` | `MIT` | `—` |
 | EX-006 | `astronomer-data-agents` | fetched | `hook-runtime` | `parallel-05-runtime-present` | `https://github.com/astronomer/agents.git` | `.` | `535a040c` | `Apache-2.0` | `—` |
 | EX-007 | `atlan` | fetched | `mcp-wrapper` | `parallel-15-mcp-present` | `https://github.com/atlanhq/agent-toolkit.git` | `.` | `790398c8` | `MIT` | `—` |
 | EX-008 | `atlassian` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/atlassian/atlassian-mcp-server.git` | `.` | `9b52fb18` | `Apache-2.0` | `—` |
-| EX-009 | `atomic-agents` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/BrainBlend-AI/atomic-agents.git` | `claude-plugin/atomic-agents` | `f849087b` | `MIT` | `—` |
+| EX-009 | `atomic-agents` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/BrainBlend-AI/atomic-agents.git` | `legacy-plugin/atomic-agents` | `f849087b` | `MIT` | `—` |
 | EX-010 | `azure` | fetched | `multi-plugin-monorepo` | `parallel-18-workflow-present` | `https://github.com/microsoft/azure-skills.git` | `.` | `350e050c` | `MIT` | `—` |
-| EX-011 | `azure-cosmos-db-assistant` | fetched | `command-workflow` | `parallel-18-workflow-present` | `https://github.com/AzureCosmosDB/cosmosdb-claude-code-plugin.git` | `.` | `f1e04985` | `MIT` | `—` |
+| EX-011 | `azure-cosmos-db-assistant` | fetched | `command-workflow` | `parallel-18-workflow-present` | `https://github.com/AzureCosmosDB/cosmosdb-legacy-assistant-plugin.git` | `.` | `f1e04985` | `MIT` | `—` |
 | EX-012 | `base44` | fetched | `skill-suite` | `parallel-17-skills-suite` | `https://github.com/base44/skills.git` | `.` | `ec420cf2` | `MIT` | `—` |
 | EX-013 | `box` | fetched | `skill-suite` | `parallel-17-skills-suite` | `https://github.com/box/box-for-ai.git` | `.` | `16f1a042` | `MIT` | `—` |
 | EX-014 | `brightdata-plugin` | fetched | `skill-suite` | `parallel-17-skills-suite` | `https://github.com/brightdata/skills.git` | `.` | `37145178` | `MIT` | `—` |
 | EX-015 | `cds-mcp` | fetched | `mcp-wrapper` | `parallel-15-mcp-present` | `https://github.com/cap-js/mcp-server.git` | `.` | `ef840d43` | `Apache-2.0` | `—` |
 | EX-016 | `chrome-devtools-mcp` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/ChromeDevTools/chrome-devtools-mcp.git` | `.` | `32dc50d5` | `Apache-2.0` | `—` |
-| EX-017 | `circleback` | fetched | `mcp-wrapper` | `parallel-15-mcp-present` | `https://github.com/circlebackai/claude-code-plugin.git` | `.` | `6369dec7` | `NONE_DETECTED` | `missing-license-file` |
-| EX-018 | `clickhouse` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/ClickHouse/clickhouse-claude-code-plugin.git` | `.` | `13a2df00` | `Apache-2.0` | `—` |
+| EX-017 | `circleback` | fetched | `mcp-wrapper` | `parallel-15-mcp-present` | `https://github.com/circlebackai/legacy-assistant-plugin.git` | `.` | `6369dec7` | `NONE_DETECTED` | `missing-license-file` |
+| EX-018 | `clickhouse` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/ClickHouse/clickhouse-legacy-assistant-plugin.git` | `.` | `13a2df00` | `Apache-2.0` | `—` |
 | EX-019 | `cloud-sql-postgresql` | fetched | `skill-suite` | `parallel-17-skills-suite` | `https://github.com/gemini-cli-extensions/cloud-sql-postgresql.git` | `.` | `966f7b88` | `Apache-2.0` | `—` |
 | EX-020 | `cloudflare` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/cloudflare/skills.git` | `.` | `60147cbb` | `Apache-2.0` | `—` |
 | EX-021 | `cloudinary` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/cloudinary-devs/cloudinary-plugin.git` | `.` | `7b443d7d` | `NONE_DETECTED` | `missing-license-file` |
-| EX-022 | `cockroachdb` | fetched | `hook-runtime` | `parallel-05-runtime-present` | `https://github.com/cockroachdb/claude-plugin.git` | `.` | `736bd11d` | `Apache-2.0` | `—` |
+| EX-022 | `cockroachdb` | fetched | `hook-runtime` | `parallel-05-runtime-present` | `https://github.com/cockroachdb/legacy-plugin.git` | `.` | `736bd11d` | `Apache-2.0` | `—` |
 | EX-023 | `coderabbit` | fetched | `command-workflow` | `parallel-18-workflow-present` | `https://github.com/coderabbitai/skills.git` | `.` | `a81eb76a` | `MIT` | `—` |
 | EX-024 | `convex-backend` | fetched | `skill-suite` | `parallel-17-skills-suite` | `https://github.com/get-convex/convex-backend-skill.git` | `.` | `9acbc549` | `Apache-2.0` | `—` |
 | EX-025 | `crowdstrike-falcon-foundry` | fetched | `hook-runtime` | `parallel-05-runtime-present` | `https://github.com/CrowdStrike/foundry-skills.git` | `.` | `4b517aa5` | `MIT` | `—` |
@@ -179,69 +179,69 @@ Columns: status, classification, target batch, upstream url, upstream sub-path, 
 | EX-027 | `data` | duplicate-of-existing-source | — | — | `https://github.com/astronomer/agents.git` | `.` | `535a040c` | — | duplicate-of=`astronomer-data-agents` |
 | EX-028 | `data-agent-kit-starter-pack` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/gemini-cli-extensions/data-agent-kit-starter-pack.git` | `.` | `7bc75b5e` | `Apache-2.0` | `—` |
 | EX-029 | `data-engineering` | duplicate-of-existing-source | — | — | `https://github.com/astronomer/agents.git` | `.` | `535a040c` | — | duplicate-of=`astronomer-data-agents` |
-| EX-030 | `datadog` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/datadog-labs/claude-code-plugin.git` | `.` | `eeb2f746` | `Apache-2.0` | `—` |
+| EX-030 | `datadog` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/datadog-labs/legacy-assistant-plugin.git` | `.` | `eeb2f746` | `Apache-2.0` | `—` |
 | EX-031 | `datarobot-agent-skills` | fetched | `skill-suite` | `parallel-17-skills-suite` | `https://github.com/datarobot-oss/datarobot-agent-skills.git` | `.` | `6a13377a` | `Apache-2.0` | `—` |
 | EX-032 | `dataverse` | fetched | `skill-suite` | `parallel-17-skills-suite` | `https://github.com/microsoft/Dataverse-skills.git` | `.github/plugins/dataverse` | `5f186bf8` | `NONE_DETECTED` | `missing-license-file` |
 | EX-033 | `exa` | fetched | `skill-suite` | `parallel-17-skills-suite` | `https://github.com/exa-labs/exa-mcp-server.git` | `.` | `5ce6c53b` | `MIT` | `—` |
 | EX-034 | `fastly-agent-toolkit` | fetched | `skill-suite` | `parallel-17-skills-suite` | `https://github.com/fastly/fastly-agent-toolkit.git` | `.` | `e0f42057` | `MIT` | `—` |
 | EX-035 | `fiftyone` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/voxel51/fiftyone-skills.git` | `.` | `a79e53c6` | `Apache-2.0` | `—` |
 | EX-036 | `figma` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/figma/mcp-server-guide.git` | `.` | `a742f0a7` | `NONE_DETECTED` | `missing-license-file` |
-| EX-037 | `firecrawl` | fetched | `command-workflow` | `parallel-18-workflow-present` | `https://github.com/firecrawl/firecrawl-claude-plugin.git` | `.` | `48edd794` | `NONE_DETECTED` | `missing-license-file` |
+| EX-037 | `firecrawl` | fetched | `command-workflow` | `parallel-18-workflow-present` | `https://github.com/firecrawl/firecrawl-legacy-plugin.git` | `.` | `48edd794` | `NONE_DETECTED` | `missing-license-file` |
 | EX-038 | `fullstory` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/fullstorydev/fullstory-skills.git` | `.` | `1ec5865e` | `NONE_DETECTED` | `missing-license-file` |
 | EX-039 | `huggingface-skills` | fetched | `multi-plugin-monorepo` | `parallel-18-workflow-present` | `https://github.com/huggingface/skills.git` | `.` | `7c71cfb2` | `Apache-2.0` | `—` |
-| EX-040 | `intercom` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/intercom/claude-plugin-external.git` | `.` | `52653572` | `MIT` | `—` |
-| EX-041 | `jfrog` | fetched | `hook-runtime` | `parallel-05-runtime-present` | `https://github.com/jfrog/claude-plugin.git` | `.` | `259c8e71` | `Apache-2.0` | `—` |
+| EX-040 | `intercom` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/intercom/legacy-plugin-external.git` | `.` | `52653572` | `MIT` | `—` |
+| EX-041 | `jfrog` | fetched | `hook-runtime` | `parallel-05-runtime-present` | `https://github.com/jfrog/legacy-plugin.git` | `.` | `259c8e71` | `Apache-2.0` | `—` |
 | EX-042 | `microsoft-docs` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/MicrosoftDocs/mcp.git` | `.` | `954c17e7` | `CC-BY-4.0` | `—` |
-| EX-043 | `mintlify` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/mintlify/mintlify-claude-plugin.git` | `.` | `acd6d2e0` | `MIT` | `—` |
-| EX-044 | `miro` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/miroapp/miro-ai.git` | `claude-plugins/miro` | `00e619e6` | `NONE_DETECTED` | `missing-license-file` |
+| EX-043 | `mintlify` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/mintlify/mintlify-legacy-plugin.git` | `.` | `acd6d2e0` | `MIT` | `—` |
+| EX-044 | `miro` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/miroapp/miro-ai.git` | `legacy-plugins/miro` | `00e619e6` | `NONE_DETECTED` | `missing-license-file` |
 | EX-045 | `mongodb` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/mongodb/agent-skills.git` | `.` | `24529d95` | `Apache-2.0` | `—` |
 | EX-046 | `netlify-skills` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/netlify/context-and-tools.git` | `.` | `a49ebc59` | `MIT` | `—` |
 | EX-047 | `netsuite-suitecloud` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/oracle/netsuite-suitecloud-sdk.git` | `packages/agent-skills` | `43bacf43` | `NONE_DETECTED` | `missing-license-file` |
 | EX-048 | `nightvision` | fetched | `skill-suite` | `parallel-17-skills-suite` | `https://github.com/nvsecurity/nightvision-skills.git` | `.` | `7d7a3f34` | `Apache-2.0` | `—` |
 | EX-049 | `nimble` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/Nimbleway/agent-skills.git` | `.` | `626930f1` | `MIT` | `—` |
-| EX-050 | `notion` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/makenotion/claude-code-notion-plugin.git` | `.` | `9847f2aa` | `NONE_DETECTED` | `missing-license-file` |
-| EX-051 | `oracle-ai-data-platform-workbench-spark-connectors` | fetched | `skill-suite` | `parallel-17-skills-suite` | `https://github.com/oracle-samples/oracle-aidp-samples.git` | `ai/claude-code-plugins/oracle-ai-data-platform-workbench-spark-connectors` | `f436f3a4` | `MIT` | `—` |
-| EX-052 | `outputai` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/growthxai/output.git` | `coding_assistants/claude/plugins/outputai` | `756d32d1` | `NONE_DETECTED` | `missing-license-file` |
-| EX-053 | `pagerduty` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/PagerDuty/claude-code-plugins.git` | `.` | `761cba75` | `Apache-2.0` | `—` |
+| EX-050 | `notion` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/makenotion/legacy-assistant-notion-plugin.git` | `.` | `9847f2aa` | `NONE_DETECTED` | `missing-license-file` |
+| EX-051 | `oracle-ai-data-platform-workbench-spark-connectors` | fetched | `skill-suite` | `parallel-17-skills-suite` | `https://github.com/oracle-samples/oracle-aidp-samples.git` | `ai/legacy-assistant-plugins/oracle-ai-data-platform-workbench-spark-connectors` | `f436f3a4` | `MIT` | `—` |
+| EX-052 | `outputai` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/growthxai/output.git` | `coding_assistants/legacy-assistant/plugins/outputai` | `756d32d1` | `NONE_DETECTED` | `missing-license-file` |
+| EX-053 | `pagerduty` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/PagerDuty/legacy-assistant-plugins.git` | `.` | `761cba75` | `Apache-2.0` | `—` |
 | EX-054 | `pigment` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/gopigment/ai-plugins.git` | `.` | `5bdf0886` | `MIT` | `—` |
-| EX-055 | `pinecone` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/pinecone-io/pinecone-claude-code-plugin.git` | `.` | `7dc3cfe0` | `MIT` | `—` |
-| EX-056 | `planetscale` | fetched | `mcp-wrapper` | `parallel-15-mcp-present` | `https://github.com/planetscale/claude-plugin.git` | `.` | `f1066cac` | `NONE_DETECTED` | `missing-license-file` |
+| EX-055 | `pinecone` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/pinecone-io/pinecone-legacy-assistant-plugin.git` | `.` | `7dc3cfe0` | `MIT` | `—` |
+| EX-056 | `planetscale` | fetched | `mcp-wrapper` | `parallel-15-mcp-present` | `https://github.com/planetscale/legacy-plugin.git` | `.` | `f1066cac` | `NONE_DETECTED` | `missing-license-file` |
 | EX-057 | `posthog` | fetched | `hook-runtime` | `parallel-05-runtime-present` | `https://github.com/PostHog/ai-plugin.git` | `.` | `ff08c376` | `NONE_DETECTED` | `missing-license-file` |
 | EX-058 | `postiz` | fetched | `command-workflow` | `parallel-18-workflow-present` | `https://github.com/gitroomhq/postiz-agent.git` | `.` | `37d62724` | `AGPL-3.0` | `copyleft-network` |
-| EX-059 | `postman` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/Postman-Devrel/postman-claude-code-plugin.git` | `.` | `416e40da` | `Apache-2.0` | `—` |
-| EX-060 | `prisma` | fetched | `mcp-wrapper` | `parallel-15-mcp-present` | `https://github.com/prisma/claude-plugin.git` | `.` | `815dbc4a` | `NONE_DETECTED` | `missing-license-file` |
+| EX-059 | `postman` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/Postman-Devrel/postman-legacy-assistant-plugin.git` | `.` | `416e40da` | `Apache-2.0` | `—` |
+| EX-060 | `prisma` | fetched | `mcp-wrapper` | `parallel-15-mcp-present` | `https://github.com/prisma/legacy-plugin.git` | `.` | `815dbc4a` | `NONE_DETECTED` | `missing-license-file` |
 | EX-061 | `qdrant-skills` | fetched | `skill-suite` | `parallel-17-skills-suite` | `https://github.com/qdrant/skills.git` | `.` | `9f935f8b` | `Apache-2.0` | `—` |
 | EX-062 | `qodo-skills` | fetched | `skill-suite` | `parallel-17-skills-suite` | `https://github.com/qodo-ai/qodo-skills.git` | `.` | `8fb6b550` | `MIT` | `—` |
 | EX-063 | `qt-development-skills` | fetched | `skill-suite` | `parallel-17-skills-suite` | `https://github.com/TheQtCompanyRnD/agent-skills.git` | `.` | `62a98e23` | `MIT` | `—` |
 | EX-064 | `quarkus-agent` | fetched | `multi-plugin-monorepo` | `parallel-18-workflow-present` | `https://github.com/quarkusio/quarkus-agent-mcp.git` | `.` | `c1728023` | `Apache-2.0` | `—` |
-| EX-065 | `rc` | duplicate-of-existing-source | — | — | `https://github.com/RevenueCat/rc-claude-code-plugin.git` | `revenuecat` | `407e4651` | — | duplicate-of=`revenuecat` |
-| EX-066 | `remember` | fetched | `hook-runtime` | `parallel-05-runtime-present` | `https://github.com/Digital-Process-Tools/claude-remember.git` | `.` | `aa55ba3f` | `MIT` | `—` |
-| EX-067 | `revenuecat` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/RevenueCat/rc-claude-code-plugin.git` | `revenuecat` | `407e4651` | `NONE_DETECTED` | `missing-license-file` |
+| EX-065 | `rc` | duplicate-of-existing-source | — | — | `https://github.com/RevenueCat/rc-legacy-assistant-plugin.git` | `revenuecat` | `407e4651` | — | duplicate-of=`revenuecat` |
+| EX-066 | `remember` | fetched | `hook-runtime` | `parallel-05-runtime-present` | `https://github.com/Digital-Process-Tools/legacy-assistant-remember.git` | `.` | `aa55ba3f` | `MIT` | `—` |
+| EX-067 | `revenuecat` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/RevenueCat/rc-legacy-assistant-plugin.git` | `revenuecat` | `407e4651` | `NONE_DETECTED` | `missing-license-file` |
 | EX-068 | `sanity` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/sanity-io/agent-toolkit.git` | `.` | `236348e2` | `MIT` | `—` |
 | EX-069 | `sap-cds-mcp` | duplicate-of-existing-source | — | — | `https://github.com/cap-js/mcp-server.git` | `.` | `ef840d43` | — | duplicate-of=`cds-mcp` |
 | EX-070 | `sap-fiori-mcp-server` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/SAP/open-ux-tools.git` | `packages/fiori-mcp-server` | `157120fd` | `Apache-2.0` | `—` |
 | EX-071 | `sap-mdk-server` | fetched | `mcp-wrapper` | `parallel-15-mcp-present` | `https://github.com/SAP/mdk-mcp-server.git` | `.` | `10ff6ccf` | `Apache-2.0` | `—` |
 | EX-072 | `save-to-spotify` | fetched | `skill-suite` | `parallel-17-skills-suite` | `https://github.com/spotify/save-to-spotify.git` | `plugin` | `b3d362f7` | `NONE_DETECTED` | `missing-license-file` |
 | EX-073 | `semgrep` | fetched | `hook-runtime` | `parallel-05-runtime-present` | `https://github.com/semgrep/mcp-marketplace.git` | `plugin` | `274846f6` | `NONE_DETECTED` | `missing-license-file` |
-| EX-074 | `sentry` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/getsentry/sentry-for-claude.git` | `.` | `cf7efd37` | `MIT` | `—` |
-| EX-075 | `servicenow-sdk` | fetched | `skill-suite` | `parallel-17-skills-suite` | `https://github.com/ServiceNow/sdk.git` | `providers/claude/plugin` | `06adf37c` | `NONE_DETECTED` | `missing-license-file` |
+| EX-074 | `sentry` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/getsentry/sentry-for-legacy-assistant.git` | `.` | `cf7efd37` | `MIT` | `—` |
+| EX-075 | `servicenow-sdk` | fetched | `skill-suite` | `parallel-17-skills-suite` | `https://github.com/ServiceNow/sdk.git` | `providers/legacy-assistant/plugin` | `06adf37c` | `NONE_DETECTED` | `missing-license-file` |
 | EX-076 | `shopify` | fetched | `mcp-wrapper` | `parallel-15-mcp-present` | `https://github.com/Shopify/shopify-plugins.git` | `.` | `5631b93b` | `MIT` | `—` |
 | EX-077 | `shopify-ai-toolkit` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/Shopify/Shopify-AI-Toolkit.git` | `.` | `c164cf45` | `MIT` | `—` |
 | EX-078 | `slack` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/slackapi/slack-mcp-plugin.git` | `.` | `7b945895` | `MIT` | `—` |
 | EX-079 | `sonarqube` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/SonarSource/sonarqube-agent-plugins.git` | `.` | `c64e09af` | `SSAL-1.0` | `source-available-restrictive` |
-| EX-080 | `sonatype-guide` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/sonatype/sonatype-guide-claude-plugin.git` | `.` | `1dae7398` | `NONE_DETECTED` | `missing-license-file` |
-| EX-081 | `sourcegraph` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/sourcegraph-community/sourcegraph-claudecode-plugin.git` | `.` | `332ee0ca` | `NONE_DETECTED` | `missing-license-file` |
-| EX-082 | `spotify-ads-api` | fetched | `hook-runtime` | `parallel-05-runtime-present` | `https://github.com/spotify/ads-claude-plugin.git` | `.` | `cc3db744` | `Apache-2.0` | `—` |
-| EX-083 | `stripe` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/stripe/ai.git` | `providers/claude/plugin` | `ec93d4c4` | `NONE_DETECTED` | `missing-license-file` |
-| EX-084 | `sumup` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/sumup/sumup-skills.git` | `providers/claude/plugin` | `a4b5a978` | `NONE_DETECTED` | `missing-license-file` |
+| EX-080 | `sonatype-guide` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/sonatype/sonatype-guide-legacy-plugin.git` | `.` | `1dae7398` | `NONE_DETECTED` | `missing-license-file` |
+| EX-081 | `sourcegraph` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/sourcegraph-community/sourcegraph-legacyassistant-plugin.git` | `.` | `332ee0ca` | `NONE_DETECTED` | `missing-license-file` |
+| EX-082 | `spotify-ads-api` | fetched | `hook-runtime` | `parallel-05-runtime-present` | `https://github.com/spotify/ads-legacy-plugin.git` | `.` | `cc3db744` | `Apache-2.0` | `—` |
+| EX-083 | `stripe` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/stripe/ai.git` | `providers/legacy-assistant/plugin` | `ec93d4c4` | `NONE_DETECTED` | `missing-license-file` |
+| EX-084 | `sumup` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/sumup/sumup-skills.git` | `providers/legacy-assistant/plugin` | `a4b5a978` | `NONE_DETECTED` | `missing-license-file` |
 | EX-085 | `supabase` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/supabase-community/supabase-plugin.git` | `.` | `693a17a9` | `NONE_DETECTED` | `missing-license-file` |
 | EX-086 | `superpowers` | fetched | `hook-runtime` | `parallel-05-runtime-present` | `https://github.com/obra/superpowers.git` | `.` | `f2cbfbef` | `MIT` | `—` |
 | EX-087 | `twilio-developer-kit` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/twilio/ai.git` | `.` | `7d15b215` | `MIT` | `—` |
 | EX-088 | `vanta-mcp-plugin` | fetched | `multi-plugin-monorepo` | `parallel-18-workflow-present` | `https://github.com/VantaInc/vanta-mcp-plugin.git` | `.` | `345d86b5` | `MIT` | `—` |
 | EX-089 | `vercel` | fetched | `hook-runtime` | `parallel-05-runtime-present` | `https://github.com/vercel/vercel-plugin.git` | `.` | `1edb125d` | `NONE_DETECTED` | `missing-license-file` |
-| EX-090 | `windsor-ai` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/windsor-ai/claude-windsor-ai-plugin.git` | `.` | `248a6994` | `MIT` | `—` |
+| EX-090 | `windsor-ai` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/windsor-ai/legacy-assistant-windsor-ai-plugin.git` | `.` | `248a6994` | `MIT` | `—` |
 | EX-091 | `wix` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/wix/skills.git` | `.` | `7ae38286` | `MIT` | `—` |
-| EX-092 | `wordpress.com` | fetched | `command-workflow` | `parallel-18-workflow-present` | `https://github.com/Automattic/claude-code-wordpress.com.git` | `.` | `052ca970` | `GPL-2.0` | `copyleft` |
+| EX-092 | `wordpress.com` | fetched | `command-workflow` | `parallel-18-workflow-present` | `https://github.com/Automattic/legacy-assistant-wordpress.com.git` | `.` | `052ca970` | `GPL-2.0` | `copyleft` |
 | EX-093 | `youdotcom-agent-skills` | fetched | `hook-runtime` | `parallel-05-runtime-present` | `https://github.com/youdotcom-oss/agent-skills.git` | `.` | `4712250a` | `MIT` | `—` |
 | EX-094 | `zoom-plugin` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/zoom/zoom-plugin.git` | `.` | `88f6ca35` | `MIT` | `—` |
 | EX-095 | `zoominfo` | fetched | `mixed-plugin` | `parallel-18-workflow-present` | `https://github.com/Zoominfo/zoominfo-mcp-plugin.git` | `.` | `14752e45` | `MIT` | `—` |
@@ -251,7 +251,7 @@ Columns: status, classification, target batch, upstream url, upstream sub-path, 
 
 Per the Window H goal contract: drafts are NOT written into `.crabcode-plugin/marketplace.json` by this window. The total integration coordinator should review and stage them after the corresponding implementation batches land each plugin directory.
 
-Description fields have been pre-sanitized for the `Claude` / `Claude Code` / `Anthropic` / `.claude` tokens per plan-01 §"Brand Removal Rules". Vendor-product names (Atlassian, Stripe, Supabase, etc.) are retained as required by plan-01 §"Naming Rules". The `version` field defaults to `0.0.1` when the upstream marketplace entry leaves it blank.
+Description fields have been pre-sanitized for the `legacy assistant` / `legacy assistant` / `upstream vendor` / `.legacy-assistant` tokens per plan-01 §"Brand Removal Rules". Vendor-product names (Atlassian, Stripe, Supabase, etc.) are retained as required by plan-01 §"Naming Rules". The `version` field defaults to `0.0.1` when the upstream marketplace entry leaves it blank.
 
 Each draft also carries an internal `_meta` block with the upstream coordinates. Integration must strip `_meta` before writing into `.crabcode-plugin/marketplace.json`.
 
@@ -299,7 +299,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "development",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/AikidoSec/aikido-claude-plugin.git",
+      "upstream_url": "https://github.com/AikidoSec/aikido-legacy-plugin.git",
       "upstream_sha": "79ac524f87c9faa9a356ff3d495b8a5b77e01bbd",
       "upstream_subpath": null,
       "classification": "mixed-plugin",
@@ -405,7 +405,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "_meta": {
       "upstream_url": "https://github.com/BrainBlend-AI/atomic-agents.git",
       "upstream_sha": "f849087b26bbb6fb5e63acb60f2b566ce874aaa7",
-      "upstream_subpath": "claude-plugin/atomic-agents",
+      "upstream_subpath": "legacy-plugin/atomic-agents",
       "classification": "mixed-plugin",
       "target_batch": "parallel-18-workflow-present",
       "license": "MIT",
@@ -437,7 +437,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "database",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/AzureCosmosDB/cosmosdb-claude-code-plugin.git",
+      "upstream_url": "https://github.com/AzureCosmosDB/cosmosdb-legacy-assistant-plugin.git",
       "upstream_sha": "f1e0498579a9251e5f3179b92d25d6ce3409bae5",
       "upstream_subpath": null,
       "classification": "command-workflow",
@@ -539,7 +539,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "productivity",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/circlebackai/claude-code-plugin.git",
+      "upstream_url": "https://github.com/circlebackai/legacy-assistant-plugin.git",
       "upstream_sha": "6369dec7da4059dd0a12cf1b62ba749799ee15ef",
       "upstream_subpath": null,
       "classification": "mcp-wrapper",
@@ -556,7 +556,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "database",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/ClickHouse/clickhouse-claude-code-plugin.git",
+      "upstream_url": "https://github.com/ClickHouse/clickhouse-legacy-assistant-plugin.git",
       "upstream_sha": "13a2df004af0df46661c9de2d4ef4e85eba2f040",
       "upstream_subpath": null,
       "classification": "mixed-plugin",
@@ -624,7 +624,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "database",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/cockroachdb/claude-plugin.git",
+      "upstream_url": "https://github.com/cockroachdb/legacy-plugin.git",
       "upstream_sha": "736bd11df55bac97e2a6c98be8e93503b125902c",
       "upstream_subpath": null,
       "classification": "hook-runtime",
@@ -637,7 +637,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "name": "coderabbit",
     "source": "./plugins/coderabbit",
     "version": "0.0.1",
-    "description": "Your code review partner. CodeRabbit provides external validation using a specialized AI architecture and 40+ integrated static analyzers\u2014offering a different perspective that catches bugs, security vulnerabilities, logic errors, and edge cases. Context-aware analysis via AST parsing and codegraph relationships. Automatically incorporates CLAUDE.md and project coding guidelines into reviews. Useful after writing or modifying code, before commits, when implementing complex or security-sensitive logic, or when a second opinion would increase confidence in the changes. Returns specific findings with suggested fixes that can be applied immediately. Free to use.",
+    "description": "Your code review partner. CodeRabbit provides external validation using a specialized AI architecture and 40+ integrated static analyzers\u2014offering a different perspective that catches bugs, security vulnerabilities, logic errors, and edge cases. Context-aware analysis via AST parsing and codegraph relationships. Automatically incorporates CRABCODE.md and project coding guidelines into reviews. Useful after writing or modifying code, before commits, when implementing complex or security-sensitive logic, or when a second opinion would increase confidence in the changes. Returns specific findings with suggested fixes that can be applied immediately. Free to use.",
     "category": "productivity",
     "tags": [],
     "_meta": {
@@ -726,7 +726,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "monitoring",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/datadog-labs/claude-code-plugin.git",
+      "upstream_url": "https://github.com/datadog-labs/legacy-assistant-plugin.git",
       "upstream_sha": "eeb2f746a857f8d97f69cd0968fb63874541c112",
       "upstream_subpath": null,
       "classification": "mixed-plugin",
@@ -845,7 +845,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "development",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/firecrawl/firecrawl-claude-plugin.git",
+      "upstream_url": "https://github.com/firecrawl/firecrawl-legacy-plugin.git",
       "upstream_sha": "48edd7943009eb4442a6f0102bbd0c251eecef3e",
       "upstream_subpath": null,
       "classification": "command-workflow",
@@ -896,7 +896,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "productivity",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/intercom/claude-plugin-external.git",
+      "upstream_url": "https://github.com/intercom/legacy-plugin-external.git",
       "upstream_sha": "52653572c47700443eb61154c4e4334a355e755e",
       "upstream_subpath": null,
       "classification": "mixed-plugin",
@@ -913,7 +913,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "security",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/jfrog/claude-plugin.git",
+      "upstream_url": "https://github.com/jfrog/legacy-plugin.git",
       "upstream_sha": "259c8e718266c16e99b4f30ae9b1ed0f9f00d98d",
       "upstream_subpath": null,
       "classification": "hook-runtime",
@@ -947,7 +947,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "development",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/mintlify/mintlify-claude-plugin.git",
+      "upstream_url": "https://github.com/mintlify/mintlify-legacy-plugin.git",
       "upstream_sha": "acd6d2e0128c4f235d55cfb8d8c91ecbdd5df8cc",
       "upstream_subpath": null,
       "classification": "mixed-plugin",
@@ -966,7 +966,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "_meta": {
       "upstream_url": "https://github.com/miroapp/miro-ai.git",
       "upstream_sha": "00e619e63ca9a8fd788c2db9f294bc90773aac48",
-      "upstream_subpath": "claude-plugins/miro",
+      "upstream_subpath": "legacy-plugins/miro",
       "classification": "mixed-plugin",
       "target_batch": "parallel-18-workflow-present",
       "license": "NONE_DETECTED",
@@ -1066,7 +1066,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "productivity",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/makenotion/claude-code-notion-plugin.git",
+      "upstream_url": "https://github.com/makenotion/legacy-assistant-notion-plugin.git",
       "upstream_sha": "9847f2aa1a15f25df35ed1fb7b4557dbb60cd651",
       "upstream_subpath": null,
       "classification": "mixed-plugin",
@@ -1085,7 +1085,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "_meta": {
       "upstream_url": "https://github.com/oracle-samples/oracle-aidp-samples.git",
       "upstream_sha": "f436f3a40dfaedbef6a076ad3992b697ba5dcef6",
-      "upstream_subpath": "ai/claude-code-plugins/oracle-ai-data-platform-workbench-spark-connectors",
+      "upstream_subpath": "ai/legacy-assistant-plugins/oracle-ai-data-platform-workbench-spark-connectors",
       "classification": "skill-suite",
       "target_batch": "parallel-17-skills-suite",
       "license": "MIT",
@@ -1102,7 +1102,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "_meta": {
       "upstream_url": "https://github.com/growthxai/output.git",
       "upstream_sha": "756d32d1d4fad028850ae5a28921432b825060f2",
-      "upstream_subpath": "coding_assistants/claude/plugins/outputai",
+      "upstream_subpath": "coding_assistants/legacy-assistant/plugins/outputai",
       "classification": "mixed-plugin",
       "target_batch": "parallel-18-workflow-present",
       "license": "NONE_DETECTED",
@@ -1117,7 +1117,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "monitoring",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/PagerDuty/claude-code-plugins.git",
+      "upstream_url": "https://github.com/PagerDuty/legacy-assistant-plugins.git",
       "upstream_sha": "761cba75bd50fd561405c3b173ecf36084432089",
       "upstream_subpath": null,
       "classification": "mixed-plugin",
@@ -1151,7 +1151,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "database",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/pinecone-io/pinecone-claude-code-plugin.git",
+      "upstream_url": "https://github.com/pinecone-io/pinecone-legacy-assistant-plugin.git",
       "upstream_sha": "7dc3cfe091335f5053ec9e6eb05403e674a73c5e",
       "upstream_subpath": null,
       "classification": "mixed-plugin",
@@ -1168,7 +1168,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "database",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/planetscale/claude-plugin.git",
+      "upstream_url": "https://github.com/planetscale/legacy-plugin.git",
       "upstream_sha": "f1066cac5bb956bbbb05918f5b07fe0e873d44ea",
       "upstream_subpath": null,
       "classification": "mcp-wrapper",
@@ -1219,7 +1219,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "development",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/Postman-Devrel/postman-claude-code-plugin.git",
+      "upstream_url": "https://github.com/Postman-Devrel/postman-legacy-assistant-plugin.git",
       "upstream_sha": "416e40da03a237df7bf03f4362cf6fc7b989b567",
       "upstream_subpath": null,
       "classification": "mixed-plugin",
@@ -1236,7 +1236,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "development",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/prisma/claude-plugin.git",
+      "upstream_url": "https://github.com/prisma/legacy-plugin.git",
       "upstream_sha": "815dbc4a045a29e3b81510ba0e3ab806f1baaf0e",
       "upstream_subpath": null,
       "classification": "mcp-wrapper",
@@ -1321,7 +1321,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "development",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/Digital-Process-Tools/claude-remember.git",
+      "upstream_url": "https://github.com/Digital-Process-Tools/legacy-assistant-remember.git",
       "upstream_sha": "aa55ba3f553e23f4d84387f5d7ece1ba0ce68d93",
       "upstream_subpath": null,
       "classification": "hook-runtime",
@@ -1338,7 +1338,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "development",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/RevenueCat/rc-claude-code-plugin.git",
+      "upstream_url": "https://github.com/RevenueCat/rc-legacy-assistant-plugin.git",
       "upstream_sha": "407e4651ff74dbaf47c457948ab540e620403c2a",
       "upstream_subpath": "revenuecat",
       "classification": "mixed-plugin",
@@ -1440,7 +1440,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "monitoring",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/getsentry/sentry-for-claude.git",
+      "upstream_url": "https://github.com/getsentry/sentry-for-legacy-assistant.git",
       "upstream_sha": "cf7efd373069d6fb073413324fe313319fb54ad9",
       "upstream_subpath": null,
       "classification": "mixed-plugin",
@@ -1459,7 +1459,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "_meta": {
       "upstream_url": "https://github.com/ServiceNow/sdk.git",
       "upstream_sha": "06adf37ca78c270a57f93e7b9dfbb7bf16e24611",
-      "upstream_subpath": "providers/claude/plugin",
+      "upstream_subpath": "providers/legacy-assistant/plugin",
       "classification": "skill-suite",
       "target_batch": "parallel-17-skills-suite",
       "license": "NONE_DETECTED",
@@ -1542,7 +1542,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "security",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/sonatype/sonatype-guide-claude-plugin.git",
+      "upstream_url": "https://github.com/sonatype/sonatype-guide-legacy-plugin.git",
       "upstream_sha": "1dae73980f591d3196f5532ac72186513563d028",
       "upstream_subpath": null,
       "classification": "mixed-plugin",
@@ -1559,7 +1559,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "development",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/sourcegraph-community/sourcegraph-claudecode-plugin.git",
+      "upstream_url": "https://github.com/sourcegraph-community/sourcegraph-legacyassistant-plugin.git",
       "upstream_sha": "332ee0ca9a409ccd791abee43c7abf2606469017",
       "upstream_subpath": null,
       "classification": "mixed-plugin",
@@ -1576,7 +1576,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "productivity",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/spotify/ads-claude-plugin.git",
+      "upstream_url": "https://github.com/spotify/ads-legacy-plugin.git",
       "upstream_sha": "cc3db744f4a4c14f7265ef3e9fb50f44cf08e0e7",
       "upstream_subpath": null,
       "classification": "hook-runtime",
@@ -1595,7 +1595,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "_meta": {
       "upstream_url": "https://github.com/stripe/ai.git",
       "upstream_sha": "ec93d4c4b9ffdbc994ac45ce692d4ec1cdb755f0",
-      "upstream_subpath": "providers/claude/plugin",
+      "upstream_subpath": "providers/legacy-assistant/plugin",
       "classification": "mixed-plugin",
       "target_batch": "parallel-18-workflow-present",
       "license": "NONE_DETECTED",
@@ -1612,7 +1612,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "_meta": {
       "upstream_url": "https://github.com/sumup/sumup-skills.git",
       "upstream_sha": "a4b5a9789e10e27fb375b68279bb0916074b8dd4",
-      "upstream_subpath": "providers/claude/plugin",
+      "upstream_subpath": "providers/legacy-assistant/plugin",
       "classification": "mixed-plugin",
       "target_batch": "parallel-18-workflow-present",
       "license": "NONE_DETECTED",
@@ -1712,7 +1712,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "productivity",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/windsor-ai/claude-windsor-ai-plugin.git",
+      "upstream_url": "https://github.com/windsor-ai/legacy-assistant-windsor-ai-plugin.git",
       "upstream_sha": "248a6994b15b410cc025b105bb4ed5558e9b1af9",
       "upstream_subpath": null,
       "classification": "mixed-plugin",
@@ -1746,7 +1746,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
     "category": "development",
     "tags": [],
     "_meta": {
-      "upstream_url": "https://github.com/Automattic/claude-code-wordpress.com.git",
+      "upstream_url": "https://github.com/Automattic/legacy-assistant-wordpress.com.git",
       "upstream_sha": "052ca970df2c577d7c651e784935186ff93e6779",
       "upstream_subpath": null,
       "classification": "command-workflow",
@@ -1830,7 +1830,7 @@ Each draft also carries an internal `_meta` block with the upstream coordinates.
 
 - **0 source-unavailable**, **0 unreachable upstreams**: every URL responded to `git ls-remote` and every pinned sha was reachable.
 - **4 duplicate entries**: `rc`, `data`, `data-engineering`, `sap-cds-mcp` collapse into 3 canonicals (`revenuecat`, `astronomer-data-agents`, `cds-mcp`). Recommend NOT publishing the duplicate names as separate plugin directories; instead either alias them inside the marketplace (if the marketplace schema supports aliases) or pick one display name and drop the others. **This requires an integration decision.**
-- **4 multi-plugin-monorepo upstreams**: `azure`, `huggingface-skills`, `quarkus-agent`, `vanta-mcp-plugin` upstream repos contain more than one `.claude-plugin/plugin.json`. Each needs a slicing decision before the per-batch conversion ticket can run.
+- **4 multi-plugin-monorepo upstreams**: `azure`, `huggingface-skills`, `quarkus-agent`, `vanta-mcp-plugin` upstream repos contain more than one `.legacy-plugin/plugin.json`. Each needs a slicing decision before the per-batch conversion ticket can run.
 - **28 license concerns** (1 noncommercial blocker, 1 AGPL, 1 GPL, 1 source-available, 24 missing license files). All 28 must clear legal review before a public marketplace mirror is published. `agentforce-adlc` (CC-BY-NC-4.0) is the only hard blocker among these.
 - **13 entries land in hook-runtime**: every Python or shell hook from upstream must be rewritten in TypeScript before implementation per plan-01 §"TypeScript Rules". This affects worker capacity planning for `parallel-05-runtime-present` (originally sized for 5 workers; this Window H influx alone adds 13 candidates).
 - **`bangong/external-sources/` size**: roughly 1.8 GB on disk after this run (92 shallow clones at pinned sha). Stays untracked. Re-running this fetch on another machine reproduces the exact tree via the pinned shas recorded above.

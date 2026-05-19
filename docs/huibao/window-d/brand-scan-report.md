@@ -73,5 +73,5 @@ addendum — those are not blocking and are not window-D scope.)
   `c-ude_desktop_config.json` are also handled.
 - Plural form `anth-...s` mapped to `crabcode-team`.
 - The `model: <family>` frontmatter line is stripped entirely so the
-  CrabCode runtime defaults apply (per CLAUDE.md §硬约束 #1
+  CrabCode runtime defaults apply (per CRABCODE.md §硬约束 #1
   "模型品牌字面 — 零容忍").

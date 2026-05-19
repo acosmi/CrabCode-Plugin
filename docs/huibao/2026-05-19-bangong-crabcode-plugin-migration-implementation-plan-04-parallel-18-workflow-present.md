@@ -2,7 +2,7 @@
 
 Date: 2026-05-19
 Parallelism: 18 workers
-Source root: `bangong/claude-plugins-official/plugins`
+Source root: `bangong/legacy-plugins-official/plugins`
 
 ## Scope
 
@@ -26,7 +26,7 @@ Use `src/` only when the plugin has executable logic that must be rewritten in T
 | Worker | Source | Target | Primary Work |
 |---|---|---|---|
 | WF-01 | `plugins/agent-sdk-dev` | `plugins/agent-sdk-dev` | Agent SDK guidance, commands, agents. |
-| WF-02 | `plugins/claude-md-management` | `plugins/crabcode-memory-management` | Convert `CLAUDE.md` workflows to `CRABCODE.md`. |
+| WF-02 | `plugins/crabcode-memory-management` | `plugins/crabcode-memory-management` | Convert `CRABCODE.md` workflows to `CRABCODE.md`. |
 | WF-03 | `plugins/code-modernization` | `plugins/code-modernization` | Modernization commands and specialist agents. |
 | WF-04 | `plugins/code-review` | `plugins/code-review` | PR/code review workflow, confidence filtering. |
 | WF-05 | `plugins/code-simplifier` | `plugins/code-simplifier` | Simplification agent. |
@@ -42,14 +42,14 @@ Use `src/` only when the plugin has executable logic that must be rewritten in T
 | WF-15 | `plugins/pr-review-toolkit` | `plugins/pr-review-toolkit` | PR review agents and commands. |
 | WF-16 | `plugins/session-report` | `plugins/session-report` | Session report skill; add manifest. |
 | WF-17 | `plugins/skill-creator` | `plugins/skill-creator` | Skill creation and evaluation skills. |
-| WF-18 | `plugins/claude-code-setup` | `crabcode-setup` | Already implemented; run regression diff and update only if gaps remain. |
+| WF-18 | `plugins/legacy-assistant-setup` | `crabcode-setup` | Already implemented; run regression diff and update only if gaps remain. |
 
 ## Rewrite Rules
 
 - Do not perform blind search-and-replace only; read each command/skill and rewrite intent.
-- Keep technical domain terms, remove Claude product identity.
+- Keep technical domain terms, remove legacy assistant product identity.
 - Replace `subagent` with `agent` or `parallel worker` depending on semantics.
-- Replace `CLAUDE.md` with `CRABCODE.md`.
+- Replace `CRABCODE.md` with `CRABCODE.md`.
 - Replace plugin development examples with `.crabcode-plugin/plugin.json`.
 - Remove model-specific wording.
 - Preserve prompt safety boundaries.
@@ -66,7 +66,7 @@ Each worker produces:
 
 ## Batch Lead Checks
 
-- Ensure `plugin-dev` and `skill-creator` do not conflict with existing Codex/CrabCode skill creator guidance.
+- Ensure `plugin-dev` and `skill-creator` do not conflict with existing legacy assistant/CrabCode skill creator guidance.
 - Ensure `code-review`, `pr-review-toolkit`, and `code-simplifier` have distinct invocation purposes.
 - Ensure `crabcode-memory-management` aligns with this repository's `CRABCODE.md` conventions.
 

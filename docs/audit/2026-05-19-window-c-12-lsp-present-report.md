@@ -7,7 +7,7 @@ Plan doc: `docs/huibao/2026-05-19-bangong-crabcode-plugin-migration-implementati
 
 ## Audit before implementation
 
-1. Plan §"Worker Assignments" lists 12 plugins (clangd / csharp / gopls / jdtls / kotlin / lua / php / pyright / ruby / rust-analyzer / swift / typescript). All 12 upstream source folders exist under `bangong/claude-plugins-official/plugins/<name>-lsp` and contain only `README.md` + `LICENSE`. Confirmed by `find bangong/claude-plugins-official/plugins/*-lsp -type f`.
+1. Plan §"Worker Assignments" lists 12 plugins (clangd / csharp / gopls / jdtls / kotlin / lua / php / pyright / ruby / rust-analyzer / swift / typescript). All 12 upstream source folders exist under `bangong/legacy-plugins-official/plugins/<name>-lsp` and contain only `README.md` + `LICENSE`. Confirmed by `find bangong/legacy-plugins-official/plugins/*-lsp -type f`.
 2. Plan §"Shared Target Shape" expects `.crabcode-plugin/plugin.json`, `.mcp.json`, `src/lsp-wrapper.ts`, `package.json`, `tsconfig.json`, `docs/legal/THIRD_PARTY_NOTICES.md`. Followed verbatim per plugin.
 3. Plan §"Shared TypeScript Runtime" defers the share-vs-inline decision to the batch lead. Decision: TS wrapper is **inlined per plugin** under `plugins/<name>/src/lsp-wrapper.ts`, because §"Directory Naming Constraints" rule 6 mandates "TypeScript runtime code must live inside the owning plugin at `plugins/<plugin-name>/src/`". Inlining avoids window-cross dependency on a `packages/lsp-wrapper` that no other plan owns.
 4. Plan §"Required Changes Per Plugin" item 6 ("Add marketplace entry") is **overridden by the goal-level Git constraint** ("不直接改 .crabcode-plugin/marketplace.json；需新增的 entry 写入批次报告"). Entries are emitted in this report instead.
@@ -51,7 +51,7 @@ Wrapper behaviour (identical across the 12 plugins, only constants differ):
 | `cd plugins/jdtls-lsp && bun run src/lsp-wrapper.ts </dev/null` | Exit 127, prints CrabCode install hint (missing-binary path verified) |
 | `cd plugins/clangd-lsp && bun run src/lsp-wrapper.ts </dev/null` | clangd spawned (already on PATH); wrapper proxy verified — clangd reports normal stdio shutdown |
 
-Root-level `bun run scripts/lint-brand.ts plugins` reports `claude` in each plugin's `docs/legal/THIRD_PARTY_NOTICES.md`. This is expected:
+Root-level `bun run scripts/lint-brand.ts plugins` reports `legacy-assistant` in each plugin's `docs/legal/THIRD_PARTY_NOTICES.md`. This is expected:
 - The notices contain legitimate upstream attribution allowed by §"Brand Removal Rules" ("Legal notices may include source attribution when needed").
 - The default brand-lint ignore (`docs/legal/**`) only matches when the legal directory sits at the scan-target root; the plan-mandated validation command (`scripts/lint-brand.ts plugins/<plugin-name>`) targets the plugin root and correctly ignores its legal notice.
 - An unrelated plugin `plugins/security-guidance/` (owned by another window) is also flagged in the root-scope scan and is outside this window's scope.

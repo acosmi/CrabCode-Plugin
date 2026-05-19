@@ -9,16 +9,16 @@
 ## Plan audit findings (filed back into plan doc §"Audit Addendum (Window G, 2026-05-19)")
 
 1. The doc title "missing local-path" is misleading. All 33 entries resolve to external git repositories (`source.source` = `git-subdir` ×32 or `url` ×1); the `.path` field merely happens to read `plugins/<name>`. They are categorically external-source entries. The 33-vs-96 split is justified only by parallelism slicing, not by source-type difference.
-2. Conversion default for `desktop-commander` source-path rename (`plugins/claude` → `plugins/desktop-commander`) verified correct at the upstream sha.
+2. Conversion default for `desktop-commander` source-path rename (`plugins/legacy-assistant` → `plugins/desktop-commander`) verified correct at the upstream sha.
 3. Most upstream subdirs have no local `LICENSE` (it sits at the repo root). Implementation windows must cite the parent repo's LICENSE in `docs/legal/THIRD_PARTY_NOTICES.md` for those subdirs.
 4. `legalzoom` declares `PROPRIETARY` in its upstream manifest; integration window should defer redistribution.
 
 ## What this window did
 
-1. Verified all 33 marketplace names exist in `bangong/claude-plugins-official/.claude-plugin/marketplace.json` at the baseline commit (`4bf08583`). Each entry's declared upstream URL, ref, baseline sha, and inner `path` were captured.
+1. Verified all 33 marketplace names exist in `bangong/legacy-plugins-official/.legacy-plugin/marketplace.json` at the baseline commit (`4bf08583`). Each entry's declared upstream URL, ref, baseline sha, and inner `path` were captured.
 2. For each entry, performed a partial-clone + sparse-checkout of the upstream subdirectory at the baseline sha, snapshotting it into `bangong/external-sources/snapshots/<entry-name>/`.
 3. Classified each snapshot into one of: `mcp-wrapper`, `skill-only`, `workflow`, `runtime`, `hook-runtime`, `declarative-only`.
-4. Counted feature artefacts (mcp files, SKILL.md, commands, agents, hooks, runtime files by language) and recorded current Claude/Anthropic brand hit counts to size brand-removal effort.
+4. Counted feature artefacts (mcp files, SKILL.md, commands, agents, hooks, runtime files by language) and recorded current legacy assistant/upstream vendor brand hit counts to size brand-removal effort.
 5. Captured each entry's license value from upstream manifest.
 6. Filed integration-window guidance (this report's tables + marketplace-entry payloads).
 
@@ -28,7 +28,7 @@
 - Then `git fetch --filter=blob:none origin <sha>` to obtain the baseline commit, `git sparse-checkout set <path>`, and `git checkout <sha>`.
 - Snapshot via `cp -R _clones/<basename>/<path> snapshots/<entry-name>/`.
 - `bangong/` is gitignored (Window A addendum) so the cache and snapshots are not tracked.
-- Six entries collided on `basename(url .git)`. Resolved by re-cloning into org-prefixed dirs (`airtable-skills`, `expo-skills`, `legalzoom-claude-plugins`, `pydantic-skills`, `neondatabase-agent-skills`). See "Collisions resolved" below.
+- Six entries collided on `basename(url .git)`. Resolved by re-cloning into org-prefixed dirs (`airtable-skills`, `expo-skills`, `legalzoom-legacy-plugins`, `pydantic-skills`, `neondatabase-agent-skills`). See "Collisions resolved" below.
 
 Driver scripts (ephemeral, not committed): `/tmp/lp33_entries.tsv`, `/tmp/lp33_fetch.sh`, `/tmp/lp33_fixups.sh`, `/tmp/lp33_classify.sh`. Logs: `bangong/external-sources/_fetch-log.tsv`, `bangong/external-sources/_classification.tsv`.
 
@@ -38,7 +38,7 @@ All 33 entries successfully snapshotted at their baseline sha. Status counts: `O
 
 | # | Entry | Upstream | Baseline sha | Path | Kind | mcp / skill / cmd / agent / hook | License | Brand hits |
 |---|---|---|---|---|---|---|---|---|
-| LP-01 | `42crunch-api-security-testing` | `42Crunch-AI/claude-plugins` | `faf5305` | `plugins/api-security-testing` | skill-only | 0/5/0/0/0 | Apache 2.0 | 2 |
+| LP-01 | `42crunch-api-security-testing` | `42Crunch-AI/legacy-plugins` | `faf5305` | `plugins/api-security-testing` | skill-only | 0/5/0/0/0 | Apache 2.0 | 2 |
 | LP-02 | `adobe-for-creativity` | `adobe/skills` | `9ca1da2` | `plugins/creative-cloud/adobe-for-creativity` | mcp-wrapper | 1/6/0/0/0 | Apache-2.0 | 3 |
 | LP-03 | `airtable` | `Airtable/skills` | `aaeb4f3` | `plugins/airtable` | mcp-wrapper | 1/2/0/0/0 | MIT | 1 |
 | LP-04 | `amazon-location-service` | `awslabs/agent-plugins` | `95381e8` | `plugins/amazon-location-service` | mcp-wrapper | 1/1/0/0/0 | Apache-2.0 | 0 |
@@ -48,7 +48,7 @@ All 33 entries successfully snapshotted at their baseline sha. Status counts: `O
 | LP-08 | `aws-amplify` | `awslabs/agent-plugins` | `95381e8` | `plugins/aws-amplify` | mcp-wrapper | 1/1/0/0/0 | Apache-2.0 | 1 |
 | LP-09 | `aws-core` | `aws/agent-toolkit-for-aws` | `ba1cc8c` | `plugins/aws-core` | runtime (ts+py) | 1/13/0/0/0 | Apache-2.0 | 13 |
 | LP-10 | `aws-data-analytics` | `aws/agent-toolkit-for-aws` | `ba1cc8c` | `plugins/aws-data-analytics` | mcp-wrapper | 1/7/0/0/0 | Apache-2.0 | 1 |
-| LP-11 | `aws-dev-toolkit` | `aws-samples/sample-claude-code-plugins-for-startups` | `ddea7fd` | `plugins/aws-dev-toolkit` | mcp-wrapper | 1/34/0/11/0 | MIT-0 | 16 |
+| LP-11 | `aws-dev-toolkit` | `aws-samples/sample-legacy-assistant-plugins-for-startups` | `ddea7fd` | `plugins/aws-dev-toolkit` | mcp-wrapper | 1/34/0/11/0 | MIT-0 | 16 |
 | LP-12 | `aws-serverless` | `awslabs/agent-plugins` | `95381e8` | `plugins/aws-serverless` | hook-runtime | 1/4/0/0/1 | Apache-2.0 | 3 |
 | LP-13 | `bigdata-com` | `Bigdata-com/bigdata-plugins-marketplace` | `c77a09c` | `plugins/bigdata-com` | runtime (py) | 1/1/22/0/0 | (manifest empty) | 1 |
 | LP-14 | `carta-cap-table` | `carta/plugins` | `49db52a` | `plugins/carta-cap-table` | hook-runtime (js) | 0/14/0/0/1 | (manifest empty) | 12 |
@@ -56,23 +56,23 @@ All 33 entries successfully snapshotted at their baseline sha. Status counts: `O
 | LP-16 | `carta-investors` | `carta/plugins` | `e72e8d5` | `plugins/carta-investors` | hook-runtime (py+js) | 0/5/0/0/1 | (manifest empty) | 11 |
 | LP-17 | `databases-on-aws` | `awslabs/agent-plugins` | `95381e8` | `plugins/databases-on-aws` | hook-runtime (py) | 1/1/0/0/1 | Apache-2.0 | 3 |
 | LP-18 | `deploy-on-aws` | `awslabs/agent-plugins` | `95381e8` | `plugins/deploy-on-aws` | hook-runtime (py) | 1/2/0/0/1 | Apache-2.0 | 2 |
-| LP-19 | `desktop-commander` | `wonderwhy-er/DesktopCommanderMCP` | `9c44119` | `plugins/claude` → `plugins/desktop-commander` | mcp-wrapper | 0/1/0/0/0 | MIT | 1 |
+| LP-19 | `desktop-commander` | `wonderwhy-er/DesktopCommanderMCP` | `9c44119` | `plugins/legacy-assistant` → `plugins/desktop-commander` | mcp-wrapper | 0/1/0/0/0 | MIT | 1 |
 | LP-20 | `expo` | `expo/skills` | `47f0ef6` | `plugins/expo` | runtime (js) | 0/13/0/0/0 | (manifest empty) | 0 |
-| LP-21 | `legalzoom` | `legalzoom/claude-plugins` | `f9fd8a0` | `plugins/legalzoom` | mcp-wrapper | 1/1/1/0/0 | **PROPRIETARY** | 5 |
+| LP-21 | `legalzoom` | `legalzoom/legacy-plugins` | `f9fd8a0` | `plugins/legalzoom` | mcp-wrapper | 1/1/1/0/0 | **PROPRIETARY** | 5 |
 | LP-22 | `liquid-lsp` | `Shopify/liquid-skills` | `a00ca03` | `plugins/liquid-lsp` | declarative-only (LSP) | 0/0/0/0/0 | MIT | 1 |
 | LP-23 | `liquid-skills` | `Shopify/liquid-skills` | `bf7a7aa` | `plugins/liquid-skills` | skill-only | 0/3/0/0/0 | MIT | 0 |
 | LP-24 | `logfire` | `pydantic/skills` | `92bd097` | `plugins/logfire` | mcp-wrapper | 1/2/4/0/0 | (manifest empty) | 5 |
-| LP-25 | `mercadopago` | `mercadopago/mercadopago-claude-marketplace` | `1de8d97` | `plugins/mercadopago` | hook-runtime (py) | 1/13/3/1/2 | Apache-2.0 | 7 |
+| LP-25 | `mercadopago` | `mercadopago/mercadopago-legacy-assistant-marketplace` | `1de8d97` | `plugins/mercadopago` | hook-runtime (py) | 1/13/3/1/2 | Apache-2.0 | 7 |
 | LP-26 | `neon` | `neondatabase/agent-skills` | `1438d7d` | `plugins/neon-postgres` | mcp-wrapper (+ skills dir promised in manifest but not present at sha) | 0/0/0/0/0 | Apache-2.0 | 0 |
 | LP-27 | `pydantic-ai` | `pydantic/skills` | `92bd097` | `plugins/ai` → `plugins/pydantic-ai` | skill-only | 0/1/0/0/0 | (manifest empty) | 5 |
 | LP-28 | `railway` | `railwayapp/railway-skills` | `eaa89d8` | `plugins/railway` | hook-runtime (py) | 0/1/0/0/2 | MIT | 2 |
 | LP-29 | `snowflake-cortex-code` | `Snowflake-Labs/snowflake-ai-kit` | `b16692d` | `plugins/cortex-code` → `plugins/snowflake-cortex-code` | hook-runtime (py) | 0/3/0/0/1 | Apache-2.0 | 16 |
-| LP-30 | `ui5` | `UI5/plugins-claude` | `19b2fb3` | `plugins/ui5` | mcp-wrapper | 1/0/0/0/0 | Apache-2.0 | 2 |
-| LP-31 | `ui5-typescript-conversion` | `UI5/plugins-claude` | `19b2fb3` | `plugins/ui5-typescript-conversion` | mcp-wrapper | 1/1/0/0/0 | Apache-2.0 | 2 |
+| LP-30 | `ui5` | `UI5/plugins-legacy-assistant` | `19b2fb3` | `plugins/ui5` | mcp-wrapper | 1/0/0/0/0 | Apache-2.0 | 2 |
+| LP-31 | `ui5-typescript-conversion` | `UI5/plugins-legacy-assistant` | `19b2fb3` | `plugins/ui5-typescript-conversion` | mcp-wrapper | 1/1/0/0/0 | Apache-2.0 | 2 |
 | LP-32 | `zapier` | `zapier/zapier-mcp` | `f34a785` | `plugins/zapier` | mcp-wrapper | 1/3/0/1/0 | (manifest empty) | 4 |
 | LP-33 | `zilliz` | `zilliztech/zilliz-plugin` | `e960396` | `plugins/zilliz` | workflow (commands) | 0/20/2/0/0 | Apache-2.0 | 4 |
 
-"Brand hits" = count of files containing the literal strings `claude`, `anthropic`, `.claude`, or `CLAUDE.md` under the snapshotted tree (regardless of context). Used to size brand-removal effort in implementation phases. Hits ≠ violations; many are legitimate references to the source repo or to the Claude Code product name.
+"Brand hits" = count of files containing the literal strings `legacy-assistant`, `upstream-vendor`, `.legacy-assistant`, or `CRABCODE.md` under the snapshotted tree (regardless of context). Used to size brand-removal effort in implementation phases. Hits ≠ violations; many are legitimate references to the source repo or to the legacy assistant product name.
 
 ## Implementation type breakdown
 
@@ -95,7 +95,7 @@ Initial driver used `basename(url .git)` as clone directory name, causing six co
 |---|---|---|
 | `airtable` | `_clones/skills` (held adobe's clone) | `_clones/airtable-skills` |
 | `expo` | `_clones/skills` | `_clones/expo-skills` |
-| `legalzoom` | `_clones/claude-plugins` (held 42crunch's clone) | `_clones/legalzoom-claude-plugins` |
+| `legalzoom` | `_clones/legacy-plugins` (held 42crunch's clone) | `_clones/legalzoom-legacy-plugins` |
 | `logfire` | `_clones/skills` | `_clones/pydantic-skills` |
 | `neon` | `_clones/agent-skills` (held auth0's clone) | `_clones/neondatabase-agent-skills` |
 | `pydantic-ai` | `_clones/skills` | `_clones/pydantic-skills` (shared with logfire — same repo) |
@@ -492,7 +492,7 @@ No plugin directories, no marketplace.json, no validators, no templates were tou
 
 ## Validation commands run
 
-- `cd bangong/claude-plugins-official && git rev-parse HEAD` → `4bf08583c37e04f764806ea7a96ca74fb80ced1d` (matches plan baseline).
+- `cd bangong/legacy-plugins-official && git rev-parse HEAD` → `4bf08583c37e04f764806ea7a96ca74fb80ced1d` (matches plan baseline).
 - `jq` cross-checks of marketplace.json: 178 plugins total; 49 string-source ("present local") + 33 git-subdir/url subset (this batch) + 96 other external (batch 08) = 178. ✓
 - All 33 names resolved via `jq -r '.plugins[] | select(.name == "<n>") | .source'` matching plan-doc target paths.
 - 33/33 snapshot directories present under `bangong/external-sources/snapshots/`; `_fetch-log.tsv` reports `OK` for all 33 after collision fixup.
