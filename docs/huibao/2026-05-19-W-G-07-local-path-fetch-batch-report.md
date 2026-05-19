@@ -78,14 +78,14 @@ All 33 entries successfully snapshotted at their baseline sha. Status counts: `O
 
 | Kind | Count | Entries |
 |---|---|---|
-| mcp-wrapper | 14 | adobe-for-creativity, airtable, amazon-location-service, amplitude, aws-agents, aws-amplify, aws-data-analytics, aws-dev-toolkit, carta-crm, desktop-commander, legalzoom, logfire, neon, ui5, ui5-typescript-conversion, zapier |
-| hook-runtime | 9 | aws-serverless, carta-cap-table, carta-investors, databases-on-aws, deploy-on-aws, mercadopago, railway, snowflake-cortex-code |
-| skill-only | 4 | 42crunch-api-security-testing, liquid-skills, pydantic-ai |
-| runtime | 3 | auth0, aws-core, bigdata-com, expo |
+| mcp-wrapper | 16 | adobe-for-creativity, airtable, amazon-location-service, amplitude, aws-agents, aws-amplify, aws-data-analytics, aws-dev-toolkit, carta-crm, desktop-commander, legalzoom, logfire, neon, ui5, ui5-typescript-conversion, zapier |
+| hook-runtime | 8 | aws-serverless, carta-cap-table, carta-investors, databases-on-aws, deploy-on-aws, mercadopago, railway, snowflake-cortex-code |
+| runtime | 4 | auth0, aws-core, bigdata-com, expo |
+| skill-only | 3 | 42crunch-api-security-testing, liquid-skills, pydantic-ai |
 | workflow | 1 | zilliz |
 | declarative-only (LSP) | 1 | liquid-lsp |
 
-(Counts above include some overlap due to multi-category fits; primary classification was assigned by precedence hook-runtime > runtime > mcp-wrapper > workflow > skill-only > declarative-only.)
+Total: 16+8+4+3+1+1 = 33. Primary classification assigned by precedence hook-runtime > runtime > mcp-wrapper > workflow > skill-only > declarative-only when multiple categories could fit (e.g. plugins shipping both MCP servers and skills are counted as `mcp-wrapper` because skills go in without runtime work; plugins shipping hooks are `hook-runtime` regardless of how many skills also exist).
 
 ## Collisions resolved
 
