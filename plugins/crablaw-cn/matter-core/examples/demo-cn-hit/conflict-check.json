@@ -1,0 +1,28 @@
+{
+  "matterId": "hit-demo-platform-2026-cross-border",
+  "status": "hit-review-required",
+  "screenedAt": "2026-05-10",
+  "screenedBy": "system",
+  "queries": [
+    "命中示例平台有限公司",
+    "91440000HITDEMO001",
+    "Hit Demo Platform Co., Ltd.",
+    "命中示例平台",
+    "命中示例平台广州分公司",
+    "示例境外母公司",
+    "Example Offshore Parent Inc."
+  ],
+  "hits": [
+    {
+      "source": "internal-client-index",
+      "matchedMatterId": "hit-demo-platform-2024-investigation",
+      "summary": "曾在 2024 年承办与示例境外母公司相关的内部调查事项，可能存在潜在利益冲突。",
+      "risk": "medium",
+      "recommendedAction": "提交合伙人会议复核并书面记录决定。"
+    }
+  ],
+  "lawyerConfirmation": {
+    "status": "not-reviewed",
+    "notes": "等待合伙人会议复核命中并形成书面决定。"
+  }
+}

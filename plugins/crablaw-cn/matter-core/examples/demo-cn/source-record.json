@@ -1,0 +1,12 @@
+{
+  "sourceId": "source-demo-001",
+  "matterId": "demo-client-2026-contract-review",
+  "sourceType": "user-provided",
+  "title": "示例 SaaS 服务合同",
+  "authority": "客户提供",
+  "urlOrRecordId": "inputs/contracts/demo-saas-agreement.docx",
+  "retrievedAt": "2026-05-13",
+  "effectiveStatus": "客户提供版本，未核验签署状态。",
+  "pinpoint": "全文",
+  "status": "unreviewed"
+}

@@ -1,0 +1,762 @@
+{
+  "name": "crabcode-plugins-official",
+  "owner": {
+    "name": "CrabCode"
+  },
+  "metadata": {
+    "version": "0.1.0",
+    "description": "Official CrabCode plugin marketplace hosted at acosmi/CrabCode-Plugin."
+  },
+  "plugins": [
+    {
+      "name": "crabcode-setup",
+      "source": "./",
+      "version": "0.1.0",
+      "description": "Analyze repositories and recommend CrabCode-native automations such as skills, hooks, agents, plugins, and MCP servers.",
+      "category": "productivity",
+      "tags": [
+        "automation",
+        "recommendations",
+        "setup",
+        "analysis"
+      ]
+    },
+    {
+      "name": "matter-core",
+      "source": "./plugins/crablaw-cn/matter-core",
+      "version": "0.1.0",
+      "description": "Matter, client, conflict-screening, permission, source-record, review-queue, and archive foundation for CrabLaw-CN.",
+      "category": "legal-workflow",
+      "tags": [
+        "prc-law",
+        "matter-management",
+        "conflicts",
+        "review-gate"
+      ]
+    },
+    {
+      "name": "cn-contract",
+      "source": "./plugins/crablaw-cn/cn-contract",
+      "version": "0.1.0",
+      "description": "PRC contract review workflow for drafts, inbound agreements, NDAs, clause redrafts, and business risk summaries.",
+      "category": "legal-workflow",
+      "tags": [
+        "prc-law",
+        "contracts",
+        "civil-code"
+      ]
+    },
+    {
+      "name": "cn-data-compliance",
+      "source": "./plugins/crablaw-cn/cn-data-compliance",
+      "version": "0.1.0",
+      "description": "PRC personal information, data security, cybersecurity, and cross-border data transfer workflow drafts.",
+      "category": "legal-workflow",
+      "tags": [
+        "prc-law",
+        "data-compliance",
+        "personal-information"
+      ]
+    },
+    {
+      "name": "cn-labor-employment",
+      "source": "./plugins/crablaw-cn/cn-labor-employment",
+      "version": "0.1.0",
+      "description": "PRC labor and employment workflow drafts for employment contracts, termination risk, non-compete, handbooks, and disputes.",
+      "category": "legal-workflow",
+      "tags": [
+        "prc-law",
+        "labor",
+        "employment"
+      ]
+    },
+    {
+      "name": "crabcode-security-review",
+      "source": "./plugins/crabcode-security-review",
+      "version": "0.1.0",
+      "description": "Focused security review workflow for pending branch changes.",
+      "category": "security",
+      "tags": [
+        "security-review",
+        "code-review",
+        "diff-review"
+      ]
+    },
+    {
+      "name": "agent-sdk-dev",
+      "source": "./plugins/agent-sdk-dev",
+      "version": "0.1.0",
+      "description": "Agent SDK development guidance, verifier agents, and project bootstrap command (genericized for CrabCode product surface).",
+      "category": "agent-dev",
+      "tags": [
+        "agent-sdk",
+        "scaffolding",
+        "verifier",
+        "python",
+        "typescript"
+      ]
+    },
+    {
+      "name": "crabcode-memory-management",
+      "source": "./plugins/crabcode-memory-management",
+      "version": "0.1.0",
+      "description": "Maintain and improve CRABCODE.md project memory files: audit quality, capture session learnings, and keep guidance current.",
+      "category": "memory",
+      "tags": [
+        "memory",
+        "crabcode-md",
+        "project-memory",
+        "session-learnings"
+      ]
+    },
+    {
+      "name": "code-modernization",
+      "source": "./plugins/code-modernization",
+      "version": "0.1.0",
+      "description": "Modernize legacy codebases (COBOL, legacy Java/C++, monolith web apps) via assess → map → extract-rules → brief → reimagine → transform → harden, with specialist review agents.",
+      "category": "workflow",
+      "tags": [
+        "modernization",
+        "legacy",
+        "refactor",
+        "agents"
+      ]
+    },
+    {
+      "name": "code-review",
+      "source": "./plugins/code-review",
+      "version": "0.1.0",
+      "description": "Automated code review for pull requests with multi-agent specialists and confidence-based scoring.",
+      "category": "code-review",
+      "tags": [
+        "code-review",
+        "pull-request",
+        "agents",
+        "confidence"
+      ]
+    },
+    {
+      "name": "code-simplifier",
+      "source": "./plugins/code-simplifier",
+      "version": "0.1.0",
+      "description": "Agent that simplifies and refines code for clarity, consistency, and maintainability while preserving functionality.",
+      "category": "code-quality",
+      "tags": [
+        "simplify",
+        "refactor",
+        "code-quality"
+      ]
+    },
+    {
+      "name": "commit-commands",
+      "source": "./plugins/commit-commands",
+      "version": "0.1.0",
+      "description": "Streamline git workflows with commit, push, PR creation, and stale-branch cleanup commands.",
+      "category": "workflow",
+      "tags": [
+        "git",
+        "commit",
+        "pull-request",
+        "branch-cleanup"
+      ]
+    },
+    {
+      "name": "cwc-makers",
+      "source": "./plugins/cwc-makers",
+      "version": "0.1.0",
+      "description": "Onboarding for the Code-with-CrabCode Makers M5Stack Cardputer: one /maker-setup command flashes firmware and installs the device skills.",
+      "category": "hardware",
+      "tags": [
+        "cardputer",
+        "m5stack",
+        "esp32",
+        "hardware",
+        "maker"
+      ]
+    },
+    {
+      "name": "crabcode-example-plugin",
+      "source": "./plugins/crabcode-example-plugin",
+      "version": "0.1.0",
+      "description": "Reference CrabCode plugin demonstrating commands, agents, skills, hooks, and MCP server configuration.",
+      "category": "example",
+      "tags": [
+        "example",
+        "reference",
+        "scaffold",
+        "documentation"
+      ]
+    },
+    {
+      "name": "feature-dev",
+      "source": "./plugins/feature-dev",
+      "version": "0.1.0",
+      "description": "Feature development workflow with specialized agents for codebase exploration, architecture design, and quality review.",
+      "category": "workflow",
+      "tags": [
+        "feature-dev",
+        "architecture",
+        "review",
+        "agents"
+      ]
+    },
+    {
+      "name": "frontend-design",
+      "source": "./plugins/frontend-design",
+      "version": "0.1.0",
+      "description": "Frontend design skill for UI/UX implementation with production-grade aesthetics.",
+      "category": "skills",
+      "tags": [
+        "frontend",
+        "design",
+        "ui",
+        "ux"
+      ]
+    },
+    {
+      "name": "math-olympiad",
+      "source": "./plugins/math-olympiad",
+      "version": "0.1.0",
+      "description": "Solve competition math (IMO, Putnam, USAMO) with adversarial verification by fresh-context verifiers; calibrated abstention over bluffing.",
+      "category": "skills",
+      "tags": [
+        "math",
+        "olympiad",
+        "verification",
+        "reasoning"
+      ]
+    },
+    {
+      "name": "mcp-server-dev",
+      "source": "./plugins/mcp-server-dev",
+      "version": "0.1.0",
+      "description": "Skills for designing and building MCP servers: deployment models (remote HTTP, MCPB, local), tool design patterns, auth, and interactive MCP apps.",
+      "category": "agent-dev",
+      "tags": [
+        "mcp",
+        "server-development",
+        "tool-design",
+        "auth"
+      ]
+    },
+    {
+      "name": "playground",
+      "source": "./plugins/playground",
+      "version": "0.1.0",
+      "description": "Create interactive HTML playgrounds: self-contained single-file explorers with visual controls, live preview, and copy-to-clipboard prompt output.",
+      "category": "skills",
+      "tags": [
+        "playground",
+        "html",
+        "interactive",
+        "exploration"
+      ]
+    },
+    {
+      "name": "plugin-dev",
+      "source": "./plugins/plugin-dev",
+      "version": "0.1.0",
+      "description": "Plugin development toolkit with skills for creating agents, commands, hooks, MCP integrations, and plugin structure guidance for CrabCode.",
+      "category": "agent-dev",
+      "tags": [
+        "plugin-development",
+        "agents",
+        "commands",
+        "hooks",
+        "mcp"
+      ]
+    },
+    {
+      "name": "pr-review-toolkit",
+      "source": "./plugins/pr-review-toolkit",
+      "version": "0.1.0",
+      "description": "Pull request review agents specializing in comments, tests, error handling, type design, code quality, and code simplification.",
+      "category": "code-review",
+      "tags": [
+        "pr-review",
+        "agents",
+        "tests",
+        "type-design"
+      ]
+    },
+    {
+      "name": "session-report",
+      "source": "./plugins/session-report",
+      "version": "0.1.0",
+      "description": "Generate a styled HTML report of a CrabCode session from local transcript files for sharing and post-mortem.",
+      "category": "workflow",
+      "tags": [
+        "session-report",
+        "transcript",
+        "html-report"
+      ]
+    },
+    {
+      "name": "skill-creator",
+      "source": "./plugins/skill-creator",
+      "version": "0.1.0",
+      "description": "Create, improve, and evaluate CrabCode skills with analyzer/grader/comparator helper agents.",
+      "category": "skills",
+      "tags": [
+        "skill-creation",
+        "evaluation",
+        "agents"
+      ]
+    },
+    {
+      "name": "asana",
+      "source": "./plugins/asana",
+      "version": "0.1.0",
+      "description": "Asana work management integration packaged for CrabCode. Create and manage tasks, search projects, update assignments, and track progress alongside your engineering workflow.",
+      "category": "productivity",
+      "tags": [
+        "asana",
+        "tasks",
+        "project-management",
+        "mcp"
+      ]
+    },
+    {
+      "name": "context7",
+      "source": "./plugins/context7",
+      "version": "0.1.0",
+      "description": "Upstash Context7 MCP server for up-to-date documentation lookup. Pull version-specific docs and code examples directly from source repositories into the CrabCode session.",
+      "category": "development",
+      "tags": [
+        "context7",
+        "documentation",
+        "upstash",
+        "mcp"
+      ]
+    },
+    {
+      "name": "discord",
+      "source": "./plugins/discord",
+      "version": "0.1.0",
+      "description": "Discord channel bridge for CrabCode. Self-contained MCP server with pairing, allowlist, and guild-channel access control. Managed by /discord:access skill.",
+      "category": "messaging",
+      "tags": [
+        "discord",
+        "messaging",
+        "channel",
+        "bridge",
+        "mcp"
+      ]
+    },
+    {
+      "name": "fakechat",
+      "source": "./plugins/fakechat",
+      "version": "0.1.0",
+      "description": "Localhost web UI for testing the CrabCode channel contract. Self-contained MCP server with stdio transport, attachment upload, and a minimal web client. No external service, no tokens, no access control.",
+      "category": "messaging",
+      "tags": [
+        "channel",
+        "mcp",
+        "testing",
+        "fakechat",
+        "localhost"
+      ]
+    },
+    {
+      "name": "firebase",
+      "source": "./plugins/firebase",
+      "version": "0.1.0",
+      "description": "Google Firebase MCP integration for CrabCode. Manage Firestore, authentication, cloud functions, hosting, and storage directly from the development surface.",
+      "category": "database",
+      "tags": [
+        "firebase",
+        "google",
+        "firestore",
+        "mcp"
+      ]
+    },
+    {
+      "name": "github",
+      "source": "./plugins/github",
+      "version": "0.1.0",
+      "description": "GitHub MCP integration for CrabCode. Create issues, manage pull requests, review code, and search repositories against GitHub's hosted MCP endpoint.",
+      "category": "productivity",
+      "tags": [
+        "github",
+        "pull-requests",
+        "issues",
+        "mcp"
+      ]
+    },
+    {
+      "name": "gitlab",
+      "source": "./plugins/gitlab",
+      "version": "0.1.0",
+      "description": "GitLab MCP integration for CrabCode. Manage repositories, merge requests, CI/CD pipelines, issues, and wikis from your CrabCode session.",
+      "category": "productivity",
+      "tags": [
+        "gitlab",
+        "merge-requests",
+        "ci-cd",
+        "mcp"
+      ]
+    },
+    {
+      "name": "greptile",
+      "source": "./plugins/greptile",
+      "version": "0.1.0",
+      "description": "Greptile MCP integration for CrabCode. View and resolve Greptile pull-request review comments from your CrabCode session.",
+      "category": "development",
+      "tags": [
+        "greptile",
+        "code-review",
+        "pull-requests",
+        "mcp"
+      ]
+    },
+    {
+      "name": "imessage",
+      "source": "./plugins/imessage",
+      "version": "0.1.0",
+      "description": "iMessage channel bridge for CrabCode (macOS). Reads chat.db directly and sends via AppleScript; allowlist-based access control governs who can reach the agent.",
+      "category": "messaging",
+      "tags": [
+        "imessage",
+        "macos",
+        "messaging",
+        "channel",
+        "bridge",
+        "mcp"
+      ]
+    },
+    {
+      "name": "laravel-boost",
+      "source": "./plugins/laravel-boost",
+      "version": "0.1.0",
+      "description": "Laravel Boost MCP integration for CrabCode. Exposes Artisan commands, Eloquent queries, routing, migrations, and framework-aware code generation through the project's local Boost server.",
+      "category": "development",
+      "tags": [
+        "laravel",
+        "php",
+        "artisan",
+        "mcp"
+      ]
+    },
+    {
+      "name": "linear",
+      "source": "./plugins/linear",
+      "version": "0.1.0",
+      "description": "Linear MCP integration for CrabCode. Create issues, manage projects, update statuses, and search across Linear workspaces from the CrabCode session.",
+      "category": "productivity",
+      "tags": [
+        "linear",
+        "issue-tracking",
+        "mcp"
+      ]
+    },
+    {
+      "name": "playwright",
+      "source": "./plugins/playwright",
+      "version": "0.1.0",
+      "description": "Microsoft Playwright MCP integration for CrabCode. Drive headless and headed browsers for end-to-end testing, page inspection, and automated screenshots.",
+      "category": "testing",
+      "tags": [
+        "playwright",
+        "browser",
+        "e2e",
+        "mcp"
+      ]
+    },
+    {
+      "name": "serena",
+      "source": "./plugins/serena",
+      "version": "0.1.0",
+      "description": "Serena MCP integration for CrabCode. Semantic code navigation, refactoring suggestions, and codebase understanding via language-server integration.",
+      "category": "development",
+      "tags": [
+        "serena",
+        "code-navigation",
+        "refactoring",
+        "mcp"
+      ]
+    },
+    {
+      "name": "telegram",
+      "source": "./plugins/telegram",
+      "version": "0.1.0",
+      "description": "Telegram channel bridge for CrabCode. Self-contained MCP server with pairing and allowlist access control. Managed by /telegram:access skill.",
+      "category": "messaging",
+      "tags": [
+        "telegram",
+        "messaging",
+        "channel",
+        "bridge",
+        "mcp"
+      ]
+    },
+    {
+      "name": "terraform",
+      "source": "./plugins/terraform",
+      "version": "0.1.0",
+      "description": "HashiCorp Terraform MCP integration for CrabCode. Plan, inspect, and reason about Infrastructure-as-Code with explicit human approval for any apply.",
+      "category": "development",
+      "tags": [
+        "terraform",
+        "iac",
+        "hashicorp",
+        "mcp"
+      ]
+    },
+    {
+      "name": "clangd-lsp",
+      "source": "./plugins/clangd-lsp",
+      "version": "0.1.0",
+      "description": "C/C++ language server (clangd) bridge for CrabCode, providing code intelligence, diagnostics, and formatting.",
+      "category": "language-server",
+      "tags": [
+        "lsp",
+        "c",
+        "cpp",
+        "clangd"
+      ]
+    },
+    {
+      "name": "csharp-lsp",
+      "source": "./plugins/csharp-lsp",
+      "version": "0.1.0",
+      "description": "C# language server bridge for CrabCode, providing code intelligence and diagnostics.",
+      "category": "language-server",
+      "tags": [
+        "lsp",
+        "csharp",
+        "dotnet"
+      ]
+    },
+    {
+      "name": "gopls-lsp",
+      "source": "./plugins/gopls-lsp",
+      "version": "0.1.0",
+      "description": "Go language server (gopls) bridge for CrabCode, providing code intelligence, refactoring, and analysis.",
+      "category": "language-server",
+      "tags": [
+        "lsp",
+        "go",
+        "gopls"
+      ]
+    },
+    {
+      "name": "jdtls-lsp",
+      "source": "./plugins/jdtls-lsp",
+      "version": "0.1.0",
+      "description": "Java language server (Eclipse JDT.LS) bridge for CrabCode, providing code intelligence and refactoring.",
+      "category": "language-server",
+      "tags": [
+        "lsp",
+        "java",
+        "jdtls"
+      ]
+    },
+    {
+      "name": "kotlin-lsp",
+      "source": "./plugins/kotlin-lsp",
+      "version": "0.1.0",
+      "description": "Kotlin language server bridge for CrabCode, providing code intelligence, refactoring, and analysis.",
+      "category": "language-server",
+      "tags": [
+        "lsp",
+        "kotlin"
+      ]
+    },
+    {
+      "name": "lua-lsp",
+      "source": "./plugins/lua-lsp",
+      "version": "0.1.0",
+      "description": "Lua language server bridge for CrabCode, providing code intelligence and diagnostics.",
+      "category": "language-server",
+      "tags": [
+        "lsp",
+        "lua"
+      ]
+    },
+    {
+      "name": "php-lsp",
+      "source": "./plugins/php-lsp",
+      "version": "0.1.0",
+      "description": "PHP language server (Intelephense) bridge for CrabCode, providing code intelligence and diagnostics.",
+      "category": "language-server",
+      "tags": [
+        "lsp",
+        "php",
+        "intelephense"
+      ]
+    },
+    {
+      "name": "pyright-lsp",
+      "source": "./plugins/pyright-lsp",
+      "version": "0.1.0",
+      "description": "Python language server (Pyright) bridge for CrabCode, providing static type checking and code intelligence.",
+      "category": "language-server",
+      "tags": [
+        "lsp",
+        "python",
+        "pyright"
+      ]
+    },
+    {
+      "name": "ruby-lsp",
+      "source": "./plugins/ruby-lsp",
+      "version": "0.1.0",
+      "description": "Ruby language server bridge for CrabCode, providing code intelligence and analysis.",
+      "category": "language-server",
+      "tags": [
+        "lsp",
+        "ruby"
+      ]
+    },
+    {
+      "name": "rust-analyzer-lsp",
+      "source": "./plugins/rust-analyzer-lsp",
+      "version": "0.1.0",
+      "description": "Rust language server (rust-analyzer) bridge for CrabCode, providing code intelligence and analysis.",
+      "category": "language-server",
+      "tags": [
+        "lsp",
+        "rust",
+        "rust-analyzer"
+      ]
+    },
+    {
+      "name": "swift-lsp",
+      "source": "./plugins/swift-lsp",
+      "version": "0.1.0",
+      "description": "Swift language server (SourceKit-LSP) bridge for CrabCode, providing code intelligence for Swift projects.",
+      "category": "language-server",
+      "tags": [
+        "lsp",
+        "swift",
+        "sourcekit"
+      ]
+    },
+    {
+      "name": "typescript-lsp",
+      "source": "./plugins/typescript-lsp",
+      "version": "0.1.0",
+      "description": "TypeScript/JavaScript language server bridge for CrabCode, providing code intelligence, go-to-definition, find references, and error checking.",
+      "category": "language-server",
+      "tags": [
+        "lsp",
+        "typescript",
+        "javascript"
+      ]
+    },
+    {
+      "name": "hookify",
+      "source": "./plugins/hookify",
+      "version": "0.1.0",
+      "description": "User-configurable CrabCode hooks driven by markdown rule files in .crabcode/hookify.*.local.md. Block or warn on Bash, Edit/Write/MultiEdit, Stop, and UserPromptSubmit events using regex or structured conditions.",
+      "category": "guardrails",
+      "tags": [
+        "hooks",
+        "rule-engine",
+        "pretooluse",
+        "stop",
+        "guardrails",
+        "regex"
+      ]
+    },
+    {
+      "name": "security-guidance",
+      "source": "./plugins/security-guidance",
+      "version": "0.1.0",
+      "description": "Pre-write hook that warns about common security pitfalls when editing files: shell injection sinks, dynamic code evaluation, XSS sinks, unsafe deserialization, and risky GitHub Actions workflow inputs.",
+      "category": "guardrails",
+      "tags": [
+        "security",
+        "hook",
+        "code-review",
+        "static-analysis",
+        "pretooluse"
+      ]
+    },
+    {
+      "name": "explanatory-output-style",
+      "source": "./plugins/explanatory-output-style",
+      "version": "0.1.0",
+      "description": "SessionStart hook that injects an explanatory output style: the agent provides brief inline educational insights about implementation choices while it works.",
+      "category": "session-style",
+      "tags": [
+        "session-start",
+        "output-style",
+        "educational",
+        "explanatory"
+      ]
+    },
+    {
+      "name": "learning-output-style",
+      "source": "./plugins/learning-output-style",
+      "version": "0.1.0",
+      "description": "SessionStart hook that switches the agent into learning mode: surfaces meaningful 5-10 line code-write opportunities for the user and pairs them with inline educational insights.",
+      "category": "session-style",
+      "tags": [
+        "session-start",
+        "output-style",
+        "learning",
+        "educational"
+      ]
+    },
+    {
+      "name": "ralph-loop",
+      "source": "./plugins/ralph-loop",
+      "version": "0.1.0",
+      "description": "Iterative self-referential development loop. A Stop hook intercepts session exit and re-feeds the same prompt with iteration safety caps and an opt-in completion promise.",
+      "category": "workflow",
+      "tags": [
+        "loop",
+        "iterative-development",
+        "stop-hook",
+        "ralph"
+      ]
+    },
+    {
+      "name": "crabcode-office-suite",
+      "source": "./plugins/crabcode-office-suite",
+      "version": "0.1.0",
+      "description": "CrabCode skills and TypeScript helpers for authoring and editing Office documents: spreadsheets, word documents, presentations, and PDFs.",
+      "category": "office",
+      "tags": [
+        "office",
+        "spreadsheet",
+        "xlsx",
+        "docx",
+        "pptx",
+        "pdf",
+        "document"
+      ]
+    },
+    {
+      "name": "crabcode-example-skills",
+      "source": "./plugins/crabcode-example-skills",
+      "version": "0.1.0",
+      "description": "A collection of example CrabCode skills demonstrating algorithmic art, visual design, brand styling, document co-authoring, internal communications, MCP server authoring, skill authoring, GIF creation, theme styling, web artifact bundling, and Playwright-based web app testing.",
+      "category": "examples",
+      "tags": [
+        "examples",
+        "skills",
+        "design",
+        "documentation",
+        "mcp",
+        "playwright"
+      ]
+    },
+    {
+      "name": "ai-api-dev",
+      "source": "./plugins/ai-api-dev",
+      "version": "0.1.0",
+      "description": "Provider-neutral guidance for building, debugging, and migrating LLM-powered applications.",
+      "category": "ai-dev",
+      "tags": [
+        "llm",
+        "api",
+        "sdk",
+        "tool-use",
+        "prompt-caching",
+        "agents"
+      ]
+    }
+  ]
+}

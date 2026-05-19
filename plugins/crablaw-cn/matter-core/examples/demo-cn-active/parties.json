@@ -1,0 +1,16 @@
+{
+  "matterId": "active-demo-employer-2026-handbook",
+  "parties": [
+    {
+      "role": "client",
+      "displayName": "活动示例雇主有限公司",
+      "unifiedSocialCreditCode": "91310000ACTIVEEMPL",
+      "normalizedNames": ["活动示例雇主", "Active Demo Employer Co., Ltd."]
+    },
+    {
+      "role": "third-party",
+      "displayName": "示例工会代表大会",
+      "normalizedNames": ["示例工会"]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "matterId": "active-demo-employer-2026-handbook",
+  "status": "no-hit",
+  "screenedAt": "2026-04-15",
+  "screenedBy": "system",
+  "queries": [
+    "活动示例雇主有限公司",
+    "91310000ACTIVEEMPL",
+    "Active Demo Employer Co., Ltd.",
+    "活动示例雇主",
+    "活动示例雇主北京分公司",
+    "示例工会代表大会",
+    "示例工会"
+  ],
+  "hits": [],
+  "lawyerConfirmation": {
+    "status": "not-reviewed",
+    "notes": "初步筛查未命中，仍由律师复核后形成最终结论。"
+  }
+}

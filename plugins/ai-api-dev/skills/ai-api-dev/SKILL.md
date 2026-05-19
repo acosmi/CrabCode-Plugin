@@ -1,6 +1,6 @@
 ---
 name: ai-api-dev
-description: "Build, debug, and optimize LLM-powered applications in a provider-neutral way. Use this skill when the user is writing code that calls an LLM API (chat completion, tool use, structured output, streaming, batch, embeddings, caching) and wants vendor-agnostic guidance covering API surface choice, prompt design, latency and cost discipline, error handling, and migration between provider SDKs. Trigger when the user mentions an LLM API, an SDK such as `openai`, `anthropic`, or an internal LLM gateway, or when the task involves tuning prompt caching, structured output, tool use, or agent loops."
+description: "Build, debug, and optimize LLM-powered applications in a provider-neutral way. Use this skill when the user is writing code that calls an LLM API (chat completion, tool use, structured output, streaming, batch, embeddings, caching) and wants vendor-agnostic guidance covering API surface choice, prompt design, latency and cost discipline, error handling, and migration between provider SDKs. Trigger when the user mentions an LLM API, a provider SDK such as OpenAI or another compatible client, or an internal LLM gateway, or when the task involves tuning prompt caching, structured output, tool use, or agent loops."
 license: Apache-2.0. See ../../docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---
 

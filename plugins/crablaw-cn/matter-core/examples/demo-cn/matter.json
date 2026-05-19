@@ -1,0 +1,14 @@
+{
+  "matterId": "demo-client-2026-contract-review",
+  "clientId": "demo-client",
+  "title": "示例 SaaS 服务合同审查",
+  "matterType": "contract",
+  "status": "pending-conflict-review",
+  "engagementScope": "审查客户提供的 SaaS 服务合同文本，并输出供律师复核的风险摘要。",
+  "responsibleLawyer": "待分配",
+  "reviewOwner": "待分配",
+  "openedAt": "2026-05-13",
+  "retentionPolicy": "按事务关闭后内部留存规则执行。",
+  "sourcePolicy": "法律依据和外部资料须记录来源并由律师复核。",
+  "notes": "演示数据。"
+}

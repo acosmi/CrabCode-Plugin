@@ -1,0 +1,11 @@
+{
+  "reviewItemId": "review-demo-client-2026-contract-review-001",
+  "matterId": "demo-client-2026-contract-review",
+  "sourcePlugin": "cn-contract",
+  "sourceSkill": "review",
+  "outputPath": "work-product/drafts/contract-risk-summary.md",
+  "status": "pending-review",
+  "createdAt": "2026-05-13",
+  "reviewer": "待分配",
+  "decisionNotes": "对外发送前必须完成律师复核。"
+}

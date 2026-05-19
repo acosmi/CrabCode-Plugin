@@ -1,0 +1,16 @@
+{
+  "matterId": "hit-demo-platform-2026-cross-border",
+  "parties": [
+    {
+      "role": "client",
+      "displayName": "命中示例平台有限公司",
+      "unifiedSocialCreditCode": "91440000HITDEMO001",
+      "normalizedNames": ["命中示例平台", "Hit Demo Platform Co., Ltd."]
+    },
+    {
+      "role": "affiliate",
+      "displayName": "示例境外母公司",
+      "normalizedNames": ["Example Offshore Parent Inc."]
+    }
+  ]
+}

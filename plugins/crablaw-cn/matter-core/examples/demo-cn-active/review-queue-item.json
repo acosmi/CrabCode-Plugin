@@ -1,0 +1,11 @@
+{
+  "reviewItemId": "review-active-demo-employer-2026-handbook-001",
+  "matterId": "active-demo-employer-2026-handbook",
+  "sourcePlugin": "cn-labor-employment",
+  "sourceSkill": "employee-handbook-review",
+  "outputPath": "work-product/drafts/handbook-revision-issues.md",
+  "status": "pending-review",
+  "createdAt": "2026-04-20",
+  "reviewer": "张律师",
+  "decisionNotes": "对外发布前必须完成律师复核与工会民主程序。"
+}

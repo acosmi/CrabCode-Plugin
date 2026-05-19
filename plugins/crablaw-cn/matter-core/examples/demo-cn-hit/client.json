@@ -1,0 +1,13 @@
+{
+  "clientId": "hit-demo-platform",
+  "displayName": "命中示例平台有限公司",
+  "unifiedSocialCreditCode": "91440000HITDEMO001",
+  "englishNames": ["Hit Demo Platform Co., Ltd."],
+  "aliases": ["命中示例平台"],
+  "affiliates": ["命中示例平台广州分公司"],
+  "contacts": [
+    { "name": "赵五", "role": "数据合规负责人", "email": "dpo@example.cn" }
+  ],
+  "status": "prospective",
+  "confidentiality": "heightened"
+}

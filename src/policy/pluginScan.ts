@@ -28,6 +28,7 @@ const SCAN_SKIP_DIRS = new Set([
   ".git",
   "dist",
   "coverage",
+  "templates",
   "yuanma",
   "bangong",
 ]);

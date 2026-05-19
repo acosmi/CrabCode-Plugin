@@ -1,0 +1,8 @@
+{
+  "name": "cn-labor-employment",
+  "version": "0.1.0",
+  "description": "PRC labor and employment workflow drafts for employment contracts, termination risk, non-compete, handbooks, and disputes.",
+  "author": {
+    "name": "CrabLaw"
+  }
+}

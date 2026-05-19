@@ -11,6 +11,7 @@ export type LayoutIssue = {
 };
 
 const APPROVED_NESTED_FAMILIES = new Set(["crablaw-cn"]);
+const PATH_SCAN_SKIP_DIRS = new Set(["node_modules", "dist", "coverage"]);
 
 export async function validateLayout(root: string): Promise<LayoutIssue[]> {
   const absRoot = path.resolve(root);
@@ -96,6 +97,8 @@ export async function validateLayout(root: string): Promise<LayoutIssue[]> {
     }
   }
 
+  await checkBannedPathSegments(pluginsDir, pluginsDir, issues);
+
   return issues;
 }
 
@@ -133,6 +136,41 @@ async function checkFamily(
         pluginDir: childDir,
         message: `plugins/${familyName}/${entry}: directory name contains a banned identifier`,
       });
+    }
+  }
+}
+
+async function checkBannedPathSegments(
+  pluginsDir: string,
+  current: string,
+  issues: LayoutIssue[],
+): Promise<void> {
+  let entries: string[] = [];
+  try {
+    entries = await readdir(current);
+  } catch {
+    return;
+  }
+
+  for (const entry of entries) {
+    const fullPath = path.join(current, entry);
+    let stats;
+    try {
+      stats = await stat(fullPath);
+    } catch {
+      continue;
+    }
+
+    if (!isCrabcodeNeutralName(entry)) {
+      issues.push({
+        severity: "error",
+        pluginDir: fullPath,
+        message: `${path.relative(pluginsDir, fullPath)}: path segment contains a banned identifier`,
+      });
+    }
+
+    if (stats.isDirectory() && !PATH_SCAN_SKIP_DIRS.has(entry)) {
+      await checkBannedPathSegments(pluginsDir, fullPath, issues);
     }
   }
 }

@@ -1,6 +1,28 @@
-# CrabCode Setup
+# CrabCode Plugin Marketplace
 
-CrabCode Setup analyzes a local repository and recommends high-value CrabCode automations. It is read-only by default: it reports what would help, but it does not create files, install plugins, or change settings.
+This repository is the official CrabCode plugin marketplace source at
+`acosmi/CrabCode-Plugin`.
+
+It also contains the `crabcode-setup` plugin, which analyzes a local repository
+and recommends high-value CrabCode automations. It is read-only by default: it
+reports what would help, but it does not create files, install plugins, or
+change settings.
+
+## Marketplace
+
+CrabCode reads the marketplace manifest from:
+
+```text
+.crabcode-plugin/marketplace.json
+```
+
+The marketplace name is `crabcode-plugins-official`. Plugin entries are
+declared in the manifest and should point either to the repository root
+(`crabcode-setup`) or to a concrete plugin directory under `plugins/`.
+
+The current marketplace includes the root setup plugin, the CrabLaw-CN and
+security review plugins, and the migrated MCP, LSP, workflow, runtime, and
+office-skill plugins under `plugins/`.
 
 ## Usage
 
@@ -22,9 +44,11 @@ bun run typecheck
 bun run test
 bun run build
 bun run lint:brand
+bun run validate
 ```
 
 ## Plugin Entry
 
 The skill wrapper lives at `skills/crabcode-automation-recommender/SKILL.md`. The command wrapper lives at `commands/recommend-automation.md`.
 
+Additional marketplace plugins live under `plugins/`.

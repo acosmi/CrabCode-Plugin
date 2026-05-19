@@ -1,0 +1,13 @@
+{
+  "sourceId": "source-active-001",
+  "matterId": "active-demo-employer-2026-handbook",
+  "sourceType": "user-provided",
+  "title": "员工手册当前版本（2025 修订）",
+  "authority": "客户人力资源部",
+  "urlOrRecordId": "inputs/handbook/2025-revision.docx",
+  "retrievedAt": "2026-04-15",
+  "effectiveStatus": "客户提供的现行版本，已确认签收范围。",
+  "pinpoint": "全文",
+  "status": "lawyer-reviewed",
+  "reviewer": "张律师"
+}

@@ -86,6 +86,19 @@ describe("policy checks", () => {
     expect(scanText(`avoid ${token} here`)).toHaveLength(1);
   });
 
+  test("brand guard ignores audit reports and nested legal notices", async () => {
+    const tempRoot = await mkdtemp(path.join(os.tmpdir(), "crabcode-brand-ignore-"));
+    const token = ["c", "la", "ude"].join("");
+    await mkdir(path.join(tempRoot, "plugins", "alpha", "docs", "legal"), { recursive: true });
+    await mkdir(path.join(tempRoot, "docs", "audit"), { recursive: true });
+    await mkdir(path.join(tempRoot, "docs", "huibao"), { recursive: true });
+    await writeFile(path.join(tempRoot, "plugins", "alpha", "docs", "legal", "THIRD_PARTY_NOTICES.md"), token);
+    await writeFile(path.join(tempRoot, "docs", "audit", "report.md"), token);
+    await writeFile(path.join(tempRoot, "docs", "huibao", "report.md"), token);
+
+    expect(await scanPath(tempRoot)).toEqual([]);
+  });
+
   test("brand guard passes repository product files", async () => {
     expect(await scanPath(root)).toEqual([]);
   });

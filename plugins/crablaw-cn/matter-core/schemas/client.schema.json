@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crablaw.local/schemas/matter-core/client.schema.json",
+  "title": "CrabLaw-CN Client",
+  "type": "object",
+  "required": ["clientId", "displayName", "status", "confidentiality"],
+  "properties": {
+    "clientId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,80}$" },
+    "displayName": { "type": "string", "minLength": 1 },
+    "unifiedSocialCreditCode": { "type": "string", "pattern": "^[0-9A-Z]{18}$" },
+    "formerNames": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "englishNames": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "aliases": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "affiliates": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "contacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "role": { "type": "string", "minLength": 1 },
+          "email": { "type": "string", "minLength": 1 },
+          "phone": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "industry": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["prospective", "active", "closed", "declined"] },
+    "confidentiality": { "enum": ["standard", "heightened", "clean-team"] },
+    "notes": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": false
+}

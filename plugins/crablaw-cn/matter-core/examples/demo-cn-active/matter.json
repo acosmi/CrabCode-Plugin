@@ -1,0 +1,14 @@
+{
+  "matterId": "active-demo-employer-2026-handbook",
+  "clientId": "active-demo-employer",
+  "title": "员工手册修订项目",
+  "matterType": "labor-employment",
+  "status": "active",
+  "engagementScope": "审阅并修订员工手册中工时、纪律、保密、福利与争议处理条款，输出供律师复核的修订草案与议题清单。",
+  "responsibleLawyer": "张律师",
+  "reviewOwner": "王合伙人",
+  "openedAt": "2026-04-15",
+  "retentionPolicy": "按事务关闭后内部留存规则执行。",
+  "sourcePolicy": "劳动法、劳动合同法及地方规则均须记录来源并由律师复核。",
+  "notes": "已通过冲突筛查，进入实质性审阅阶段。"
+}

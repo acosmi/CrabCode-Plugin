@@ -1,0 +1,8 @@
+{
+  "name": "matter-core",
+  "version": "0.1.0",
+  "description": "Matter, client, conflict-screening, permission, source-record, review-queue, and archive foundation for CrabLaw-CN.",
+  "author": {
+    "name": "CrabLaw"
+  }
+}

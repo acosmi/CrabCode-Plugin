@@ -41,6 +41,16 @@ describe("layout validator", () => {
     expect(issues.some((i) => i.message.includes("banned"))).toBe(true);
   });
 
+  test("flags banned identifiers in nested plugin path segments", async () => {
+    const root = await makeTempRoot();
+    const banned = "revise-" + "c" + "laude" + "-md.md";
+    await writePluginManifest(root, "plugins/alpha-plugin", { name: "alpha-plugin" });
+    await mkdir(path.join(root, "plugins", "alpha-plugin", "commands"), { recursive: true });
+    await writeFile(path.join(root, "plugins", "alpha-plugin", "commands", banned), "");
+    const issues = await validateLayout(root);
+    expect(issues.some((i) => i.message.includes("path segment"))).toBe(true);
+  });
+
   test("accepts approved nested family crablaw-cn", async () => {
     const root = await makeTempRoot();
     await writePluginManifest(root, "plugins/crablaw-cn/matter-core", {

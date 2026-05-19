@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crablaw.local/schemas/matter-core/parties.schema.json",
+  "title": "CrabLaw-CN Matter Parties",
+  "type": "object",
+  "required": ["matterId", "parties"],
+  "properties": {
+    "matterId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,100}$" },
+    "parties": {
+      "type": "array",
+      "minItems": 1,
+      "contains": {
+        "type": "object",
+        "required": ["role"],
+        "properties": { "role": { "const": "client" } }
+      },
+      "items": {
+        "type": "object",
+        "required": ["role", "displayName"],
+        "properties": {
+          "role": {
+            "enum": [
+              "client",
+              "counterparty",
+              "affiliate",
+              "third-party",
+              "natural-person",
+              "opposing-counsel",
+              "beneficial-owner",
+              "actual-controller",
+              "other"
+            ]
+          },
+          "displayName": { "type": "string", "minLength": 1 },
+          "normalizedNames": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+          "unifiedSocialCreditCode": { "type": "string", "pattern": "^[0-9A-Z]{18}$" },
+          "identityHint": { "type": "string", "minLength": 1 },
+          "notes": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

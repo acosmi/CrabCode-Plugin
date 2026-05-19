@@ -1,0 +1,13 @@
+{
+  "clientId": "active-demo-employer",
+  "displayName": "活动示例雇主有限公司",
+  "unifiedSocialCreditCode": "91310000ACTIVEEMPL",
+  "englishNames": ["Active Demo Employer Co., Ltd."],
+  "aliases": ["活动示例雇主"],
+  "affiliates": ["活动示例雇主北京分公司"],
+  "contacts": [
+    { "name": "李四", "role": "人力资源负责人", "email": "hr@example.cn" }
+  ],
+  "status": "active",
+  "confidentiality": "standard"
+}

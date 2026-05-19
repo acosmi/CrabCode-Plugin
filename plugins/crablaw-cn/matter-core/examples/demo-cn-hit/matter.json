@@ -1,0 +1,14 @@
+{
+  "matterId": "hit-demo-platform-2026-cross-border",
+  "clientId": "hit-demo-platform",
+  "title": "跨境数据传输路径评估",
+  "matterType": "data-compliance",
+  "status": "pending-conflict-review",
+  "engagementScope": "评估命中示例平台向境外母公司传输用户与员工个人信息的合规路径，输出供律师复核的初步分析。",
+  "responsibleLawyer": "陈律师",
+  "reviewOwner": "刘合伙人",
+  "openedAt": "2026-05-10",
+  "retentionPolicy": "按事务关闭后内部留存规则执行。",
+  "sourcePolicy": "PIPL、出境标准合同与认证规则均须记录来源并由律师复核。",
+  "notes": "冲突筛查发现潜在命中，等待律师判断。"
+}

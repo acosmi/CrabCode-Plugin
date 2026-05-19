@@ -31,10 +31,16 @@ const DEFAULT_IGNORES = [
   ".window-*-workdir/**",
   "bangong/**",
   "coverage/**",
+  "**/coverage/**",
   "dist/**",
+  "**/dist/**",
+  "docs/audit/**",
+  "docs/huibao/**",
   "docs/legal/**",
+  "**/docs/legal/**",
   "docs/**implementation-plan*.md",
   "node_modules/**",
+  "**/node_modules/**",
   "yuanma/**",
 ];
 
@@ -131,20 +137,8 @@ function isIgnored(relativePath: string, patterns: string[]): boolean {
 }
 
 function matchesPattern(relativePath: string, pattern: string): boolean {
-  if (pattern.endsWith("/**")) {
-    const head = pattern.slice(0, -3);
-    if (head.includes("*")) {
-      const prefixRegex = new RegExp(`^${head.split("*").map(escapeRegex).join("[^/]*")}(/|$)`);
-      return prefixRegex.test(relativePath);
-    }
-    return relativePath === head || relativePath.startsWith(`${head}/`);
-  }
-  if (pattern.includes("**") && pattern.includes("*")) {
-    const [prefix, suffix] = pattern.split("**");
-    return relativePath.startsWith(prefix ?? "") && wildcardMatch(relativePath, suffix ?? "");
-  }
   if (pattern.includes("*")) {
-    return wildcardMatch(relativePath, pattern);
+    return globToRegExp(pattern).test(relativePath);
   }
   return relativePath === pattern || relativePath.startsWith(`${pattern}/`);
 }
@@ -153,12 +147,23 @@ function escapeRegex(value: string): string {
   return value.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function wildcardMatch(value: string, pattern: string): boolean {
-  const escaped = pattern
-    .split("*")
-    .map((part) => part.replace(/[.+?^${}()|[\]\\]/g, "\\$&"))
-    .join(".*");
-  return new RegExp(`^${escaped}$`).test(value) || new RegExp(escaped).test(value);
+function globToRegExp(pattern: string): RegExp {
+  let source = "^";
+  for (let index = 0; index < pattern.length; index += 1) {
+    const char = pattern[index] ?? "";
+    if (char === "*") {
+      if (pattern[index + 1] === "*") {
+        source += ".*";
+        index += 1;
+      } else {
+        source += "[^/]*";
+      }
+    } else {
+      source += escapeRegex(char);
+    }
+  }
+  source += "$";
+  return new RegExp(source);
 }
 
 function normalizePath(value: string): string {

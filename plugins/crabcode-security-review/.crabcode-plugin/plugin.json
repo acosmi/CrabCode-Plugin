@@ -1,0 +1,10 @@
+{
+  "name": "crabcode-security-review",
+  "version": "0.1.0",
+  "description": "Focused security review workflow for pending branch changes.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": ["security-review", "code-review", "diff-review"]
+}

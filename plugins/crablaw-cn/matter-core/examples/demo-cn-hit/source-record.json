@@ -1,0 +1,12 @@
+{
+  "sourceId": "source-hit-001",
+  "matterId": "hit-demo-platform-2026-cross-border",
+  "sourceType": "user-provided",
+  "title": "境外接收方数据处理协议草案",
+  "authority": "客户跨境业务部",
+  "urlOrRecordId": "inputs/agreements/cross-border-dpa-draft-v2.docx",
+  "retrievedAt": "2026-05-11",
+  "effectiveStatus": "客户提供草稿版本，境外接收方实际处理目的、再转规则、安全措施 [需核验]，依赖律师与客户进一步澄清后形成最终结论。",
+  "pinpoint": "Schedule 1 与 Annex 2",
+  "status": "source-needs-check"
+}

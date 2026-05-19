@@ -1,0 +1,10 @@
+{
+  "reviewItemId": "review-hit-demo-platform-2026-cross-border-001",
+  "matterId": "hit-demo-platform-2026-cross-border",
+  "sourcePlugin": "cn-data-compliance",
+  "sourceSkill": "cross-border-transfer-check",
+  "outputPath": "work-product/drafts/cross-border-path-options.md",
+  "status": "draft",
+  "createdAt": "2026-05-12",
+  "decisionNotes": "草稿中多处出境路径与接收方合规状态标记 [需核验]，依赖律师确认。冲突审查命中尚未解除，禁止对外发送。"
+}

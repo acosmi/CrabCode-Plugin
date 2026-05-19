@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crablaw.local/schemas/matter-core/review-queue.schema.json",
+  "title": "CrabLaw-CN Review Queue Item",
+  "type": "object",
+  "required": ["reviewItemId", "matterId", "sourcePlugin", "sourceSkill", "status", "createdAt"],
+  "properties": {
+    "reviewItemId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,120}$" },
+    "matterId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,100}$" },
+    "sourcePlugin": { "enum": ["matter-core", "cn-contract", "cn-data-compliance", "cn-labor-employment"] },
+    "sourceSkill": { "type": "string", "minLength": 1 },
+    "outputPath": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["draft", "pending-review", "returned", "approved-internal", "approved-external", "sent", "archived"] },
+    "createdAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "format": "date" },
+    "reviewer": { "type": "string", "minLength": 1 },
+    "reviewedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "format": "date" },
+    "decisionActor": { "enum": ["matter-core:review-queue", "manual-lawyer-review"] },
+    "decisionNotes": { "type": "string", "minLength": 1 },
+    "externalDestination": { "type": "string", "minLength": 1 }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "sourcePlugin": { "const": "matter-core" } },
+        "required": ["sourcePlugin"]
+      },
+      "then": {
+        "properties": {
+          "sourceSkill": { "enum": ["new-client", "new-matter", "conflict-check", "review-queue", "matter-archive"] }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "sourcePlugin": { "const": "cn-contract" } },
+        "required": ["sourcePlugin"]
+      },
+      "then": {
+        "properties": {
+          "sourceSkill": { "enum": ["review", "nda-review", "clause-redraft", "risk-summary", "cold-start-interview"] }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "sourcePlugin": { "const": "cn-data-compliance" } },
+        "required": ["sourcePlugin"]
+      },
+      "then": {
+        "properties": {
+          "sourceSkill": { "enum": ["data-activity-triage", "cross-border-transfer-check", "data-processing-review", "pia-generation", "privacy-policy-review"] }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "sourcePlugin": { "const": "cn-labor-employment" } },
+        "required": ["sourcePlugin"]
+      },
+      "then": {
+        "properties": {
+          "sourceSkill": { "enum": ["employment-contract-review", "termination-risk-review", "non-compete-review", "employee-handbook-review", "labor-dispute-summary"] }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "status": { "enum": ["returned", "approved-internal", "approved-external", "sent"] } },
+        "required": ["status"]
+      },
+      "then": { "required": ["reviewer", "reviewedAt", "decisionActor"] }
+    },
+    {
+      "if": {
+        "properties": { "status": { "const": "returned" } },
+        "required": ["status"]
+      },
+      "then": { "required": ["decisionNotes"] }
+    },
+    {
+      "if": {
+        "properties": { "status": { "enum": ["approved-external", "sent"] } },
+        "required": ["status"]
+      },
+      "then": { "required": ["externalDestination"] }
+    }
+  ],
+  "additionalProperties": false
+}

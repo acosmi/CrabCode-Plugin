@@ -1,0 +1,9 @@
+{
+  "matterId": "hit-demo-platform-2026-cross-border",
+  "accessMode": "heightened",
+  "allowedUsers": ["chen.lawyer", "liu.partner"],
+  "restrictedPaths": ["work-product/drafts/external-share/"],
+  "crossMatterAccess": {
+    "enabled": false
+  }
+}

@@ -64,6 +64,24 @@ describe("manifest validator", () => {
     expect(issues.some((issue) => issue.severity === "warning" && issue.field === "keywords")).toBe(true);
   });
 
+  test("ignores repository templates during root validation", async () => {
+    const root = await makeTempRoot();
+    await writePlugin(root, "alpha-plugin", {
+      name: "alpha-plugin",
+      version: "0.1.0",
+      description: "Alpha plugin for tests",
+      author: { name: "CrabCode" },
+      license: "Apache-2.0",
+      keywords: ["tag"],
+    });
+    const templateDir = path.join(root, "templates", "plugin-standard", ".crabcode-plugin");
+    await mkdir(templateDir, { recursive: true });
+    await writeFile(path.join(templateDir, "plugin.json"), JSON.stringify({ name: "__PLUGIN_NAME__" }, null, 2));
+
+    const issues = await validateManifests(root);
+    expect(issues).toEqual([]);
+  });
+
   test("rejects non-kebab-case names", async () => {
     const root = await makeTempRoot();
     await writePlugin(root, "BadCase", {

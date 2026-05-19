@@ -1,0 +1,10 @@
+{
+  "matterId": "demo-client-2026-contract-review",
+  "accessMode": "standard",
+  "allowedUsers": ["responsible-lawyer@example.cn"],
+  "allowedTeams": ["contract-team"],
+  "restrictedPaths": ["work-product/drafts"],
+  "crossMatterAccess": {
+    "enabled": false
+  }
+}

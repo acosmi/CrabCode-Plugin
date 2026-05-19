@@ -1,0 +1,20 @@
+{
+  "clientId": "demo-client",
+  "displayName": "示例客户有限公司",
+  "unifiedSocialCreditCode": "91310000EXAMPLE001",
+  "formerNames": [],
+  "englishNames": ["Demo Client Co., Ltd."],
+  "aliases": ["示例客户"],
+  "affiliates": ["示例客户上海分公司"],
+  "contacts": [
+    {
+      "name": "张三",
+      "role": "法务负责人",
+      "email": "legal@example.cn"
+    }
+  ],
+  "industry": "互联网服务",
+  "status": "prospective",
+  "confidentiality": "standard",
+  "notes": "演示数据，仅用于校验 schema。"
+}

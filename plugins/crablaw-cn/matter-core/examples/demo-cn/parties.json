@@ -1,0 +1,17 @@
+{
+  "matterId": "demo-client-2026-contract-review",
+  "parties": [
+    {
+      "role": "client",
+      "displayName": "示例客户有限公司",
+      "normalizedNames": ["示例客户有限公司", "Demo Client Co., Ltd."],
+      "unifiedSocialCreditCode": "91310000EXAMPLE001"
+    },
+    {
+      "role": "counterparty",
+      "displayName": "示例供应商有限公司",
+      "normalizedNames": ["示例供应商有限公司"],
+      "unifiedSocialCreditCode": "91310000EXAMPLE002"
+    }
+  ]
+}

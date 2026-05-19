@@ -1,0 +1,20 @@
+{
+  "matterId": "demo-client-2026-contract-review",
+  "status": "pending",
+  "screenedAt": "2026-05-13",
+  "screenedBy": "system",
+  "queries": [
+    "示例客户有限公司",
+    "91310000EXAMPLE001",
+    "Demo Client Co., Ltd.",
+    "示例客户",
+    "示例客户上海分公司",
+    "示例供应商有限公司",
+    "91310000EXAMPLE002"
+  ],
+  "hits": [],
+  "lawyerConfirmation": {
+    "status": "not-reviewed",
+    "notes": "不得在律师确认前进入对外发送。"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "matterId": "active-demo-employer-2026-handbook",
+  "accessMode": "standard",
+  "allowedUsers": ["zhang.lawyer", "wang.partner", "li.paralegal"],
+  "crossMatterAccess": {
+    "enabled": false
+  }
+}
