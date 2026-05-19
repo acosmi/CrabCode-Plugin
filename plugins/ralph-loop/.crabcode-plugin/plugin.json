@@ -1,0 +1,16 @@
+{
+  "name": "ralph-loop",
+  "version": "0.1.0",
+  "description": "Iterative self-referential development loop. A Stop hook intercepts session exit and re-feeds the same prompt with iteration safety caps and an opt-in completion promise.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": [
+    "loop",
+    "iterative-development",
+    "stop-hook",
+    "ralph"
+  ],
+  "hooks": "./hooks/hooks.json"
+}

@@ -1,0 +1,77 @@
+{
+  "comment": "Marketplace entries produced by Window E (RT-01..RT-05). The total integrator should merge these into .crabcode-plugin/marketplace.json. Each `source` points to ./plugins/<plugin-name> per migration rule §Marketplace Rules.",
+  "entries": [
+    {
+      "name": "hookify",
+      "source": "./plugins/hookify",
+      "version": "0.1.0",
+      "description": "User-configurable CrabCode hooks driven by markdown rule files in .crabcode/hookify.*.local.md. Block or warn on Bash, Edit/Write/MultiEdit, Stop, and UserPromptSubmit events using regex or structured conditions.",
+      "category": "guardrails",
+      "tags": ["hooks", "rule-engine", "pretooluse", "stop", "guardrails", "regex"]
+    },
+    {
+      "name": "security-guidance",
+      "source": "./plugins/security-guidance",
+      "version": "0.1.0",
+      "description": "Pre-write hook that warns about common security pitfalls when editing files: shell injection sinks, dynamic code evaluation, XSS sinks, unsafe deserialization, and risky GitHub Actions workflow inputs.",
+      "category": "guardrails",
+      "tags": ["security", "hook", "code-review", "static-analysis", "pretooluse"]
+    },
+    {
+      "name": "explanatory-output-style",
+      "source": "./plugins/explanatory-output-style",
+      "version": "0.1.0",
+      "description": "SessionStart hook that injects an explanatory output style: the agent provides brief inline educational insights about implementation choices while it works.",
+      "category": "session-style",
+      "tags": ["session-start", "output-style", "educational", "explanatory"]
+    },
+    {
+      "name": "learning-output-style",
+      "source": "./plugins/learning-output-style",
+      "version": "0.1.0",
+      "description": "SessionStart hook that switches the agent into learning mode: surfaces meaningful 5-10 line code-write opportunities for the user and pairs them with inline educational insights.",
+      "category": "session-style",
+      "tags": ["session-start", "output-style", "learning", "educational"]
+    },
+    {
+      "name": "ralph-loop",
+      "source": "./plugins/ralph-loop",
+      "version": "0.1.0",
+      "description": "Iterative self-referential development loop. A Stop hook intercepts session exit and re-feeds the same prompt with iteration safety caps and an opt-in completion promise.",
+      "category": "workflow",
+      "tags": ["loop", "iterative-development", "stop-hook", "ralph"]
+    },
+    {
+      "name": "discord",
+      "source": "./plugins/discord",
+      "version": "0.1.0",
+      "description": "Discord channel bridge for CrabCode. Self-contained MCP server with pairing, allowlist, and guild-channel access control. Managed by /discord:access skill.",
+      "category": "messaging",
+      "tags": ["discord", "messaging", "channel", "bridge", "mcp"]
+    },
+    {
+      "name": "fakechat",
+      "source": "./plugins/fakechat",
+      "version": "0.1.0",
+      "description": "Localhost web UI for testing the CrabCode channel contract. Self-contained MCP server with stdio transport, attachment upload, and a minimal web client. No external service, no tokens, no access control.",
+      "category": "messaging",
+      "tags": ["channel", "mcp", "testing", "fakechat", "localhost"]
+    },
+    {
+      "name": "imessage",
+      "source": "./plugins/imessage",
+      "version": "0.1.0",
+      "description": "iMessage channel bridge for CrabCode (macOS). Reads chat.db directly and sends via AppleScript; allowlist-based access control governs who can reach the agent.",
+      "category": "messaging",
+      "tags": ["imessage", "macos", "messaging", "channel", "bridge", "mcp"]
+    },
+    {
+      "name": "telegram",
+      "source": "./plugins/telegram",
+      "version": "0.1.0",
+      "description": "Telegram channel bridge for CrabCode. Self-contained MCP server with pairing and allowlist access control. Managed by /telegram:access skill.",
+      "category": "messaging",
+      "tags": ["telegram", "messaging", "channel", "bridge", "mcp"]
+    }
+  ]
+}

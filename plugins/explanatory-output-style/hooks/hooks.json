@@ -1,0 +1,16 @@
+{
+  "description": "Explanatory output style: SessionStart hook that adds inline educational-insight instructions.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun ${CRABCODE_PLUGIN_ROOT}/src/sessionStart.ts",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

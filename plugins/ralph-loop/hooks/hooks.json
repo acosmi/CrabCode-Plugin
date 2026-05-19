@@ -1,0 +1,16 @@
+{
+  "description": "Ralph Loop Stop hook: re-feeds the active loop prompt until max iterations or completion promise.",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun ${CRABCODE_PLUGIN_ROOT}/src/stopHook.ts",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

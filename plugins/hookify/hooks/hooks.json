@@ -1,0 +1,49 @@
+{
+  "description": "Hookify plugin: user-configurable hooks loaded from .crabcode/hookify.*.local.md files.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun ${CRABCODE_PLUGIN_ROOT}/src/hooks/preToolUse.ts",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun ${CRABCODE_PLUGIN_ROOT}/src/hooks/postToolUse.ts",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun ${CRABCODE_PLUGIN_ROOT}/src/hooks/stop.ts",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun ${CRABCODE_PLUGIN_ROOT}/src/hooks/userPromptSubmit.ts",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

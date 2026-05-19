@@ -1,0 +1,17 @@
+{
+  "description": "Security reminder hook that warns about potential security issues when editing files.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun ${CRABCODE_PLUGIN_ROOT}/src/securityReminderHook.ts",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

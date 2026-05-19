@@ -1,0 +1,17 @@
+{
+  "name": "security-guidance",
+  "version": "0.1.0",
+  "description": "Pre-write hook that warns about common security pitfalls when editing files: shell injection sinks, dynamic code evaluation, XSS sinks, unsafe deserialization, and risky GitHub Actions workflow inputs.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": [
+    "security",
+    "hook",
+    "code-review",
+    "static-analysis",
+    "pretooluse"
+  ],
+  "hooks": "./hooks/hooks.json"
+}

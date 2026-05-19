@@ -1,0 +1,16 @@
+{
+  "description": "Learning output style: SessionStart hook that asks the agent to delegate meaningful 5-10 line code-write moments to the user with educational framing.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun ${CRABCODE_PLUGIN_ROOT}/src/sessionStart.ts",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

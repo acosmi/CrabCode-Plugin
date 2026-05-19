@@ -1,0 +1,16 @@
+{
+  "name": "learning-output-style",
+  "version": "0.1.0",
+  "description": "SessionStart hook that switches the agent into learning mode: surfaces meaningful 5-10 line code-write opportunities for the user and pairs them with inline educational insights.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": [
+    "session-start",
+    "output-style",
+    "learning",
+    "educational"
+  ],
+  "hooks": "./hooks/hooks.json"
+}

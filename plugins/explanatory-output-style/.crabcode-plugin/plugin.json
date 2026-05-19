@@ -1,0 +1,16 @@
+{
+  "name": "explanatory-output-style",
+  "version": "0.1.0",
+  "description": "SessionStart hook that injects an explanatory output style: the agent provides brief inline educational insights about implementation choices while it works.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "MIT",
+  "keywords": [
+    "session-start",
+    "output-style",
+    "educational",
+    "explanatory"
+  ],
+  "hooks": "./hooks/hooks.json"
+}

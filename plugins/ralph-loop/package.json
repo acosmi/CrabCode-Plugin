@@ -1,0 +1,16 @@
+{
+  "name": "ralph-loop",
+  "version": "0.1.0",
+  "description": "CrabCode Ralph Loop iterative development plugin.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "build": "bun build src/setupRalphLoop.ts src/stopHook.ts --outdir dist --target bun --format esm"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.2",
+    "typescript": "^5.9.3"
+  }
+}
