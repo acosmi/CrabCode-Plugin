@@ -1,0 +1,64 @@
+---
+name: media-ops
+description: This skill should be used when the user wants to do 自媒体/新媒体内容运营 — 抓热点选题、写主稿、做平台变体、审稿事实核查、生成预览、走审批并打发布包。Triggers on phrases like "写一篇公众号"、"做选题"、"出小红书文案"、"内容运营"、"发布包"、"运营这个号"。
+when_to_use: 用户要做内容创作到发布的全流程运营时，作为主入口编排 trends/draft/review/preview/publish 各环节。
+version: 1.0.0
+model: inherit
+effort: medium
+user-invocable: true
+---
+
+# media-ops — 内容运营主入口
+
+本 skill 是 CrabCode 媒体运营插件的总编排入口。**核心架构：创作由你（主 agent）完成，MCP 工具只做确定性的活**（抓取、聚类、落库、校验、预览、打包、留痕）。你负责研究、提炼、写作、编辑；工具负责把你的产出确定性地固化与检查。
+
+## 何时使用
+- 用户要从 0 做一篇（或一组多平台）内容并走到可发布。
+- 用户说"运营某个号/某个赛道"，需要选题→成稿→发布的闭环。
+- 用户已有部分产出（topic/brief/draft），要继续往下推进。
+
+## 全流程（Gate A：零凭证可跑的创作 + 发布包闭环）
+
+### 0. 能力与策略自检（每次开工先做）
+- `mediaops.capabilities`：确认本机可用平台与能力、当前处于 Gate A。
+- `mediaops.doctor`：检查依赖/配置健康，缺项告知用户但不阻塞创作。
+- `mediaops.policy_status`：取当前限流/合规边界，作为后续硬约束。
+
+### 1. 选题（→ `/media-trends`）
+- `mediaops.trends.search` + `mediaops.trends.cluster` 取热点并聚类。
+- **你**提炼选题角度、差异化卖点、平台匹配、可信来源、时效窗口。
+
+### 2. Brief（带来源）
+- 你产出 brief：核心论点、受众、平台/栏目、关键信息点、**可信来源清单**、调性。
+- `mediaops.content.save`（kind=brief）落库。
+
+### 3. 主稿（→ `/media-draft`）
+- 你依 brief + 品牌 profile（`references/brand-profile-schema.md`）写平台无关母稿。
+- `mediaops.content.save`（kind=draft）落库。
+
+### 4. 审稿（→ `/media-review`）
+- 你做事实核查 + 人味编辑（用 `media-human-editor` skill 的五层框架与反模板清单）。
+- `mediaops.readiness.inspect` 做确定性校验，直到通过。
+- 在成稿末尾注入显式 AI 辅助标识（`references/ai-labeling-compliance.md`）。
+
+### 5. 平台变体 + 预览（→ `/media-preview`）
+- 你按平台规范（`media-platform-adapter` skill）改写为各平台 variant。
+- `mediaops.content.save`（kind=variant）+ `mediaops.readiness.inspect` + `mediaops.preview.create`。
+
+### 6. 审批 + 发布包（→ `/media-publish`）
+- `mediaops.approval.request`（人工审批硬 gate）→ 获批后 `mediaops.publish.package`。
+- 真平台发布 API / 浏览器辅助 = **Gate B**，未配凭证前标注"待平台凭证配置（Gate B）"，不伪造成功。
+- 经 `mediaops.publish.history` 可回查发布与审计记录。
+
+### 7. 评论运营（→ `/media-comments`，可选）
+- 评论分类 + 回复建议（建议模式）；真发送 = Gate B。
+
+## 关键原则
+- **来源可追溯**：brief 与稿件的事实陈述必须有出处，存疑标"待核查"。
+- **人工 gate 不可绕**：发布前必经人工审批；AI 辅助标识不可缺失或抹除（合规红线）。
+- **工具不写字**：MCP 工具不替你创作，只做确定性操作。
+
+## 数据位置
+- 内容与审计落在 `${CRABCODE_PLUGIN_DATA}` 下，按 content id 组织。
+- 插件资源（platform registry、模板）在 `${CRABCODE_PLUGIN_ROOT}` 下。
+- 会话关联用 `${CRABCODE_SESSION_ID}`。

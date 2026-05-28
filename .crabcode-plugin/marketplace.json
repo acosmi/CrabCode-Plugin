@@ -757,6 +757,21 @@
         "prompt-caching",
         "agents"
       ]
+    },
+    {
+      "name": "crabcode-media-ops",
+      "source": "./plugins/crabcode-media-ops",
+      "version": "0.1.0",
+      "description": "Media operations toolkit: trend discovery, agent-assisted drafting, human review, platform adaptation, AI-label compliance, and approved publishing via local publish packages.",
+      "category": "content-ops",
+      "tags": [
+        "media-ops",
+        "publishing",
+        "wechat",
+        "xiaohongshu",
+        "toutiao",
+        "mcp"
+      ]
     }
   ]
 }

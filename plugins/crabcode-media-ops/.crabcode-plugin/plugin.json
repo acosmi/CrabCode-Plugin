@@ -1,0 +1,10 @@
+{
+  "name": "crabcode-media-ops",
+  "version": "0.1.0",
+  "description": "Media operations toolkit for CrabCode: trend discovery, agent-assisted drafting, human review, platform adaptation, and approved publishing via local publish packages.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": ["media-ops", "publishing", "wechat", "xiaohongshu", "toutiao", "mcp"]
+}
