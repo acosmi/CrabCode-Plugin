@@ -12,6 +12,15 @@
       "name": "crabcode-setup",
       "source": "./",
       "version": "0.1.0",
+      "displayName": "CrabCode 一键配置",
+      "shortDescription": "分析仓库并推荐 CrabCode 原生自动化:技能、钩子、智能体、插件与 MCP 服务",
+      "longDescription": "扫描当前仓库结构与工作流,推荐适合的 CrabCode 原生自动化能力(技能 Skills、钩子 Hooks、智能体 Agents、插件 Plugins、MCP 服务),帮助快速把项目接入 CrabCode 生态。",
+      "defaultPrompt": [
+        "分析这个仓库,推荐适合的 CrabCode 自动化",
+        "为这个项目推荐合适的技能和钩子",
+        "看看这个仓库适合接哪些 MCP 服务"
+      ],
+      "brandColor": "#f97316",
       "description": "Analyze repositories and recommend CrabCode-native automations such as skills, hooks, agents, plugins, and MCP servers.",
       "category": "productivity",
       "tags": [
@@ -110,6 +119,15 @@
       "name": "crabcode-security-review",
       "source": "./plugins/crabcode-security-review",
       "version": "0.1.0",
+      "displayName": "CrabCode 安全审查",
+      "shortDescription": "针对待提交分支变更的聚焦式安全审查工作流",
+      "longDescription": "对当前分支的待提交变更做聚焦式安全审查,识别注入、越权、敏感信息泄露等常见风险,给出可执行的修复建议,适合提交/合并前的安全把关。",
+      "defaultPrompt": [
+        "对当前分支的改动做一次安全审查",
+        "检查这些变更有没有安全风险",
+        "审查这次提交的越权与注入风险"
+      ],
+      "brandColor": "#cf222e",
       "description": "Focused security review workflow for pending branch changes.",
       "category": "security",
       "tags": [
@@ -122,6 +140,15 @@
       "name": "agent-sdk-dev",
       "source": "./plugins/agent-sdk-dev",
       "version": "0.1.0",
+      "displayName": "Agent SDK 开发",
+      "shortDescription": "Agent SDK 开发指引、验证者智能体与项目脚手架命令",
+      "longDescription": "面向 Agent SDK 开发的指引、验证者(verifier)智能体与项目初始化命令,支持 Python 与 TypeScript,帮助快速搭建并校验基于 SDK 的智能体应用。",
+      "defaultPrompt": [
+        "帮我用 Agent SDK 搭一个项目骨架",
+        "为我的智能体写一个验证者 agent",
+        "讲讲 Agent SDK 的最佳实践"
+      ],
+      "brandColor": "#0969da",
       "description": "Agent SDK development guidance, verifier agents, and project bootstrap command (genericized for CrabCode product surface).",
       "category": "agent-dev",
       "tags": [
@@ -136,6 +163,15 @@
       "name": "crabcode-memory-management",
       "source": "./plugins/crabcode-memory-management",
       "version": "0.1.0",
+      "displayName": "CrabCode 记忆管理",
+      "shortDescription": "维护与改进 CRABCODE.md 项目记忆:审计质量、沉淀会话经验、保持指引最新",
+      "longDescription": "维护和改进项目的 CRABCODE.md 记忆文件:审计记忆质量、把会话中的经验沉淀进文档、保持协作指引与代码现状同步,让 CrabCode 在长期项目中持续了解上下文。",
+      "defaultPrompt": [
+        "审计并改进这个项目的 CRABCODE.md",
+        "把本次会话的经验沉淀进项目记忆",
+        "检查项目记忆有没有过时的内容"
+      ],
+      "brandColor": "#f97316",
       "description": "Maintain and improve CRABCODE.md project memory files: audit quality, capture session learnings, and keep guidance current.",
       "category": "memory",
       "tags": [
@@ -149,6 +185,15 @@
       "name": "code-modernization",
       "source": "./plugins/code-modernization",
       "version": "0.1.0",
+      "displayName": "遗留代码现代化",
+      "shortDescription": "通过评估→映射→提取规则→重构等流程现代化遗留代码库,配专家审查智能体",
+      "longDescription": "现代化遗留代码库(COBOL、老旧 Java/C++、单体 Web 应用),通过评估→映射→提取规则→简报→重新构想→转换→加固的流程推进,并配备专家审查智能体。",
+      "defaultPrompt": [
+        "评估这个遗留代码库的现代化路径",
+        "帮我把这段老代码重构成现代写法",
+        "提取这段遗留逻辑的业务规则"
+      ],
+      "brandColor": "#0969da",
       "description": "Modernize legacy codebases (COBOL, legacy Java/C++, monolith web apps) via assess → map → extract-rules → brief → reimagine → transform → harden, with specialist review agents.",
       "category": "workflow",
       "tags": [
@@ -162,6 +207,15 @@
       "name": "code-review",
       "source": "./plugins/code-review",
       "version": "0.1.0",
+      "displayName": "代码审查",
+      "shortDescription": "面向 Pull Request 的自动化代码审查,多智能体专家 + 置信度评分",
+      "longDescription": "面向 Pull Request 的自动化代码审查,由多个专长智能体协作,并基于置信度评分给出审查结论,帮助在合并前发现质量与缺陷问题。",
+      "defaultPrompt": [
+        "审查这个 Pull Request",
+        "对当前改动做一次代码审查",
+        "找出这段代码的潜在缺陷"
+      ],
+      "brandColor": "#0969da",
       "description": "Automated code review for pull requests with multi-agent specialists and confidence-based scoring.",
       "category": "code-review",
       "tags": [
@@ -175,6 +229,15 @@
       "name": "code-simplifier",
       "source": "./plugins/code-simplifier",
       "version": "0.1.0",
+      "displayName": "代码精简",
+      "shortDescription": "在保持功能不变的前提下,精简与优化代码的清晰度、一致性与可维护性",
+      "longDescription": "一个在保持功能不变前提下精简和优化代码的智能体,提升代码的清晰度、一致性与可维护性,适合重构与代码质量改进。",
+      "defaultPrompt": [
+        "精简这段代码",
+        "在不改变功能的前提下重构这个文件",
+        "让这段代码更易读"
+      ],
+      "brandColor": "#0969da",
       "description": "Agent that simplifies and refines code for clarity, consistency, and maintainability while preserving functionality.",
       "category": "code-quality",
       "tags": [
@@ -187,6 +250,15 @@
       "name": "commit-commands",
       "source": "./plugins/commit-commands",
       "version": "0.1.0",
+      "displayName": "Git 提交命令",
+      "shortDescription": "精简 Git 工作流:提交、推送、创建 PR 与清理过期分支命令",
+      "longDescription": "通过一组命令精简 Git 工作流,覆盖提交、推送、创建 Pull Request 与清理过期分支,减少重复的手工操作。",
+      "defaultPrompt": [
+        "帮我提交并推送当前改动",
+        "为这些改动创建一个 PR",
+        "清理已合并的过期分支"
+      ],
+      "brandColor": "#f97316",
       "description": "Streamline git workflows with commit, push, PR creation, and stale-branch cleanup commands.",
       "category": "workflow",
       "tags": [
@@ -200,6 +272,14 @@
       "name": "cwc-makers",
       "source": "./plugins/cwc-makers",
       "version": "0.1.0",
+      "displayName": "创客硬件(Cardputer)",
+      "shortDescription": "Code-with-CrabCode 创客 M5Stack Cardputer 上手:一条命令刷固件并安装设备技能",
+      "longDescription": "面向 Code-with-CrabCode 创客的 M5Stack Cardputer 上手插件:一条 /maker-setup 命令即可刷写固件并安装设备技能,快速把硬件接入 CrabCode。",
+      "defaultPrompt": [
+        "帮我配置 M5Stack Cardputer",
+        "刷写 Cardputer 固件并安装技能"
+      ],
+      "brandColor": "#f97316",
       "description": "Onboarding for the Code-with-CrabCode Makers M5Stack Cardputer: one /maker-setup command flashes firmware and installs the device skills.",
       "category": "hardware",
       "tags": [
@@ -214,6 +294,14 @@
       "name": "crabcode-example-plugin",
       "source": "./plugins/crabcode-example-plugin",
       "version": "0.1.0",
+      "displayName": "CrabCode 示例插件",
+      "shortDescription": "演示命令、智能体、技能、钩子与 MCP 服务配置的参考插件",
+      "longDescription": "一个参考用的 CrabCode 插件,完整演示命令(commands)、智能体(agents)、技能(skills)、钩子(hooks)与 MCP 服务的配置方式,适合作为开发自己插件时的模板与对照。",
+      "defaultPrompt": [
+        "看看这个示例插件是怎么组织的",
+        "照着这个示例帮我搭一个插件骨架"
+      ],
+      "brandColor": "#6b7280",
       "description": "Reference CrabCode plugin demonstrating commands, agents, skills, hooks, and MCP server configuration.",
       "category": "example",
       "tags": [
@@ -227,6 +315,15 @@
       "name": "feature-dev",
       "source": "./plugins/feature-dev",
       "version": "0.1.0",
+      "displayName": "功能开发",
+      "shortDescription": "功能开发工作流,含代码库探索、架构设计与质量审查的专长智能体",
+      "longDescription": "功能开发工作流,配备代码库探索、架构设计与质量审查的专长智能体,帮助从需求到实现完整推进一个功能。",
+      "defaultPrompt": [
+        "帮我规划这个新功能的实现",
+        "探索代码库找到相关模块",
+        "为这个功能设计架构"
+      ],
+      "brandColor": "#0969da",
       "description": "Feature development workflow with specialized agents for codebase exploration, architecture design, and quality review.",
       "category": "workflow",
       "tags": [
@@ -240,6 +337,15 @@
       "name": "frontend-design",
       "source": "./plugins/frontend-design",
       "version": "0.1.0",
+      "displayName": "前端设计",
+      "shortDescription": "面向 UI/UX 实现的前端设计技能,产出生产级的视觉品质",
+      "longDescription": "面向 UI/UX 实现的前端设计技能,帮助产出具备生产级视觉品质的界面,兼顾美观与可用性。",
+      "defaultPrompt": [
+        "帮我设计这个页面的界面",
+        "优化这个组件的视觉效果",
+        "做一个好看的落地页"
+      ],
+      "brandColor": "#d6336c",
       "description": "Frontend design skill for UI/UX implementation with production-grade aesthetics.",
       "category": "skills",
       "tags": [
@@ -253,6 +359,15 @@
       "name": "math-olympiad",
       "source": "./plugins/math-olympiad",
       "version": "0.1.0",
+      "displayName": "数学奥林匹克",
+      "shortDescription": "求解竞赛数学(IMO、Putnam、USAMO),以独立验证者对抗式校验,宁可弃权不蒙混",
+      "longDescription": "求解竞赛数学题(IMO、Putnam、USAMO 等),由全新上下文的验证者做对抗式校验;在没有把握时校准地选择弃权,而非蒙混作答。",
+      "defaultPrompt": [
+        "帮我解这道竞赛数学题",
+        "验证这个证明是否严谨",
+        "讲讲这道 IMO 题的思路"
+      ],
+      "brandColor": "#8957e5",
       "description": "Solve competition math (IMO, Putnam, USAMO) with adversarial verification by fresh-context verifiers; calibrated abstention over bluffing.",
       "category": "skills",
       "tags": [
@@ -266,6 +381,15 @@
       "name": "mcp-server-dev",
       "source": "./plugins/mcp-server-dev",
       "version": "0.1.0",
+      "displayName": "MCP 服务开发",
+      "shortDescription": "设计与构建 MCP 服务的技能:部署模型、工具设计、鉴权与交互式 MCP 应用",
+      "longDescription": "用于设计和构建 MCP(Model Context Protocol)服务的技能,涵盖部署模型(远程 HTTP、MCPB、本地)、工具设计模式、鉴权,以及交互式 MCP 应用的开发。",
+      "defaultPrompt": [
+        "帮我设计一个 MCP 服务",
+        "讲讲 MCP 的工具设计模式",
+        "我的 MCP 服务怎么加鉴权"
+      ],
+      "brandColor": "#0969da",
       "description": "Skills for designing and building MCP servers: deployment models (remote HTTP, MCPB, local), tool design patterns, auth, and interactive MCP apps.",
       "category": "agent-dev",
       "tags": [
@@ -279,6 +403,14 @@
       "name": "playground",
       "source": "./plugins/playground",
       "version": "0.1.0",
+      "displayName": "交互式演练场",
+      "shortDescription": "创建交互式 HTML 演练场:自包含单文件、可视化控件、实时预览与一键复制提示词",
+      "longDescription": "创建交互式 HTML 演练场:自包含的单文件探索器,带可视化控件、实时预览与一键复制提示词输出,适合快速试验与演示。",
+      "defaultPrompt": [
+        "帮我做一个交互式 HTML 演练场",
+        "用可视化控件演示这个算法"
+      ],
+      "brandColor": "#8957e5",
       "description": "Create interactive HTML playgrounds: self-contained single-file explorers with visual controls, live preview, and copy-to-clipboard prompt output.",
       "category": "skills",
       "tags": [
@@ -292,6 +424,15 @@
       "name": "plugin-dev",
       "source": "./plugins/plugin-dev",
       "version": "0.1.0",
+      "displayName": "插件开发",
+      "shortDescription": "CrabCode 插件开发工具箱:智能体、命令、钩子、MCP 集成与插件结构指引",
+      "longDescription": "CrabCode 插件开发工具箱,提供创建智能体、命令、钩子、MCP 集成与插件结构的技能与指引,帮助从零开发一个完整的 CrabCode 插件。",
+      "defaultPrompt": [
+        "帮我创建一个 CrabCode 插件",
+        "给插件加一个自定义命令",
+        "讲讲插件的目录结构"
+      ],
+      "brandColor": "#8957e5",
       "description": "Plugin development toolkit with skills for creating agents, commands, hooks, MCP integrations, and plugin structure guidance for CrabCode.",
       "category": "agent-dev",
       "tags": [
@@ -306,6 +447,15 @@
       "name": "pr-review-toolkit",
       "source": "./plugins/pr-review-toolkit",
       "version": "0.1.0",
+      "displayName": "PR 审查工具箱",
+      "shortDescription": "PR 审查智能体集合:注释、测试、错误处理、类型设计、代码质量与精简",
+      "longDescription": "Pull Request 审查智能体集合,各自专长于注释、测试、错误处理、类型设计、代码质量与代码精简,从多个维度审查一个 PR。",
+      "defaultPrompt": [
+        "从多个维度审查这个 PR",
+        "检查这个 PR 的测试覆盖",
+        "评估这段代码的类型设计"
+      ],
+      "brandColor": "#0969da",
       "description": "Pull request review agents specializing in comments, tests, error handling, type design, code quality, and code simplification.",
       "category": "code-review",
       "tags": [
@@ -319,6 +469,14 @@
       "name": "session-report",
       "source": "./plugins/session-report",
       "version": "0.1.0",
+      "displayName": "会话报告",
+      "shortDescription": "从本地转录文件生成带样式的 CrabCode 会话 HTML 报告,便于分享与复盘",
+      "longDescription": "从本地转录(transcript)文件生成带样式的 CrabCode 会话 HTML 报告,适合分享与事后复盘(post-mortem)。",
+      "defaultPrompt": [
+        "把这次会话生成一份 HTML 报告",
+        "为本次会话做一个复盘报告"
+      ],
+      "brandColor": "#f97316",
       "description": "Generate a styled HTML report of a CrabCode session from local transcript files for sharing and post-mortem.",
       "category": "workflow",
       "tags": [
@@ -331,6 +489,15 @@
       "name": "skill-creator",
       "source": "./plugins/skill-creator",
       "version": "0.1.0",
+      "displayName": "技能创建器",
+      "shortDescription": "创建、改进与评估 CrabCode 技能,配分析/评分/对比辅助智能体",
+      "longDescription": "用于创建、改进与评估 CrabCode 技能的工具,内置分析器、评分器与对比器辅助智能体,帮助快速产出高质量、可评估的技能。",
+      "defaultPrompt": [
+        "帮我创建一个新技能",
+        "评估并改进这个技能",
+        "对比这两个技能的优劣"
+      ],
+      "brandColor": "#8957e5",
       "description": "Create, improve, and evaluate CrabCode skills with analyzer/grader/comparator helper agents.",
       "category": "skills",
       "tags": [
@@ -752,6 +919,15 @@
       "name": "crabcode-office-suite",
       "source": "./plugins/crabcode-office-suite",
       "version": "0.1.0",
+      "displayName": "CrabCode 办公套件",
+      "shortDescription": "撰写与编辑 Office 文档的技能与工具:表格、Word、演示文稿与 PDF",
+      "longDescription": "用于撰写和编辑 Office 文档的 CrabCode 技能与 TypeScript 辅助工具,覆盖电子表格(xlsx)、Word 文档(docx)、演示文稿(pptx)与 PDF 的创建与编辑。",
+      "defaultPrompt": [
+        "帮我做一个数据分析的 Excel 表格",
+        "把这份内容整理成 PPT 演示文稿",
+        "生成一份格式规范的 Word 文档"
+      ],
+      "brandColor": "#2ea043",
       "description": "CrabCode skills and TypeScript helpers for authoring and editing Office documents: spreadsheets, word documents, presentations, and PDFs.",
       "category": "office",
       "tags": [
@@ -768,6 +944,14 @@
       "name": "crabcode-example-skills",
       "source": "./plugins/crabcode-example-skills",
       "version": "0.1.0",
+      "displayName": "CrabCode 示例技能集",
+      "shortDescription": "演示算法艺术、视觉设计、文档协作、MCP 编写、GIF 制作等的示例技能集合",
+      "longDescription": "一组示例 CrabCode 技能,涵盖算法艺术、视觉设计、品牌样式、文档协同撰写、内部沟通、MCP 服务编写、技能编写、GIF 制作、主题样式、Web 制品打包与基于 Playwright 的 Web 应用测试,适合学习技能写法。",
+      "defaultPrompt": [
+        "看看这些示例技能都能做什么",
+        "用示例技能帮我做一张算法艺术图"
+      ],
+      "brandColor": "#6b7280",
       "description": "A collection of example CrabCode skills demonstrating algorithmic art, visual design, brand styling, document co-authoring, internal communications, MCP server authoring, skill authoring, GIF creation, theme styling, web artifact bundling, and Playwright-based web app testing.",
       "category": "examples",
       "tags": [
@@ -783,6 +967,15 @@
       "name": "ai-api-dev",
       "source": "./plugins/ai-api-dev",
       "version": "0.1.0",
+      "displayName": "AI API 开发",
+      "shortDescription": "厂商中立的 LLM 应用构建、调试与迁移指引",
+      "longDescription": "厂商中立(provider-neutral)的指引,帮助构建、调试与迁移基于大语言模型的应用,覆盖 API 调用、工具使用(tool use)、提示词缓存与智能体设计等主题。",
+      "defaultPrompt": [
+        "帮我接入一个 LLM API",
+        "调试我的工具调用(tool use)逻辑",
+        "讲讲提示词缓存怎么用"
+      ],
+      "brandColor": "#0969da",
       "description": "Provider-neutral guidance for building, debugging, and migrating LLM-powered applications.",
       "category": "ai-dev",
       "tags": [
@@ -798,6 +991,15 @@
       "name": "crabcode-media-ops",
       "source": "./plugins/crabcode-media-ops",
       "version": "0.1.0",
+      "displayName": "CrabCode 媒体运营",
+      "shortDescription": "媒体运营工具箱:选题、智能体辅助撰写、人工审核、多平台适配、AI 标识合规与审批发布",
+      "longDescription": "面向内容媒体运营的工具箱:趋势选题发现、智能体辅助起草、人工审核、多平台(微信、小红书、今日头条等)适配、AI 生成内容标识合规,以及经审批后通过本地发布包发布。",
+      "defaultPrompt": [
+        "帮我发现这个领域的内容选题",
+        "把这篇内容适配成小红书风格",
+        "起草一篇公众号文章"
+      ],
+      "brandColor": "#8957e5",
       "description": "Media operations toolkit: trend discovery, agent-assisted drafting, human review, platform adaptation, AI-label compliance, and approved publishing via local publish packages.",
       "category": "content-ops",
       "tags": [
