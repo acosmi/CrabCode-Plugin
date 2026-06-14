@@ -25,6 +25,15 @@
       "name": "matter-core",
       "source": "./plugins/crablaw-cn/matter-core",
       "version": "0.1.0",
+      "displayName": "案件管理底座",
+      "shortDescription": "CrabLaw-CN 的案件、客户、利冲筛查、授权、来源记录、审查队列与归档基础",
+      "longDescription": "CrabLaw-CN 中国法律工作流的基础模块。提供案件(matter)、客户、利益冲突筛查、授权与权限、来源记录、审查队列与归档的统一底座,是其它中国法律插件的依赖基础。",
+      "defaultPrompt": [
+        "新建一个案件并录入客户信息",
+        "对这个新客户做利益冲突筛查",
+        "查看当前待审查队列"
+      ],
+      "brandColor": "#b5462f",
       "description": "Matter, client, conflict-screening, permission, source-record, review-queue, and archive foundation for CrabLaw-CN.",
       "category": "legal-workflow",
       "tags": [
@@ -38,6 +47,15 @@
       "name": "cn-contract",
       "source": "./plugins/crablaw-cn/cn-contract",
       "version": "0.1.0",
+      "displayName": "中国合同审查",
+      "shortDescription": "中国法合同全流程审查:起草、来件协议、NDA、条款重写与商业风险摘要",
+      "longDescription": "面向中国法律环境的合同审查工作流。覆盖合同起草、来件协议审阅、保密协议(NDA)、条款重写与商业风险摘要,依据《民法典》合同编及相关司法解释,帮助快速定位风险条款并给出修改建议。",
+      "defaultPrompt": [
+        "帮我审查这份 NDA 的风险条款",
+        "起草一份采购框架合同",
+        "总结这份合同的商业风险点"
+      ],
+      "brandColor": "#b5462f",
       "description": "PRC contract review workflow for drafts, inbound agreements, NDAs, clause redrafts, and business risk summaries.",
       "category": "legal-workflow",
       "tags": [
@@ -50,6 +68,15 @@
       "name": "cn-data-compliance",
       "source": "./plugins/crablaw-cn/cn-data-compliance",
       "version": "0.1.0",
+      "displayName": "中国数据合规",
+      "shortDescription": "个人信息保护、数据安全、网络安全与数据出境合规工作流草拟",
+      "longDescription": "面向中国数据合规的工作流草拟模块。覆盖《个人信息保护法》《数据安全法》《网络安全法》及数据跨境传输相关要求,辅助起草合规文件、开展个人信息保护影响评估与数据出境路径分析。",
+      "defaultPrompt": [
+        "起草一份个人信息处理告知同意书",
+        "做一次数据出境合规路径分析",
+        "评估这个产品的个人信息收集合规性"
+      ],
+      "brandColor": "#b5462f",
       "description": "PRC personal information, data security, cybersecurity, and cross-border data transfer workflow drafts.",
       "category": "legal-workflow",
       "tags": [
@@ -62,6 +89,15 @@
       "name": "cn-labor-employment",
       "source": "./plugins/crablaw-cn/cn-labor-employment",
       "version": "0.1.0",
+      "displayName": "中国劳动用工",
+      "shortDescription": "劳动合同、解除风险、竞业限制、员工手册与劳动争议工作流草拟",
+      "longDescription": "面向中国劳动与用工的工作流草拟模块。覆盖劳动合同起草、解除/裁员风险评估、竞业限制协议、员工手册与劳动争议处理,依据《劳动合同法》及地方司法实践提供草拟与风险提示。",
+      "defaultPrompt": [
+        "起草一份劳动合同",
+        "评估这次解除劳动合同的法律风险",
+        "拟一份竞业限制协议"
+      ],
+      "brandColor": "#b5462f",
       "description": "PRC labor and employment workflow drafts for employment contracts, termination risk, non-compete, handbooks, and disputes.",
       "category": "legal-workflow",
       "tags": [
