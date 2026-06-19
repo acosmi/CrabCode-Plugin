@@ -510,6 +510,15 @@
       "name": "asana",
       "source": "./plugins/asana",
       "version": "0.1.0",
+      "displayName": "Asana 任务管理",
+      "shortDescription": "在 CrabCode 中接入 Asana,创建管理任务、搜索项目、更新负责人并跟踪进度",
+      "longDescription": "为 CrabCode 打包的 Asana 工作管理集成。可直接在开发流程中创建和管理任务、搜索项目、更新任务负责人并跟踪进度,把研发工作与团队的任务管理打通。",
+      "defaultPrompt": [
+        "在 Asana 里帮我新建一个任务",
+        "查一下这个项目下还有哪些待办任务",
+        "把这个任务指派给某位成员并更新进度"
+      ],
+      "brandColor": "#f06a6a",
       "description": "Asana work management integration packaged for CrabCode. Create and manage tasks, search projects, update assignments, and track progress alongside your engineering workflow.",
       "category": "productivity",
       "tags": [
@@ -523,6 +532,15 @@
       "name": "context7",
       "source": "./plugins/context7",
       "version": "0.1.0",
+      "displayName": "Context7 文档检索",
+      "shortDescription": "通过 Upstash Context7 实时查询版本对应的官方文档与代码示例",
+      "longDescription": "接入 Upstash Context7 MCP 服务,实时查询最新文档。可直接从源码仓库拉取与具体版本对应的文档与代码示例,带入 CrabCode 会话,避免依赖过时资料。",
+      "defaultPrompt": [
+        "查一下这个库当前版本的官方用法",
+        "给我这个 API 的最新代码示例",
+        "用 Context7 拉取这个框架的文档"
+      ],
+      "brandColor": "#0969da",
       "description": "Upstash Context7 MCP server for up-to-date documentation lookup. Pull version-specific docs and code examples directly from source repositories into the CrabCode session.",
       "category": "development",
       "tags": [
@@ -536,6 +554,15 @@
       "name": "discord",
       "source": "./plugins/discord",
       "version": "0.1.0",
+      "displayName": "Discord 频道桥接",
+      "shortDescription": "把 CrabCode 接入 Discord 频道,内置配对、白名单与服务器频道访问控制",
+      "longDescription": "为 CrabCode 提供的 Discord 频道桥接。自带 MCP 服务,支持配对、白名单与服务器(guild)频道级访问控制,通过 /discord:access 技能管理谁可以触达智能体,让团队在 Discord 中与智能体协作。",
+      "defaultPrompt": [
+        "把这条结果发到指定的 Discord 频道",
+        "配置 Discord 频道桥接的白名单",
+        "查看当前 Discord 桥接的访问控制设置"
+      ],
+      "brandColor": "#5865f2",
       "description": "Discord channel bridge for CrabCode. Self-contained MCP server with pairing, allowlist, and guild-channel access control. Managed by /discord:access skill.",
       "category": "messaging",
       "tags": [
@@ -550,6 +577,15 @@
       "name": "fakechat",
       "source": "./plugins/fakechat",
       "version": "0.1.0",
+      "displayName": "FakeChat 频道测试",
+      "shortDescription": "本地网页 UI,用于测试 CrabCode 频道契约,无需外部服务与令牌",
+      "longDescription": "用于测试 CrabCode 频道契约(channel contract)的本地网页界面。自带 MCP 服务,采用 stdio 传输,支持附件上传与一个极简网页客户端;不依赖任何外部服务、无需令牌、无访问控制,适合在本地快速验证频道接入。",
+      "defaultPrompt": [
+        "启动 FakeChat 本地测试界面",
+        "用 FakeChat 验证一下频道消息收发",
+        "通过 FakeChat 测试附件上传"
+      ],
+      "brandColor": "#6b7280",
       "description": "Localhost web UI for testing the CrabCode channel contract. Self-contained MCP server with stdio transport, attachment upload, and a minimal web client. No external service, no tokens, no access control.",
       "category": "messaging",
       "tags": [
@@ -564,6 +600,15 @@
       "name": "firebase",
       "source": "./plugins/firebase",
       "version": "0.1.0",
+      "displayName": "Firebase 集成",
+      "shortDescription": "在 CrabCode 中管理 Firestore、鉴权、云函数、托管与存储",
+      "longDescription": "为 CrabCode 提供的 Google Firebase MCP 集成。可直接在开发界面中管理 Firestore 数据库、用户鉴权、云函数(Cloud Functions)、网站托管与文件存储,把后端服务的常见运维操作纳入对话流程。",
+      "defaultPrompt": [
+        "查询一下这个 Firestore 集合的数据",
+        "帮我部署一个 Firebase 云函数",
+        "看看当前 Firebase 项目的存储用量"
+      ],
+      "brandColor": "#ffca28",
       "description": "Google Firebase MCP integration for CrabCode. Manage Firestore, authentication, cloud functions, hosting, and storage directly from the development surface.",
       "category": "database",
       "tags": [
@@ -577,6 +622,15 @@
       "name": "github",
       "source": "./plugins/github",
       "version": "0.1.0",
+      "displayName": "GitHub 集成",
+      "shortDescription": "在 CrabCode 中创建 issue、管理 PR、审查代码并搜索仓库",
+      "longDescription": "为 CrabCode 提供的 GitHub MCP 集成。基于 GitHub 官方托管的 MCP 端点,可创建 issue、管理 Pull Request、审查代码并搜索仓库,把日常的协作与代码评审操作搬进对话。",
+      "defaultPrompt": [
+        "在 GitHub 上帮我建一个 issue",
+        "看看这个仓库当前的 Pull Request",
+        "搜索一下这个组织里相关的仓库"
+      ],
+      "brandColor": "#1f2328",
       "description": "GitHub MCP integration for CrabCode. Create issues, manage pull requests, review code, and search repositories against GitHub's hosted MCP endpoint.",
       "category": "productivity",
       "tags": [
@@ -590,6 +644,15 @@
       "name": "gitlab",
       "source": "./plugins/gitlab",
       "version": "0.1.0",
+      "displayName": "GitLab 集成",
+      "shortDescription": "在 CrabCode 中管理仓库、合并请求、CI/CD 流水线、issue 与 Wiki",
+      "longDescription": "为 CrabCode 提供的 GitLab MCP 集成。可在会话中管理仓库、合并请求(Merge Request)、CI/CD 流水线、issue 与 Wiki,把项目协作与持续集成的常见操作纳入对话流程。",
+      "defaultPrompt": [
+        "在 GitLab 上创建一个合并请求",
+        "查看这条 CI/CD 流水线的运行状态",
+        "列出这个仓库当前的 issue"
+      ],
+      "brandColor": "#fc6d26",
       "description": "GitLab MCP integration for CrabCode. Manage repositories, merge requests, CI/CD pipelines, issues, and wikis from your CrabCode session.",
       "category": "productivity",
       "tags": [
@@ -603,6 +666,15 @@
       "name": "greptile",
       "source": "./plugins/greptile",
       "version": "0.1.0",
+      "displayName": "Greptile 代码审查",
+      "shortDescription": "在 CrabCode 中查看并处理 Greptile 的 PR 审查评论",
+      "longDescription": "为 CrabCode 提供的 Greptile MCP 集成。可在会话中查看并逐条处理 Greptile 对 Pull Request 给出的代码审查评论,把自动化代码审查的反馈直接带入修复流程。",
+      "defaultPrompt": [
+        "查看 Greptile 对这个 PR 的审查评论",
+        "逐条处理 Greptile 提出的问题",
+        "把这条 Greptile 评论标记为已解决"
+      ],
+      "brandColor": "#0969da",
       "description": "Greptile MCP integration for CrabCode. View and resolve Greptile pull-request review comments from your CrabCode session.",
       "category": "development",
       "tags": [
@@ -616,6 +688,15 @@
       "name": "imessage",
       "source": "./plugins/imessage",
       "version": "0.1.0",
+      "displayName": "iMessage 频道桥接",
+      "shortDescription": "macOS 上把 CrabCode 接入 iMessage,直读 chat.db 并经 AppleScript 收发",
+      "longDescription": "面向 macOS 的 iMessage 频道桥接。直接读取 chat.db 获取消息、通过 AppleScript 发送回复,并以白名单方式控制谁可以触达智能体,让你在 iMessage 中与 CrabCode 智能体对话。",
+      "defaultPrompt": [
+        "把这条结果通过 iMessage 发给我",
+        "配置 iMessage 桥接的白名单",
+        "查看最近的 iMessage 会话消息"
+      ],
+      "brandColor": "#34c759",
       "description": "iMessage channel bridge for CrabCode (macOS). Reads chat.db directly and sends via AppleScript; allowlist-based access control governs who can reach the agent.",
       "category": "messaging",
       "tags": [
@@ -631,6 +712,15 @@
       "name": "laravel-boost",
       "source": "./plugins/laravel-boost",
       "version": "0.1.0",
+      "displayName": "Laravel Boost 集成",
+      "shortDescription": "在 CrabCode 中执行 Artisan 命令、Eloquent 查询、路由、迁移与框架感知的代码生成",
+      "longDescription": "为 CrabCode 提供的 Laravel Boost MCP 集成。通过项目本地的 Boost 服务,暴露 Artisan 命令、Eloquent 查询、路由、数据库迁移,以及理解框架约定的代码生成能力,加速 Laravel 项目开发。",
+      "defaultPrompt": [
+        "帮我跑一个 Artisan 命令",
+        "用 Eloquent 查询这张表的数据",
+        "生成一个新的迁移文件"
+      ],
+      "brandColor": "#ff2d20",
       "description": "Laravel Boost MCP integration for CrabCode. Exposes Artisan commands, Eloquent queries, routing, migrations, and framework-aware code generation through the project's local Boost server.",
       "category": "development",
       "tags": [
@@ -644,6 +734,15 @@
       "name": "linear",
       "source": "./plugins/linear",
       "version": "0.1.0",
+      "displayName": "Linear 任务跟踪",
+      "shortDescription": "在 CrabCode 中创建 issue、管理项目、更新状态并跨工作区搜索",
+      "longDescription": "为 CrabCode 提供的 Linear MCP 集成。可在会话中创建 issue、管理项目、更新任务状态,并跨多个 Linear 工作区(workspace)搜索,把研发任务跟踪与编码工作打通。",
+      "defaultPrompt": [
+        "在 Linear 上帮我建一个 issue",
+        "把这个任务的状态改成进行中",
+        "搜索一下 Linear 里相关的任务"
+      ],
+      "brandColor": "#5e6ad2",
       "description": "Linear MCP integration for CrabCode. Create issues, manage projects, update statuses, and search across Linear workspaces from the CrabCode session.",
       "category": "productivity",
       "tags": [
@@ -656,6 +755,15 @@
       "name": "playwright",
       "source": "./plugins/playwright",
       "version": "0.1.0",
+      "displayName": "Playwright 浏览器自动化",
+      "shortDescription": "在 CrabCode 中驱动有头/无头浏览器做端到端测试、页面巡检与自动截图",
+      "longDescription": "为 CrabCode 提供的 Microsoft Playwright MCP 集成。可驱动有头与无头浏览器,用于端到端(E2E)测试、页面元素巡检与自动截图,把浏览器自动化能力直接接入开发与测试流程。",
+      "defaultPrompt": [
+        "用 Playwright 跑一遍端到端测试",
+        "打开这个页面并截一张图",
+        "检查这个表单提交的交互流程"
+      ],
+      "brandColor": "#2ead33",
       "description": "Microsoft Playwright MCP integration for CrabCode. Drive headless and headed browsers for end-to-end testing, page inspection, and automated screenshots.",
       "category": "testing",
       "tags": [
@@ -669,6 +777,15 @@
       "name": "serena",
       "source": "./plugins/serena",
       "version": "0.1.0",
+      "displayName": "Serena 代码导航",
+      "shortDescription": "基于语言服务的语义级代码导航、重构建议与代码库理解",
+      "longDescription": "为 CrabCode 提供的 Serena MCP 集成。借助语言服务(language server)实现语义级代码导航、重构建议与对整个代码库的结构化理解,帮助智能体更精准地定位符号与跨文件分析。",
+      "defaultPrompt": [
+        "用 Serena 帮我理清这个代码库的结构",
+        "找出这个函数的所有调用点",
+        "给这段代码一些重构建议"
+      ],
+      "brandColor": "#0969da",
       "description": "Serena MCP integration for CrabCode. Semantic code navigation, refactoring suggestions, and codebase understanding via language-server integration.",
       "category": "development",
       "tags": [
@@ -682,6 +799,15 @@
       "name": "telegram",
       "source": "./plugins/telegram",
       "version": "0.1.0",
+      "displayName": "Telegram 频道桥接",
+      "shortDescription": "把 CrabCode 接入 Telegram,内置配对与白名单访问控制",
+      "longDescription": "为 CrabCode 提供的 Telegram 频道桥接。自带 MCP 服务,支持配对与白名单访问控制,通过 /telegram:access 技能管理谁可以触达智能体,让你在 Telegram 中与 CrabCode 智能体对话。",
+      "defaultPrompt": [
+        "把这条结果通过 Telegram 发给我",
+        "配置 Telegram 桥接的白名单",
+        "查看当前 Telegram 桥接的访问设置"
+      ],
+      "brandColor": "#229ed9",
       "description": "Telegram channel bridge for CrabCode. Self-contained MCP server with pairing and allowlist access control. Managed by /telegram:access skill.",
       "category": "messaging",
       "tags": [
@@ -696,6 +822,15 @@
       "name": "terraform",
       "source": "./plugins/terraform",
       "version": "0.1.0",
+      "displayName": "Terraform 基础设施",
+      "shortDescription": "在 CrabCode 中规划、查看与分析 IaC,任何 apply 都需人工显式批准",
+      "longDescription": "为 CrabCode 提供的 HashiCorp Terraform MCP 集成。可对基础设施即代码(IaC)进行 plan、查看与推理分析;任何实际变更(apply)都必须经过人工显式批准,在保证安全的前提下辅助基础设施管理。",
+      "defaultPrompt": [
+        "帮我跑一次 terraform plan 看看变更",
+        "解释一下这份 Terraform 配置会改什么",
+        "检查这次基础设施变更有没有风险"
+      ],
+      "brandColor": "#7b42bc",
       "description": "HashiCorp Terraform MCP integration for CrabCode. Plan, inspect, and reason about Infrastructure-as-Code with explicit human approval for any apply.",
       "category": "development",
       "tags": [
@@ -709,6 +844,15 @@
       "name": "clangd-lsp",
       "source": "./plugins/clangd-lsp",
       "version": "0.1.0",
+      "displayName": "C/C++ 语言服务",
+      "shortDescription": "接入 clangd,为 C/C++ 提供代码智能、诊断与格式化",
+      "longDescription": "为 CrabCode 提供的 C/C++ 语言服务(clangd)桥接。提供代码智能(补全、跳转、引用查找)、诊断与代码格式化,让智能体在 C/C++ 项目中更精准地理解与编辑代码。",
+      "defaultPrompt": [
+        "分析这个 C++ 项目的诊断问题",
+        "跳转到这个符号的定义",
+        "找出这个函数的所有引用"
+      ],
+      "brandColor": "#3178c6",
       "description": "C/C++ language server (clangd) bridge for CrabCode, providing code intelligence, diagnostics, and formatting.",
       "category": "language-server",
       "tags": [
@@ -722,6 +866,15 @@
       "name": "csharp-lsp",
       "source": "./plugins/csharp-lsp",
       "version": "0.1.0",
+      "displayName": "C# 语言服务",
+      "shortDescription": "为 C# 提供代码智能与诊断的语言服务桥接",
+      "longDescription": "为 CrabCode 提供的 C# 语言服务桥接。提供代码智能(补全、跳转、引用查找)与诊断能力,帮助智能体在 .NET / C# 项目中更准确地理解与编辑代码。",
+      "defaultPrompt": [
+        "分析这个 C# 项目的类型错误",
+        "跳转到这个符号的定义",
+        "找出这个方法的所有引用"
+      ],
+      "brandColor": "#512bd4",
       "description": "C# language server bridge for CrabCode, providing code intelligence and diagnostics.",
       "category": "language-server",
       "tags": [
@@ -734,6 +887,15 @@
       "name": "gopls-lsp",
       "source": "./plugins/gopls-lsp",
       "version": "0.1.0",
+      "displayName": "Go 语言服务",
+      "shortDescription": "接入 gopls,为 Go 提供代码智能、重构与静态分析",
+      "longDescription": "为 CrabCode 提供的 Go 语言服务(gopls)桥接。提供代码智能(补全、跳转、引用查找)、重构与静态分析,帮助智能体在 Go 项目中更精准地理解与编辑代码。",
+      "defaultPrompt": [
+        "分析这个 Go 项目的诊断问题",
+        "跳转到这个符号的定义",
+        "重命名这个函数并更新所有引用"
+      ],
+      "brandColor": "#00add8",
       "description": "Go language server (gopls) bridge for CrabCode, providing code intelligence, refactoring, and analysis.",
       "category": "language-server",
       "tags": [
@@ -746,6 +908,15 @@
       "name": "jdtls-lsp",
       "source": "./plugins/jdtls-lsp",
       "version": "0.1.0",
+      "displayName": "Java 语言服务",
+      "shortDescription": "接入 Eclipse JDT.LS,为 Java 提供代码智能与重构",
+      "longDescription": "为 CrabCode 提供的 Java 语言服务(Eclipse JDT.LS)桥接。提供代码智能(补全、跳转、引用查找)与重构能力,帮助智能体在 Java 项目中更准确地理解与编辑代码。",
+      "defaultPrompt": [
+        "分析这个 Java 项目的诊断问题",
+        "跳转到这个符号的定义",
+        "重命名这个类并更新所有引用"
+      ],
+      "brandColor": "#f89820",
       "description": "Java language server (Eclipse JDT.LS) bridge for CrabCode, providing code intelligence and refactoring.",
       "category": "language-server",
       "tags": [
@@ -758,6 +929,15 @@
       "name": "kotlin-lsp",
       "source": "./plugins/kotlin-lsp",
       "version": "0.1.0",
+      "displayName": "Kotlin 语言服务",
+      "shortDescription": "为 Kotlin 提供代码智能、重构与静态分析的语言服务桥接",
+      "longDescription": "为 CrabCode 提供的 Kotlin 语言服务桥接。提供代码智能(补全、跳转、引用查找)、重构与静态分析,帮助智能体在 Kotlin 项目中更精准地理解与编辑代码。",
+      "defaultPrompt": [
+        "分析这个 Kotlin 项目的诊断问题",
+        "跳转到这个符号的定义",
+        "重命名这个函数并更新所有引用"
+      ],
+      "brandColor": "#7f52ff",
       "description": "Kotlin language server bridge for CrabCode, providing code intelligence, refactoring, and analysis.",
       "category": "language-server",
       "tags": [
@@ -769,6 +949,15 @@
       "name": "lua-lsp",
       "source": "./plugins/lua-lsp",
       "version": "0.1.0",
+      "displayName": "Lua 语言服务",
+      "shortDescription": "为 Lua 提供代码智能与诊断的语言服务桥接",
+      "longDescription": "为 CrabCode 提供的 Lua 语言服务桥接。提供代码智能(补全、跳转、引用查找)与诊断能力,帮助智能体在 Lua 项目中更准确地理解与编辑代码。",
+      "defaultPrompt": [
+        "分析这个 Lua 项目的诊断问题",
+        "跳转到这个符号的定义",
+        "找出这个函数的所有引用"
+      ],
+      "brandColor": "#000080",
       "description": "Lua language server bridge for CrabCode, providing code intelligence and diagnostics.",
       "category": "language-server",
       "tags": [
@@ -780,6 +969,15 @@
       "name": "php-lsp",
       "source": "./plugins/php-lsp",
       "version": "0.1.0",
+      "displayName": "PHP 语言服务",
+      "shortDescription": "接入 Intelephense,为 PHP 提供代码智能与诊断",
+      "longDescription": "为 CrabCode 提供的 PHP 语言服务(Intelephense)桥接。提供代码智能(补全、跳转、引用查找)与诊断能力,帮助智能体在 PHP 项目中更准确地理解与编辑代码。",
+      "defaultPrompt": [
+        "分析这个 PHP 项目的诊断问题",
+        "跳转到这个符号的定义",
+        "找出这个函数的所有引用"
+      ],
+      "brandColor": "#777bb4",
       "description": "PHP language server (Intelephense) bridge for CrabCode, providing code intelligence and diagnostics.",
       "category": "language-server",
       "tags": [
@@ -792,6 +990,15 @@
       "name": "pyright-lsp",
       "source": "./plugins/pyright-lsp",
       "version": "0.1.0",
+      "displayName": "Python 语言服务",
+      "shortDescription": "接入 Pyright,为 Python 提供静态类型检查与代码智能",
+      "longDescription": "为 CrabCode 提供的 Python 语言服务(Pyright)桥接。提供静态类型检查与代码智能(补全、跳转、引用查找),帮助智能体在 Python 项目中更准确地发现类型问题并编辑代码。",
+      "defaultPrompt": [
+        "分析这个 Python 项目的类型错误",
+        "跳转到这个符号的定义",
+        "找出这个函数的所有引用"
+      ],
+      "brandColor": "#3776ab",
       "description": "Python language server (Pyright) bridge for CrabCode, providing static type checking and code intelligence.",
       "category": "language-server",
       "tags": [
@@ -804,6 +1011,15 @@
       "name": "ruby-lsp",
       "source": "./plugins/ruby-lsp",
       "version": "0.1.0",
+      "displayName": "Ruby 语言服务",
+      "shortDescription": "为 Ruby 提供代码智能与静态分析的语言服务桥接",
+      "longDescription": "为 CrabCode 提供的 Ruby 语言服务桥接。提供代码智能(补全、跳转、引用查找)与静态分析,帮助智能体在 Ruby 项目中更准确地理解与编辑代码。",
+      "defaultPrompt": [
+        "分析这个 Ruby 项目的诊断问题",
+        "跳转到这个符号的定义",
+        "找出这个方法的所有引用"
+      ],
+      "brandColor": "#cc342d",
       "description": "Ruby language server bridge for CrabCode, providing code intelligence and analysis.",
       "category": "language-server",
       "tags": [
@@ -815,6 +1031,15 @@
       "name": "rust-analyzer-lsp",
       "source": "./plugins/rust-analyzer-lsp",
       "version": "0.1.0",
+      "displayName": "Rust 语言服务",
+      "shortDescription": "接入 rust-analyzer,为 Rust 提供代码智能与静态分析",
+      "longDescription": "为 CrabCode 提供的 Rust 语言服务(rust-analyzer)桥接。提供代码智能(补全、跳转、引用查找)与静态分析,帮助智能体在 Rust 项目中更精准地理解与编辑代码。",
+      "defaultPrompt": [
+        "分析这个 Rust 项目的诊断问题",
+        "跳转到这个符号的定义",
+        "找出这个函数的所有引用"
+      ],
+      "brandColor": "#dea584",
       "description": "Rust language server (rust-analyzer) bridge for CrabCode, providing code intelligence and analysis.",
       "category": "language-server",
       "tags": [
@@ -827,6 +1052,15 @@
       "name": "swift-lsp",
       "source": "./plugins/swift-lsp",
       "version": "0.1.0",
+      "displayName": "Swift 语言服务",
+      "shortDescription": "接入 SourceKit-LSP,为 Swift 项目提供代码智能",
+      "longDescription": "为 CrabCode 提供的 Swift 语言服务(SourceKit-LSP)桥接。为 Swift 项目提供代码智能(补全、跳转、引用查找),帮助智能体更准确地理解与编辑代码。",
+      "defaultPrompt": [
+        "分析这个 Swift 项目的诊断问题",
+        "跳转到这个符号的定义",
+        "找出这个函数的所有引用"
+      ],
+      "brandColor": "#f05138",
       "description": "Swift language server (SourceKit-LSP) bridge for CrabCode, providing code intelligence for Swift projects.",
       "category": "language-server",
       "tags": [
@@ -839,6 +1073,15 @@
       "name": "typescript-lsp",
       "source": "./plugins/typescript-lsp",
       "version": "0.1.0",
+      "displayName": "TypeScript 语言服务",
+      "shortDescription": "为 TypeScript/JavaScript 提供代码智能、跳转定义、引用查找与错误检查",
+      "longDescription": "为 CrabCode 提供的 TypeScript/JavaScript 语言服务桥接。提供代码智能(补全)、跳转到定义、查找引用与错误检查,帮助智能体在前端与 Node 项目中更精准地理解与编辑代码。",
+      "defaultPrompt": [
+        "分析这个项目的类型错误",
+        "跳转到这个符号的定义",
+        "找出这个函数的所有引用"
+      ],
+      "brandColor": "#3178c6",
       "description": "TypeScript/JavaScript language server bridge for CrabCode, providing code intelligence, go-to-definition, find references, and error checking.",
       "category": "language-server",
       "tags": [
@@ -851,6 +1094,15 @@
       "name": "hookify",
       "source": "./plugins/hookify",
       "version": "0.1.0",
+      "displayName": "自定义钩子规则",
+      "shortDescription": "用 Markdown 规则文件配置 CrabCode 钩子,按正则或结构化条件拦截或告警",
+      "longDescription": "由 .crabcode/hookify.*.local.md 中的 Markdown 规则文件驱动的可自定义 CrabCode 钩子。可针对 Bash、Edit/Write/MultiEdit、Stop 与 UserPromptSubmit 等事件,使用正则或结构化条件进行拦截(block)或告警(warn),为团队定制护栏。",
+      "defaultPrompt": [
+        "帮我加一条规则,禁止执行危险的删除命令",
+        "在写入特定目录时给出告警",
+        "查看当前生效的 hookify 规则"
+      ],
+      "brandColor": "#d29922",
       "description": "User-configurable CrabCode hooks driven by markdown rule files in .crabcode/hookify.*.local.md. Block or warn on Bash, Edit/Write/MultiEdit, Stop, and UserPromptSubmit events using regex or structured conditions.",
       "category": "guardrails",
       "tags": [
@@ -866,6 +1118,15 @@
       "name": "security-guidance",
       "source": "./plugins/security-guidance",
       "version": "0.1.0",
+      "displayName": "代码安全提示",
+      "shortDescription": "写入前钩子,在编辑文件时对常见安全隐患给出告警",
+      "longDescription": "一个在写入前(pre-write)触发的钩子,在编辑文件时对常见安全隐患给出告警,包括 shell 注入点、动态代码执行、XSS 注入点、不安全的反序列化,以及有风险的 GitHub Actions 工作流输入,帮助在引入风险前及时提醒。",
+      "defaultPrompt": [
+        "启用代码安全提示钩子",
+        "检查我刚改的文件有没有安全隐患",
+        "看看这段代码有没有注入风险"
+      ],
+      "brandColor": "#cf222e",
       "description": "Pre-write hook that warns about common security pitfalls when editing files: shell injection sinks, dynamic code evaluation, XSS sinks, unsafe deserialization, and risky GitHub Actions workflow inputs.",
       "category": "guardrails",
       "tags": [
@@ -880,6 +1141,15 @@
       "name": "explanatory-output-style",
       "source": "./plugins/explanatory-output-style",
       "version": "0.1.0",
+      "displayName": "讲解式输出风格",
+      "shortDescription": "会话启动钩子,让智能体在工作时附带简短的实现思路讲解",
+      "longDescription": "一个在会话启动(SessionStart)时注入「讲解式输出风格」的钩子:智能体在执行任务的同时,会就实现选择给出简短的内联说明,帮助你边看边理解它为什么这么做。",
+      "defaultPrompt": [
+        "切换到讲解式输出风格",
+        "实现时顺便讲讲你的思路",
+        "解释一下这里为什么这么做"
+      ],
+      "brandColor": "#8957e5",
       "description": "SessionStart hook that injects an explanatory output style: the agent provides brief inline educational insights about implementation choices while it works.",
       "category": "session-style",
       "tags": [
@@ -893,6 +1163,15 @@
       "name": "learning-output-style",
       "source": "./plugins/learning-output-style",
       "version": "0.1.0",
+      "displayName": "学习式输出风格",
+      "shortDescription": "会话启动钩子,把智能体切到学习模式,留出可动手的小段代码并配讲解",
+      "longDescription": "一个在会话启动(SessionStart)时把智能体切换到「学习模式」的钩子:它会为用户挑出有意义的 5-10 行可亲手编写的代码机会,并配上内联的讲解说明,适合边做边学。",
+      "defaultPrompt": [
+        "切换到学习式输出风格",
+        "留一段代码让我自己写并给我讲解",
+        "用学习模式带我做这个功能"
+      ],
+      "brandColor": "#8957e5",
       "description": "SessionStart hook that switches the agent into learning mode: surfaces meaningful 5-10 line code-write opportunities for the user and pairs them with inline educational insights.",
       "category": "session-style",
       "tags": [
@@ -906,6 +1185,15 @@
       "name": "ralph-loop",
       "source": "./plugins/ralph-loop",
       "version": "0.1.0",
+      "displayName": "迭代自循环开发",
+      "shortDescription": "Stop 钩子拦截会话退出并重投同一提示词,带迭代次数上限与可选完成承诺",
+      "longDescription": "一个迭代式的自循环开发模式:通过 Stop 钩子拦截会话退出,并把同一条提示词重新投喂给智能体反复推进,内置迭代次数安全上限,并支持可选的「完成承诺」以便在达成目标时自动收尾。",
+      "defaultPrompt": [
+        "用迭代自循环把这个任务做完",
+        "反复迭代直到测试全部通过",
+        "设置迭代上限并开始自循环"
+      ],
+      "brandColor": "#d29922",
       "description": "Iterative self-referential development loop. A Stop hook intercepts session exit and re-feeds the same prompt with iteration safety caps and an opt-in completion promise.",
       "category": "workflow",
       "tags": [
