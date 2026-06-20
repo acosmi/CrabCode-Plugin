@@ -7,3 +7,6 @@ docs/legal/
 .DS_Store
 *.log
 *.tmp
+
+# 上游参考代码暂存区(Apache-2.0,待转换为 CrabCode 原生插件后再正式入库)
+vendor/
