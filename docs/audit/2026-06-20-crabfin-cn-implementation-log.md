@@ -135,3 +135,26 @@
 
 **结论**:本轮可实施范围(阶段 0/1/2/4)全部完成并通过权威校验;阶段 3 为方案明确暂缓项(硬性正确性边界,非遗漏)。
 
+
+---
+
+## 交付后毁灭性复核审计(敌意视角)
+
+- **根因证伪**:vendor 豁免——在 vendor/ 造含 claude/anthropic 的探针,`bun run lint:brand .` 命中 0/exit 0,实证根因生效、不依赖删除;layout 白名单——新增测试通过,容器布局 validate exit 0。两项均非症状级。
+- **关联方与回归**:干净 HEAD 重跑 `bun run validate` exit 0(唯一输出为 crablaw-cn 既有 WARNING,非本任务);`bun test` 33 pass/0 fail;`git diff --stat main...HEAD` = 44 文件 +6065/−1(−1 为 layout 单行替换,无误删/无残留调试)。
+- **需求对齐**:5 决策全满足;阶段 3 中国深度内容为方案明确暂缓(硬边界),非偷偷收缩范围。
+- **过度工程反向审**:无超需求抽象;6 子板块各 1 条 marketplace 条目是决策 3 明文要求;未引入新运行期依赖。
+- **交付完整性(git)**:核心产出全部在 `HEAD`,工作树干净;无 stash/临时 worktree 遗留。
+
+**结论:通过**。本轮可实施范围(阶段 0/1/2/4)全部完成并经权威校验;阶段 3 为正确性暂缓项。
+
+## 合并闸门(破坏性操作交回用户)
+
+按 git 硬约束,合并 main / 删除任务分支**默认不执行**。合并安全核验:HEAD 仅领先 main 本任务 3 提交、落后 0,无他人未合并改动、无覆盖其他窗口产出风险。
+
+建议合并步骤(由用户决定执行):
+```
+git checkout main
+git merge --no-ff task/crabfin-cn-implementation-20260620
+# 可选:git branch -d task/crabfin-cn-implementation-20260620
+```
