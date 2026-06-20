@@ -1,0 +1,15 @@
+{
+  "name": "cn-investment-banking",
+  "version": "0.1.0",
+  "description": "China investment banking & M&A scaffold: teasers, CIMs, merger models, and deal tracking (pending CSRC restructuring and tender-offer rules).",
+  "author": {
+    "name": "CrabFin"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "finance",
+    "investment-banking",
+    "m-and-a",
+    "csrc"
+  ]
+}

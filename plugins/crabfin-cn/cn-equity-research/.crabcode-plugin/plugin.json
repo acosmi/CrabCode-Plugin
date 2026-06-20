@@ -1,0 +1,15 @@
+{
+  "name": "cn-equity-research",
+  "version": "0.1.0",
+  "description": "China equity research scaffold: A-share/HK earnings analysis, initiating coverage, model updates, and morning notes (pending CN disclosure rules and CAS materials).",
+  "author": {
+    "name": "CrabFin"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "finance",
+    "equity-research",
+    "a-share",
+    "cas"
+  ]
+}

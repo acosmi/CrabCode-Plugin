@@ -1,0 +1,15 @@
+{
+  "name": "cn-kyc-ops",
+  "version": "0.1.0",
+  "description": "China KYC & operations scaffold: onboarding document parsing and rules-grid evaluation (pending AML, real-name, and UBO rules).",
+  "author": {
+    "name": "CrabFin"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "finance",
+    "kyc",
+    "aml",
+    "operations"
+  ]
+}

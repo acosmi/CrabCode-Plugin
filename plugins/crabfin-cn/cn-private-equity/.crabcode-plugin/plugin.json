@@ -1,0 +1,15 @@
+{
+  "name": "cn-private-equity",
+  "version": "0.1.0",
+  "description": "China private equity scaffold: sourcing, screening, diligence, IC memos, and portfolio monitoring (pending AMAC filing norms).",
+  "author": {
+    "name": "CrabFin"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "finance",
+    "private-equity",
+    "diligence",
+    "amac"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "cn-fund-admin",
+  "version": "0.1.0",
+  "description": "China fund administration scaffold: GL reconciliation, accruals, roll-forwards, and NAV tie-out (pending AMAC valuation guidance).",
+  "author": {
+    "name": "CrabFin"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "finance",
+    "fund-admin",
+    "nav",
+    "valuation"
+  ]
+}

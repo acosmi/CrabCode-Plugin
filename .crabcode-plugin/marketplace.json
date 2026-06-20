@@ -1298,6 +1298,150 @@
         "toutiao",
         "mcp"
       ]
+    },
+    {
+      "name": "fin-core",
+      "source": "./plugins/crabfin-cn/fin-core",
+      "version": "0.1.0",
+      "displayName": "CrabFin 财务建模底座",
+      "shortDescription": "通用财务建模主工作流:DCF、LBO、三表模型、可比公司,以及 Excel/PPT 自动生成与 deck 质检",
+      "longDescription": "CrabFin-CN 的底座工作流,提供全球通用的财务建模能力:DCF 估值、LBO、三表联动、可比公司与竞品分析,配合无头 Excel/PowerPoint 生成与投行 deck 质量检查。建议先安装此底座,再按需带入中国领域子板块。",
+      "defaultPrompt": [
+        "帮我搭一个 DCF 估值模型",
+        "对这份财务模型做公式审计",
+        "把这组可比公司做成对比表"
+      ],
+      "brandColor": "#0ea5e9",
+      "description": "Universal financial modeling foundation: DCF, LBO, 3-statement, comps, and headless Excel/PPT authoring.",
+      "category": "finance",
+      "tags": [
+        "valuation",
+        "dcf",
+        "lbo",
+        "comps",
+        "modeling",
+        "excel"
+      ]
+    },
+    {
+      "name": "cn-equity-research",
+      "source": "./plugins/crabfin-cn/cn-equity-research",
+      "version": "0.1.0",
+      "displayName": "中国股票研究",
+      "shortDescription": "A股/港股研究子板块:财报分析、首次覆盖、模型更新、晨报(骨架,待补监管素材)",
+      "longDescription": "面向 A股/港股的卖方/买方股票研究子板块。当前为骨架,通用建模能力由 CrabFin 底座提供;中国特定的深度内容(企业会计准则、信息披露规则、估值惯例)待权威素材到位后补充。",
+      "defaultPrompt": [
+        "分析这家A股公司的最新财报",
+        "为这只股票起草首次覆盖报告"
+      ],
+      "brandColor": "#0ea5e9",
+      "description": "China equity research scaffold (pending CN disclosure rules and CAS materials).",
+      "category": "finance",
+      "tags": [
+        "equity-research",
+        "a-share",
+        "earnings"
+      ]
+    },
+    {
+      "name": "cn-investment-banking",
+      "source": "./plugins/crabfin-cn/cn-investment-banking",
+      "version": "0.1.0",
+      "displayName": "中国投行并购",
+      "shortDescription": "中国投行与并购子板块:teaser、CIM、并购模型、交易跟踪(骨架,待补监管素材)",
+      "longDescription": "面向中国市场的投行与并购子板块。当前为骨架,通用并购建模由 CrabFin 底座提供;中国特定内容(重组管理办法、要约收购规则、反垄断申报)待权威素材到位后补充。",
+      "defaultPrompt": [
+        "为这单交易起草 teaser",
+        "搭一个并购对价测算模型"
+      ],
+      "brandColor": "#0ea5e9",
+      "description": "China IB & M&A scaffold (pending CSRC restructuring and tender-offer rules).",
+      "category": "finance",
+      "tags": [
+        "investment-banking",
+        "m-and-a",
+        "csrc"
+      ]
+    },
+    {
+      "name": "cn-private-equity",
+      "source": "./plugins/crabfin-cn/cn-private-equity",
+      "version": "0.1.0",
+      "displayName": "中国私募股权",
+      "shortDescription": "私募股权子板块:项目搜寻、筛选、尽调、IC备忘、组合监控(骨架,待补监管素材)",
+      "longDescription": "面向中国市场的私募股权子板块。当前为骨架,通用回报建模由 CrabFin 底座提供;中国特定内容(基金业协会备案、尽调口径、对赌/回购惯例)待权威素材到位后补充。",
+      "defaultPrompt": [
+        "生成一份尽调清单",
+        "为这个标的写 IC 备忘录"
+      ],
+      "brandColor": "#0ea5e9",
+      "description": "China private equity scaffold (pending AMAC filing norms).",
+      "category": "finance",
+      "tags": [
+        "private-equity",
+        "diligence",
+        "amac"
+      ]
+    },
+    {
+      "name": "cn-wealth",
+      "source": "./plugins/crabfin-cn/cn-wealth",
+      "version": "0.1.0",
+      "displayName": "中国财富管理",
+      "shortDescription": "财富管理子板块:客户回顾、理财规划、组合再平衡(骨架,待补监管素材)",
+      "longDescription": "面向中国市场的财富管理子板块。当前为骨架,通用组合分析由 CrabFin 底座提供;中国特定内容(资管新规、理财销售规则、税务口径)待权威素材到位后补充。",
+      "defaultPrompt": [
+        "为客户做一份组合回顾",
+        "起草一份理财规划方案"
+      ],
+      "brandColor": "#0ea5e9",
+      "description": "China wealth management scaffold (pending new asset-management rules).",
+      "category": "finance",
+      "tags": [
+        "wealth",
+        "planning",
+        "rebalance"
+      ]
+    },
+    {
+      "name": "cn-fund-admin",
+      "source": "./plugins/crabfin-cn/cn-fund-admin",
+      "version": "0.1.0",
+      "displayName": "中国基金行政",
+      "shortDescription": "基金行政子板块:总账对账、计提、滚存、NAV 勾稽(骨架,待补监管素材)",
+      "longDescription": "面向中国市场的基金行政与估值子板块。当前为骨架,通用表格审计/清洗由 CrabFin 底座提供;中国特定内容(中基协估值指引、基金会计核算规则)待权威素材到位后补充。",
+      "defaultPrompt": [
+        "对这期 NAV 做勾稽核对",
+        "排一张计提表"
+      ],
+      "brandColor": "#0ea5e9",
+      "description": "China fund administration scaffold (pending AMAC valuation guidance).",
+      "category": "finance",
+      "tags": [
+        "fund-admin",
+        "nav",
+        "valuation"
+      ]
+    },
+    {
+      "name": "cn-kyc-ops",
+      "source": "./plugins/crabfin-cn/cn-kyc-ops",
+      "version": "0.1.0",
+      "displayName": "中国KYC与运营",
+      "shortDescription": "KYC 与运营子板块:开户文档解析、规则栅格评估(骨架,待补监管素材)",
+      "longDescription": "面向中国市场的 KYC 与运营子板块。当前为骨架;中国特定内容(反洗钱、客户身份识别/实名制、受益所有人识别)待权威素材到位后补充。",
+      "defaultPrompt": [
+        "解析这份开户材料并校验",
+        "按规则栅格做 KYC 缺口检查"
+      ],
+      "brandColor": "#0ea5e9",
+      "description": "China KYC & operations scaffold (pending AML/UBO rules).",
+      "category": "finance",
+      "tags": [
+        "kyc",
+        "aml",
+        "operations"
+      ]
     }
   ]
 }

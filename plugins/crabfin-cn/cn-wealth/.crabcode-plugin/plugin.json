@@ -1,0 +1,15 @@
+{
+  "name": "cn-wealth",
+  "version": "0.1.0",
+  "description": "China wealth management scaffold: client reviews, financial plans, and portfolio rebalancing (pending new asset-management rules).",
+  "author": {
+    "name": "CrabFin"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "finance",
+    "wealth",
+    "planning",
+    "rebalance"
+  ]
+}
