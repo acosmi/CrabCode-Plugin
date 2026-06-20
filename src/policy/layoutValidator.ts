@@ -10,7 +10,7 @@ export type LayoutIssue = {
   message: string;
 };
 
-const APPROVED_NESTED_FAMILIES = new Set(["crablaw-cn"]);
+const APPROVED_NESTED_FAMILIES = new Set(["crablaw-cn", "crabfin-cn"]);
 const PATH_SCAN_SKIP_DIRS = new Set(["node_modules", "dist", "coverage"]);
 
 export async function validateLayout(root: string): Promise<LayoutIssue[]> {

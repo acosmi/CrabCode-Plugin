@@ -60,6 +60,15 @@ describe("layout validator", () => {
     expect(issues).toEqual([]);
   });
 
+  test("accepts approved nested family crabfin-cn", async () => {
+    const root = await makeTempRoot();
+    await writePluginManifest(root, "plugins/crabfin-cn/fin-core", {
+      name: "fin-core",
+    });
+    const issues = await validateLayout(root);
+    expect(issues).toEqual([]);
+  });
+
   test("rejects unapproved nested family", async () => {
     const root = await makeTempRoot();
     await writePluginManifest(root, "plugins/random-family/something", {

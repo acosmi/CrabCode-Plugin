@@ -43,6 +43,8 @@ const DEFAULT_IGNORES = [
   "docs/**implementation-plan*.md",
   "node_modules/**",
   "**/node_modules/**",
+  "vendor/**",
+  "**/vendor/**",
   "yuanma/**",
 ];
 
