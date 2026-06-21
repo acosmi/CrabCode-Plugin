@@ -1923,13 +1923,112 @@
       "brandColor": "#f97316",
       "description": "Pre-built small business workflows (payroll planning, month-end close, weekly briefs, growth campaigns) using your QuickBooks, PayPal, HubSpot, Docusign, and other connected tools. You approve every step that touches money or customers.",
       "category": "work-platform",
+      "tier": "workflow",
       "tags": [
         "smb",
         "finance",
         "marketing",
         "operations"
       ],
-      "tier": "workflow"
+      "groups": [
+        {
+          "name": "smb-onboarding",
+          "displayName": "上手与智能路由",
+          "skills": [
+            "smb-onboard",
+            "smb-router"
+          ]
+        },
+        {
+          "name": "cash-payroll",
+          "displayName": "现金流与薪酬",
+          "skills": [
+            "cash-flow-snapshot",
+            "invoice-chase",
+            "plan-payroll"
+          ]
+        },
+        {
+          "name": "month-close",
+          "displayName": "月度结账",
+          "skills": [
+            "close-month",
+            "month-end-prep",
+            "month-heads-up"
+          ]
+        },
+        {
+          "name": "tax-filing",
+          "displayName": "税务申报",
+          "skills": [
+            "tax-prep",
+            "tax-season-organizer"
+          ]
+        },
+        {
+          "name": "pricing-margin",
+          "displayName": "定价与盈利",
+          "skills": [
+            "margin-analyzer",
+            "price-check"
+          ]
+        },
+        {
+          "name": "sales-pipeline",
+          "displayName": "销售管道",
+          "skills": [
+            "lead-triage",
+            "call-list",
+            "sales-brief"
+          ]
+        },
+        {
+          "name": "marketing-content",
+          "displayName": "营销与内容",
+          "skills": [
+            "run-campaign",
+            "content-strategy",
+            "canva-creator"
+          ]
+        },
+        {
+          "name": "crm-customer",
+          "displayName": "客户关系与 CRM",
+          "skills": [
+            "crm-cleanup",
+            "crm-maintenance",
+            "customer-pulse",
+            "customer-pulse-check"
+          ]
+        },
+        {
+          "name": "customer-support",
+          "displayName": "客户服务",
+          "skills": [
+            "handle-complaint",
+            "ticket-deflector"
+          ]
+        },
+        {
+          "name": "contract-hiring",
+          "displayName": "合同与用人",
+          "skills": [
+            "contract-review",
+            "review-contract",
+            "job-post-builder"
+          ]
+        },
+        {
+          "name": "ops-briefs",
+          "displayName": "经营简报与复盘",
+          "skills": [
+            "business-pulse",
+            "monday-brief",
+            "friday-brief",
+            "quarterly-review"
+          ]
+        }
+      ]
     }
   ]
 }
