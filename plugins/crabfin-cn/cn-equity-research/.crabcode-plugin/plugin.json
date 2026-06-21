@@ -1,15 +1,19 @@
 {
   "name": "cn-equity-research",
   "version": "0.1.0",
-  "description": "China equity research scaffold: A-share/HK earnings analysis, initiating coverage, model updates, and morning notes (pending CN disclosure rules and CAS materials).",
-  "author": {
-    "name": "CrabFin"
-  },
+  "description": "中国A股/港股股票研究板块。基于 fin-core 通用建模底座，承载中国市场特定口径：CAS科目映射、证监会/申万行业分类、沪深北港交所披露规则、A股估值惯例。",
+  "author": { "name": "CrabFin-CN" },
   "license": "Apache-2.0",
-  "keywords": [
-    "finance",
-    "equity-research",
-    "a-share",
-    "cas"
+  "keywords": ["china","a-share","hk-stock","equity-research","sell-side","buy-side","CAS","industry-classification"],
+  "skills": [
+    "./skills/catalyst-calendar",
+    "./skills/earnings-analysis",
+    "./skills/earnings-preview",
+    "./skills/idea-generation",
+    "./skills/initiating-coverage",
+    "./skills/model-update",
+    "./skills/morning-note",
+    "./skills/sector-overview",
+    "./skills/thesis-tracker"
   ]
 }

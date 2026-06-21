@@ -1328,8 +1328,8 @@
       "source": "./plugins/crabfin-cn/cn-equity-research",
       "version": "0.1.0",
       "displayName": "中国股票研究",
-      "shortDescription": "A股/港股研究子板块:财报分析、首次覆盖、模型更新、晨报(骨架,待补监管素材)",
-      "longDescription": "面向 A股/港股的卖方/买方股票研究子板块。当前为骨架,通用建模能力由 CrabFin 底座提供;中国特定的深度内容(企业会计准则、信息披露规则、估值惯例)待权威素材到位后补充。",
+      "shortDescription": "A股/港股研究子板块:财报分析、首次覆盖、模型更新、晨报(含CAS科目/申万行业/信息披露/估值惯例)",
+      "longDescription": "面向 A股/港股的卖方/买方股票研究子板块。通用建模能力由 CrabFin 底座提供;已内置中国特定监管内容:企业会计准则(CAS)科目映射、申万行业分类(2021版)、沪深北港交所信息披露规则、A股/港股估值惯例与基准倍数。9个技能覆盖催化剂日历、财报分析/前瞻、选股思路、首次覆盖、模型更新、晨报、行业概览、投资逻辑跟踪。",
       "defaultPrompt": [
         "分析这家A股公司的最新财报",
         "为这只股票起草首次覆盖报告"
@@ -1348,14 +1348,14 @@
       "source": "./plugins/crabfin-cn/cn-investment-banking",
       "version": "0.1.0",
       "displayName": "中国投行并购",
-      "shortDescription": "中国投行与并购子板块:teaser、CIM、并购模型、交易跟踪(骨架,待补监管素材)",
-      "longDescription": "面向中国市场的投行与并购子板块。当前为骨架,通用并购建模由 CrabFin 底座提供;中国特定内容(重组管理办法、要约收购规则、反垄断申报)待权威素材到位后补充。",
+      "shortDescription": "中国投行与并购子板块:teaser、CIM、并购模型、交易跟踪，含重组管理办法/要约收购/反垄断申报口径",
+      "longDescription": "面向中国市场的投行与并购子板块。已内置 9 项技能，涵盖 teaser/CIM/并购对价测算/交易跟踪全流程。中国特定口径包括：重大资产重组管理办法(50%/80%/12-36月)、要约收购披露阈值(5%/10%/15%/20%/30%)、经营者集中申报标准(120亿/40亿/8亿)、国资交易32号令/外资准入负面清单。",
       "defaultPrompt": [
         "为这单交易起草 teaser",
         "搭一个并购对价测算模型"
       ],
       "brandColor": "#0ea5e9",
-      "description": "China IB & M&A scaffold (pending CSRC restructuring and tender-offer rules).",
+      "description": "China IB & M&A: 9 skills covering teaser, CIM, merger modeling, deal tracking with CSRC restructuring rules and antitrust filings.",
       "category": "finance",
       "tags": [
         "investment-banking",
@@ -1368,14 +1368,14 @@
       "source": "./plugins/crabfin-cn/cn-private-equity",
       "version": "0.1.0",
       "displayName": "中国私募股权",
-      "shortDescription": "私募股权子板块:项目搜寻、筛选、尽调、IC备忘、组合监控(骨架,待补监管素材)",
-      "longDescription": "面向中国市场的私募股权子板块。当前为骨架,通用回报建模由 CrabFin 底座提供;中国特定内容(基金业协会备案、尽调口径、对赌/回购惯例)待权威素材到位后补充。",
+      "shortDescription": "私募股权子板块:项目搜寻、筛选、尽调、IC备忘、组合监控，含AMAC备案/对赌回购/合格投资者口径",
+      "longDescription": "面向中国市场的私募股权子板块。已内置 10 项技能，覆盖项目搜寻/筛选/尽调/IC备忘/组合监控全流程。中国特定口径包括：AMAC私募备案(实缴≥1000万/≥5人/20工作日)、九民纪要第5条对赌回购可执行性、合格投资者分级(300万/500万/1000万)、尽调必查清单(3大层面/7板块/44条)。",
       "defaultPrompt": [
         "生成一份尽调清单",
         "为这个标的写 IC 备忘录"
       ],
       "brandColor": "#0ea5e9",
-      "description": "China private equity scaffold (pending AMAC filing norms).",
+      "description": "China private equity: 10 skills covering deal sourcing, screening, diligence, IC memos with AMAC filing and VAM enforceability.",
       "category": "finance",
       "tags": [
         "private-equity",
@@ -1388,14 +1388,14 @@
       "source": "./plugins/crabfin-cn/cn-wealth",
       "version": "0.1.0",
       "displayName": "中国财富管理",
-      "shortDescription": "财富管理子板块:客户回顾、理财规划、组合再平衡(骨架,待补监管素材)",
-      "longDescription": "面向中国市场的财富管理子板块。当前为骨架,通用组合分析由 CrabFin 底座提供;中国特定内容(资管新规、理财销售规则、税务口径)待权威素材到位后补充。",
+      "shortDescription": "财富管理子板块:客户回顾、理财规划、组合再平衡、税务亏损收割，含资管新规/适当性管理/个税口径",
+      "longDescription": "面向中国市场的财富管理子板块。已内置 6 项技能，涵盖客户回顾/理财规划/组合再平衡/税务亏损收割(中国税制口径)全流程。中国特定口径包括：资管新规(打破刚兑/禁止嵌套一层/净值化/杠杆140%-200%)、投资者适当性C1-C5与R1-R5匹配矩阵、理财产品销售双录+24h冷静期、中国个税(综合所得3-45%七级/股息差异化/转让暂免)。",
       "defaultPrompt": [
         "为客户做一份组合回顾",
         "起草一份理财规划方案"
       ],
       "brandColor": "#0ea5e9",
-      "description": "China wealth management scaffold (pending new asset-management rules).",
+      "description": "China wealth management: 6 skills covering client reviews, financial planning, rebalancing with new asset-management rules and tax treatment.",
       "category": "finance",
       "tags": [
         "wealth",
@@ -1408,14 +1408,14 @@
       "source": "./plugins/crabfin-cn/cn-fund-admin",
       "version": "0.1.0",
       "displayName": "中国基金行政",
-      "shortDescription": "基金行政子板块:总账对账、计提、滚存、NAV 勾稽(骨架,待补监管素材)",
-      "longDescription": "面向中国市场的基金行政与估值子板块。当前为骨架,通用表格审计/清洗由 CrabFin 底座提供;中国特定内容(中基协估值指引、基金会计核算规则)待权威素材到位后补充。",
+      "shortDescription": "基金行政子板块:总账对账、计提、滚存、NAV 勾稽，含AMAC估值指引/基金会计科目/公允价值层级",
+      "longDescription": "面向中国市场的基金行政与估值子板块。已内置 6 项技能，涵盖总账对账/计提/滚存/NAV勾稽全流程。中国特定口径包括：中基协基金估值指引(公允价值三层级Level1/2/3/CAS39)、基金会计科目体系(6大类/100+明细)、份额登记确认(T日申购/T+1确认)、流动性受限资产折扣率(15-35%)。",
       "defaultPrompt": [
         "对这期 NAV 做勾稽核对",
         "排一张计提表"
       ],
       "brandColor": "#0ea5e9",
-      "description": "China fund administration scaffold (pending AMAC valuation guidance).",
+      "description": "China fund administration: 6 skills covering GL recon, accrual schedules, NAV tie-out with AMAC valuation guidance.",
       "category": "finance",
       "tags": [
         "fund-admin",
@@ -1428,14 +1428,14 @@
       "source": "./plugins/crabfin-cn/cn-kyc-ops",
       "version": "0.1.0",
       "displayName": "中国KYC与运营",
-      "shortDescription": "KYC 与运营子板块:开户文档解析、规则栅格评估(骨架,待补监管素材)",
-      "longDescription": "面向中国市场的 KYC 与运营子板块。当前为骨架;中国特定内容(反洗钱、客户身份识别/实名制、受益所有人识别)待权威素材到位后补充。",
+      "shortDescription": "KYC 与运营子板块:开户文档解析、规则栅格评估，含反洗钱法(2025)/受益所有人识别/可疑交易报告",
+      "longDescription": "面向中国市场的 KYC 与运营子板块。已内置 2 项技能，涵盖开户文档解析/规则栅格评估。中国特定口径包括：反洗钱法(2024修订/2025.1.1生效/9类客户身份信息)、受益所有人识别(25%持股穿透/3个标准)、可疑交易报告(5万现金/20万转账)、开户文档必填字段(25+项)。",
       "defaultPrompt": [
         "解析这份开户材料并校验",
         "按规则栅格做 KYC 缺口检查"
       ],
       "brandColor": "#0ea5e9",
-      "description": "China KYC & operations scaffold (pending AML/UBO rules).",
+      "description": "China KYC & operations: 2 skills covering doc parsing and rules-grid evaluation with 2025 AML law and UBO identification.",
       "category": "finance",
       "tags": [
         "kyc",

@@ -1,15 +1,12 @@
 {
   "name": "cn-kyc-ops",
   "version": "0.1.0",
-  "description": "China KYC & operations scaffold: onboarding document parsing and rules-grid evaluation (pending AML, real-name, and UBO rules).",
-  "author": {
-    "name": "CrabFin"
-  },
+  "description": "中国KYC与反洗钱子板块：开户文档解析、KYC规则栅格评估。承载反洗钱法/受益所有人识别/客户尽调中国口径。依赖 fin-core 提供文档解析基础。",
+  "author": { "name": "CrabFin-CN" },
   "license": "Apache-2.0",
-  "keywords": [
-    "finance",
-    "kyc",
-    "aml",
-    "operations"
+  "keywords": ["china", "kyc", "aml", "反洗钱", "受益所有人", "客户尽调"],
+  "skills": [
+    "./skills/kyc-doc-parse",
+    "./skills/kyc-rules"
   ]
 }

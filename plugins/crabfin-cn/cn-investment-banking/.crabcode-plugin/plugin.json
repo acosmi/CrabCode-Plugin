@@ -1,15 +1,19 @@
 {
   "name": "cn-investment-banking",
   "version": "0.1.0",
-  "description": "China investment banking & M&A scaffold: teasers, CIMs, merger models, and deal tracking (pending CSRC restructuring and tender-offer rules).",
-  "author": {
-    "name": "CrabFin"
-  },
+  "description": "中国投行并购子板块：A股并购重组、要约收购、交易流程。承载 teaser/CIM/并购对价测算/交易跟踪的中国监管口径。依赖 fin-core 提供通用建模能力。",
+  "author": { "name": "CrabFin-CN" },
   "license": "Apache-2.0",
-  "keywords": [
-    "finance",
-    "investment-banking",
-    "m-and-a",
-    "csrc"
+  "keywords": ["china", "investment-banking", "ma", "merger", "acquisition", "重组", "要约收购"],
+  "skills": [
+    "./skills/buyer-list",
+    "./skills/cim-builder",
+    "./skills/datapack-builder",
+    "./skills/deal-tracker",
+    "./skills/merger-model",
+    "./skills/pitch-deck",
+    "./skills/process-letter",
+    "./skills/strip-profile",
+    "./skills/teaser"
   ]
 }

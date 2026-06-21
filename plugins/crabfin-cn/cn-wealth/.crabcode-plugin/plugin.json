@@ -1,15 +1,16 @@
 {
   "name": "cn-wealth",
   "version": "0.1.0",
-  "description": "China wealth management scaffold: client reviews, financial plans, and portfolio rebalancing (pending new asset-management rules).",
-  "author": {
-    "name": "CrabFin"
-  },
+  "description": "中国财富管理子板块：客户回顾、理财规划、组合再平衡、税务筹划。承载中国资管新规/适当性/个税口径。依赖 fin-core 提供通用组合分析。",
+  "author": { "name": "CrabFin-CN" },
   "license": "Apache-2.0",
-  "keywords": [
-    "finance",
-    "wealth",
-    "planning",
-    "rebalance"
+  "keywords": ["china", "wealth-management", "理财", "适当性", "资管新规", "个税"],
+  "skills": [
+    "./skills/client-report",
+    "./skills/client-review",
+    "./skills/financial-plan",
+    "./skills/investment-proposal",
+    "./skills/portfolio-rebalance",
+    "./skills/tax-loss-harvesting"
   ]
 }
