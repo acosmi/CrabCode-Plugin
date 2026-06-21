@@ -1,0 +1,23 @@
+{
+  "name": "cn-legal-study",
+  "version": "0.1.0",
+  "description": "PRC legal study and bar/postgraduate exam preparation aids: study plans, outlines, flashcards, case studies, question and essay practice, statute recitation, and mock drills. Educational use, not individualized legal advice.",
+  "author": {
+    "name": "CrabLaw"
+  },
+  "license": "Apache-2.0",
+  "keywords": ["prc-law", "legal-education", "bar-exam", "study"],
+  "skills": [
+    "./skills/case-study",
+    "./skills/essay-practice",
+    "./skills/exam-forecast",
+    "./skills/exam-question-practice",
+    "./skills/flashcards",
+    "./skills/legal-writing",
+    "./skills/mock-interview",
+    "./skills/outline-builder",
+    "./skills/statute-recite",
+    "./skills/study-plan",
+    "./skills/study-session"
+  ]
+}

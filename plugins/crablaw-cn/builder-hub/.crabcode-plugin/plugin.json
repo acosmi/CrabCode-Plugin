@@ -1,0 +1,20 @@
+{
+  "name": "builder-hub",
+  "version": "0.1.0",
+  "description": "Plugin and skill management meta-tooling: install, uninstall, enable/disable, browse the registry, surface related skills, run auto-update checks, and skill QA.",
+  "author": {
+    "name": "CrabLaw"
+  },
+  "license": "Apache-2.0",
+  "keywords": ["plugin-management", "skills", "meta-tooling"],
+  "skills": [
+    "./skills/auto-updater",
+    "./skills/disable",
+    "./skills/registry-browser",
+    "./skills/related-skills-surfacer",
+    "./skills/skill-installer",
+    "./skills/skill-manager",
+    "./skills/skills-qa",
+    "./skills/uninstall"
+  ]
+}

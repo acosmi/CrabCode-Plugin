@@ -131,6 +131,17 @@
     },
     {
       "if": {
+        "properties": { "sourcePlugin": { "const": "cn-legal-aid" } },
+        "required": ["sourcePlugin"]
+      },
+      "then": {
+        "properties": {
+          "sourceSkill": { "enum": ["aid-application-form", "aid-intake", "case-closure", "case-memo", "case-status", "client-comms-log", "deadlines", "document-draft", "eligibility-check", "plain-language-letter", "research-start", "supervisor-review-queue"] }
+        }
+      }
+    },
+    {
+      "if": {
         "properties": { "status": { "enum": ["returned", "approved-internal", "approved-external", "sent"] } },
         "required": ["status"]
       },

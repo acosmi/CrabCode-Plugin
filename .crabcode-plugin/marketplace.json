@@ -242,6 +242,69 @@
       ]
     },
     {
+      "name": "cn-legal-aid",
+      "source": "./plugins/crablaw-cn/cn-legal-aid",
+      "version": "0.1.0",
+      "displayName": "中国法律援助",
+      "shortDescription": "法律援助工作流草拟:申请受理、资格审查、表单、备忘、通俗告知、期限与质量监督",
+      "longDescription": "面向中国法律援助的工作流草拟模块。覆盖受援人申请受理与资格审查(经济困难、事项范围)、申请表单生成、案件备忘与法律文书起草、通俗语言告知、期限管理、质量监督复核与结案归档,依据《法律援助法》提供草拟与风险提示。",
+      "defaultPrompt": [
+        "登记一位法律援助申请人",
+        "审查这个法律援助申请的资格",
+        "生成法律援助申请表"
+      ],
+      "brandColor": "#b5462f",
+      "description": "PRC legal aid workflow drafts for applicant intake, eligibility screening, application forms, case memos, plain-language letters, deadlines, supervisor review, and case closure under the Legal Aid Law.",
+      "category": "legal-workflow",
+      "tags": [
+        "prc-law",
+        "legal-aid",
+        "access-to-justice"
+      ]
+    },
+    {
+      "name": "cn-legal-study",
+      "source": "./plugins/crablaw-cn/cn-legal-study",
+      "version": "0.1.0",
+      "displayName": "中国法考法硕备考",
+      "shortDescription": "法考与法律硕士备考辅助:学习计划、知识大纲、记忆卡片、案例研习、真题与主观题训练(教育用途)",
+      "longDescription": "面向国家统一法律职业资格考试(法考)与法律硕士的备考辅助模块。覆盖备考计划、学科大纲、记忆卡片、指导性案例研习、客观题与主观题训练、法条背诵、考点预测与法律写作。教育备考用途,非针对个案的法律意见。",
+      "defaultPrompt": [
+        "帮我制定法考备考计划",
+        "讲讲这个法考知识点",
+        "给我出几道民法客观题练习"
+      ],
+      "brandColor": "#b5462f",
+      "description": "PRC legal study and bar/postgraduate exam preparation aids: study plans, outlines, flashcards, case studies, question and essay practice, statute recitation, and mock drills. Educational use, not individualized legal advice.",
+      "category": "legal-education",
+      "tags": [
+        "prc-law",
+        "legal-education",
+        "bar-exam"
+      ]
+    },
+    {
+      "name": "builder-hub",
+      "source": "./plugins/crablaw-cn/builder-hub",
+      "version": "0.1.0",
+      "displayName": "插件与技能管理中心",
+      "shortDescription": "CrabCode 插件市场的插件/技能管理元工具:安装、卸载、启停、浏览、推荐、更新与质检",
+      "longDescription": "面向 CrabCode 插件市场的通用管理元工具。覆盖技能/插件的安装、卸载、启用禁用、市场目录浏览、关联技能推荐、更新检查与质量答疑,帮助用户管理本地已装技能与发现新技能。",
+      "defaultPrompt": [
+        "安装一个新技能",
+        "看看有哪些可用插件",
+        "管理我已装的技能"
+      ],
+      "brandColor": "#6e7781",
+      "description": "Plugin and skill management meta-tooling: install, uninstall, enable/disable, browse the registry, surface related skills, run auto-update checks, and skill QA.",
+      "category": "developer-tools",
+      "tags": [
+        "plugin-management",
+        "skills",
+        "meta-tooling"
+      ]
+    },
+    {
       "name": "crabcode-security-review",
       "source": "./plugins/crabcode-security-review",
       "version": "0.1.0",

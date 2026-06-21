@@ -154,3 +154,37 @@
 
 ### 五、教训沉淀
 subagent 自检不可信(本批 2/26 谎报红线合规)。主控「必备段脚本校验 + 全仓 grep」是有效拦截网;红线标语应纳入字符级精确校验(全角逗号),已并入主控重核标准流程。
+
+---
+
+## 批次 3:cn-legal-aid / cn-legal-study / builder-hub(语义重建 + 元工具)
+
+### 一、前置审计(承根因 2:三板块无中国法直接对应)
+- legal-clinic 绑定美国 ABA Formal Op.512、law-student 绑定 JD/Bar/IRAC/Socratic、builder-hub 是插件管理元工具。直译不成立,须按中国语境**重新设计 skill 集**(不强制 1:1 对应 _legacy 清单,符合背景文档第 6 节注)。
+
+### 二、架构偏离论证(Matter Gate 豁免;先论证后做)
+- **偏离点**:cn-legal-study 与 builder-hub 的 skill **不走 matter-core Matter Gate**;cn-legal-study 红线替换为教育免责声明,builder-hub 不挂法律红线。
+- **原因(根因)**:Matter Gate(建客户→建事务→冲突筛查)与统一红线【AI 辅助草稿，需律师复核】是为**面向真实当事人的法律工作产品**设计的执业保护。cn-legal-study 是备考学习材料(用户=考生,无当事人/案件/利益冲突),builder-hub 是插件管理操作(无任何法律产品属性)。强套 Matter Gate 既无意义又是障碍;对一份抽认卡标"需律师复核"反而误导。
+- **影响面**:仅这两板块;不影响法律板块的 gate 强制。
+- **与原始需求一致性**:背景文档第 7 节已**预留**「学习类评估是否豁免 Matter Gate(批次 3 前确认)」、决策 B 将 builder-hub 定为「去美国法化的通用元工具」。本豁免是落实预留决策,非静默扩大/收缩;属范围澄清(非法律产品不产生法律工作产品,故第 10 节红线不适用),非突破核心边界。
+- **保守边界**:cn-legal-study 仍保留 citationTag(教学法条准确性需要)与教育免责头;并非完全无护栏。
+- **反证(根因判定)**:若 Matter Gate 该套用于学习/元工具而我误豁免,则用户在这两板块会遇到无意义的 NO_ACTIVE_MATTER 阻断、且学习材料被误标法律产品红线——这恰是套用的危害,证明豁免是根因正解。
+- **对比保留**:cn-legal-aid **保留完整 matter 体系 + Matter Gate + 标准红线**——法律援助是面向真实受援人的法律服务(《法律援助法》2022 施行),有当事人=client、援助事项=matter、质量监督=review-queue,且法援含利益冲突回避,必须 gate。
+
+### 三、skill 集设计(语义重建)
+- **cn-legal-aid(12,走 matter 体系)**:aid-intake / eligibility-check / aid-application-form / client-comms-log / plain-language-letter / case-memo / document-draft / deadlines / research-start / case-status / supervisor-review-queue / case-closure。依据《法律援助法》(经济困难审查、事项范围、值班律师、质量监督)。
+- **cn-legal-study(11,豁免 Matter Gate)**:study-plan / outline-builder / flashcards / case-study(指导性案例/请求权基础分析,替 IRAC)/ exam-question-practice(客观题)/ essay-practice(主观题/案例分析)/ statute-recite(法条背诵)/ mock-interview(主观题思路追问,替 Socratic)/ exam-forecast / legal-writing / study-session。面向国家统一法律职业资格考试(法考)与法律硕士。
+- **builder-hub(8,豁免 Matter Gate,无法律红线)**:skill-installer / uninstall / disable / skill-manager / registry-browser / related-skills-surfacer / auto-updater / skills-qa。通用插件/技能管理元工具。
+
+### 四、底座与注册待办
+- review-queue:cn-legal-aid 加 sourceSkill allOf 分支(enum 批次1 已含 cn-legal-aid);cn-legal-study/builder-hub 不入 matter 体系,不加。
+- marketplace 注册 3 条目(builder-hub 的 category/tags 按元工具定,不用 legal-workflow/prc-law)。
+
+### 五、主控差异化重核结论(三板块结构不同,分别核)
+- **cn-legal-aid(走 matter 体系)**:12 文件全角红线 + Matter Gate(引用 PRACTICE.md)+ 三段 + when 从句,异常 0;ABA/legal clinic/品牌/境外 SaaS/半角红线零命中;review-queue 已含 cn-legal-aid allOf 分支。抽样深核 eligibility-check:法援事项范围、经济困难标准(地方规定/低保救助凭证/承诺)、免予审查情形(英雄烈士近亲属、劳动报酬/工伤、特定刑案)、刑事应当通知/指定辩护(盲聋哑、精神病人、未成年人、无期死刑、缺席审判)、地方标准挂 Currency Gate —— **专业准确**。
+- **cn-legal-study(豁免 gate)**:11 文件标准教育免责头(全角,mock-interview 半角已修正)、无 Matter Gate/PRACTICE/法律红线、三段 + when 齐、品牌零命中。抽样 case-study:请求权基础分析法(找规范-查要件-涵摄-结论)+ 法律关系分析法,IRAC 仅在替代对照语境 —— **专业准确,豁免落实**。
+- **builder-hub(豁免 gate + 无法律红线)**:8 文件品牌词零命中(最高风险点)、无 Matter Gate/PRACTICE/法律红线、三段 + when 齐、全文中性表述(CrabCode 插件市场/技能/marketplace)。
+- **全量门禁(13 板块完整)**:validate-all all checks passed;bun test 33 pass/0 fail。
+
+### 六、交付
+已提交批次 3(见 git log)。crablaw-cn 伞下达 13 板块(matter-core + 12 子板块),9 个新板块全部中国法化/语义重建/去美国法化完成。
