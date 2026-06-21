@@ -12,5 +12,14 @@
     "commands",
     "hooks",
     "mcp"
+  ],
+  "skills": [
+    "./skills/agent-development",
+    "./skills/command-development",
+    "./skills/hook-development",
+    "./skills/mcp-integration",
+    "./skills/plugin-settings",
+    "./skills/plugin-structure",
+    "./skills/skill-development"
   ]
 }

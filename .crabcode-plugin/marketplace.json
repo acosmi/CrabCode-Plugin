@@ -28,243 +28,188 @@
         "recommendations",
         "setup",
         "analysis"
-      ]
+      ],
+      "tier": "capability"
     },
     {
-      "name": "matter-core",
-      "source": "./plugins/crablaw-cn/matter-core",
+      "name": "crablaw-cn",
+      "source": "./plugins/crablaw-cn",
       "version": "0.1.0",
-      "displayName": "案件管理底座",
-      "shortDescription": "CrabLaw-CN 的案件、客户、利冲筛查、授权、来源记录、审查队列与归档基础",
-      "longDescription": "CrabLaw-CN 中国法律工作流的基础模块。提供案件(matter)、客户、利益冲突筛查、授权与权限、来源记录、审查队列与归档的统一底座,是其它中国法律插件的依赖基础。",
+      "displayName": "法律工作流",
+      "shortDescription": "中国法律实务工作流:案件底座、合同、诉讼、知产、公司、劳动、数据合规、AI 治理、监管、产品与法援",
+      "longDescription": "CrabLaw-CN 中国法律实务工作流伞插件。一次安装即获得 11 个实务板块(案件管理底座、合同、数据合规、劳动用工、公司、诉讼、知识产权、监管、AI 治理、产品、法律援助)共 86 项技能,板块以分组形式在能力区展示、按需带入。",
       "defaultPrompt": [
-        "新建一个案件并录入客户信息",
-        "对这个新客户做利益冲突筛查",
-        "查看当前待审查队列"
+        "新建一个案件并做利益冲突筛查",
+        "起草一份符合中国法的合同并审查风险",
+        "梳理这起诉讼的证据清单与时间线"
       ],
       "brandColor": "#b5462f",
-      "description": "Matter, client, conflict-screening, permission, source-record, review-queue, and archive foundation for CrabLaw-CN.",
+      "description": "CrabLaw-CN 中国法律实务工作流伞插件。一次安装即获得 11 个实务板块(案件管理底座、合同、数据合规、劳动用工、公司、诉讼、知识产权、监管、AI 治理、产品、法律援助)共 86 项技能,板块以分组形式在能力区展示、按需带入。",
       "category": "legal-workflow",
+      "tier": "workflow",
       "tags": [
         "prc-law",
-        "matter-management",
-        "conflicts",
-        "review-gate"
-      ]
-    },
-    {
-      "name": "cn-contract",
-      "source": "./plugins/crablaw-cn/cn-contract",
-      "version": "0.1.0",
-      "displayName": "中国合同审查",
-      "shortDescription": "中国法合同全流程审查:起草、来件协议、NDA、条款重写与商业风险摘要",
-      "longDescription": "面向中国法律环境的合同审查工作流。覆盖合同起草、来件协议审阅、保密协议(NDA)、条款重写与商业风险摘要,依据《民法典》合同编及相关司法解释,帮助快速定位风险条款并给出修改建议。",
-      "defaultPrompt": [
-        "帮我审查这份 NDA 的风险条款",
-        "起草一份采购框架合同",
-        "总结这份合同的商业风险点"
+        "legal-workflow",
+        "umbrella"
       ],
-      "brandColor": "#b5462f",
-      "description": "PRC contract review workflow for drafts, inbound agreements, NDAs, clause redrafts, and business risk summaries.",
-      "category": "legal-workflow",
-      "tags": [
-        "prc-law",
-        "contracts",
-        "civil-code"
-      ]
-    },
-    {
-      "name": "cn-data-compliance",
-      "source": "./plugins/crablaw-cn/cn-data-compliance",
-      "version": "0.1.0",
-      "displayName": "中国数据合规",
-      "shortDescription": "个人信息保护、数据安全、网络安全与数据出境合规工作流草拟",
-      "longDescription": "面向中国数据合规的工作流草拟模块。覆盖《个人信息保护法》《数据安全法》《网络安全法》及数据跨境传输相关要求,辅助起草合规文件、开展个人信息保护影响评估与数据出境路径分析。",
-      "defaultPrompt": [
-        "起草一份个人信息处理告知同意书",
-        "做一次数据出境合规路径分析",
-        "评估这个产品的个人信息收集合规性"
-      ],
-      "brandColor": "#b5462f",
-      "description": "PRC personal information, data security, cybersecurity, and cross-border data transfer workflow drafts.",
-      "category": "legal-workflow",
-      "tags": [
-        "prc-law",
-        "data-compliance",
-        "personal-information"
-      ]
-    },
-    {
-      "name": "cn-labor-employment",
-      "source": "./plugins/crablaw-cn/cn-labor-employment",
-      "version": "0.1.0",
-      "displayName": "中国劳动用工",
-      "shortDescription": "劳动合同、解除风险、竞业限制、员工手册与劳动争议工作流草拟",
-      "longDescription": "面向中国劳动与用工的工作流草拟模块。覆盖劳动合同起草、解除/裁员风险评估、竞业限制协议、员工手册与劳动争议处理,依据《劳动合同法》及地方司法实践提供草拟与风险提示。",
-      "defaultPrompt": [
-        "起草一份劳动合同",
-        "评估这次解除劳动合同的法律风险",
-        "拟一份竞业限制协议"
-      ],
-      "brandColor": "#b5462f",
-      "description": "PRC labor and employment workflow drafts for employment contracts, termination risk, non-compete, handbooks, and disputes.",
-      "category": "legal-workflow",
-      "tags": [
-        "prc-law",
-        "labor",
-        "employment"
-      ]
-    },
-    {
-      "name": "cn-corporate",
-      "source": "./plugins/crablaw-cn/cn-corporate",
-      "version": "0.1.0",
-      "displayName": "中国公司与并购",
-      "shortDescription": "公司治理与并购工作流草拟:董事会/股东会决议、主体合规、尽调、交割与投后整合",
-      "longDescription": "面向中国公司治理与并购(M&A)的工作流草拟模块。覆盖董事会/股东会决议与会议纪要、公司存续期合规(章程、工商变更登记、年报、出资、印章)、法律尽职调查与重大合同清单、股权收购/增资交割清单与并购后整合,依据《公司法》《民法典》《证券法》《外商投资法》提供草拟与风险提示。",
-      "defaultPrompt": [
-        "起草一份董事会决议",
-        "梳理这次股权收购的交割清单",
-        "对这批尽调文件做法律风险提取"
-      ],
-      "brandColor": "#b5462f",
-      "description": "PRC corporate governance and M&A workflow drafts for board/shareholder resolutions, entity compliance, transaction diligence, closing, and post-deal integration.",
-      "category": "legal-workflow",
-      "tags": [
-        "prc-law",
-        "corporate",
-        "m-and-a"
-      ]
-    },
-    {
-      "name": "cn-litigation",
-      "source": "./plugins/crablaw-cn/cn-litigation",
-      "version": "0.1.0",
-      "displayName": "中国民商事诉讼",
-      "shortDescription": "民商事诉讼与仲裁工作流草拟:立案信息、时间线、律师函、证据保全、庭审质证与诉讼文书",
-      "longDescription": "面向中国民商事诉讼与仲裁的工作流草拟模块。覆盖立案前信息收集与案件登记、事实时间线、争点对照、律师函、证据保全与留存、庭审与质证准备、调查取证应对及起诉状/答辩状/代理词等诉讼文书分段起草,依据《民事诉讼法》《仲裁法》《民法典》及相关司法解释提供草拟与风险提示。",
-      "defaultPrompt": [
-        "帮我梳理这个案子的事实时间线",
-        "起草一份律师函",
-        "准备这次开庭的质证要点"
-      ],
-      "brandColor": "#b5462f",
-      "description": "PRC civil and commercial litigation and arbitration workflow drafts for case intake, chronology, demand letters, evidence preservation, hearing preparation, and pleadings.",
-      "category": "legal-workflow",
-      "tags": [
-        "prc-law",
-        "litigation",
-        "arbitration"
-      ]
-    },
-    {
-      "name": "cn-ip",
-      "source": "./plugins/crablaw-cn/cn-ip",
-      "version": "0.1.0",
-      "displayName": "中国知识产权",
-      "shortDescription": "知识产权工作流草拟:权利登记、检索清除、FTO/侵权分流、警告函、平台投诉、IP条款与开源审查、资产组合",
-      "longDescription": "面向中国知识产权的工作流草拟模块。覆盖发明披露与权利登记、申请前检索清除、自由实施(FTO)与侵权分流、停止侵害警告函、网络平台通知删除、合同IP条款与开源软件合规审查及资产组合管理,依据《商标法》《专利法》《著作权法》《反不正当竞争法》《电子商务法》提供草拟与风险提示。",
-      "defaultPrompt": [
-        "对这个商标做申请前检索清除",
-        "起草一份侵权警告函",
-        "梳理我们的知识产权资产组合"
-      ],
-      "brandColor": "#b5462f",
-      "description": "PRC intellectual property workflow drafts for invention intake, clearance, FTO and infringement triage, cease-and-desist, takedowns, IP clause and open-source review, and portfolio management.",
-      "category": "legal-workflow",
-      "tags": [
-        "prc-law",
-        "intellectual-property",
-        "trademark"
-      ]
-    },
-    {
-      "name": "cn-regulatory",
-      "source": "./plugins/crablaw-cn/cn-regulatory",
-      "version": "0.1.0",
-      "displayName": "中国行政监管合规",
-      "shortDescription": "行政监管合规工作流草拟:监管动态监控、政策对比、合规差距分析、意见提交与制度改写",
-      "longDescription": "面向中国行政监管合规的工作流草拟模块。覆盖监管动态与新规/征求意见稿监控、政策法规版本对比、合规差距分析、征求意见提交与内部合规制度改写,按立法法效力层级梳理监管要求,提供草拟与风险提示。",
-      "defaultPrompt": [
-        "盯一下这个领域有没有新规",
-        "对比这部规章修订前后的差异",
-        "做一次合规差距分析"
-      ],
-      "brandColor": "#b5462f",
-      "description": "PRC regulatory compliance workflow drafts for monitoring rules, policy diffing, gap analysis, comment letters, and internal policy redrafting.",
-      "category": "legal-workflow",
-      "tags": [
-        "prc-law",
-        "regulatory",
-        "compliance"
-      ]
-    },
-    {
-      "name": "cn-ai-governance",
-      "source": "./plugins/crablaw-cn/cn-ai-governance",
-      "version": "0.1.0",
-      "displayName": "中国AI合规治理",
-      "shortDescription": "生成式AI合规治理工作流草拟:用例盘点与分级、算法影响评估、供应商AI审查、政策监控与制度起草",
-      "longDescription": "面向中国生成式AI合规治理的工作流草拟模块。覆盖AI用例盘点与风险分级、算法影响/安全评估报告、第三方AI服务审查、AI监管政策监控、内部AI治理制度起草与合规差距分析,依据《生成式人工智能服务管理暂行办法》《互联网信息服务算法推荐管理规定》《互联网信息服务深度合成管理规定》及个保法/数安法提供草拟与风险提示。",
-      "defaultPrompt": [
-        "给这个AI功能做风险分级",
-        "生成一份算法影响评估",
-        "盘点我们的AI用例"
-      ],
-      "brandColor": "#b5462f",
-      "description": "PRC AI governance workflow drafts for AI inventory, use-case triage, algorithm impact assessment, vendor AI review, and policy monitoring under generative-AI, algorithm-recommendation, and deep-synthesis rules.",
-      "category": "legal-workflow",
-      "tags": [
-        "prc-law",
-        "ai-governance",
-        "generative-ai"
-      ]
-    },
-    {
-      "name": "cn-product",
-      "source": "./plugins/crablaw-cn/cn-product",
-      "version": "0.1.0",
-      "displayName": "中国产品与营销合规",
-      "shortDescription": "产品与营销合规工作流草拟:功能风险评估、上线审查、快速问题研判与广告用语审查",
-      "longDescription": "面向中国产品与营销合规的工作流草拟模块。覆盖产品功能法律风险评估、上线前综合合规审查、快速法律问题研判与营销宣传用语审查,依据《广告法》《反不正当竞争法》《消费者权益保护法》《电子商务法》并联动数据、AI、知识产权等专项,提供草拟与风险提示。",
-      "defaultPrompt": [
-        "这句广告语能不能用",
-        "给这个新功能做上线合规审查",
-        "评估这个产品功能的法律风险"
-      ],
-      "brandColor": "#b5462f",
-      "description": "PRC product and marketing compliance workflow drafts for feature risk assessment, launch review, and marketing claims review.",
-      "category": "legal-workflow",
-      "tags": [
-        "prc-law",
-        "product",
-        "advertising"
-      ]
-    },
-    {
-      "name": "cn-legal-aid",
-      "source": "./plugins/crablaw-cn/cn-legal-aid",
-      "version": "0.1.0",
-      "displayName": "中国法律援助",
-      "shortDescription": "法律援助工作流草拟:申请受理、资格审查、表单、备忘、通俗告知、期限与质量监督",
-      "longDescription": "面向中国法律援助的工作流草拟模块。覆盖受援人申请受理与资格审查(经济困难、事项范围)、申请表单生成、案件备忘与法律文书起草、通俗语言告知、期限管理、质量监督复核与结案归档,依据《法律援助法》提供草拟与风险提示。",
-      "defaultPrompt": [
-        "登记一位法律援助申请人",
-        "审查这个法律援助申请的资格",
-        "生成法律援助申请表"
-      ],
-      "brandColor": "#b5462f",
-      "description": "PRC legal aid workflow drafts for applicant intake, eligibility screening, application forms, case memos, plain-language letters, deadlines, supervisor review, and case closure under the Legal Aid Law.",
-      "category": "legal-workflow",
-      "tags": [
-        "prc-law",
-        "legal-aid",
-        "access-to-justice"
+      "groups": [
+        {
+          "name": "matter-core",
+          "displayName": "案件管理底座",
+          "skills": [
+            "compliance-deadline-watcher",
+            "conflict-check",
+            "matter-archive",
+            "matter-deep-analysis",
+            "new-client",
+            "new-matter",
+            "review-queue"
+          ]
+        },
+        {
+          "name": "cn-contract",
+          "displayName": "中国合同审查",
+          "skills": [
+            "clause-redraft",
+            "cold-start-interview",
+            "nda-review",
+            "review",
+            "risk-summary"
+          ]
+        },
+        {
+          "name": "cn-data-compliance",
+          "displayName": "中国数据合规",
+          "skills": [
+            "cross-border-transfer-check",
+            "data-activity-triage",
+            "data-processing-review",
+            "pia-generation",
+            "privacy-policy-review"
+          ]
+        },
+        {
+          "name": "cn-labor-employment",
+          "displayName": "中国劳动用工",
+          "skills": [
+            "employee-handbook-review",
+            "employment-contract-review",
+            "labor-dispute-summary",
+            "non-compete-review",
+            "termination-risk-review"
+          ]
+        },
+        {
+          "name": "cn-corporate",
+          "displayName": "中国公司与并购",
+          "skills": [
+            "ai-tool-handoff",
+            "board-minutes",
+            "closing-checklist",
+            "deal-team-summary",
+            "diligence-issue-extraction",
+            "entity-compliance",
+            "integration-management",
+            "material-contract-schedule",
+            "tabular-review",
+            "written-consent"
+          ]
+        },
+        {
+          "name": "cn-litigation",
+          "displayName": "中国民商事诉讼",
+          "skills": [
+            "brief-section-drafter",
+            "chronology",
+            "claim-chart",
+            "demand-draft",
+            "demand-intake",
+            "demand-received",
+            "deposition-prep",
+            "legal-hold",
+            "matter-briefing",
+            "matter-close",
+            "matter-intake",
+            "matter-update",
+            "oc-status",
+            "portfolio-status",
+            "privilege-log-review",
+            "subpoena-triage"
+          ]
+        },
+        {
+          "name": "cn-ip",
+          "displayName": "中国知识产权",
+          "skills": [
+            "cease-desist",
+            "clearance",
+            "fto-triage",
+            "infringement-triage",
+            "invention-intake",
+            "ip-clause-review",
+            "oss-review",
+            "portfolio",
+            "takedown"
+          ]
+        },
+        {
+          "name": "cn-regulatory",
+          "displayName": "中国行政监管合规",
+          "skills": [
+            "comments",
+            "gap-surfacer",
+            "gaps",
+            "policy-diff",
+            "policy-redraft",
+            "reg-feed-watcher"
+          ]
+        },
+        {
+          "name": "cn-ai-governance",
+          "displayName": "中国AI合规治理",
+          "skills": [
+            "ai-inventory",
+            "aia-generation",
+            "policy-monitor",
+            "policy-starter",
+            "reg-gap-analysis",
+            "use-case-triage",
+            "vendor-ai-review"
+          ]
+        },
+        {
+          "name": "cn-product",
+          "displayName": "中国产品与营销合规",
+          "skills": [
+            "feature-risk-assessment",
+            "is-this-a-problem",
+            "launch-review",
+            "marketing-claims-review"
+          ]
+        },
+        {
+          "name": "cn-legal-aid",
+          "displayName": "中国法律援助",
+          "skills": [
+            "aid-application-form",
+            "aid-intake",
+            "case-closure",
+            "case-memo",
+            "case-status",
+            "client-comms-log",
+            "deadlines",
+            "document-draft",
+            "eligibility-check",
+            "plain-language-letter",
+            "research-start",
+            "supervisor-review-queue"
+          ]
+        }
       ]
     },
     {
       "name": "cn-legal-study",
-      "source": "./plugins/crablaw-cn/cn-legal-study",
+      "source": "./plugins/cn-legal-study",
       "version": "0.1.0",
       "displayName": "中国法考法硕备考",
       "shortDescription": "法考与法律硕士备考辅助:学习计划、知识大纲、记忆卡片、案例研习、真题与主观题训练(教育用途)",
@@ -281,11 +226,12 @@
         "prc-law",
         "legal-education",
         "bar-exam"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "builder-hub",
-      "source": "./plugins/crablaw-cn/builder-hub",
+      "source": "./plugins/builder-hub",
       "version": "0.1.0",
       "displayName": "插件与技能管理中心",
       "shortDescription": "CrabCode 插件市场的插件/技能管理元工具:安装、卸载、启停、浏览、推荐、更新与质检",
@@ -302,7 +248,8 @@
         "plugin-management",
         "skills",
         "meta-tooling"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "crabcode-security-review",
@@ -323,7 +270,8 @@
         "security-review",
         "code-review",
         "diff-review"
-      ]
+      ],
+      "tier": "capability"
     },
     {
       "name": "agent-sdk-dev",
@@ -346,7 +294,8 @@
         "verifier",
         "python",
         "typescript"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "crabcode-memory-management",
@@ -368,7 +317,8 @@
         "crabcode-md",
         "project-memory",
         "session-learnings"
-      ]
+      ],
+      "tier": "capability"
     },
     {
       "name": "code-modernization",
@@ -390,7 +340,8 @@
         "legacy",
         "refactor",
         "agents"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "code-review",
@@ -412,7 +363,8 @@
         "pull-request",
         "agents",
         "confidence"
-      ]
+      ],
+      "tier": "capability"
     },
     {
       "name": "code-simplifier",
@@ -433,7 +385,8 @@
         "simplify",
         "refactor",
         "code-quality"
-      ]
+      ],
+      "tier": "capability"
     },
     {
       "name": "commit-commands",
@@ -455,7 +408,8 @@
         "commit",
         "pull-request",
         "branch-cleanup"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "cwc-makers",
@@ -477,7 +431,8 @@
         "esp32",
         "hardware",
         "maker"
-      ]
+      ],
+      "tier": "capability"
     },
     {
       "name": "crabcode-example-plugin",
@@ -498,7 +453,8 @@
         "reference",
         "scaffold",
         "documentation"
-      ]
+      ],
+      "tier": "capability"
     },
     {
       "name": "feature-dev",
@@ -520,7 +476,8 @@
         "architecture",
         "review",
         "agents"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "frontend-design",
@@ -542,7 +499,8 @@
         "design",
         "ui",
         "ux"
-      ]
+      ],
+      "tier": "capability"
     },
     {
       "name": "math-olympiad",
@@ -564,7 +522,8 @@
         "olympiad",
         "verification",
         "reasoning"
-      ]
+      ],
+      "tier": "capability"
     },
     {
       "name": "mcp-server-dev",
@@ -586,7 +545,8 @@
         "server-development",
         "tool-design",
         "auth"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "playground",
@@ -607,7 +567,8 @@
         "html",
         "interactive",
         "exploration"
-      ]
+      ],
+      "tier": "capability"
     },
     {
       "name": "plugin-dev",
@@ -630,7 +591,8 @@
         "commands",
         "hooks",
         "mcp"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "pr-review-toolkit",
@@ -652,7 +614,8 @@
         "agents",
         "tests",
         "type-design"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "session-report",
@@ -672,7 +635,8 @@
         "session-report",
         "transcript",
         "html-report"
-      ]
+      ],
+      "tier": "capability"
     },
     {
       "name": "skill-creator",
@@ -693,7 +657,8 @@
         "skill-creation",
         "evaluation",
         "agents"
-      ]
+      ],
+      "tier": "capability"
     },
     {
       "name": "asana",
@@ -715,7 +680,8 @@
         "tasks",
         "project-management",
         "mcp"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "context7",
@@ -737,7 +703,8 @@
         "documentation",
         "upstash",
         "mcp"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "discord",
@@ -760,7 +727,8 @@
         "channel",
         "bridge",
         "mcp"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "fakechat",
@@ -783,7 +751,8 @@
         "testing",
         "fakechat",
         "localhost"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "firebase",
@@ -805,7 +774,8 @@
         "google",
         "firestore",
         "mcp"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "github",
@@ -827,7 +797,8 @@
         "pull-requests",
         "issues",
         "mcp"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "gitlab",
@@ -849,7 +820,8 @@
         "merge-requests",
         "ci-cd",
         "mcp"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "greptile",
@@ -871,7 +843,8 @@
         "code-review",
         "pull-requests",
         "mcp"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "imessage",
@@ -895,7 +868,8 @@
         "channel",
         "bridge",
         "mcp"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "laravel-boost",
@@ -917,7 +891,8 @@
         "php",
         "artisan",
         "mcp"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "linear",
@@ -938,7 +913,8 @@
         "linear",
         "issue-tracking",
         "mcp"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "playwright",
@@ -960,7 +936,8 @@
         "browser",
         "e2e",
         "mcp"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "serena",
@@ -982,7 +959,8 @@
         "code-navigation",
         "refactoring",
         "mcp"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "telegram",
@@ -1005,7 +983,8 @@
         "channel",
         "bridge",
         "mcp"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "terraform",
@@ -1027,7 +1006,8 @@
         "iac",
         "hashicorp",
         "mcp"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "clangd-lsp",
@@ -1049,7 +1029,8 @@
         "c",
         "cpp",
         "clangd"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "csharp-lsp",
@@ -1070,7 +1051,8 @@
         "lsp",
         "csharp",
         "dotnet"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "gopls-lsp",
@@ -1091,7 +1073,8 @@
         "lsp",
         "go",
         "gopls"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "jdtls-lsp",
@@ -1112,7 +1095,8 @@
         "lsp",
         "java",
         "jdtls"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "kotlin-lsp",
@@ -1132,7 +1116,8 @@
       "tags": [
         "lsp",
         "kotlin"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "lua-lsp",
@@ -1152,7 +1137,8 @@
       "tags": [
         "lsp",
         "lua"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "php-lsp",
@@ -1173,7 +1159,8 @@
         "lsp",
         "php",
         "intelephense"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "pyright-lsp",
@@ -1194,7 +1181,8 @@
         "lsp",
         "python",
         "pyright"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "ruby-lsp",
@@ -1214,7 +1202,8 @@
       "tags": [
         "lsp",
         "ruby"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "rust-analyzer-lsp",
@@ -1235,7 +1224,8 @@
         "lsp",
         "rust",
         "rust-analyzer"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "swift-lsp",
@@ -1256,7 +1246,8 @@
         "lsp",
         "swift",
         "sourcekit"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "typescript-lsp",
@@ -1277,7 +1268,8 @@
         "lsp",
         "typescript",
         "javascript"
-      ]
+      ],
+      "tier": "connector"
     },
     {
       "name": "hookify",
@@ -1301,7 +1293,8 @@
         "stop",
         "guardrails",
         "regex"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "security-guidance",
@@ -1324,7 +1317,8 @@
         "code-review",
         "static-analysis",
         "pretooluse"
-      ]
+      ],
+      "tier": "capability"
     },
     {
       "name": "explanatory-output-style",
@@ -1346,7 +1340,8 @@
         "output-style",
         "educational",
         "explanatory"
-      ]
+      ],
+      "tier": "capability"
     },
     {
       "name": "learning-output-style",
@@ -1368,7 +1363,8 @@
         "output-style",
         "learning",
         "educational"
-      ]
+      ],
+      "tier": "capability"
     },
     {
       "name": "ralph-loop",
@@ -1390,7 +1386,8 @@
         "iterative-development",
         "stop-hook",
         "ralph"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "crabcode-office-suite",
@@ -1415,7 +1412,8 @@
         "pptx",
         "pdf",
         "document"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "crabcode-example-skills",
@@ -1438,7 +1436,8 @@
         "documentation",
         "mcp",
         "playwright"
-      ]
+      ],
+      "tier": "capability"
     },
     {
       "name": "ai-api-dev",
@@ -1462,7 +1461,8 @@
         "tool-use",
         "prompt-caching",
         "agents"
-      ]
+      ],
+      "tier": "capability"
     },
     {
       "name": "crabcode-media-ops",
@@ -1486,150 +1486,127 @@
         "xiaohongshu",
         "toutiao",
         "mcp"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
-      "name": "fin-core",
-      "source": "./plugins/crabfin-cn/fin-core",
+      "name": "crabfin-cn",
+      "source": "./plugins/crabfin-cn",
       "version": "0.1.0",
-      "displayName": "CrabFin 财务建模底座",
-      "shortDescription": "通用财务建模主工作流:DCF、LBO、三表模型、可比公司,以及 Excel/PPT 自动生成与 deck 质检",
-      "longDescription": "CrabFin-CN 的底座工作流,提供全球通用的财务建模能力:DCF 估值、LBO、三表联动、可比公司与竞品分析,配合无头 Excel/PowerPoint 生成与投行 deck 质量检查。建议先安装此底座,再按需带入中国领域子板块。",
+      "displayName": "财务分析工作流",
+      "shortDescription": "中国财务/金融工作流:基金管理底座、股票研究、投行、私募股权、财富管理、基金行政与 KYC",
+      "longDescription": "CrabFin-CN 中国财务/金融工作流伞插件。一次安装即获得 7 个板块(基金管理底座、股票研究、投资银行、私募股权、财富管理、基金行政、KYC 运营)共 54 项技能,板块以分组形式在能力区展示、按需带入。",
       "defaultPrompt": [
-        "帮我搭一个 DCF 估值模型",
-        "对这份财务模型做公式审计",
-        "把这组可比公司做成对比表"
+        "对这家公司做一份股票研究报告",
+        "梳理这单私募股权交易的尽调清单",
+        "执行本月基金行政月末结账流程"
       ],
       "brandColor": "#0ea5e9",
-      "description": "Universal financial modeling foundation: DCF, LBO, 3-statement, comps, and headless Excel/PPT authoring.",
+      "description": "CrabFin-CN 中国财务/金融工作流伞插件。一次安装即获得 7 个板块(基金管理底座、股票研究、投资银行、私募股权、财富管理、基金行政、KYC 运营)共 54 项技能,板块以分组形式在能力区展示、按需带入。",
       "category": "finance",
+      "tier": "workflow",
       "tags": [
-        "valuation",
-        "dcf",
-        "lbo",
-        "comps",
-        "modeling",
-        "excel"
-      ]
-    },
-    {
-      "name": "cn-equity-research",
-      "source": "./plugins/crabfin-cn/cn-equity-research",
-      "version": "0.1.0",
-      "displayName": "中国股票研究",
-      "shortDescription": "A股/港股研究子板块:财报分析、首次覆盖、模型更新、晨报(含CAS科目/申万行业/信息披露/估值惯例)",
-      "longDescription": "面向 A股/港股的卖方/买方股票研究子板块。通用建模能力由 CrabFin 底座提供;已内置中国特定监管内容:企业会计准则(CAS)科目映射、申万行业分类(2021版)、沪深北港交所信息披露规则、A股/港股估值惯例与基准倍数。9个技能覆盖催化剂日历、财报分析/前瞻、选股思路、首次覆盖、模型更新、晨报、行业概览、投资逻辑跟踪。",
-      "defaultPrompt": [
-        "分析这家A股公司的最新财报",
-        "为这只股票起草首次覆盖报告"
+        "prc-finance",
+        "finance-workflow",
+        "umbrella"
       ],
-      "brandColor": "#0ea5e9",
-      "description": "China equity research scaffold (pending CN disclosure rules and CAS materials).",
-      "category": "finance",
-      "tags": [
-        "equity-research",
-        "a-share",
-        "earnings"
-      ]
-    },
-    {
-      "name": "cn-investment-banking",
-      "source": "./plugins/crabfin-cn/cn-investment-banking",
-      "version": "0.1.0",
-      "displayName": "中国投行并购",
-      "shortDescription": "中国投行与并购子板块:teaser、CIM、并购模型、交易跟踪，含重组管理办法/要约收购/反垄断申报口径",
-      "longDescription": "面向中国市场的投行与并购子板块。已内置 9 项技能，涵盖 teaser/CIM/并购对价测算/交易跟踪全流程。中国特定口径包括：重大资产重组管理办法(50%/80%/12-36月)、要约收购披露阈值(5%/10%/15%/20%/30%)、经营者集中申报标准(120亿/40亿/8亿)、国资交易32号令/外资准入负面清单。",
-      "defaultPrompt": [
-        "为这单交易起草 teaser",
-        "搭一个并购对价测算模型"
-      ],
-      "brandColor": "#0ea5e9",
-      "description": "China IB & M&A: 9 skills covering teaser, CIM, merger modeling, deal tracking with CSRC restructuring rules and antitrust filings.",
-      "category": "finance",
-      "tags": [
-        "investment-banking",
-        "m-and-a",
-        "csrc"
-      ]
-    },
-    {
-      "name": "cn-private-equity",
-      "source": "./plugins/crabfin-cn/cn-private-equity",
-      "version": "0.1.0",
-      "displayName": "中国私募股权",
-      "shortDescription": "私募股权子板块:项目搜寻、筛选、尽调、IC备忘、组合监控，含AMAC备案/对赌回购/合格投资者口径",
-      "longDescription": "面向中国市场的私募股权子板块。已内置 10 项技能，覆盖项目搜寻/筛选/尽调/IC备忘/组合监控全流程。中国特定口径包括：AMAC私募备案(实缴≥1000万/≥5人/20工作日)、九民纪要第5条对赌回购可执行性、合格投资者分级(300万/500万/1000万)、尽调必查清单(3大层面/7板块/44条)。",
-      "defaultPrompt": [
-        "生成一份尽调清单",
-        "为这个标的写 IC 备忘录"
-      ],
-      "brandColor": "#0ea5e9",
-      "description": "China private equity: 10 skills covering deal sourcing, screening, diligence, IC memos with AMAC filing and VAM enforceability.",
-      "category": "finance",
-      "tags": [
-        "private-equity",
-        "diligence",
-        "amac"
-      ]
-    },
-    {
-      "name": "cn-wealth",
-      "source": "./plugins/crabfin-cn/cn-wealth",
-      "version": "0.1.0",
-      "displayName": "中国财富管理",
-      "shortDescription": "财富管理子板块:客户回顾、理财规划、组合再平衡、税务亏损收割，含资管新规/适当性管理/个税口径",
-      "longDescription": "面向中国市场的财富管理子板块。已内置 6 项技能，涵盖客户回顾/理财规划/组合再平衡/税务亏损收割(中国税制口径)全流程。中国特定口径包括：资管新规(打破刚兑/禁止嵌套一层/净值化/杠杆140%-200%)、投资者适当性C1-C5与R1-R5匹配矩阵、理财产品销售双录+24h冷静期、中国个税(综合所得3-45%七级/股息差异化/转让暂免)。",
-      "defaultPrompt": [
-        "为客户做一份组合回顾",
-        "起草一份理财规划方案"
-      ],
-      "brandColor": "#0ea5e9",
-      "description": "China wealth management: 6 skills covering client reviews, financial planning, rebalancing with new asset-management rules and tax treatment.",
-      "category": "finance",
-      "tags": [
-        "wealth",
-        "planning",
-        "rebalance"
-      ]
-    },
-    {
-      "name": "cn-fund-admin",
-      "source": "./plugins/crabfin-cn/cn-fund-admin",
-      "version": "0.1.0",
-      "displayName": "中国基金行政",
-      "shortDescription": "基金行政子板块:总账对账、计提、滚存、NAV 勾稽，含AMAC估值指引/基金会计科目/公允价值层级",
-      "longDescription": "面向中国市场的基金行政与估值子板块。已内置 6 项技能，涵盖总账对账/计提/滚存/NAV勾稽全流程。中国特定口径包括：中基协基金估值指引(公允价值三层级Level1/2/3/CAS39)、基金会计科目体系(6大类/100+明细)、份额登记确认(T日申购/T+1确认)、流动性受限资产折扣率(15-35%)。",
-      "defaultPrompt": [
-        "对这期 NAV 做勾稽核对",
-        "排一张计提表"
-      ],
-      "brandColor": "#0ea5e9",
-      "description": "China fund administration: 6 skills covering GL recon, accrual schedules, NAV tie-out with AMAC valuation guidance.",
-      "category": "finance",
-      "tags": [
-        "fund-admin",
-        "nav",
-        "valuation"
-      ]
-    },
-    {
-      "name": "cn-kyc-ops",
-      "source": "./plugins/crabfin-cn/cn-kyc-ops",
-      "version": "0.1.0",
-      "displayName": "中国KYC与运营",
-      "shortDescription": "KYC 与运营子板块:开户文档解析、规则栅格评估，含反洗钱法(2025)/受益所有人识别/可疑交易报告",
-      "longDescription": "面向中国市场的 KYC 与运营子板块。已内置 2 项技能，涵盖开户文档解析/规则栅格评估。中国特定口径包括：反洗钱法(2024修订/2025.1.1生效/9类客户身份信息)、受益所有人识别(25%持股穿透/3个标准)、可疑交易报告(5万现金/20万转账)、开户文档必填字段(25+项)。",
-      "defaultPrompt": [
-        "解析这份开户材料并校验",
-        "按规则栅格做 KYC 缺口检查"
-      ],
-      "brandColor": "#0ea5e9",
-      "description": "China KYC & operations: 2 skills covering doc parsing and rules-grid evaluation with 2025 AML law and UBO identification.",
-      "category": "finance",
-      "tags": [
-        "kyc",
-        "aml",
-        "operations"
+      "groups": [
+        {
+          "name": "fin-core",
+          "displayName": "CrabFin 财务建模底座",
+          "skills": [
+            "audit-xls",
+            "clean-data-xls",
+            "competitive-analysis",
+            "comps-analysis",
+            "dcf-model",
+            "deck-refresh",
+            "ib-check-deck",
+            "lbo-model",
+            "ppt-template-creator",
+            "pptx-author",
+            "three-statement-model",
+            "xlsx-author"
+          ]
+        },
+        {
+          "name": "cn-equity-research",
+          "displayName": "中国股票研究",
+          "skills": [
+            "catalyst-calendar",
+            "earnings-analysis",
+            "earnings-preview",
+            "idea-generation",
+            "initiating-coverage",
+            "model-update",
+            "morning-note",
+            "sector-overview",
+            "thesis-tracker"
+          ]
+        },
+        {
+          "name": "cn-investment-banking",
+          "displayName": "中国投行并购",
+          "skills": [
+            "buyer-list",
+            "cim-builder",
+            "datapack-builder",
+            "deal-tracker",
+            "merger-model",
+            "pitch-deck",
+            "process-letter",
+            "strip-profile",
+            "teaser"
+          ]
+        },
+        {
+          "name": "cn-private-equity",
+          "displayName": "中国私募股权",
+          "skills": [
+            "ai-readiness",
+            "dd-checklist",
+            "dd-meeting-prep",
+            "deal-screening",
+            "deal-sourcing",
+            "ic-memo",
+            "portfolio-monitoring",
+            "returns-analysis",
+            "unit-economics",
+            "value-creation-plan"
+          ]
+        },
+        {
+          "name": "cn-wealth",
+          "displayName": "中国财富管理",
+          "skills": [
+            "client-report",
+            "client-review",
+            "financial-plan",
+            "investment-proposal",
+            "portfolio-rebalance",
+            "tax-loss-harvesting"
+          ]
+        },
+        {
+          "name": "cn-fund-admin",
+          "displayName": "中国基金行政",
+          "skills": [
+            "accrual-schedule",
+            "break-trace",
+            "gl-recon",
+            "nav-tieout",
+            "roll-forward",
+            "variance-commentary"
+          ]
+        },
+        {
+          "name": "cn-kyc-ops",
+          "displayName": "中国KYC与运营",
+          "skills": [
+            "kyc-doc-parse",
+            "kyc-rules"
+          ]
+        }
       ]
     },
     {
@@ -1652,7 +1629,8 @@
         "code-review",
         "architecture",
         "incident-response"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "crabwork-data",
@@ -1674,7 +1652,8 @@
         "sql",
         "visualization",
         "dashboard"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "crabwork-sales",
@@ -1696,7 +1675,8 @@
         "crm",
         "outreach",
         "pipeline"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "crabwork-marketing",
@@ -1718,7 +1698,8 @@
         "content",
         "campaign",
         "seo"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "crabwork-customer-support",
@@ -1740,7 +1721,8 @@
         "helpdesk",
         "triage",
         "knowledge-base"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "crabwork-product-management",
@@ -1762,7 +1744,8 @@
         "roadmap",
         "user-research",
         "competitive-analysis"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "crabwork-hr",
@@ -1784,7 +1767,8 @@
         "recruiting",
         "onboarding",
         "compensation"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "crabwork-design",
@@ -1806,7 +1790,8 @@
         "ux",
         "accessibility",
         "figma"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "crabwork-operations",
@@ -1828,7 +1813,8 @@
         "compliance",
         "process",
         "vendor-management"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "crabwork-productivity",
@@ -1850,7 +1836,8 @@
         "task-management",
         "memory",
         "dashboard"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "crabwork-enterprise-search",
@@ -1872,7 +1859,8 @@
         "digest",
         "knowledge-base",
         "productivity"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "crabwork-plugin-management",
@@ -1894,7 +1882,8 @@
         "scaffolding",
         "customization",
         "mcp"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "crabwork-bio-research",
@@ -1916,7 +1905,8 @@
         "genomics",
         "single-cell",
         "drug-discovery"
-      ]
+      ],
+      "tier": "workflow"
     },
     {
       "name": "crabwork-small-business",
@@ -1938,7 +1928,8 @@
         "finance",
         "marketing",
         "operations"
-      ]
+      ],
+      "tier": "workflow"
     }
   ]
 }

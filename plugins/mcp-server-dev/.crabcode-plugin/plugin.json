@@ -11,5 +11,10 @@
     "server-development",
     "tool-design",
     "auth"
+  ],
+  "skills": [
+    "./skills/build-mcp-app",
+    "./skills/build-mcp-server",
+    "./skills/build-mcpb"
   ]
 }
