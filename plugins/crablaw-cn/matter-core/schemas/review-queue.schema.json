@@ -7,7 +7,7 @@
   "properties": {
     "reviewItemId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,120}$" },
     "matterId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,100}$" },
-    "sourcePlugin": { "enum": ["matter-core", "cn-contract", "cn-data-compliance", "cn-labor-employment"] },
+    "sourcePlugin": { "enum": ["matter-core", "cn-contract", "cn-data-compliance", "cn-labor-employment", "cn-corporate", "cn-litigation", "cn-ip", "cn-regulatory", "cn-ai-governance", "cn-product", "cn-legal-aid"] },
     "sourceSkill": { "type": "string", "minLength": 1 },
     "outputPath": { "type": "string", "minLength": 1 },
     "status": { "enum": ["draft", "pending-review", "returned", "approved-internal", "approved-external", "sent", "archived"] },
@@ -60,6 +60,28 @@
       "then": {
         "properties": {
           "sourceSkill": { "enum": ["employment-contract-review", "termination-risk-review", "non-compete-review", "employee-handbook-review", "labor-dispute-summary"] }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "sourcePlugin": { "const": "cn-corporate" } },
+        "required": ["sourcePlugin"]
+      },
+      "then": {
+        "properties": {
+          "sourceSkill": { "enum": ["ai-tool-handoff", "board-minutes", "closing-checklist", "deal-team-summary", "diligence-issue-extraction", "entity-compliance", "integration-management", "material-contract-schedule", "tabular-review", "written-consent"] }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "sourcePlugin": { "const": "cn-litigation" } },
+        "required": ["sourcePlugin"]
+      },
+      "then": {
+        "properties": {
+          "sourceSkill": { "enum": ["brief-section-drafter", "chronology", "claim-chart", "demand-draft", "demand-intake", "demand-received", "deposition-prep", "legal-hold", "matter-briefing", "matter-close", "matter-intake", "matter-update", "oc-status", "portfolio-status", "privilege-log-review", "subpoena-triage"] }
         }
       }
     },

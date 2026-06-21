@@ -1,0 +1,28 @@
+{
+  "name": "cn-litigation",
+  "version": "0.1.0",
+  "description": "PRC civil and commercial litigation and arbitration workflow drafts for case intake, chronology, demand letters, evidence preservation, hearing preparation, and pleadings.",
+  "author": {
+    "name": "CrabLaw"
+  },
+  "license": "Apache-2.0",
+  "keywords": ["prc-law", "litigation", "arbitration", "dispute-resolution"],
+  "skills": [
+    "./skills/brief-section-drafter",
+    "./skills/chronology",
+    "./skills/claim-chart",
+    "./skills/demand-draft",
+    "./skills/demand-intake",
+    "./skills/demand-received",
+    "./skills/deposition-prep",
+    "./skills/legal-hold",
+    "./skills/matter-briefing",
+    "./skills/matter-close",
+    "./skills/matter-intake",
+    "./skills/matter-update",
+    "./skills/oc-status",
+    "./skills/portfolio-status",
+    "./skills/privilege-log-review",
+    "./skills/subpoena-triage"
+  ]
+}

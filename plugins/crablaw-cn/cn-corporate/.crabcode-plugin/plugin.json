@@ -1,0 +1,22 @@
+{
+  "name": "cn-corporate",
+  "version": "0.1.0",
+  "description": "PRC corporate governance and M&A workflow drafts for board/shareholder resolutions, entity compliance, transaction diligence, closing, and post-deal integration.",
+  "author": {
+    "name": "CrabLaw"
+  },
+  "license": "Apache-2.0",
+  "keywords": ["prc-law", "corporate", "m-and-a", "governance"],
+  "skills": [
+    "./skills/ai-tool-handoff",
+    "./skills/board-minutes",
+    "./skills/closing-checklist",
+    "./skills/deal-team-summary",
+    "./skills/diligence-issue-extraction",
+    "./skills/entity-compliance",
+    "./skills/integration-management",
+    "./skills/material-contract-schedule",
+    "./skills/tabular-review",
+    "./skills/written-consent"
+  ]
+}

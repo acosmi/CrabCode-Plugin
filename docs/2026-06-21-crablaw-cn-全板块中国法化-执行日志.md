@@ -80,3 +80,47 @@
   - 影响面:本仓库 CI(brand 校验/test)。**不放松对产品文件的检查**——`plugins/` 下所有文件仍全检;仅豁免 `docs/` 下「实施方案/执行日志」类记录性文档,与既有 `docs/audit/**`、`docs/huibao/**`、`docs/legal/**`、`implementation-plan` 豁免完全同质。
   - 与原始需求一致性:背景文档第 10 节品牌红线针对「正文/产品」;规划文档合法引用品牌词讨论红线本就应豁免,此修复对齐设计意图,未扩大或收缩实质范围。
   - 反证(根因判定):若非根因,下一份中文规划文档仍会让门禁变红;补中文镜像 ignore 后,该类复发被消除。回归测试锁定该行为防止再退化。
+
+---
+
+## 批次 1:cn-corporate(10)+ cn-litigation(16)
+
+### 一、skill 集与定位(主控锁定)
+- cn-corporate(10):ai-tool-handoff/board-minutes/closing-checklist/deal-team-summary/diligence-issue-extraction/entity-compliance/integration-management/material-contract-schedule/tabular-review/written-consent。
+- cn-litigation(16):brief-section-drafter/chronology/claim-chart/demand-draft/demand-intake/demand-received/deposition-prep/legal-hold/matter-briefing/matter-close/matter-intake/matter-update/oc-status/portfolio-status/privilege-log-review/subpoena-triage。
+- 两板块属常规中国法化(非语义重建);US-only 概念(deposition/privilege-log/subpoena)映射到中国对应制度并在正文说明,保留 skill 数对齐文档第 6 节,不擅自收缩。
+
+### 二、派发(文档第 9 节)
+3 个 subagent 并行起草 SKILL.md:corporate(10)/ litigation 流程组(8)/ litigation 实务组(8)。每个 prompt 含目标/范式文件路径/中国法约束/禁区(不改 matter-core、不写 schema/.mcp.json/agents、禁 _legacy 正文、git 主控负责)/验收/产出格式。subagent 自检不予采信,主控独立重核。
+
+### 三、用户新指令:技能用 skill-creator 深度优化(方法论决策)
+- **指令**:用户中途要求「技能要使用 skill-creator 深度优化」。
+- **决策(自主判断,属方法变更,先论证)**:skill-creator 完整形态是 draft→test→量化 benchmark→浏览器 viewer 人工反馈→迭代 的重型评测循环。对 26 个法律 SKILL.md 全套跑量化 eval + 人工浏览器 review,(a)违背本任务「自主执行不中途请示」,(b)其自动 grader 判定的是触发率/产物形态,**无法判断中国法条正确性**(须法律重核)。故采纳 skill-creator 中**可自主、对本场景高 ROI 的核心标准**:
+  1. **description 深度优化(第一优先级)**:改为 pushy + “what it does AND when to use” 触发格式。agent 产出的 description 多只含 what(如 `Draft or review PRC board minutes...`),缺 when/触发短语 → 易 undertrigger。逐个补「使用场景/用户可能说的话/中文触发词」并适度 pushy。
+  2. **渐进式披露**:SKILL.md 控 <500 行、厚法条清单按需下沉 references/。现状 40-45 行精简,**当前非痛点**;skill-creator 明确「keep lean、不为优化而增厚、rigid 结构是 yellow flag」,故不无谓加抽象。
+  3. **写作风格**:imperative + 解释 why + 必要处补示例。agent 产出已基本达标,小幅精修。
+- **落地**:(a) 主控按上述标准重写批次 1 全部 26 个 description;(b) 将该 description 标准固化进批次 2-3 的 agent 派发模板,从源头产出,避免返工。
+- **反证(根因判定)**:若 description 优化非根因,则 skill 在「用户没明说 skill 名/文件类型但实际需要」的场景仍不触发;补 when+pushy 后该 undertrigger 路径关闭。
+- **不做**:量化 eval 循环 / 浏览器 viewer / run_loop.py 全自动 description 循环(26 skill × claude -p 成本与时长不可控,且需人工 review)——以主控法条口径重核替代 grader。
+
+### 四、主控重核策略(独立、不爆上下文)
+1. 自动化全覆盖:grep 美国法/境外 SaaS/品牌残留;脚本校验每个 SKILL.md 含必备段(frontmatter+红线+Matter Gate 引用+Workflow+Output+Next Steps);validate-all + bun test。
+2. 抽样深读法条口径:每板块抽高风险 skill 深读(corporate 已读 board-minutes/diligence-issue-extraction,质量达标;litigation 重点抽 deposition-prep/privilege-log-review/subpoena-triage/brief-section-drafter 等映射风险点)。
+3. description 优化时逐个再过 frontmatter,自然全覆盖。
+
+### 五、主控重核结论(独立执行,未采信 subagent 自检)
+- **残留 grep(独立全量)**:cn-corporate + cn-litigation 对 `U.S.C/ABA/Delaware/fiduciary/Westlaw/CourtListener/DocuSign/Ironclad/iManage/Slack/claude/anthropic/sonnet/opus/haiku/codex` **零命中**。
+- **必备段脚本校验**:26 个 SKILL.md 的 frontmatter + 红线 header + Matter Gate(引用 PRACTICE.md)+ Workflow + Output + Next Steps **缺失计数 0**。
+- **抽样深核法条口径**:subpoena-triage(法院依职权/依申请调查取证 + 律师调查令映射,入向/出向、配合义务边界、异议、涉密处理)、deposition-prep(当事人陈述/证人出庭/质证三性、民诉法定证据种类、证人作证规则)、board-minutes、diligence-issue-extraction —— 口径**专业准确**,US-only 概念(deposition/subpoena/privilege log)均在「制度映射说明」语境出现,未作实体规则。
+
+### 六、批次 0 遗漏修复(同类变体,诚实记录)
+- **问题**:批次 0 审计三问之三「遗漏同类」我自己中招——补了 `matter.matterType` enum,却漏了 `review-queue.schema.json` 的 `sourcePlugin` enum(同样含板块名的封闭枚举)。两个 litigation subagent 均独立报告此缺口,主控独立核实属实。
+- **根因**:含板块名的封闭 enum 散落在多个 schema,批次 0 只排查了 matterType 一处,未系统扫描全部 schema 的板块枚举。
+- **修复(根因级)**:(a) `sourcePlugin` enum 一次性补全所有走 matter 体系的板块(cn-corporate/cn-litigation/cn-ip/cn-regulatory/cn-ai-governance/cn-product/cn-legal-aid;cn-legal-study/builder-hub 不入 matter 体系故不加),杜绝批次 2/3 反复改底座;(b) 为批次 1 的 cn-corporate/cn-litigation 补 allOf 分支(sourceSkill 白名单),批次 2/3 板块的分支随各自批次落地时补。
+- **反证**:若非根因,批次 2/3 每落一个板块都会再撞 review-queue enum 缺口;一次补全 enum 后该复发路径关闭。已确认全 schema 仅 review-queue 含板块名 enum(其余文件命中均为 `$id` 路径)。
+
+### 七、marketplace 注册
+主控已在根 `.crabcode-plugin/marketplace.json` 注册 cn-corporate / cn-litigation 两条目(displayName/中文 short&long description/defaultPrompt/brandColor/英文 description/category=legal-workflow/tags),对齐既有 crablaw-cn 条目范式。manifest/marketplace/layout 静态校验通过。
+
+### 八、待办(description subagent 完成后)
+重核全部 26 个优化后 description(grep 提取 + 抽样质量判断 + git diff 确认仅动 description 行)→ 全量 validate-all + bun test → 主控提交批次 1。

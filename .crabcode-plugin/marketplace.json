@@ -116,6 +116,48 @@
       ]
     },
     {
+      "name": "cn-corporate",
+      "source": "./plugins/crablaw-cn/cn-corporate",
+      "version": "0.1.0",
+      "displayName": "中国公司与并购",
+      "shortDescription": "公司治理与并购工作流草拟:董事会/股东会决议、主体合规、尽调、交割与投后整合",
+      "longDescription": "面向中国公司治理与并购(M&A)的工作流草拟模块。覆盖董事会/股东会决议与会议纪要、公司存续期合规(章程、工商变更登记、年报、出资、印章)、法律尽职调查与重大合同清单、股权收购/增资交割清单与并购后整合,依据《公司法》《民法典》《证券法》《外商投资法》提供草拟与风险提示。",
+      "defaultPrompt": [
+        "起草一份董事会决议",
+        "梳理这次股权收购的交割清单",
+        "对这批尽调文件做法律风险提取"
+      ],
+      "brandColor": "#b5462f",
+      "description": "PRC corporate governance and M&A workflow drafts for board/shareholder resolutions, entity compliance, transaction diligence, closing, and post-deal integration.",
+      "category": "legal-workflow",
+      "tags": [
+        "prc-law",
+        "corporate",
+        "m-and-a"
+      ]
+    },
+    {
+      "name": "cn-litigation",
+      "source": "./plugins/crablaw-cn/cn-litigation",
+      "version": "0.1.0",
+      "displayName": "中国民商事诉讼",
+      "shortDescription": "民商事诉讼与仲裁工作流草拟:立案信息、时间线、律师函、证据保全、庭审质证与诉讼文书",
+      "longDescription": "面向中国民商事诉讼与仲裁的工作流草拟模块。覆盖立案前信息收集与案件登记、事实时间线、争点对照、律师函、证据保全与留存、庭审与质证准备、调查取证应对及起诉状/答辩状/代理词等诉讼文书分段起草,依据《民事诉讼法》《仲裁法》《民法典》及相关司法解释提供草拟与风险提示。",
+      "defaultPrompt": [
+        "帮我梳理这个案子的事实时间线",
+        "起草一份律师函",
+        "准备这次开庭的质证要点"
+      ],
+      "brandColor": "#b5462f",
+      "description": "PRC civil and commercial litigation and arbitration workflow drafts for case intake, chronology, demand letters, evidence preservation, hearing preparation, and pleadings.",
+      "category": "legal-workflow",
+      "tags": [
+        "prc-law",
+        "litigation",
+        "arbitration"
+      ]
+    },
+    {
       "name": "crabcode-security-review",
       "source": "./plugins/crabcode-security-review",
       "version": "0.1.0",
