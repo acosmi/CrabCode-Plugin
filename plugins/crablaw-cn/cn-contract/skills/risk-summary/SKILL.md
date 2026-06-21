@@ -12,7 +12,7 @@ Prepare an internal business-facing summary from a contract review. Do not send 
 
 ## Matter Gate
 
-Apply the standard CrabLaw-CN Matter Gate from `matter-core/PRACTICE.md` (Required Gate). Additionally confirm the upstream review item exists; risk summaries must derive from a recorded review item, not from raw input. Stop with the matching matter-core stop code if any check fails.
+Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate from `matter-core/PRACTICE.md` (Required Gate). Additionally confirm the upstream review item exists; risk summaries must derive from a recorded review item, not from raw input. Stop with the matching matter-core stop code if any check fails.
 
 ## Workflow
 

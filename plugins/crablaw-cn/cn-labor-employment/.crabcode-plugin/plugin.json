@@ -4,5 +4,14 @@
   "description": "PRC labor and employment workflow drafts for employment contracts, termination risk, non-compete, handbooks, and disputes.",
   "author": {
     "name": "CrabLaw"
-  }
+  },
+  "license": "Apache-2.0",
+  "keywords": ["prc-law", "labor", "employment"],
+  "skills": [
+    "./skills/employee-handbook-review",
+    "./skills/employment-contract-review",
+    "./skills/labor-dispute-summary",
+    "./skills/non-compete-review",
+    "./skills/termination-risk-review"
+  ]
 }

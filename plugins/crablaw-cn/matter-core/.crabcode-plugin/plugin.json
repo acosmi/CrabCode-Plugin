@@ -4,5 +4,16 @@
   "description": "Matter, client, conflict-screening, permission, source-record, review-queue, and archive foundation for CrabLaw-CN.",
   "author": {
     "name": "CrabLaw"
-  }
+  },
+  "license": "Apache-2.0",
+  "keywords": ["prc-law", "matter-management", "conflicts", "review-gate"],
+  "skills": [
+    "./skills/compliance-deadline-watcher",
+    "./skills/conflict-check",
+    "./skills/matter-archive",
+    "./skills/matter-deep-analysis",
+    "./skills/new-client",
+    "./skills/new-matter",
+    "./skills/review-queue"
+  ]
 }

@@ -1,0 +1,18 @@
+{
+  "findingId": "dilig-active-demo-employer-2026-handbook-001",
+  "matterId": "active-demo-employer-2026-handbook",
+  "sourceDoc": "员工手册修订草案 v3（用户提供）",
+  "category": "clause",
+  "excerpt": "员工严重违反规章制度的，公司可立即解除劳动合同且不支付任何补偿。",
+  "issue": "纪律解除条款未界定“严重违反”的具体情形与民主程序、告知程序，存在解除被认定违法的风险。",
+  "citationTag": "[模型知识-待核]",
+  "severity": "red",
+  "gap": false,
+  "producedBy": "diligence-analyzer",
+  "analysis": {
+    "severityRationale": "解除依据与程序缺失会直接导致违法解除赔偿风险，且涉及全体员工，影响面大。",
+    "severityFloorApplied": true,
+    "recommendation": "补充“严重违反”量化情形、工会/职工代表大会民主程序与送达告知记录；地方裁审口径须按用工地核验。",
+    "needsLawyer": true
+  }
+}

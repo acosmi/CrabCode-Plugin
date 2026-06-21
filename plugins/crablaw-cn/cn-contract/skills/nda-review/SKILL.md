@@ -12,7 +12,7 @@ Review an NDA or confidentiality agreement. This is a draft workpaper for lawyer
 
 ## Matter Gate
 
-Apply the standard CrabLaw-CN Matter Gate from `matter-core/PRACTICE.md` (Required Gate). Additionally confirm the engagement scope explicitly includes NDA or confidentiality review. Stop with the matching matter-core stop code if any check fails.
+Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate from `matter-core/PRACTICE.md` (Required Gate). Additionally confirm the engagement scope explicitly includes NDA or confidentiality review. Stop with the matching matter-core stop code if any check fails.
 
 ## Workflow
 

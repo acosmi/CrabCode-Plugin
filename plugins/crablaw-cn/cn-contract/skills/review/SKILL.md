@@ -12,7 +12,7 @@ Review a contract under PRC law workflow controls. Do not mark the agreement as 
 
 ## Matter Gate
 
-Apply the standard CrabLaw-CN Matter Gate from `matter-core/PRACTICE.md` (Required Gate). Before reading the document body, additionally confirm the contract review fits the engagement scope and the output destination is the review queue. Stop with the matching matter-core stop code if any check fails.
+Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate from `matter-core/PRACTICE.md` (Required Gate). Before reading the document body, additionally confirm the contract review fits the engagement scope and the output destination is the review queue. Stop with the matching matter-core stop code if any check fails.
 
 ## Workflow
 

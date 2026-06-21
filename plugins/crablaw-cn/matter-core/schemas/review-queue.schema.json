@@ -26,7 +26,7 @@
       },
       "then": {
         "properties": {
-          "sourceSkill": { "enum": ["new-client", "new-matter", "conflict-check", "review-queue", "matter-archive"] }
+          "sourceSkill": { "enum": ["new-client", "new-matter", "conflict-check", "review-queue", "matter-archive", "matter-deep-analysis", "compliance-deadline-watcher"] }
         }
       }
     },

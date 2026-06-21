@@ -22,3 +22,16 @@ Outputs are drafts for lawyer or senior HR/legal review. They may identify risks
 - Contract term, tenure, compensation, social insurance, working hour system, and policy acknowledgments.
 - Proposed action, reason, timeline, evidence, prior communications, and protected status concerns.
 - Local rule verification status and review owner.
+
+## Shared Guardrails & Currency
+
+This profile inherits the shared guardrail layer in `matter-core/PRACTICE.md` (role recognition, send-destination check, citation-hygiene tags, reviewer note, severity floor, scaffolding-not-blinders, output discipline) and its Currency Gate. Severance and unlawful-termination calculations, non-compete scope, and arbitration timelines are local-rule dependent: apply the Currency Gate against `matter-core/references/cn-currency-watch.md` and verify against the work location before relying on any figure.
+
+## Playbook (config-driven)
+
+These positions are read from the team configuration, not hardcoded; treat `[未配置]` as "ask the user":
+
+- Local adjudication stance by work location (arbitration/litigation tendencies).
+- Severance and compensation calculation preferences within statutory bounds.
+- Non-compete scope, geography, and compensation defaults.
+- Termination procedure checklist and review-owner routing.

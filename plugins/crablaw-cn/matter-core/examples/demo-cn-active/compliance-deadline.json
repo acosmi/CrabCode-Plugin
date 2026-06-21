@@ -1,0 +1,15 @@
+{
+  "deadlineId": "ddl-active-demo-employer-2026-handbook-001",
+  "matterId": "active-demo-employer-2026-handbook",
+  "title": "修订后员工手册民主程序及向员工公示的完成期限",
+  "obligationType": "regulatory-filing",
+  "basis": "劳动合同法关于规章制度须经民主程序并公示告知方对员工生效的要求；具体口径按用工地规则核验。",
+  "citationTag": "[模型知识-待核]",
+  "dueDate": "2026-07-15",
+  "leadTimeDays": 30,
+  "severity": "yellow",
+  "status": "active",
+  "responsibleLawyer": "张律师",
+  "createdAt": "2026-06-20",
+  "notes": "手册修订草案定稿后须完成职工代表大会/全体职工讨论与公示留痕，否则修订条款可能对员工不生效。"
+}

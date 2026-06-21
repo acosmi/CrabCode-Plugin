@@ -12,7 +12,7 @@ Draft clause language for review. Do not present the clause as final or approved
 
 ## Matter Gate
 
-Apply the standard CrabLaw-CN Matter Gate from `matter-core/PRACTICE.md` (Required Gate). If conflict-check status is `pending`, stop before drafting and emit `CONFLICT_CHECK_PENDING`; if `hit-review-required`, stop and emit `CONFLICT_REVIEW_REQUIRED`. Stop with the matching matter-core stop code if any other check fails.
+Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate from `matter-core/PRACTICE.md` (Required Gate). If conflict-check status is `pending`, stop before drafting and emit `CONFLICT_CHECK_PENDING`; if `hit-review-required`, stop and emit `CONFLICT_REVIEW_REQUIRED`. Stop with the matching matter-core stop code if any other check fails.
 
 ## Workflow
 

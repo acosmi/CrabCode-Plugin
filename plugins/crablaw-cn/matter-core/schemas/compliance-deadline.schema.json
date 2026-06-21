@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crablaw.local/schemas/matter-core/compliance-deadline.schema.json",
+  "title": "CrabLaw-CN Compliance Deadline",
+  "description": "A structured, re-checkable compliance or contractual obligation with a due date. The compliance-deadline-watcher skill reads these records (never re-parses prose) so the watch is deterministic and cannot drift or hallucinate dates.",
+  "type": "object",
+  "required": ["deadlineId", "matterId", "title", "obligationType", "basis", "citationTag", "dueDate", "leadTimeDays", "severity", "status", "createdAt"],
+  "properties": {
+    "deadlineId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,120}$" },
+    "matterId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,100}$" },
+    "title": { "type": "string", "minLength": 1 },
+    "obligationType": {
+      "description": "Neutral, PRC-rooted obligation categories. data-export-reassessment=数据出境评估复评; pip-compliance-audit=个人信息保护合规审计; mlps-renewal=网络安全等级保护测评续期; security-assessment-refile=安全评估重新申报; contract-renewal=合同续签; contract-expiry=合同到期; regulatory-filing=监管备案/申报; license-renewal=资质/许可续期; litigation-deadline=诉讼/仲裁期限; retention-expiry=资料留存到期; other=其他",
+      "enum": [
+        "data-export-reassessment",
+        "pip-compliance-audit",
+        "mlps-renewal",
+        "security-assessment-refile",
+        "contract-renewal",
+        "contract-expiry",
+        "regulatory-filing",
+        "license-renewal",
+        "litigation-deadline",
+        "retention-expiry",
+        "other"
+      ]
+    },
+    "basis": { "type": "string", "minLength": 1, "description": "Legal or contractual basis for the deadline (statute/clause/agency notice)." },
+    "citationTag": { "enum": ["[已核验-来源]", "[用户提供]", "[模型知识-待核]"] },
+    "sourceRef": { "type": "string", "minLength": 1, "description": "Pointer to the governing source; required when citationTag is [已核验-来源]." },
+    "dueDate": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "format": "date" },
+    "leadTimeDays": { "type": "integer", "minimum": 0, "maximum": 3650, "description": "How many days before dueDate the watcher should start surfacing this item." },
+    "recurrenceMonths": { "type": "integer", "minimum": 1, "maximum": 120, "description": "For recurring obligations, the interval; the watcher proposes the next dueDate after completion. Omit for one-shot deadlines." },
+    "severity": { "enum": ["info", "green", "yellow", "red"] },
+    "status": { "enum": ["active", "completed", "superseded", "cancelled"] },
+    "responsibleLawyer": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "format": "date" },
+    "completedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "format": "date" },
+    "notes": { "type": "string", "minLength": 1 }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "citationTag": { "const": "[已核验-来源]" } },
+        "required": ["citationTag"]
+      },
+      "then": { "required": ["sourceRef"] }
+    },
+    {
+      "if": {
+        "properties": { "status": { "const": "completed" } },
+        "required": ["status"]
+      },
+      "then": { "required": ["completedAt"] }
+    }
+  ],
+  "additionalProperties": false
+}
