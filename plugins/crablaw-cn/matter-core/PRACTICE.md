@@ -4,7 +4,7 @@
 
 This profile is the shared guardrail layer for CrabLaw-CN. Every substantive domain skill references it, so the guardrails below apply on every run without each skill restating them. Domain plugins must not produce substantive legal work product unless the current matter has passed the required checks below.
 
-> Why this file carries the guardrails: in this runtime a plugin cannot ship an always-on context file to the end user; the only always-on enforcement point is that every non-intake skill is required (by `scripts/lint-tool-scope.ts`) to contain a `## Matter Gate` section that references this file. Putting the shared guardrails here means every skill inherits them through that single reference.
+> Why this file carries the guardrails: in this runtime a plugin cannot ship an always-on context file to the end user; the enforcement point is the repository check `scripts/lint-tool-scope.ts` (run by `bun run validate`), which requires every substantive domain skill to contain a `## Matter Gate` section that references this file. Intake skills that establish the matter prerequisites (new-client, new-matter, conflict-check, matter-archive, review-queue, and the domain cold-start interview) and the non-legal-service boards (`builder-hub`, `cn-legal-study`) are exempt. Putting the shared guardrails here means every gated skill inherits them through that single reference.
 
 ## Storage Root
 

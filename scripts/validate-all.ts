@@ -9,6 +9,10 @@ import {
   validateMarketplace,
 } from "../src/policy/marketplaceValidator.ts";
 import { formatLayoutIssues, validateLayout } from "../src/policy/layoutValidator.ts";
+import {
+  formatMatterGateIssues,
+  validateMatterGate,
+} from "../src/policy/matterGateValidator.ts";
 
 const root = path.resolve(process.argv[2] ?? ".");
 
@@ -41,6 +45,13 @@ if (layout.length > 0) {
   hasOutput = true;
   process.stderr.write(`[layout]\n${formatLayoutIssues(layout, root)}\n`);
   if (layout.some((issue) => issue.severity === "error")) hasError = true;
+}
+
+const matterGate = await validateMatterGate(root);
+if (matterGate.length > 0) {
+  hasOutput = true;
+  process.stderr.write(`[tool-scope]\n${formatMatterGateIssues(matterGate, root)}\n`);
+  if (matterGate.some((issue) => issue.severity === "error")) hasError = true;
 }
 
 if (!hasOutput) {

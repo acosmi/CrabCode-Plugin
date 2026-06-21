@@ -14,6 +14,7 @@
     "lint:manifest": "bun run scripts/validate-manifest.ts",
     "lint:marketplace": "bun run scripts/validate-marketplace.ts",
     "lint:layout": "bun run scripts/validate-layout.ts",
+    "lint:tool-scope": "bun run scripts/lint-tool-scope.ts",
     "validate": "bun run scripts/validate-all.ts",
     "test": "bun test ./tests/",
     "typecheck": "tsc --noEmit"
