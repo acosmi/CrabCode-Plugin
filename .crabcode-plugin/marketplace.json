@@ -22,7 +22,7 @@
       ],
       "brandColor": "#f97316",
       "description": "Analyze repositories and recommend CrabCode-native automations such as skills, hooks, agents, plugins, and MCP servers.",
-      "category": "productivity",
+      "category": "essentials",
       "tags": [
         "automation",
         "recommendations",
@@ -276,7 +276,7 @@
       ],
       "brandColor": "#b5462f",
       "description": "PRC legal study and bar/postgraduate exam preparation aids: study plans, outlines, flashcards, case studies, question and essay practice, statute recitation, and mock drills. Educational use, not individualized legal advice.",
-      "category": "legal-education",
+      "category": "showcase",
       "tags": [
         "prc-law",
         "legal-education",
@@ -297,7 +297,7 @@
       ],
       "brandColor": "#6e7781",
       "description": "Plugin and skill management meta-tooling: install, uninstall, enable/disable, browse the registry, surface related skills, run auto-update checks, and skill QA.",
-      "category": "developer-tools",
+      "category": "essentials",
       "tags": [
         "plugin-management",
         "skills",
@@ -339,7 +339,7 @@
       ],
       "brandColor": "#0969da",
       "description": "Agent SDK development guidance, verifier agents, and project bootstrap command (genericized for CrabCode product surface).",
-      "category": "agent-dev",
+      "category": "dev-tools",
       "tags": [
         "agent-sdk",
         "scaffolding",
@@ -362,7 +362,7 @@
       ],
       "brandColor": "#f97316",
       "description": "Maintain and improve CRABCODE.md project memory files: audit quality, capture session learnings, and keep guidance current.",
-      "category": "memory",
+      "category": "essentials",
       "tags": [
         "memory",
         "crabcode-md",
@@ -384,7 +384,7 @@
       ],
       "brandColor": "#0969da",
       "description": "Modernize legacy codebases (COBOL, legacy Java/C++, monolith web apps) via assess → map → extract-rules → brief → reimagine → transform → harden, with specialist review agents.",
-      "category": "workflow",
+      "category": "dev-workflow",
       "tags": [
         "modernization",
         "legacy",
@@ -406,7 +406,7 @@
       ],
       "brandColor": "#0969da",
       "description": "Automated code review for pull requests with multi-agent specialists and confidence-based scoring.",
-      "category": "code-review",
+      "category": "dev-workflow",
       "tags": [
         "code-review",
         "pull-request",
@@ -428,7 +428,7 @@
       ],
       "brandColor": "#0969da",
       "description": "Agent that simplifies and refines code for clarity, consistency, and maintainability while preserving functionality.",
-      "category": "code-quality",
+      "category": "dev-workflow",
       "tags": [
         "simplify",
         "refactor",
@@ -449,7 +449,7 @@
       ],
       "brandColor": "#f97316",
       "description": "Streamline git workflows with commit, push, PR creation, and stale-branch cleanup commands.",
-      "category": "workflow",
+      "category": "dev-workflow",
       "tags": [
         "git",
         "commit",
@@ -470,7 +470,7 @@
       ],
       "brandColor": "#f97316",
       "description": "Onboarding for the Code-with-CrabCode Makers M5Stack Cardputer: one /maker-setup command flashes firmware and installs the device skills.",
-      "category": "hardware",
+      "category": "showcase",
       "tags": [
         "cardputer",
         "m5stack",
@@ -492,7 +492,7 @@
       ],
       "brandColor": "#6b7280",
       "description": "Reference CrabCode plugin demonstrating commands, agents, skills, hooks, and MCP server configuration.",
-      "category": "example",
+      "category": "essentials",
       "tags": [
         "example",
         "reference",
@@ -514,7 +514,7 @@
       ],
       "brandColor": "#0969da",
       "description": "Feature development workflow with specialized agents for codebase exploration, architecture design, and quality review.",
-      "category": "workflow",
+      "category": "dev-workflow",
       "tags": [
         "feature-dev",
         "architecture",
@@ -536,7 +536,7 @@
       ],
       "brandColor": "#d6336c",
       "description": "Frontend design skill for UI/UX implementation with production-grade aesthetics.",
-      "category": "skills",
+      "category": "content-office",
       "tags": [
         "frontend",
         "design",
@@ -558,7 +558,7 @@
       ],
       "brandColor": "#8957e5",
       "description": "Solve competition math (IMO, Putnam, USAMO) with adversarial verification by fresh-context verifiers; calibrated abstention over bluffing.",
-      "category": "skills",
+      "category": "showcase",
       "tags": [
         "math",
         "olympiad",
@@ -580,7 +580,7 @@
       ],
       "brandColor": "#0969da",
       "description": "Skills for designing and building MCP servers: deployment models (remote HTTP, MCPB, local), tool design patterns, auth, and interactive MCP apps.",
-      "category": "agent-dev",
+      "category": "dev-tools",
       "tags": [
         "mcp",
         "server-development",
@@ -601,7 +601,7 @@
       ],
       "brandColor": "#8957e5",
       "description": "Create interactive HTML playgrounds: self-contained single-file explorers with visual controls, live preview, and copy-to-clipboard prompt output.",
-      "category": "skills",
+      "category": "showcase",
       "tags": [
         "playground",
         "html",
@@ -623,7 +623,7 @@
       ],
       "brandColor": "#8957e5",
       "description": "Plugin development toolkit with skills for creating agents, commands, hooks, MCP integrations, and plugin structure guidance for CrabCode.",
-      "category": "agent-dev",
+      "category": "dev-tools",
       "tags": [
         "plugin-development",
         "agents",
@@ -646,7 +646,7 @@
       ],
       "brandColor": "#0969da",
       "description": "Pull request review agents specializing in comments, tests, error handling, type design, code quality, and code simplification.",
-      "category": "code-review",
+      "category": "dev-workflow",
       "tags": [
         "pr-review",
         "agents",
@@ -667,7 +667,7 @@
       ],
       "brandColor": "#f97316",
       "description": "Generate a styled HTML report of a CrabCode session from local transcript files for sharing and post-mortem.",
-      "category": "workflow",
+      "category": "dev-workflow",
       "tags": [
         "session-report",
         "transcript",
@@ -688,7 +688,7 @@
       ],
       "brandColor": "#8957e5",
       "description": "Create, improve, and evaluate CrabCode skills with analyzer/grader/comparator helper agents.",
-      "category": "skills",
+      "category": "dev-tools",
       "tags": [
         "skill-creation",
         "evaluation",
@@ -709,7 +709,7 @@
       ],
       "brandColor": "#f06a6a",
       "description": "Asana work management integration packaged for CrabCode. Create and manage tasks, search projects, update assignments, and track progress alongside your engineering workflow.",
-      "category": "productivity",
+      "category": "integrations",
       "tags": [
         "asana",
         "tasks",
@@ -731,7 +731,7 @@
       ],
       "brandColor": "#0969da",
       "description": "Upstash Context7 MCP server for up-to-date documentation lookup. Pull version-specific docs and code examples directly from source repositories into the CrabCode session.",
-      "category": "development",
+      "category": "dev-tools",
       "tags": [
         "context7",
         "documentation",
@@ -753,7 +753,7 @@
       ],
       "brandColor": "#5865f2",
       "description": "Discord channel bridge for CrabCode. Self-contained MCP server with pairing, allowlist, and guild-channel access control. Managed by /discord:access skill.",
-      "category": "messaging",
+      "category": "integrations",
       "tags": [
         "discord",
         "messaging",
@@ -776,7 +776,7 @@
       ],
       "brandColor": "#6b7280",
       "description": "Localhost web UI for testing the CrabCode channel contract. Self-contained MCP server with stdio transport, attachment upload, and a minimal web client. No external service, no tokens, no access control.",
-      "category": "messaging",
+      "category": "integrations",
       "tags": [
         "channel",
         "mcp",
@@ -799,7 +799,7 @@
       ],
       "brandColor": "#ffca28",
       "description": "Google Firebase MCP integration for CrabCode. Manage Firestore, authentication, cloud functions, hosting, and storage directly from the development surface.",
-      "category": "database",
+      "category": "integrations",
       "tags": [
         "firebase",
         "google",
@@ -821,7 +821,7 @@
       ],
       "brandColor": "#1f2328",
       "description": "GitHub MCP integration for CrabCode. Create issues, manage pull requests, review code, and search repositories against GitHub's hosted MCP endpoint.",
-      "category": "productivity",
+      "category": "integrations",
       "tags": [
         "github",
         "pull-requests",
@@ -843,7 +843,7 @@
       ],
       "brandColor": "#fc6d26",
       "description": "GitLab MCP integration for CrabCode. Manage repositories, merge requests, CI/CD pipelines, issues, and wikis from your CrabCode session.",
-      "category": "productivity",
+      "category": "integrations",
       "tags": [
         "gitlab",
         "merge-requests",
@@ -865,7 +865,7 @@
       ],
       "brandColor": "#0969da",
       "description": "Greptile MCP integration for CrabCode. View and resolve Greptile pull-request review comments from your CrabCode session.",
-      "category": "development",
+      "category": "dev-tools",
       "tags": [
         "greptile",
         "code-review",
@@ -887,7 +887,7 @@
       ],
       "brandColor": "#34c759",
       "description": "iMessage channel bridge for CrabCode (macOS). Reads chat.db directly and sends via AppleScript; allowlist-based access control governs who can reach the agent.",
-      "category": "messaging",
+      "category": "integrations",
       "tags": [
         "imessage",
         "macos",
@@ -911,7 +911,7 @@
       ],
       "brandColor": "#ff2d20",
       "description": "Laravel Boost MCP integration for CrabCode. Exposes Artisan commands, Eloquent queries, routing, migrations, and framework-aware code generation through the project's local Boost server.",
-      "category": "development",
+      "category": "dev-tools",
       "tags": [
         "laravel",
         "php",
@@ -933,7 +933,7 @@
       ],
       "brandColor": "#5e6ad2",
       "description": "Linear MCP integration for CrabCode. Create issues, manage projects, update statuses, and search across Linear workspaces from the CrabCode session.",
-      "category": "productivity",
+      "category": "integrations",
       "tags": [
         "linear",
         "issue-tracking",
@@ -954,7 +954,7 @@
       ],
       "brandColor": "#2ead33",
       "description": "Microsoft Playwright MCP integration for CrabCode. Drive headless and headed browsers for end-to-end testing, page inspection, and automated screenshots.",
-      "category": "testing",
+      "category": "integrations",
       "tags": [
         "playwright",
         "browser",
@@ -976,7 +976,7 @@
       ],
       "brandColor": "#0969da",
       "description": "Serena MCP integration for CrabCode. Semantic code navigation, refactoring suggestions, and codebase understanding via language-server integration.",
-      "category": "development",
+      "category": "dev-tools",
       "tags": [
         "serena",
         "code-navigation",
@@ -998,7 +998,7 @@
       ],
       "brandColor": "#229ed9",
       "description": "Telegram channel bridge for CrabCode. Self-contained MCP server with pairing and allowlist access control. Managed by /telegram:access skill.",
-      "category": "messaging",
+      "category": "integrations",
       "tags": [
         "telegram",
         "messaging",
@@ -1021,7 +1021,7 @@
       ],
       "brandColor": "#7b42bc",
       "description": "HashiCorp Terraform MCP integration for CrabCode. Plan, inspect, and reason about Infrastructure-as-Code with explicit human approval for any apply.",
-      "category": "development",
+      "category": "integrations",
       "tags": [
         "terraform",
         "iac",
@@ -1293,7 +1293,7 @@
       ],
       "brandColor": "#d29922",
       "description": "User-configurable CrabCode hooks driven by markdown rule files in .crabcode/hookify.*.local.md. Block or warn on Bash, Edit/Write/MultiEdit, Stop, and UserPromptSubmit events using regex or structured conditions.",
-      "category": "guardrails",
+      "category": "security",
       "tags": [
         "hooks",
         "rule-engine",
@@ -1317,7 +1317,7 @@
       ],
       "brandColor": "#cf222e",
       "description": "Pre-write hook that warns about common security pitfalls when editing files: shell injection sinks, dynamic code evaluation, XSS sinks, unsafe deserialization, and risky GitHub Actions workflow inputs.",
-      "category": "guardrails",
+      "category": "security",
       "tags": [
         "security",
         "hook",
@@ -1384,7 +1384,7 @@
       ],
       "brandColor": "#d29922",
       "description": "Iterative self-referential development loop. A Stop hook intercepts session exit and re-feeds the same prompt with iteration safety caps and an opt-in completion promise.",
-      "category": "workflow",
+      "category": "dev-workflow",
       "tags": [
         "loop",
         "iterative-development",
@@ -1406,7 +1406,7 @@
       ],
       "brandColor": "#2ea043",
       "description": "CrabCode skills and TypeScript helpers for authoring and editing Office documents: spreadsheets, word documents, presentations, and PDFs.",
-      "category": "office",
+      "category": "content-office",
       "tags": [
         "office",
         "spreadsheet",
@@ -1430,7 +1430,7 @@
       ],
       "brandColor": "#6b7280",
       "description": "A collection of example CrabCode skills demonstrating algorithmic art, visual design, brand styling, document co-authoring, internal communications, MCP server authoring, skill authoring, GIF creation, theme styling, web artifact bundling, and Playwright-based web app testing.",
-      "category": "examples",
+      "category": "essentials",
       "tags": [
         "examples",
         "skills",
@@ -1454,7 +1454,7 @@
       ],
       "brandColor": "#0969da",
       "description": "Provider-neutral guidance for building, debugging, and migrating LLM-powered applications.",
-      "category": "ai-dev",
+      "category": "dev-tools",
       "tags": [
         "llm",
         "api",
@@ -1478,7 +1478,7 @@
       ],
       "brandColor": "#8957e5",
       "description": "Media operations toolkit: trend discovery, agent-assisted drafting, human review, platform adaptation, AI-label compliance, and approved publishing via local publish packages.",
-      "category": "content-ops",
+      "category": "content-office",
       "tags": [
         "media-ops",
         "publishing",
