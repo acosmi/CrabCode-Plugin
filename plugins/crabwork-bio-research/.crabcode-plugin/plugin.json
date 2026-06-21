@@ -1,0 +1,27 @@
+{
+  "name": "crabwork-bio-research",
+  "version": "0.1.0",
+  "description": "Connect to preclinical research tools and databases (literature search, genomics analysis, target prioritization) to accelerate early-stage life sciences R&D",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "bioinformatics",
+    "life-sciences",
+    "genomics",
+    "single-cell",
+    "literature-search",
+    "drug-discovery",
+    "nextflow",
+    "research"
+  ],
+  "skills": [
+    "./skills/instrument-data-to-allotrope",
+    "./skills/nextflow-development",
+    "./skills/scientific-problem-selection",
+    "./skills/scvi-tools",
+    "./skills/single-cell-rna-qc",
+    "./skills/start"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "name": "crabwork-sales",
+  "version": "0.1.0",
+  "description": "Prospect, craft outreach, and build deal strategy faster. Prep for calls, manage your pipeline, and write personalized messaging that moves deals forward.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "sales",
+    "crm",
+    "prospecting",
+    "outreach",
+    "pipeline",
+    "forecast",
+    "call-prep",
+    "competitive-intelligence"
+  ],
+  "skills": [
+    "./skills/account-research",
+    "./skills/call-prep",
+    "./skills/call-summary",
+    "./skills/competitive-intelligence",
+    "./skills/create-an-asset",
+    "./skills/daily-briefing",
+    "./skills/draft-outreach",
+    "./skills/forecast",
+    "./skills/pipeline-review"
+  ]
+}

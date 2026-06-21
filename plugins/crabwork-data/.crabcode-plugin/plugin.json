@@ -1,0 +1,31 @@
+{
+  "name": "crabwork-data",
+  "version": "0.1.0",
+  "description": "Write SQL, explore datasets, and generate insights faster. Build visualizations and dashboards, and turn raw data into clear stories for stakeholders.",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "CrabCode"
+  },
+  "keywords": [
+    "data-analysis",
+    "sql",
+    "data-warehouse",
+    "visualization",
+    "dashboard",
+    "statistics",
+    "data-exploration",
+    "analytics"
+  ],
+  "skills": [
+    "./skills/analyze",
+    "./skills/build-dashboard",
+    "./skills/create-viz",
+    "./skills/data-context-extractor",
+    "./skills/data-visualization",
+    "./skills/explore-data",
+    "./skills/sql-queries",
+    "./skills/statistical-analysis",
+    "./skills/validate-data",
+    "./skills/write-query"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "name": "crabwork-engineering",
+  "version": "0.1.0",
+  "description": "Streamline engineering workflows — standups, code review, architecture decisions, incident response, and technical documentation. Works with your existing tools or standalone.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "engineering",
+    "code-review",
+    "architecture",
+    "incident-response",
+    "debugging",
+    "documentation",
+    "standup",
+    "tech-debt"
+  ],
+  "skills": [
+    "./skills/architecture",
+    "./skills/code-review",
+    "./skills/debug",
+    "./skills/deploy-checklist",
+    "./skills/documentation",
+    "./skills/incident-response",
+    "./skills/standup",
+    "./skills/system-design",
+    "./skills/tech-debt",
+    "./skills/testing-strategy"
+  ]
+}

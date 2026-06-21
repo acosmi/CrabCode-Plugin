@@ -1,0 +1,30 @@
+{
+  "name": "crabwork-operations",
+  "version": "0.1.0",
+  "description": "Optimize business operations — vendor management, process documentation, change management, capacity planning, and compliance tracking. Keep your organization running efficiently.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "operations",
+    "vendor-management",
+    "process-documentation",
+    "change-management",
+    "capacity-planning",
+    "compliance",
+    "risk-assessment",
+    "runbook"
+  ],
+  "skills": [
+    "./skills/capacity-plan",
+    "./skills/change-request",
+    "./skills/compliance-tracking",
+    "./skills/process-doc",
+    "./skills/process-optimization",
+    "./skills/risk-assessment",
+    "./skills/runbook",
+    "./skills/status-report",
+    "./skills/vendor-review"
+  ]
+}

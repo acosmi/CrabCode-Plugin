@@ -1,0 +1,29 @@
+{
+  "name": "crabwork-product-management",
+  "version": "0.1.0",
+  "description": "Write feature specs, plan roadmaps, and synthesize user research faster. Keep stakeholders updated and stay ahead of the competitive landscape.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "product-management",
+    "roadmap",
+    "feature-spec",
+    "user-research",
+    "competitive-analysis",
+    "metrics",
+    "stakeholder",
+    "brainstorming"
+  ],
+  "skills": [
+    "./skills/competitive-brief",
+    "./skills/metrics-review",
+    "./skills/product-brainstorming",
+    "./skills/roadmap-update",
+    "./skills/sprint-planning",
+    "./skills/stakeholder-update",
+    "./skills/synthesize-research",
+    "./skills/write-spec"
+  ]
+}

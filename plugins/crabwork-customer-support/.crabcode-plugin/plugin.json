@@ -1,0 +1,26 @@
+{
+  "name": "crabwork-customer-support",
+  "version": "0.1.0",
+  "description": "Triage tickets, draft responses, escalate issues, and build your knowledge base. Research customer context and turn resolved issues into self-service content.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "customer-support",
+    "ticket-triage",
+    "escalation",
+    "knowledge-base",
+    "customer-research",
+    "response-drafting",
+    "helpdesk",
+    "service"
+  ],
+  "skills": [
+    "./skills/customer-escalation",
+    "./skills/customer-research",
+    "./skills/draft-response",
+    "./skills/kb-article",
+    "./skills/ticket-triage"
+  ]
+}

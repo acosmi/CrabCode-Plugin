@@ -1,0 +1,30 @@
+{
+  "name": "crabwork-hr",
+  "version": "0.1.0",
+  "description": "Streamline people operations — recruiting, onboarding, performance reviews, compensation analysis, and policy guidance. Maintain compliance and keep your team running smoothly.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "human-resources",
+    "recruiting",
+    "onboarding",
+    "performance-review",
+    "compensation",
+    "people-analytics",
+    "org-planning",
+    "hr-policy"
+  ],
+  "skills": [
+    "./skills/comp-analysis",
+    "./skills/draft-offer",
+    "./skills/interview-prep",
+    "./skills/onboarding",
+    "./skills/org-planning",
+    "./skills/people-report",
+    "./skills/performance-review",
+    "./skills/policy-lookup",
+    "./skills/recruiting-pipeline"
+  ]
+}

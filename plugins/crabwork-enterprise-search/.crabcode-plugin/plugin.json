@@ -1,0 +1,26 @@
+{
+  "name": "crabwork-enterprise-search",
+  "version": "0.1.0",
+  "description": "Search across all of your company's tools in one place. Find anything across email, chat, documents, and wikis without switching between apps.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "enterprise-search",
+    "search",
+    "digest",
+    "knowledge-base",
+    "synthesis",
+    "productivity",
+    "mcp",
+    "workplace"
+  ],
+  "skills": [
+    "./skills/digest",
+    "./skills/knowledge-synthesis",
+    "./skills/search",
+    "./skills/search-strategy",
+    "./skills/source-management"
+  ]
+}

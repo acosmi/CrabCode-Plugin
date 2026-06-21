@@ -1,0 +1,25 @@
+{
+  "name": "crabwork-productivity",
+  "version": "0.1.0",
+  "description": "Manage tasks, plan your day, and build up memory of important context about your work. Syncs with your calendar, email, and chat to keep everything organized and on track.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "productivity",
+    "task-management",
+    "memory",
+    "planning",
+    "dashboard",
+    "calendar",
+    "email",
+    "workflow"
+  ],
+  "skills": [
+    "./skills/memory-management",
+    "./skills/start",
+    "./skills/task-management",
+    "./skills/update"
+  ]
+}

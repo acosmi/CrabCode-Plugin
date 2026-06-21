@@ -1,0 +1,28 @@
+{
+  "name": "crabwork-design",
+  "version": "0.1.0",
+  "description": "Accelerate design workflows — critique, design system management, UX writing, accessibility audits, research synthesis, and dev handoff. From exploration to pixel-perfect specs.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "design",
+    "design-critique",
+    "design-system",
+    "ux-writing",
+    "accessibility",
+    "user-research",
+    "handoff",
+    "figma"
+  ],
+  "skills": [
+    "./skills/accessibility-review",
+    "./skills/design-critique",
+    "./skills/design-handoff",
+    "./skills/design-system",
+    "./skills/research-synthesis",
+    "./skills/user-research",
+    "./skills/ux-copy"
+  ]
+}
