@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crablaw.local/schemas/matter-core/reg-policy.schema.json",
+  "title": "CrabLaw-CN Regulatory Policy Item",
+  "description": "A single PRC statute / regulation / rule / normative document tracked by the regulatory and AI-governance plugins (consumed by policy-diff, gap analysis, and policy-monitor). Filing/comment deadlines are NOT stored here; they are compliance-deadline records (obligationType=regulatory-filing).",
+  "type": "object",
+  "required": ["policyId", "matterId", "title", "issuer", "effectiveLevel", "status", "citationTag", "createdAt"],
+  "properties": {
+    "policyId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,120}$" },
+    "matterId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,100}$" },
+    "title": { "type": "string", "minLength": 1, "description": "Official name of the statute/regulation/document." },
+    "issuer": { "type": "string", "minLength": 1, "description": "发文机关 (issuing authority), e.g. 国家网信办." },
+    "documentNumber": { "type": "string", "minLength": 1, "description": "文号, e.g. 国家互联网信息办公室令第15号." },
+    "effectiveLevel": {
+      "description": "Legal hierarchy. law=法律; administrative-regulation=行政法规; departmental-rule=部门规章; local-regulation=地方性法规; local-government-rule=地方政府规章; normative-document=规范性文件; national-standard=国家标准; industry-standard=行业标准; other=其他",
+      "enum": ["law", "administrative-regulation", "departmental-rule", "local-regulation", "local-government-rule", "normative-document", "national-standard", "industry-standard", "other"]
+    },
+    "domain": { "type": "string", "minLength": 1, "description": "Regulatory domain, e.g. 数据安全 / 广告 / 金融 / 生成式AI." },
+    "publishedDate": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "format": "date" },
+    "effectiveDate": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "format": "date" },
+    "status": {
+      "description": "draft-for-comment=征求意见稿; published=已公布未施行; effective=施行中; amended=已修订; repealed=已废止; superseded=被取代; other=其他",
+      "enum": ["draft-for-comment", "published", "effective", "amended", "repealed", "superseded", "other"]
+    },
+    "citationTag": { "enum": ["[已核验-来源]", "[用户提供]", "[模型知识-待核]"] },
+    "sourceRef": { "type": "string", "minLength": 1, "description": "Pointer to the governing source; required when citationTag is [已核验-来源]." },
+    "createdAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "format": "date" },
+    "notes": { "type": "string", "minLength": 1 }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "citationTag": { "const": "[已核验-来源]" } }, "required": ["citationTag"] },
+      "then": { "required": ["sourceRef"] }
+    }
+  ],
+  "additionalProperties": false
+}

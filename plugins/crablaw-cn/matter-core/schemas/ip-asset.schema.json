@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crablaw.local/schemas/matter-core/ip-asset.schema.json",
+  "title": "CrabLaw-CN IP Asset",
+  "description": "Registration record for a PRC intellectual-property asset. Renewal reminders (续展/年费) are NOT stored here; they are compliance-deadline records (obligationType=license-renewal) so the watcher stays the single source of truth. expiryDate here is the static legal right-term fact, not a task.",
+  "type": "object",
+  "required": ["assetId", "matterId", "ipType", "holder", "status", "citationTag", "createdAt"],
+  "properties": {
+    "assetId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,120}$" },
+    "matterId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,100}$" },
+    "ipType": {
+      "description": "trademark=商标; patent-invention=发明专利; patent-utility-model=实用新型专利; patent-design=外观设计专利; copyright=著作权; trade-secret=商业秘密; domain=域名; other=其他",
+      "enum": ["trademark", "patent-invention", "patent-utility-model", "patent-design", "copyright", "trade-secret", "domain", "other"]
+    },
+    "registrationNumber": { "type": "string", "minLength": 1, "description": "注册号/申请号/登记号. Omit before filing." },
+    "holder": { "type": "string", "minLength": 1, "description": "权利人 (rights holder)." },
+    "territory": { "type": "string", "minLength": 1, "description": "Jurisdiction/territory, e.g. CN, 马德里指定国. Default CN." },
+    "niceClasses": { "type": "string", "minLength": 1, "description": "For trademarks, 尼斯分类 class numbers, e.g. 9;35;42." },
+    "applicationDate": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "format": "date" },
+    "registrationDate": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "format": "date" },
+    "expiryDate": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "format": "date", "description": "Static end of the legal right term; the renewal TASK is tracked separately via compliance-deadline." },
+    "status": {
+      "description": "application=申请中; registered=已注册/授权; rejected=驳回; expired=届满失效; invalidated=被无效/撤销; transferred=已转让; licensed=已许可; other=其他",
+      "enum": ["application", "registered", "rejected", "expired", "invalidated", "transferred", "licensed", "other"]
+    },
+    "licensing": {
+      "description": "none=无许可; exclusive=独占许可; sole=排他许可; non-exclusive=普通许可; unknown=未知",
+      "enum": ["none", "exclusive", "sole", "non-exclusive", "unknown"]
+    },
+    "citationTag": { "enum": ["[已核验-来源]", "[用户提供]", "[模型知识-待核]"] },
+    "sourceRef": { "type": "string", "minLength": 1, "description": "Pointer to the governing source; required when citationTag is [已核验-来源]." },
+    "createdAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "format": "date" },
+    "notes": { "type": "string", "minLength": 1 }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "citationTag": { "const": "[已核验-来源]" } }, "required": ["citationTag"] },
+      "then": { "required": ["sourceRef"] }
+    }
+  ],
+  "additionalProperties": false
+}

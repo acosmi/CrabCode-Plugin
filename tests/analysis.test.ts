@@ -95,6 +95,8 @@ describe("policy checks", () => {
     await writeFile(path.join(tempRoot, "plugins", "alpha", "docs", "legal", "THIRD_PARTY_NOTICES.md"), token);
     await writeFile(path.join(tempRoot, "docs", "audit", "report.md"), token);
     await writeFile(path.join(tempRoot, "docs", "huibao", "report.md"), token);
+    await writeFile(path.join(tempRoot, "docs", "2026-01-01-x-实施方案存档.md"), token);
+    await writeFile(path.join(tempRoot, "docs", "2026-01-01-x-执行日志.md"), token);
 
     expect(await scanPath(tempRoot)).toEqual([]);
   });

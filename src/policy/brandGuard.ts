@@ -41,6 +41,8 @@ const DEFAULT_IGNORES = [
   "docs/legal/**",
   "**/docs/legal/**",
   "docs/**implementation-plan*.md",
+  "docs/**实施方案*.md",
+  "docs/**执行日志*.md",
   "node_modules/**",
   "**/node_modules/**",
   "vendor/**",

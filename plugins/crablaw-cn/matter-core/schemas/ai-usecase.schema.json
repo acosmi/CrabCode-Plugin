@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crablaw.local/schemas/matter-core/ai-usecase.schema.json",
+  "title": "CrabLaw-CN AI Use Case",
+  "description": "Inventory record for an AI/algorithmic use case under PRC AI governance rules (生成式AI服务管理办法 / 算法推荐管理规定 / 深度合成规定). Used by the ai-governance plugin and referenced by product and vendor-AI reviews. Impact-assessment findings are diligence-finding records; filing deadlines are compliance-deadline records.",
+  "type": "object",
+  "required": ["usecaseId", "matterId", "name", "deploymentContext", "riskLevel", "citationTag", "createdAt"],
+  "properties": {
+    "usecaseId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,120}$" },
+    "matterId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,100}$" },
+    "name": { "type": "string", "minLength": 1 },
+    "description": { "type": "string", "minLength": 1 },
+    "deploymentContext": {
+      "description": "internal-tool=内部工具; customer-facing=面向客户; public-service=向公众提供服务; embedded-product=嵌入产品; vendor-provided=第三方/供应商提供; research=研究测试; other=其他",
+      "enum": ["internal-tool", "customer-facing", "public-service", "embedded-product", "vendor-provided", "research", "other"]
+    },
+    "aiCategory": {
+      "description": "generative-text=生成式文本; generative-media=生成式图像/音视频; decision-support=决策辅助; automated-decision=自动化决策; recommendation=算法推荐; biometric=生物识别; other=其他",
+      "enum": ["generative-text", "generative-media", "decision-support", "automated-decision", "recommendation", "biometric", "other"]
+    },
+    "dataTypes": {
+      "type": "array",
+      "description": "Categories of data processed.",
+      "items": { "enum": ["personal-information", "sensitive-personal-information", "important-data", "public-data", "none", "unknown"] },
+      "minItems": 1
+    },
+    "filingStatus": {
+      "description": "PRC AI filing posture. not-required=无需备案; required-not-filed=需备案未备案; algorithm-filed=算法备案已完成; deep-synthesis-filed=深度合成备案已完成; large-model-registered=生成式AI(大模型)上线登记已完成; other=其他",
+      "enum": ["not-required", "required-not-filed", "algorithm-filed", "deep-synthesis-filed", "large-model-registered", "other"]
+    },
+    "riskLevel": { "enum": ["low", "medium", "high", "unacceptable", "unassessed"] },
+    "citationTag": { "enum": ["[已核验-来源]", "[用户提供]", "[模型知识-待核]"] },
+    "sourceRef": { "type": "string", "minLength": 1, "description": "Pointer to the governing source; required when citationTag is [已核验-来源]." },
+    "createdAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "format": "date" },
+    "notes": { "type": "string", "minLength": 1 }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "citationTag": { "const": "[已核验-来源]" } }, "required": ["citationTag"] },
+      "then": { "required": ["sourceRef"] }
+    }
+  ],
+  "additionalProperties": false
+}

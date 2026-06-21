@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crablaw.local/schemas/matter-core/litigation-matter.schema.json",
+  "title": "CrabLaw-CN Litigation Matter",
+  "description": "Static registration record for a PRC litigation or arbitration case. Deadlines (举证/开庭/上诉/执行期限) are NOT stored here; they live in compliance-deadline records (obligationType=litigation-deadline) so the watcher remains the single source of truth and dates cannot drift across two stores.",
+  "type": "object",
+  "required": ["caseId", "matterId", "forumType", "partyRole", "citationTag", "status", "createdAt"],
+  "properties": {
+    "caseId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,120}$" },
+    "matterId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,100}$" },
+    "forumType": {
+      "description": "Adjudication forum. people-court=人民法院; arbitration-commission=仲裁委员会; administrative-review=行政复议机关; administrative-litigation=行政诉讼(人民法院); enforcement-court=执行法院; other=其他",
+      "enum": ["people-court", "arbitration-commission", "administrative-review", "administrative-litigation", "enforcement-court", "other"]
+    },
+    "forumName": { "type": "string", "minLength": 1, "description": "Named court or arbitration commission, e.g. 北京市第一中级人民法院 / 中国国际经济贸易仲裁委员会." },
+    "caseNumber": { "type": "string", "minLength": 1, "description": "案号, e.g. (2024)京01民初123号. Omit before case is filed/docketed." },
+    "causeOfAction": { "type": "string", "minLength": 1, "description": "案由 (cause of action), e.g. 买卖合同纠纷." },
+    "partyRole": {
+      "description": "Our client's procedural position. plaintiff=原告; defendant=被告; third-party=第三人; appellant=上诉人; appellee=被上诉人; applicant=申请人; respondent=被申请人; claimant=仲裁申请人; other=其他",
+      "enum": ["plaintiff", "defendant", "third-party", "appellant", "appellee", "applicant", "respondent", "claimant", "other"]
+    },
+    "instance": {
+      "description": "Procedural stage. first-instance=一审; second-instance=二审; retrial=再审; enforcement=执行; arbitration=仲裁; preservation=保全; other=其他",
+      "enum": ["first-instance", "second-instance", "retrial", "enforcement", "arbitration", "preservation", "other"]
+    },
+    "claimAmount": { "type": "string", "minLength": 1, "description": "诉请/标的金额 as text (preserve original units and currency; never coerce to float)." },
+    "claimSummary": { "type": "string", "minLength": 1, "description": "Short summary of the claims or relief sought." },
+    "counsel": { "type": "string", "minLength": 1, "description": "承办律师 (responsible litigator)." },
+    "preservation": { "type": "boolean", "description": "True if property/evidence preservation (财产/证据保全) is involved." },
+    "citationTag": { "enum": ["[已核验-来源]", "[用户提供]", "[模型知识-待核]"] },
+    "sourceRef": { "type": "string", "minLength": 1, "description": "Pointer to the governing source; required when citationTag is [已核验-来源]." },
+    "status": { "enum": ["active", "stayed", "concluded", "withdrawn", "enforcement", "archived"] },
+    "createdAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "format": "date" },
+    "concludedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "format": "date" },
+    "notes": { "type": "string", "minLength": 1 }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "citationTag": { "const": "[已核验-来源]" } }, "required": ["citationTag"] },
+      "then": { "required": ["sourceRef"] }
+    },
+    {
+      "if": { "properties": { "status": { "enum": ["concluded", "archived"] } }, "required": ["status"] },
+      "then": { "required": ["concludedAt"] }
+    }
+  ],
+  "additionalProperties": false
+}
