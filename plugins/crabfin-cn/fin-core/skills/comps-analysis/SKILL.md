@@ -1,6 +1,7 @@
 ---
 name: comps-analysis
 description: |
+  可比公司估值分析(中国版底座)。构建机构级 comps——营运指标、估值倍数、统计基准;数据取自巨潮资讯网/交易所披露与 Wind/同花顺(非 SEC),可比公司同申万行业优先。当用户要做可比公司、comps、估值倍数对标、PE/PB/EV-EBITDA 同业比较时触发(triggers: comparable company analysis, comps, trading multiples, 可比公司, 估值倍数, 同业估值)。先读 references/cn-data-sources.md 套用中国数据源。
   Build institutional-grade comparable company analyses with operating metrics, valuation multiples, and statistical benchmarking in Excel/spreadsheet format.
 
   **Perfect for:**
@@ -21,6 +22,8 @@ license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attributio
 ---
 
 # Comparable Company Analysis
+
+> **中国版底座(中文优先)**:分析机制沿用下方通用英文流程,**数据来源与行业分类改用中国口径**——公司数据取自巨潮资讯网/沪深北交易所披露与 Wind/同花顺(非 SEC),可比公司按**申万行业**划分并区分板块(主板/科创板/创业板/北交所/港股)。**先读 [`../../references/cn-data-sources.md`](../../references/cn-data-sources.md);下方英文 Data Source Priority 中的 SEC 层级一律以本适配器的中国来源替换。** 输出注明数据来源、取数日期、计价货币。
 
 ## ⚠️ CRITICAL: Data Source Priority (READ FIRST)
 

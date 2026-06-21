@@ -1,10 +1,12 @@
 ---
 name: three-statement-model
-description: Complete, populate and fill out 3-statement financial model templates (Income Statement, Balance Sheet, Cash Flow Statement) . Use when asked to fill out model templates, complete existing model frameworks, populate financial models with data, complete a partially filled IS/BS/CF framework, or link integrated financial statements within an existing template structure. Triggers include requests to fill in, complete, or populate a 3-statement model template
+description: 三表财务模型(利润表/资产负债表/现金流量表)填充与勾稽(中国版底座)。按企业会计准则(CAS)科目口径填充并联动三表,数据取自巨潮资讯网/交易所定期报告(非 SEC/10-K)。当用户要填/补全/搭建三表模型、做三表联动与勾稽时触发(triggers: 3-statement model, IS/BS/CF, 三表模型, 三表联动, 利润表/资产负债表/现金流量表, fill/populate/complete model template)。执行前先读 references/cn-data-sources.md。
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---
 
 # 3-Statement Financial Model Template Completion
+
+> **中国版底座(中文优先)**:勾稽/联动机制沿用下方通用英文流程,**数据来源与科目口径改用中国口径**——取自巨潮资讯网/沪深北交易所定期报告(非 SEC/10-K),科目按企业会计准则(CAS),科目→报表行项映射见 `cn-equity-research/sources/mappings/CAS科目映射`。**先读 [`../../references/cn-data-sources.md`](../../references/cn-data-sources.md) 再套用英文流程;`references/sec-filings.md` 仅作通用结构参考,中国实操以 CAS 与巨潮披露为准。** 输出注明数据来源、取数日期、计价货币(默认人民币)、所用准则。
 
 Complete and populate integrated financial model templates with proper linkages between Income Statement, Balance Sheet, and Cash Flow Statement.
 
