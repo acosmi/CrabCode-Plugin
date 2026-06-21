@@ -1,6 +1,6 @@
 ---
 name: employment-contract-review
-description: Review a PRC employment contract draft as a lawyer-review workpaper.
+description: 在中国法工作流中审查劳动合同草稿,产出律师复核工作底稿。当用户提到审劳动合同/看看这份劳动合同/用工合同/入职合同/劳动合同有没有问题/合同条款合规,或拿到一份待签劳动合同需要法律把关时使用本技能(即使未明说"审查")。
 argument-hint: "[contract text, file path, or facts]"
 ---
 

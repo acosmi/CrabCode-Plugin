@@ -1,6 +1,6 @@
 ---
 name: labor-dispute-summary
-description: Organize PRC labor dispute facts, evidence, claims, defenses, deadlines, and review points.
+description: 梳理中国法劳动争议的事实、证据、请求、抗辩、期限与复核要点。当用户提到劳动仲裁/劳动争议/员工告公司/仲裁应对/争议材料整理/被申请仲裁了怎么办,或需要把一摞劳动纠纷材料体系化梳理供律师复核时使用本技能(即使未明说"争议梳理")。
 argument-hint: "[dispute materials or facts]"
 ---
 

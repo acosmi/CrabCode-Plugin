@@ -1,6 +1,6 @@
 ---
 name: review
-description: Review a PRC contract draft or inbound agreement as a lawyer-review workpaper.
+description: 在中国法工作流中对合同草稿或来件协议做律师复核式审查,产出复核工作底稿。当用户提到审合同/看看这份协议/合同有没有问题/合同风险/条款问题/帮我把把关,或拿到一份待签合同需要法律审核时使用本技能(即使未明说"审查")。
 argument-hint: "[file path, pasted text, or matter facts]"
 ---
 

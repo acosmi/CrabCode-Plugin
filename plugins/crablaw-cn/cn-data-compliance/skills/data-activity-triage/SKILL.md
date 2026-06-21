@@ -1,6 +1,6 @@
 ---
 name: data-activity-triage
-description: Triage a PRC data processing activity for personal information, sensitive personal information, important data, PIA, and cross-border review needs.
+description: 对中国法下某项数据处理活动做初步分诊,判断是否涉及个人信息、敏感个人信息、重要数据,以及是否需做个人信息保护影响评估或出境审查。当用户提到这个数据合规吗/要不要做评估/涉不涉及个人信息/数据处理要注意什么/合规分诊/先判一判,或需要为某数据活动确定合规路径时使用本技能(即使未明说"分诊")。
 argument-hint: "[processing activity facts]"
 ---
 

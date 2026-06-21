@@ -1,6 +1,6 @@
 ---
 name: employee-handbook-review
-description: Review a PRC employee handbook or policy update for legal and procedure risks.
+description: 审查中国法员工手册或制度修订的法律与民主程序风险。当用户提到员工手册/规章制度/公司制度/制度修订/手册合规/这条规定能不能写,或需要对内部规章的合法性与程序性把关时使用本技能(即使未明说"手册审查")。
 argument-hint: "[handbook text, policy text, or change request]"
 ---
 

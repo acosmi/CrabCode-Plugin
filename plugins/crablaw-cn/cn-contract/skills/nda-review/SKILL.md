@@ -1,6 +1,6 @@
 ---
 name: nda-review
-description: Review a confidentiality agreement or NDA under PRC-law contract and trade-secret workflow controls.
+description: 在中国法合同与商业秘密工作流中审查保密协议/NDA,产出律师复核工作底稿。当用户提到保密协议/NDA/竞业保密/保密条款/这份保密合同看看,或需要对收发保密协议做法律把关时使用本技能(即使未明说"NDA 审查")。
 argument-hint: "[NDA file path, pasted text, or matter facts]"
 ---
 

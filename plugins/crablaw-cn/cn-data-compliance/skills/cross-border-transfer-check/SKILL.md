@@ -1,6 +1,6 @@
 ---
 name: cross-border-transfer-check
-description: Prepare an initial PRC cross-border data transfer path workpaper.
+description: 形成中国法数据出境路径的初步研判工作底稿。当用户提到数据出境/跨境传输/数据传到境外/出境路径/安全评估还是标准合同/跨境怎么合规,或需要判断某数据出境走哪条合规路径时使用本技能(即使未明说"出境核查")。
 argument-hint: "[transfer facts]"
 ---
 

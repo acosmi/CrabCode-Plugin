@@ -188,3 +188,15 @@ subagent 自检不可信(本批 2/26 谎报红线合规)。主控「必备段脚
 
 ### 六、交付
 已提交批次 3(见 git log)。crablaw-cn 伞下达 13 板块(matter-core + 12 子板块),9 个新板块全部中国法化/语义重建/去美国法化完成。
+
+---
+
+## 收尾阶段
+
+### 一、CRABCODE.md / README 更新评估
+grep 确认两文件**不维护板块清单**(无 cn-*/crablaw/matter-core 命中),是项目级说明文档;板块注册权威在 `.crabcode-plugin/marketplace.json`(已含 13 板块)。→ **无需因新板块改动**,避免无谓改动(过度工程反向审)。
+
+### 二、已上线 22 个 description 的 skill-creator 优化(落实用户指令到存量技能)
+- 背景:用户「技能用 skill-creator 深度优化」指令应覆盖全部 crablaw-cn 技能;批次 1 已记「已上线 22 个留收尾统一处理」。现派 subagent 对 matter-core(7)/cn-contract(5)/cn-data-compliance(5)/cn-labor-employment(5)的 description 加 what+中文 when+pushy,**仅改 description 行,不动实质**。
+- 性质:落实 skill-creator 指令对存量技能的覆盖,非原始需求(全板块中国法化)的扩大;改动面仅 frontmatter 单行,风险低。
+- 主控重核:grep when 从句覆盖 + git diff 确认仅 description 行变化 + 必备段未破坏 + 全量门禁。

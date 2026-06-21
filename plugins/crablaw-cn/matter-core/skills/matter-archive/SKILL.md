@@ -1,6 +1,6 @@
 ---
 name: matter-archive
-description: Archive a matter with outputs, source records, review records, permissions, and audit trail preserved.
+description: 归档某事项,完整保留其产出、来源记录、复核记录、权限与审计轨迹(归档而非删除)。当用户提到结案/归档/案子办完了/封存/把这个 matter 收尾,或需要在事项完结后留痕封存时使用本技能(即使未明说"归档")。
 argument-hint: "[matter id]"
 ---
 

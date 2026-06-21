@@ -1,6 +1,6 @@
 ---
 name: review-queue
-description: Create, list, update, or inspect lawyer review queue items for CrabLaw-CN outputs.
+description: 创建、列出、更新或查看 CrabLaw-CN 各项产出的律师复核队列条目。当用户提到复核队列/待复核/审核列表/待审项/复核进度/有哪些要审的,或需要登记某份产出待律师复核、查看复核状态时使用本技能(即使未明说"复核队列")。
 argument-hint: "<new | list | update | show> [matter id] [item id]"
 ---
 

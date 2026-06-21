@@ -1,6 +1,6 @@
 ---
 name: clause-redraft
-description: Draft or revise a PRC contract clause for lawyer review within an active matter.
+description: 在活跃事项内起草或修订中国法合同条款,产出供律师复核的条款稿。当用户提到改条款/重写这条/帮我拟一条/条款怎么写/这段改一下/给个替代表述,或需要对某具体条款做改写打磨时使用本技能(即使未明说"改写")。
 argument-hint: "[clause text and objective]"
 ---
 
