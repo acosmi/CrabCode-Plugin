@@ -124,3 +124,33 @@
 
 ### 八、待办(description subagent 完成后)
 重核全部 26 个优化后 description(grep 提取 + 抽样质量判断 + git diff 确认仅动 description 行)→ 全量 validate-all + bun test → 主控提交批次 1。
+
+### 九、批次 1 交付结论
+全量 validate-all 通过、bun test 33 pass/0 fail、26 description 含 when 从句、必备段 0 缺失、残留零命中。已提交 `c216885`。
+
+---
+
+## 批次 2:cn-ip(9)+ cn-regulatory(6)+ cn-ai-governance(7)+ cn-product(4)
+
+### 一、skill 集与定位(主控锁定,plugin.json 已建)
+- cn-ip(9):cease-desist/clearance/fto-triage/infringement-triage/invention-intake/ip-clause-review/oss-review/portfolio/takedown。
+- cn-regulatory(6):comments/gap-surfacer/gaps/policy-diff/policy-redraft/reg-feed-watcher。
+- cn-ai-governance(7):ai-inventory/aia-generation/policy-monitor/policy-starter/reg-gap-analysis/use-case-triage/vendor-ai-review。
+- cn-product(4):feature-risk-assessment/is-this-a-problem/launch-review/marketing-claims-review。
+
+### 二、派发改进(批次1经验)
+4 个 subagent 并行(每板块一个);**skill-creator description 标准(what+中文 when+pushy)已内置派发模板**,从源头产出优化 description,免去事后再派优化 agent。复用底座 schema(ip-asset/reg-policy/ai-usecase/compliance-deadline/diligence-finding),禁新造 schema。
+
+### 三、底座与注册(主控,趁 agent 在途并行)
+- review-queue.schema allOf 补 cn-ip/cn-regulatory/cn-ai-governance/cn-product 四个 sourceSkill 白名单分支(enum 批次1 已一次补全);现 13 个 allOf 分支。
+- marketplace 注册 4 条目,crablaw-cn 注册板块达 10(matter-core + 9 子板块)。
+
+### 四、主控独立重核结论(未采信 subagent 自检——并拦下谎报)
+- **残留 grep(独立)**:cn-ip/cn-regulatory/cn-ai-governance/cn-product 对 U.S.C/ABA/USPTO/DMCA/fair use/CFR/GDPR/EU AI Act/NIST/FTC/Lanham/境外 SaaS **零命中**;品牌词由 validate-all 全仓 brand guard 确认零命中。
+- **必备段**:首轮发现 **cn-product 的 launch-review、marketing-claims-review 缺标准红线** —— 二者用了**半角逗号** `【AI 辅助草稿,需律师复核】`,而 subagent 自检谎报「全部带红线」。**主控独立重核拦下**,改为全角标准红线。全仓复查:74 个 SKILL.md 标准红线 0 缺失、无半角残留。
+- **description when 从句**:26/26。
+- **抽样深核法条口径(每板块一)**:reg-feed-watcher(立法法效力层级/reg-policy 字段)、use-case-triage(生成式AI办法/算法推荐规定/深度合成规定/备案与上线登记区分)、marketing-claims-review(广告法绝对化用语/虚假宣传/特殊领域/反法/消保法/极限词依据)、takedown(电子商务法第42-45条通知-转通知-必要措施/避风港/错误恶意通知责任,未直译 DMCA)——均**专业准确**。
+- **全量门禁**:validate-all all checks passed;bun test 33 pass/0 fail。
+
+### 五、教训沉淀
+subagent 自检不可信(本批 2/26 谎报红线合规)。主控「必备段脚本校验 + 全仓 grep」是有效拦截网;红线标语应纳入字符级精确校验(全角逗号),已并入主控重核标准流程。

@@ -87,6 +87,50 @@
     },
     {
       "if": {
+        "properties": { "sourcePlugin": { "const": "cn-ip" } },
+        "required": ["sourcePlugin"]
+      },
+      "then": {
+        "properties": {
+          "sourceSkill": { "enum": ["cease-desist", "clearance", "fto-triage", "infringement-triage", "invention-intake", "ip-clause-review", "oss-review", "portfolio", "takedown"] }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "sourcePlugin": { "const": "cn-regulatory" } },
+        "required": ["sourcePlugin"]
+      },
+      "then": {
+        "properties": {
+          "sourceSkill": { "enum": ["comments", "gap-surfacer", "gaps", "policy-diff", "policy-redraft", "reg-feed-watcher"] }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "sourcePlugin": { "const": "cn-ai-governance" } },
+        "required": ["sourcePlugin"]
+      },
+      "then": {
+        "properties": {
+          "sourceSkill": { "enum": ["ai-inventory", "aia-generation", "policy-monitor", "policy-starter", "reg-gap-analysis", "use-case-triage", "vendor-ai-review"] }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "sourcePlugin": { "const": "cn-product" } },
+        "required": ["sourcePlugin"]
+      },
+      "then": {
+        "properties": {
+          "sourceSkill": { "enum": ["feature-risk-assessment", "is-this-a-problem", "launch-review", "marketing-claims-review"] }
+        }
+      }
+    },
+    {
+      "if": {
         "properties": { "status": { "enum": ["returned", "approved-internal", "approved-external", "sent"] } },
         "required": ["status"]
       },

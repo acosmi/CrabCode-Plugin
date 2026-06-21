@@ -158,6 +158,90 @@
       ]
     },
     {
+      "name": "cn-ip",
+      "source": "./plugins/crablaw-cn/cn-ip",
+      "version": "0.1.0",
+      "displayName": "中国知识产权",
+      "shortDescription": "知识产权工作流草拟:权利登记、检索清除、FTO/侵权分流、警告函、平台投诉、IP条款与开源审查、资产组合",
+      "longDescription": "面向中国知识产权的工作流草拟模块。覆盖发明披露与权利登记、申请前检索清除、自由实施(FTO)与侵权分流、停止侵害警告函、网络平台通知删除、合同IP条款与开源软件合规审查及资产组合管理,依据《商标法》《专利法》《著作权法》《反不正当竞争法》《电子商务法》提供草拟与风险提示。",
+      "defaultPrompt": [
+        "对这个商标做申请前检索清除",
+        "起草一份侵权警告函",
+        "梳理我们的知识产权资产组合"
+      ],
+      "brandColor": "#b5462f",
+      "description": "PRC intellectual property workflow drafts for invention intake, clearance, FTO and infringement triage, cease-and-desist, takedowns, IP clause and open-source review, and portfolio management.",
+      "category": "legal-workflow",
+      "tags": [
+        "prc-law",
+        "intellectual-property",
+        "trademark"
+      ]
+    },
+    {
+      "name": "cn-regulatory",
+      "source": "./plugins/crablaw-cn/cn-regulatory",
+      "version": "0.1.0",
+      "displayName": "中国行政监管合规",
+      "shortDescription": "行政监管合规工作流草拟:监管动态监控、政策对比、合规差距分析、意见提交与制度改写",
+      "longDescription": "面向中国行政监管合规的工作流草拟模块。覆盖监管动态与新规/征求意见稿监控、政策法规版本对比、合规差距分析、征求意见提交与内部合规制度改写,按立法法效力层级梳理监管要求,提供草拟与风险提示。",
+      "defaultPrompt": [
+        "盯一下这个领域有没有新规",
+        "对比这部规章修订前后的差异",
+        "做一次合规差距分析"
+      ],
+      "brandColor": "#b5462f",
+      "description": "PRC regulatory compliance workflow drafts for monitoring rules, policy diffing, gap analysis, comment letters, and internal policy redrafting.",
+      "category": "legal-workflow",
+      "tags": [
+        "prc-law",
+        "regulatory",
+        "compliance"
+      ]
+    },
+    {
+      "name": "cn-ai-governance",
+      "source": "./plugins/crablaw-cn/cn-ai-governance",
+      "version": "0.1.0",
+      "displayName": "中国AI合规治理",
+      "shortDescription": "生成式AI合规治理工作流草拟:用例盘点与分级、算法影响评估、供应商AI审查、政策监控与制度起草",
+      "longDescription": "面向中国生成式AI合规治理的工作流草拟模块。覆盖AI用例盘点与风险分级、算法影响/安全评估报告、第三方AI服务审查、AI监管政策监控、内部AI治理制度起草与合规差距分析,依据《生成式人工智能服务管理暂行办法》《互联网信息服务算法推荐管理规定》《互联网信息服务深度合成管理规定》及个保法/数安法提供草拟与风险提示。",
+      "defaultPrompt": [
+        "给这个AI功能做风险分级",
+        "生成一份算法影响评估",
+        "盘点我们的AI用例"
+      ],
+      "brandColor": "#b5462f",
+      "description": "PRC AI governance workflow drafts for AI inventory, use-case triage, algorithm impact assessment, vendor AI review, and policy monitoring under generative-AI, algorithm-recommendation, and deep-synthesis rules.",
+      "category": "legal-workflow",
+      "tags": [
+        "prc-law",
+        "ai-governance",
+        "generative-ai"
+      ]
+    },
+    {
+      "name": "cn-product",
+      "source": "./plugins/crablaw-cn/cn-product",
+      "version": "0.1.0",
+      "displayName": "中国产品与营销合规",
+      "shortDescription": "产品与营销合规工作流草拟:功能风险评估、上线审查、快速问题研判与广告用语审查",
+      "longDescription": "面向中国产品与营销合规的工作流草拟模块。覆盖产品功能法律风险评估、上线前综合合规审查、快速法律问题研判与营销宣传用语审查,依据《广告法》《反不正当竞争法》《消费者权益保护法》《电子商务法》并联动数据、AI、知识产权等专项,提供草拟与风险提示。",
+      "defaultPrompt": [
+        "这句广告语能不能用",
+        "给这个新功能做上线合规审查",
+        "评估这个产品功能的法律风险"
+      ],
+      "brandColor": "#b5462f",
+      "description": "PRC product and marketing compliance workflow drafts for feature risk assessment, launch review, and marketing claims review.",
+      "category": "legal-workflow",
+      "tags": [
+        "prc-law",
+        "product",
+        "advertising"
+      ]
+    },
+    {
       "name": "crabcode-security-review",
       "source": "./plugins/crabcode-security-review",
       "version": "0.1.0",
