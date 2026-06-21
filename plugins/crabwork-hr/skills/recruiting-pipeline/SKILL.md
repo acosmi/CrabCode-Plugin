@@ -1,6 +1,6 @@
 ---
 name: recruiting-pipeline
-description: Track and manage recruiting pipeline stages. Trigger with "recruiting update", "candidate pipeline", "how many candidates", "hiring status", or when the user discusses sourcing, screening, interviewing, or extending offers.
+description: Track and manage the recruiting pipeline from sourcing to offer acceptance — stages, conversion rates, and velocity. Trigger with "recruiting update", "candidate pipeline", "how many candidates", "hiring status", "where are we on the req", "time to fill", "offer acceptance rate", "which source produces hires", or when the user discusses sourcing, screening, interviewing, debriefs, extending offers, or ATS funnel metrics.
 ---
 
 # Recruiting Pipeline

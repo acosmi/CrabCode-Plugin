@@ -1,6 +1,6 @@
 ---
 name: status-report
-description: Generate a status report with KPIs, risks, and action items. Use when writing a weekly or monthly update for leadership, summarizing project health with green/yellow/red status, surfacing risks and decisions that need stakeholder attention, or turning a pile of project tracker activity into a readable narrative.
+description: Generates a status report with KPIs, risks, decisions, and next steps. Use when writing a weekly, monthly, or quarterly update for leadership or stakeholders, summarizing project or team health with green/yellow/red (RAG) status, surfacing risks and decisions that need attention, turning a pile of project-tracker activity into a readable narrative, or when the user says "write a status update", "weekly report", "where are we on this", "exec summary", or "what should I tell leadership".
 argument-hint: "[weekly | monthly | quarterly] [project or team]"
 ---
 

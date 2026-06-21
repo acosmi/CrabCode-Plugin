@@ -1,6 +1,6 @@
 ---
 name: validate-data
-description: QA an analysis before sharing -- methodology, accuracy, and bias checks. Use when reviewing an analysis before a stakeholder presentation, spot-checking calculations and aggregation logic, verifying a SQL query's results look right, or assessing whether conclusions are actually supported by the data.
+description: QA a data analysis before it ships -- check methodology, calculations, and bias, then rate confidence. Use when the user says "double-check this", "does this look right", "sanity-check my numbers", "review before I send it to the execs", "is my conclusion supported", or worries about a join inflating counts, a partial-period comparison, or average-of-averages. Triggers on validating an analysis, report, notebook, or a SQL query and its results before a stakeholder presentation or decision.
 argument-hint: "<analysis to review>"
 ---
 

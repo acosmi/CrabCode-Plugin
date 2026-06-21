@@ -3,9 +3,11 @@ name: crm-maintenance
 description: >
   Keeps HubSpot current without the owner opening it: creates and updates
   contacts and deals from email and calendar context, logs notes and calls,
-  and flags stale records. The "stop doing data entry" skill. Use when the
-  user asks to update the CRM, log a call, clean up HubSpot, or add context
-  to a deal.
+  and flags stale records. The "stop doing data entry" skill. Use when the user
+  asks to update the CRM, "log a call," "log this meeting," "add this contact to
+  HubSpot," "update the deal," "note what we discussed," "add context to a deal,"
+  or wants their CRM kept in sync after a conversation. (For bulk dedupe and
+  stale-deal sweeps, that is crm-cleanup.)
 ---
 
 # CRM Maintenance

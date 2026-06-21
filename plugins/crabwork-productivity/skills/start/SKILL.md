@@ -1,6 +1,6 @@
 ---
 name: start
-description: Initialize the productivity system and open the dashboard. Use when setting up the plugin for the first time, bootstrapping working memory from your existing task list, or decoding the shorthand (nicknames, acronyms, project codenames) you use in your todos.
+description: Initialize the productivity system (TASKS.md, working memory, deep memory, and the visual dashboard) and open the dashboard. Use on first-time setup ("set up the plugin", "get me started", "initialize my tasks/memory"), when bootstrapping working memory from an existing todo list or task app (Asana, Linear, Jira, Notion, Todoist), when the user wants to open or see the dashboard, or when doing the initial decode of the nicknames, acronyms, and project codenames found in their todos. Invoked as /crabwork-productivity:start.
 ---
 
 # Start Command

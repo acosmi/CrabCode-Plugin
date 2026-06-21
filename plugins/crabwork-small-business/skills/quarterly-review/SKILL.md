@@ -1,6 +1,6 @@
 ---
 name: quarterly-review
-description: Generates a full QBR narrative — revenue trend, margin trend, customer health, top opportunities and risks — as a presentation-ready PDF or deck. Accepts optional quarter and save-to arguments.
+description: Generates a full QBR narrative — revenue trend, margin trend, customer health, top opportunities and risks — as a presentation-ready PDF or deck. Trigger when the owner runs /quarterly-review or says "quarterly review," "QBR," "build a board deck," "how did the quarter go," "end-of-quarter summary," or wants a quarter-over-quarter business recap. Accepts optional quarter and save-to arguments.
 allowed-tools: Read, WebFetch, Bash
 ---
 

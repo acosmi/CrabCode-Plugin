@@ -1,6 +1,6 @@
 ---
 name: system-design
-description: Design systems, services, and architectures. Trigger with "design a system for", "how should we architect", "system design for", "what's the right architecture for", or when the user needs help with API design, data modeling, or service boundaries.
+description: Design systems, services, and architectures from requirements — the open-ended "how should we build this" counterpart to the architecture/ADR skill. Trigger with "design a system for", "how should we architect", "system design for", "what's the right architecture for", "how do we scale this", "how should we structure this service", or when the user needs help with API design, data modeling, caching/queue design, or service boundaries. For documenting a single decision between named options as an ADR, prefer the architecture skill.
 ---
 
 # System Design

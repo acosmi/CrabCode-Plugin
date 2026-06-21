@@ -1,20 +1,11 @@
 ---
 name: single-cell-rna-qc
-description: Performs quality control on single-cell RNA-seq data (.h5ad or .h5 files) using scverse best practices with MAD-based filtering and comprehensive visualizations. Use when users request QC analysis, filtering low-quality cells, assessing data quality, or following scverse/scanpy best practices for single-cell analysis.
+description: Performs quality control on single-cell RNA-seq data (.h5ad AnnData or 10X Genomics .h5 / Cell Ranger output) using scverse best practices—MAD-based outlier filtering, mitochondrial/ribosomal/hemoglobin metrics, and before/after visualizations. Use when users want to QC scRNA-seq data, filter low-quality cells, remove outliers, compute or plot QC metrics, set count/gene/MT% thresholds, or follow scverse/scanpy best practices. Triggers on "run QC on my single-cell data", "filter low-quality cells", h5ad/scanpy/AnnData QC, MAD filtering, percent mito cutoff, or assessing single-cell data quality before downstream analysis.
 ---
 
 # Single-Cell RNA-seq Quality Control
 
 Automated QC workflow for single-cell RNA-seq data following scverse best practices.
-
-## When to Use This Skill
-
-Use when users:
-- Request quality control or QC on single-cell RNA-seq data
-- Want to filter low-quality cells or assess data quality
-- Need QC visualizations or metrics
-- Ask to follow scverse/scanpy best practices
-- Request MAD-based filtering or outlier detection
 
 **Supported input formats:**
 - `.h5ad` files (AnnData format from scanpy/Python workflows)

@@ -1,6 +1,6 @@
 ---
 name: email-sequence
-description: Design and draft multi-email sequences with full copy, timing, branching logic, exit conditions, and performance benchmarks. Use when building onboarding, lead nurture, re-engagement, win-back, or product launch flows, when you need a complete drip campaign with A/B test suggestions, or when mapping a sequence end-to-end with a flow diagram.
+description: Designs and drafts multi-email sequences with full copy, timing, branching logic, exit conditions, and performance benchmarks. Use when asked to "build a drip campaign", "write an onboarding sequence", "create a nurture flow", "set up a welcome series", "draft a win-back / re-engagement email series", or "map out a product-launch email flow"; when you need a complete sequence with A/B test suggestions; or when mapping the emails, branches, and exits end-to-end with a flow diagram.
 argument-hint: "[sequence type]"
 ---
 

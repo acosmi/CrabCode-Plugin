@@ -1,6 +1,6 @@
 ---
 name: risk-assessment
-description: Identify, assess, and mitigate operational risks. Trigger with "what are the risks", "risk assessment", "risk register", "what could go wrong", or when the user is evaluating risks associated with a project, vendor, process, or decision.
+description: Identifies, assesses, and mitigates operational risks using a likelihood/impact matrix and a prioritized risk register. Use when evaluating what could go wrong with a project, vendor, process, launch, or decision, when building or updating a risk register, when scoring risks by likelihood and impact, or when the user says "what are the risks", "risk assessment", "risk register", "what could go wrong", "worst case", or "how do we mitigate this".
 ---
 
 # Risk Assessment

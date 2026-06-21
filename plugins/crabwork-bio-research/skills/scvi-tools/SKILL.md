@@ -1,6 +1,6 @@
 ---
 name: scvi-tools
-description: Deep learning for single-cell analysis using scvi-tools. This skill should be used when users need (1) data integration and batch correction with scVI/scANVI, (2) ATAC-seq analysis with PeakVI, (3) CITE-seq multi-modal analysis with totalVI, (4) multiome RNA+ATAC analysis with MultiVI, (5) spatial transcriptomics deconvolution with DestVI, (6) label transfer and reference mapping with scANVI/scArches, (7) RNA velocity with veloVI, or (8) any deep learning-based single-cell method. Triggers include mentions of scVI, scANVI, totalVI, PeakVI, MultiVI, DestVI, veloVI, sysVI, scArches, variational autoencoder, VAE, batch correction, data integration, multi-modal, CITE-seq, multiome, reference mapping, latent space.
+description: Runs deep-learning single-cell analysis with scvi-tools. Use for (1) data integration and batch correction with scVI/scANVI, (2) ATAC-seq analysis with PeakVI, (3) CITE-seq multi-modal analysis with totalVI, (4) multiome RNA+ATAC analysis with MultiVI, (5) spatial transcriptomics deconvolution with DestVI, (6) label transfer and reference mapping with scANVI/scArches, (7) RNA velocity with veloVI, (8) cross-technology batch correction with sysVI, or any deep-learning-based single-cell method. Triggers on scVI, scANVI, totalVI, PeakVI, MultiVI, DestVI, veloVI, sysVI, scArches, variational autoencoder/VAE, batch correction, data integration, multi-modal, CITE-seq, multiome, reference mapping, query-to-reference mapping, latent space, or "integrate my scRNA-seq / h5ad datasets with deep learning".
 ---
 
 # scvi-tools Deep Learning Skill
@@ -14,15 +14,6 @@ This skill provides guidance for deep learning-based single-cell analysis using 
 3. Use scripts in `scripts/` to avoid rewriting common code
 4. For installation or GPU issues, consult `references/environment_setup.md`
 5. For debugging, consult `references/troubleshooting.md`
-
-## When to Use This Skill
-
-- When scvi-tools, scVI, scANVI, or related models are mentioned
-- When deep learning-based batch correction or integration is needed
-- When working with multi-modal data (CITE-seq, multiome)
-- When reference mapping or label transfer is required
-- When analyzing ATAC-seq or spatial transcriptomics data
-- When learning latent representations of single-cell data
 
 ## Model Selection Guide
 

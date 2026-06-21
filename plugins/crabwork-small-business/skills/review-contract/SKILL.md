@@ -1,6 +1,6 @@
 ---
 name: review-contract
-description: Reviews a contract in plain English, surfaces red flags with severity ratings, and produces a marked-up docx/PDF with suggested redlines. Accepts optional file path or DocuSign envelope ID.
+description: Reviews a contract in plain English, surfaces red flags with severity ratings, and produces a marked-up docx/PDF with suggested redlines. Trigger when the owner runs /review-contract or says "review this contract," "what am I signing," "should I sign this," "check this NDA/MSA/agreement," "any red flags in this," "look at these terms," or uploads/forwards a contract or legal document. Accepts optional file path or DocuSign envelope ID.
 allowed-tools: Read, WebFetch, Bash
 ---
 

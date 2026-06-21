@@ -1,6 +1,6 @@
 ---
 name: source-management
-description: Manages connected MCP sources for enterprise search. Detects available sources, guides users to connect new ones, handles source priority ordering, and manages rate limiting awareness.
+description: Manages which work sources are connected for enterprise search and how they are queried. Use to detect available MCP sources from the tool list, guide a user to connect a missing tool ("I don't have chat connected", "how do I add email"), order sources by query type, report source health and coverage in results, and handle rate limits or unavailable sources gracefully. Pull in when no or few sources are connected, when a user asks about adding or connecting a source, or when a source errors or is throttled mid-search.
 user-invocable: false
 ---
 

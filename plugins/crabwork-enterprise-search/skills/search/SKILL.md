@@ -1,6 +1,6 @@
 ---
 name: search
-description: Search across all connected sources in one query. Trigger with "find that doc about...", "what did we decide on...", "where was the conversation about...", or when looking for a decision, document, or discussion that could live in chat, email, cloud storage, or a project tracker.
+description: Searches across all connected work sources at once (chat, email, cloud storage, project tracker, CRM, wiki) and synthesizes one answer. Trigger with "find that doc about...", "what did we decide on...", "where was the conversation about...", "who said...", "did anyone mention...", "search for...", "look up...", "is there an email/message/file about...", or any question where the answer could live in more than one tool and you don't know which. Also fires for cross-tool lookups by person, project, or date ("everything from Sarah on Aurora", "messages about the launch last week").
 argument-hint: "<query>"
 ---
 

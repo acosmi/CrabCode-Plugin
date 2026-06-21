@@ -1,6 +1,6 @@
 ---
 name: tax-prep
-description: Prepares tax-season materials — quarterly estimated tax calculation or year-end 1099 prep — and produces an accountant handoff packet. Accepts optional mode and year arguments.
+description: Prepares tax-season materials — quarterly estimated tax calculation or year-end 1099 prep — and produces an accountant handoff packet (framed as deliverables, not tax advice). Trigger when the owner runs /tax-prep or mentions "estimated taxes," "quarterly taxes," "how much to set aside for taxes," "1099s," "1099-NEC," "contractor payments," "W-9s," "year-end tax prep," or "my accountant needs..." Accepts optional mode and year arguments.
 allowed-tools: Read, WebFetch, Bash
 ---
 

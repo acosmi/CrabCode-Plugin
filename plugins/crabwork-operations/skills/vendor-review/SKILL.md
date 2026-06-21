@@ -1,6 +1,6 @@
 ---
 name: vendor-review
-description: Evaluate a vendor — cost analysis, risk assessment, and recommendation. Use when reviewing a new vendor proposal, deciding whether to renew or replace a contract, comparing two vendors side-by-side, or building a TCO breakdown and negotiation points before procurement sign-off.
+description: Evaluates a vendor or supplier — total cost of ownership, risk assessment, performance, fit, and a clear recommendation. Use when reviewing a new vendor proposal or RFP response, deciding whether to renew, replace, or churn a contract, comparing two or more vendors side-by-side, building a TCO breakdown or negotiation points before procurement sign-off, or when the user says "should we renew this", "evaluate this vendor", "compare these suppliers", "is this contract worth it", or "review this proposal".
 argument-hint: "<vendor name or proposal>"
 ---
 

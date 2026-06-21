@@ -1,6 +1,6 @@
 ---
 name: ux-copy
-description: Write or review UX copy — microcopy, error messages, empty states, CTAs. Trigger with "write copy for", "what should this button say?", "review this error message", or when naming a CTA, wording a confirmation dialog, filling an empty state, or writing onboarding text.
+description: Writes or reviews UX copy — microcopy, error messages, empty states, CTAs, tooltips, confirmation dialogs, and onboarding text. Trigger with "write copy for", "what should this button say?", "review this error message", "name this CTA", "word this dialog", "fix this microcopy", or when filling an empty state, wording a confirmation, setting loading-state text, or matching tone for a screen.
 argument-hint: "<context or copy to review>"
 ---
 

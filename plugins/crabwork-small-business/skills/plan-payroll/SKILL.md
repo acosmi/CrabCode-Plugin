@@ -1,6 +1,6 @@
 ---
 name: plan-payroll
-description: Forecasts cash, ranks overdue invoices, and stages PayPal reminders so the owner can confidently run payroll. Accepts optional horizon and payroll-date arguments.
+description: Forecasts cash, ranks overdue invoices, and stages PayPal reminders so the owner can confidently run payroll. Trigger when the owner runs /plan-payroll or says "can I make payroll," "do I have enough to pay my team," "cash is tight before payroll," "plan for payroll," "will payroll clear," or worries about covering wages. Accepts optional horizon and payroll-date arguments.
 allowed-tools: Read, WebFetch, Bash
 ---
 

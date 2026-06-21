@@ -1,6 +1,6 @@
 ---
 name: content-creation
-description: Draft marketing content across channels — blog posts, social media, email newsletters, landing pages, press releases, and case studies. Use when writing any marketing content, when you need channel-specific formatting, SEO-optimized copy, headline options, or calls to action.
+description: Reference frameworks for marketing content — per-channel structure templates (blog, social, email, landing page, press release, case study), writing best practices by channel, SEO fundamentals, and headline, hook, and CTA formulas. Consult when drafting or reviewing any marketing copy and you need the structural template, on-page SEO checklist, or a headline/hook/CTA pattern to apply.
 user-invocable: false
 ---
 

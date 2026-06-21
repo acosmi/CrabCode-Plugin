@@ -4,8 +4,11 @@ description: >
   Analyzes sales data from PayPal and QuickBooks to find top performers and
   slow movers, layers in seasonality, and produces a prioritized 30-day
   content brief: what to push, what offers to run, what to hold. Strategic
-  output only — no calendars or assets. Use when the user asks what to post,
-  wants a content plan, asks what's selling, or what to promote this month.
+  output only — no calendars, no assets, no sends. Use when the user asks "what
+  should I post," "what should I promote this month," "what's selling," "build
+  me a content plan," "what offers should I run," or wants a data-backed
+  marketing plan. (To turn an approved brief into actual posts and assets, that
+  is canva-creator / run-campaign.)
 ---
 
 # Content Strategy

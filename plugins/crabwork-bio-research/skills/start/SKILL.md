@@ -1,6 +1,6 @@
 ---
 name: start
-description: Set up your bio-research environment and explore available tools. Use when first getting oriented with the plugin, checking which literature, drug-discovery, or visualization MCP servers are connected, or surveying available analysis skills before starting a new project.
+description: Orients a biological researcher to the bio-research plugin—checks which literature, drug-discovery, data-repository, and visualization MCP servers are connected, and surveys the available analysis skills. Use when getting started or onboarding, when the user asks "what can this plugin do", "what tools/MCP servers are available", "how do I begin", "help me get set up", "what skills are here", or when they describe a research goal but are unsure where to start.
 ---
 
 # Bio-Research Start

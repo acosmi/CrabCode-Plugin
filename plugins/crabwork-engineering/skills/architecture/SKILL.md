@@ -1,6 +1,6 @@
 ---
 name: architecture
-description: Create or evaluate an architecture decision record (ADR). Use when choosing between technologies (e.g., Kafka vs SQS), documenting a design decision with trade-offs and consequences, reviewing a system design proposal, or designing a new component from requirements and constraints.
+description: Create or evaluate an architecture decision record (ADR). Use when choosing between technologies (e.g., Kafka vs SQS, Postgres vs Mongo, REST vs gRPC), doing a build-vs-buy or tech-selection call, documenting a design decision with trade-offs and consequences, capturing "why did we pick X", reviewing a system design proposal, or designing a new component from requirements and constraints. Triggers include "should we use X or Y", "write an ADR", "document this decision", "evaluate this architecture".
 argument-hint: "<decision or system to design>"
 ---
 

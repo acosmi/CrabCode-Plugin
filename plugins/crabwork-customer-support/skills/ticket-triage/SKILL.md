@@ -1,6 +1,6 @@
 ---
 name: ticket-triage
-description: Triage and prioritize a support ticket or customer issue. Use when a new ticket comes in and needs categorization, assigning P1-P4 priority, deciding which team should handle it, or checking whether it's a duplicate or known issue before routing.
+description: Triages an incoming support ticket or customer issue — categorizes it, assigns a P1-P4 priority, recommends routing, checks for duplicates and known issues, and drafts a suggested first response. Use when a new ticket comes in and needs categorization, you need to set its priority, decide which team or queue should handle it, or confirm whether it duplicates a known issue before routing. Trigger with "triage this ticket", "what priority is this", "who should this go to", "is this a P1", "route this", "categorize this issue", or pasting a raw customer message that needs assessment.
 argument-hint: "<ticket or issue description>"
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: pipeline-review
-description: Analyze pipeline health — prioritize deals, flag risks, get a weekly action plan. Use when running a weekly pipeline review, deciding which deals to focus on this week, spotting stale or stuck opportunities, auditing for hygiene issues like bad close dates, or identifying single-threaded deals.
+description: Analyzes pipeline health — prioritizes deals, flags risks, and produces a weekly action plan. Use when running a weekly pipeline review, deciding which deals to focus on this week, spotting stale or stuck opportunities, auditing for hygiene issues like bad close dates or missing next steps, or identifying single-threaded deals. Trigger with "review my pipeline", "what should I work on this week", "which deals are at risk", "clean up my pipeline", or when you paste a deal list and ask where to focus.
 argument-hint: "<segment or rep>"
 ---
 

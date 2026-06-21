@@ -1,8 +1,11 @@
 ---
 name: create-crabcode-plugin
 description: >
-  Guide users through creating a new plugin from scratch.
-  Use when users want to create a plugin, build a plugin, make a new plugin, develop a plugin, scaffold a plugin, start a plugin from scratch, or design a plugin.
+  Guides the user through creating a brand-new CrabCode plugin from scratch via conversation — discovery,
+  component planning, design, implementation, and packaging into an installable .plugin file.
+  Use when the user wants to create, build, make, develop, scaffold, design, or start a new plugin,
+  "turn this workflow into a plugin", "I want my own plugin", or needs to author plugin components
+  (skills, agents, hooks, MCP servers) or a plugin.json manifest from nothing.
 ---
 
 # Create CrabCode Plugin

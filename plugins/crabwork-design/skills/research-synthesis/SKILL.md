@@ -1,6 +1,6 @@
 ---
 name: research-synthesis
-description: Synthesize user research into themes, insights, and recommendations. Use when you have interview transcripts, survey results, usability test notes, support tickets, or NPS responses that need to be distilled into patterns, user segments, and prioritized next steps.
+description: Synthesizes raw user research into themes, insights, and prioritized recommendations. Trigger with "synthesize this research", "find themes in these interviews", "what are the takeaways from this survey?", "analyze these usability notes", "make sense of this feedback", or when you have interview transcripts, survey results, usability test notes, support tickets, app store reviews, or NPS/CSAT responses that need distilling into patterns, user segments, and next steps.
 argument-hint: "<research data, transcripts, or survey results>"
 ---
 

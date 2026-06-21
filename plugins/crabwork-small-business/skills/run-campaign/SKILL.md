@@ -1,6 +1,6 @@
 ---
 name: run-campaign
-description: Runs an end-to-end marketing campaign — sales analysis, content brief, Canva assets, HubSpot send. Accepts optional lookback and channel arguments.
+description: Runs an end-to-end marketing campaign — sales analysis, content brief, Canva assets, HubSpot send. Trigger when the owner runs /run-campaign or says "run a campaign," "I need more customers," "sales are down, help me promote," "launch a promotion," "do a full marketing push," or wants soup-to-nuts campaign execution from analysis through scheduled posts. Accepts optional lookback and channel arguments.
 allowed-tools: Read, WebFetch, Bash
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: customer-pulse-check
-description: Synthesizes themes from PayPal disputes, HubSpot tickets, and review exports into a top-3 fixable issues list with drafted response templates. Accepts optional since-date argument.
+description: Synthesizes themes from PayPal disputes, HubSpot tickets, and review exports into a top-3 fixable issues list with drafted response templates. Trigger when the owner runs /customer-pulse-check or asks "what are customers saying," "any complaints lately," "review my feedback," "what are people unhappy about," "summarize my reviews," or wants recurring customer issues surfaced. Accepts optional since-date argument.
 allowed-tools: Read, WebFetch, Bash
 ---
 

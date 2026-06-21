@@ -1,6 +1,6 @@
 ---
 name: monday-brief
-description: Generates a one-page Monday morning briefing — cash, sales, pipeline, week ahead, top three to-dos. Accepts optional post destination and save-to arguments.
+description: Generates a one-page Monday morning briefing across every live connector — cash, sales, pipeline, week ahead, top three to-dos. Trigger when the owner runs /monday-brief or says "what's on my plate this week," "Monday brief," "start-of-week summary," "catch me up to start the week," "what should I focus on this week," or wants a beginning-of-week overview. Accepts optional post destination and save-to arguments.
 allowed-tools: Read, WebFetch, Bash
 ---
 

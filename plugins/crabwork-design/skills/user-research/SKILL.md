@@ -1,6 +1,6 @@
 ---
 name: user-research
-description: Plan, conduct, and synthesize user research. Trigger with "user research plan", "interview guide", "usability test", "survey design", "research questions", or when the user needs help with any aspect of understanding their users through research.
+description: Plans and structures user research studies — choosing methods, writing interview guides, designing surveys and usability tests, and framing analysis. Trigger with "user research plan", "write an interview guide", "design a survey", "plan a usability test", "what research method should I use?", "research questions", "card sort", "how many participants do I need?", or when figuring out how to understand users through research. For analyzing data you already collected, see the research-synthesis skill.
 ---
 
 # User Research
@@ -39,3 +39,5 @@ Help plan, execute, and synthesize user research studies.
 - Interview guide (questions, probes, activities)
 - Synthesis report (themes, insights, recommendations)
 - Highlight reel (key quotes and observations)
+
+Once data is collected, the **research-synthesis** skill turns transcripts, survey results, and notes into themes, segments, and prioritized recommendations.

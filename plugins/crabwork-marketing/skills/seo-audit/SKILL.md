@@ -1,6 +1,6 @@
 ---
 name: seo-audit
-description: Run a comprehensive SEO audit — keyword research, on-page analysis, content gaps, technical checks, and competitor comparison. Use when assessing a site's SEO health, when finding keyword opportunities and content gaps competitors own, or when you need a prioritized action plan split into quick wins and strategic investments.
+description: Runs a comprehensive SEO audit — keyword research, on-page analysis, content gaps, technical checks, and competitor comparison. Use when asked to "audit our SEO", "do keyword research", "why aren't we ranking?", "check our site's SEO", "find content gaps", "run a technical SEO check", or "how do we compare to [competitor] on search"; when assessing a site's SEO health; or when you need a prioritized action plan split into quick wins and strategic investments.
 argument-hint: "<url or topic> [audit type]"
 ---
 

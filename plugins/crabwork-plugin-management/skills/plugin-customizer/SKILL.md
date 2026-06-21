@@ -1,9 +1,12 @@
 ---
 name: plugin-customizer
 description: >
-  Customize a CrabCode plugin for a specific organization's tools and workflows.
-  Use when: customize plugin, set up plugin, configure plugin, tailor plugin, adjust plugin settings,
-  customize plugin connectors, customize plugin skill, tweak plugin, modify plugin configuration.
+  Tailors an existing CrabCode plugin to a specific organization's tools, workflows, and conventions,
+  then packages it as an installable .plugin file. Use when the user wants to customize, set up, configure,
+  tailor, adapt, personalize, tweak, or modify a plugin — including first-time setup of a generic plugin
+  template, filling in placeholders, "make this plugin work for my team / for us / for Asana / for Slack",
+  "set up the plugin for our org", updating a plugin's connectors, skill, ticket tool, channel, or URLs,
+  connecting MCPs for the tools a plugin references, or repackaging a plugin after edits.
 ---
 
 # Plugin Customization

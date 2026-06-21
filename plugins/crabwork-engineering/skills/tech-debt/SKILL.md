@@ -1,6 +1,6 @@
 ---
 name: tech-debt
-description: Identify, categorize, and prioritize technical debt. Trigger with "tech debt", "technical debt audit", "what should we refactor", "code health", or when the user asks about code quality, refactoring priorities, or maintenance backlog.
+description: Identify, categorize, and prioritize technical debt. Trigger with "tech debt", "technical debt audit", "what should we refactor", "where should we clean up", "this codebase needs modernizing", "deal with our legacy code", "code health", or when the user asks about code quality, refactoring priorities, or a maintenance/cleanup backlog.
 ---
 
 # Tech Debt Management

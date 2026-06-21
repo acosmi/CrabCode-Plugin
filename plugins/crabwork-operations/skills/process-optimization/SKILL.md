@@ -1,6 +1,6 @@
 ---
 name: process-optimization
-description: Analyze and improve business processes. Trigger with "this process is slow", "how can we improve", "streamline this workflow", "too many steps", "bottleneck", or when the user describes an inefficient process they want to fix.
+description: Analyzes and improves business processes — maps current state, finds waste and bottlenecks, and designs a leaner future state with estimated impact. Use when a workflow feels slow, manual, or error-prone, when there are too many steps, handoffs, or approvals, when work keeps getting stuck or redone, or when the user says "this process is slow", "how can we improve this", "streamline this workflow", "cut the steps", "reduce handoffs", "automate this", or "where's the bottleneck".
 ---
 
 # Process Optimization

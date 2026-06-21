@@ -1,6 +1,6 @@
 ---
 name: crm-cleanup
-description: Scans HubSpot for stale deals, duplicate contacts, and missing fields, then fixes what the owner approves. Accepts optional scope argument for deals, contacts, or all.
+description: Scans HubSpot for stale deals, duplicate contacts, and missing fields, then fixes what the owner approves. Trigger when the owner runs /crm-cleanup or says "clean up the CRM," "HubSpot is a mess," "dedupe my contacts," "fix stale deals," "tidy up my pipeline," or wants their CRM data cleaned. Accepts optional scope argument for deals, contacts, or all.
 allowed-tools: Read, WebFetch, Bash
 ---
 

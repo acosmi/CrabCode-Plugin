@@ -1,6 +1,6 @@
 ---
 name: sql-queries
-description: Write correct, performant SQL across all major data warehouse dialects (Snowflake, BigQuery, Databricks, PostgreSQL, etc.). Use when writing queries, optimizing slow SQL, translating between dialects, or building complex analytical queries with CTEs, window functions, or aggregations.
+description: Reference for correct, performant SQL across major warehouse dialects (Snowflake, BigQuery, Databricks, PostgreSQL, Redshift, and more). Use for dialect-specific date/string/JSON syntax and performance tips, for window-function and CTE patterns, for cohort-retention, funnel, and deduplication templates, and for debugging failed queries. Load whenever writing, optimizing, or translating analytical SQL.
 user-invocable: false
 ---
 

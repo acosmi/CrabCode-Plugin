@@ -1,6 +1,6 @@
 ---
 name: interview-prep
-description: Create structured interview plans with competency-based questions and scorecards. Trigger with "interview plan for", "interview questions for", "how should we interview", "scorecard for", or when the user is preparing to interview candidates.
+description: Create structured interview plans with competency-based questions, scoring rubrics, panel assignments, and debrief templates. Trigger with "interview plan for", "interview questions for", "how should we interview", "scorecard for", "interview rubric", "behavioral questions for a [role]", "who should be on the panel", or when the user is preparing to interview candidates or wants to make interviews more consistent and less biased.
 ---
 
 # Interview Prep

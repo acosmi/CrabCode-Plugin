@@ -1,6 +1,6 @@
 ---
 name: sales-brief
-description: Surfaces top and bottom sellers, identifies seasonality patterns, and produces a 2-week content brief to push winners and clear slow movers. Accepts optional lookback window of 30, 60, or 90 days.
+description: Surfaces top and bottom sellers, identifies seasonality patterns, and produces a 2-week content brief to push winners and clear slow movers. Trigger when the owner runs /sales-brief or asks "what's selling," "what should I promote," "what's my best seller," "what's not moving," "what to post about," or wants a data-backed plan for what to push next. Accepts optional lookback window of 30, 60, or 90 days.
 allowed-tools: Read, WebFetch, Bash
 ---
 

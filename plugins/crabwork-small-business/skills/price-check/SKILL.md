@@ -1,6 +1,6 @@
 ---
 name: price-check
-description: Produces a margin-by-product table and three pricing-scenario data views so the owner can see the full financial picture before making a pricing decision. Accepts optional product name argument.
+description: Produces a margin-by-product table and three pricing-scenario data views so the owner can see the full financial picture before making a pricing decision. Trigger when the owner runs /price-check or asks "should I raise prices," "what are my margins," "what should I charge," "am I making enough on this," "is this priced right," or "my costs are going up." Accepts optional product name argument.
 allowed-tools: Read, WebFetch, Bash
 ---
 

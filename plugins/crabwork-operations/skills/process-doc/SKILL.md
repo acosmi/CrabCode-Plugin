@@ -1,6 +1,6 @@
 ---
 name: process-doc
-description: Document a business process — flowcharts, RACI, and SOPs. Use when formalizing a process that lives in someone's head, building a RACI to clarify who owns what, writing an SOP for a handoff or audit, or capturing the exceptions and edge cases of how work actually gets done.
+description: Documents a business process as a complete SOP — purpose, scope, RACI matrix, process flow, detailed steps, and edge cases. Use when formalizing a process that lives in someone's head, building a RACI to clarify who owns what, writing an SOP or process doc for a handoff, onboarding, or audit, capturing the exceptions and edge cases of how work actually gets done, or when the user says "document this process", "write an SOP", "who's responsible for what", or "we need this written down". For step-by-step operational procedures with commands and troubleshooting, use the runbook skill instead.
 argument-hint: "<process name or description>"
 ---
 

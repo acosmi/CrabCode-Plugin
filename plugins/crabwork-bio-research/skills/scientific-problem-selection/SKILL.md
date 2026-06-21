@@ -1,6 +1,6 @@
 ---
 name: scientific-problem-selection
-description: This skill should be used when scientists need help with research problem selection, project ideation, troubleshooting stuck projects, or strategic scientific decisions. Use this skill when users ask to pitch a new research idea, work through a project problem, evaluate project risks, plan research strategy, navigate decision trees, or get help choosing what scientific problem to work on. Typical requests include "I have an idea for a project", "I'm stuck on my research", "help me evaluate this project", "what should I work on", or "I need strategic advice about my research".
+description: Guides scientists through research problem selection, project ideation, troubleshooting stuck projects, and strategic scientific decisions, using a conversational framework from Fischbach & Walsh (Cell, 2024). Use when a researcher wants to pitch a new project idea, work through a problem in a current project, assess project risks, define success metrics, plan research strategy, navigate decision trees, or decide what to work on. Triggers on "I have an idea for a project", "I'm stuck on my research", "help me evaluate this project", "what should I work on", "is this worth pursuing", "how do I choose a thesis/PhD project", "should I pivot", "I need strategic advice about my research", or requests for go/no-go analysis, risk assessment, or impact assessment of a scientific direction.
 ---
 
 # Scientific Problem Selection Skills

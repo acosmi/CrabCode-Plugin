@@ -1,6 +1,6 @@
 ---
 name: write-query
-description: Write optimized SQL for your dialect with best practices. Use when translating a natural-language data need into SQL, building a multi-CTE query with joins and aggregations, optimizing a query against a large partitioned table, or getting dialect-specific syntax for Snowflake, BigQuery, Postgres, etc.
+description: Write an optimized SQL query from a natural-language description, tuned to the user's dialect. Use when the user says "write a query", "give me the SQL for", "how do I query", "I need a query that", or describes data to pull (counts, joins, aggregations, cohort retention, funnels, top-N). Triggers on building multi-CTE queries with window functions, optimizing slow SQL on large partitioned tables, and getting dialect-specific syntax for Snowflake, BigQuery, Postgres, Redshift, Databricks, MySQL, SQL Server, DuckDB, or SQLite.
 argument-hint: "<description of what data you need>"
 ---
 

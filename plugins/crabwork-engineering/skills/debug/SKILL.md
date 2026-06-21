@@ -1,6 +1,6 @@
 ---
 name: debug
-description: Structured debugging session — reproduce, isolate, diagnose, and fix. Trigger with an error message or stack trace, "this works in staging but not prod", "something broke after the deploy", or when behavior diverges from expected and the cause isn't obvious.
+description: Structured debugging session — reproduce, isolate, diagnose, and fix. Trigger with an error message or stack trace, "why is this failing?", "this works in staging but not prod", "something broke after the deploy", "help me track down this bug", "this test is flaky", or when behavior diverges from expected and the root cause isn't obvious.
 argument-hint: "<error message or problem description>"
 ---
 

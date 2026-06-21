@@ -1,6 +1,6 @@
 ---
 name: knowledge-synthesis
-description: Combines search results from multiple sources into coherent, deduplicated answers with source attribution. Handles confidence scoring based on freshness and authority, and summarizes large result sets effectively.
+description: Combines raw search results from multiple work sources into one coherent, deduplicated answer with inline source attribution. Use after gathering results from chat, email, cloud storage, or a project tracker and before replying — to merge duplicates across sources, score confidence by freshness and authority, surface conflicts between sources, and right-size the summary to the result count. Pull in whenever a search or digest returns hits from more than one source.
 user-invocable: false
 ---
 

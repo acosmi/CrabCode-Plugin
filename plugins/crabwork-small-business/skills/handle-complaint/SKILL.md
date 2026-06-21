@@ -1,6 +1,6 @@
 ---
 name: handle-complaint
-description: Handles an incoming customer complaint end-to-end — pulls context, drafts a response, and suggests an operational fix. Accepts optional email or ticket ID argument.
+description: Handles an incoming customer complaint end-to-end — pulls order and account context, drafts a tone-matched response, and suggests an operational fix so it doesn't recur. Trigger when the owner runs /handle-complaint or says "a customer is upset," "handle this complaint," "angry customer email," "deal with this complaint," "respond to this unhappy customer," or forwards a negative message. Accepts optional email or ticket ID argument.
 allowed-tools: Read, WebFetch, Bash
 ---
 

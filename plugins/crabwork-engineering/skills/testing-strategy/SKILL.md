@@ -1,6 +1,6 @@
 ---
 name: testing-strategy
-description: Design test strategies and test plans. Trigger with "how should we test", "test strategy for", "write tests for", "test plan", "what tests do we need", or when the user needs help with testing approaches, coverage, or test architecture.
+description: Design test strategies and test plans. Trigger with "how should we test", "test strategy for", "what tests do we need", "test plan", "where are our coverage gaps", "unit vs integration vs e2e", "how do I do TDD here", or when the user needs help with testing approaches, coverage targets, the testing pyramid, or test architecture. (For writing actual test code for a specific file, this gives the plan; pair it with hands-on implementation.)
 ---
 
 # Testing Strategy

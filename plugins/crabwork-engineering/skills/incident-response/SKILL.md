@@ -1,6 +1,6 @@
 ---
 name: incident-response
-description: Run an incident response workflow — triage, communicate, and write postmortem. Trigger with "we have an incident", "production is down", an alert that needs severity assessment, a status update mid-incident, or when writing a blameless postmortem after resolution.
+description: Run an incident response workflow — triage, communicate, and write postmortem. Trigger with "we have an incident", "production is down", "we have an outage", "the site is broken for users", an alert or page that needs severity (SEV) assessment, an on-call situation, a status update mid-incident, or when writing a blameless postmortem / RCA after resolution.
 argument-hint: "<incident description or alert>"
 ---
 

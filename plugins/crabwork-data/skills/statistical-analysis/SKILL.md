@@ -1,6 +1,6 @@
 ---
 name: statistical-analysis
-description: Apply statistical methods including descriptive stats, trend analysis, outlier detection, and hypothesis testing. Use when analyzing distributions, testing for significance, detecting anomalies, computing correlations, or interpreting statistical results.
+description: Reference for sound statistical methods -- descriptive stats and percentiles, trend analysis and forecasting, outlier and anomaly detection, hypothesis testing (t-test, A/B, ANOVA, chi-squared), and common traps. Use when summarizing a distribution, deciding mean vs median, judging whether a difference is significant or just noise, detecting anomalies, computing or interpreting correlations, or guarding against Simpson's paradox, survivorship bias, and correlation-as-causation. Load whenever an analysis makes a statistical claim.
 user-invocable: false
 ---
 

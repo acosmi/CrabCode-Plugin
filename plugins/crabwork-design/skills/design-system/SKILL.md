@@ -1,6 +1,6 @@
 ---
 name: design-system
-description: Audit, document, or extend your design system. Use when checking for naming inconsistencies or hardcoded values across components, writing documentation for a component's variants, states, and accessibility notes, or designing a new pattern that fits the existing system.
+description: Audits, documents, or extends a design system. Trigger with "audit our design system", "document this component", "design a new component", "check for hardcoded values", "are our tokens consistent?", or when checking for naming inconsistencies or hardcoded values across components, writing documentation for a component's variants, states, props, and accessibility notes, or designing a new pattern that fits the existing system.
 argument-hint: "[audit | document | extend] <component or system>"
 ---
 

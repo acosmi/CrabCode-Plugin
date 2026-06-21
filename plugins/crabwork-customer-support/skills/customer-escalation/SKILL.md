@@ -1,6 +1,6 @@
 ---
 name: customer-escalation
-description: Package an escalation for engineering, product, or leadership with full context. Use when a bug needs engineering attention beyond normal support, multiple customers report the same issue, a customer is threatening to churn, or an issue has sat unresolved past its SLA.
+description: Packages a support issue into a structured escalation brief for engineering, product, security, or leadership, with impact assessment, reproduction steps, and the right escalation target. Use when a bug needs engineering attention beyond frontline support, multiple customers report the same issue, a customer is threatening to churn or downgrade, an issue has sat unresolved past its SLA, or a security or data concern needs urgent routing. Trigger with "escalate this to engineering", "this needs to go to product", "package this for leadership", "who should own this bug", "write up an escalation", or "this is past SLA".
 argument-hint: "<issue summary> [customer name]"
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Review code changes for security, performance, and correctness. Trigger with a PR URL or diff, "review this before I merge", "is this code safe?", or when checking a change for N+1 queries, injection risks, missing edge cases, or error handling gaps.
+description: Review code changes for security, performance, and correctness. Trigger with a PR URL or diff, "review this before I merge", "look over my changes", "any issues with this code?", "give me PR feedback", "is this code safe?", or when checking a change for N+1 queries, injection risks (SQLi/XSS/SSRF), race conditions, missing edge cases, or error handling gaps.
 argument-hint: "<PR URL, diff, or file path>"
 ---
 

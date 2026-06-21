@@ -1,6 +1,6 @@
 ---
 name: roadmap-update
-description: Update, create, or reprioritize your product roadmap. Use when adding a new initiative and deciding what moves to make room, shifting priorities after new information comes in, moving timelines due to a dependency slip, or building a Now/Next/Later view from scratch.
+description: Updates, creates, or reprioritizes a product roadmap. Use when adding a new initiative and deciding what moves to make room, reprioritizing with RICE/ICE/MoSCoW or a value-vs-effort matrix, shifting priorities after new information, moving timelines due to a dependency slip, mapping dependencies, or building a Now/Next/Later or quarterly roadmap from scratch. Triggers on "update the roadmap", "where does this fit on the roadmap?", "reprioritize", "what comes off if we add X?", or "build a Now/Next/Later".
 argument-hint: "<update description>"
 ---
 

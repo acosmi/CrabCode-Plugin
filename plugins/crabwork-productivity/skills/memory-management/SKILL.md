@@ -1,6 +1,6 @@
 ---
 name: memory-management
-description: Two-tier memory system that makes CrabCode a true workplace collaborator. Decodes shorthand, acronyms, nicknames, and internal language so CrabCode understands requests like a colleague would. CRABCODE.md for working memory, memory/ directory for the full knowledge base.
+description: Two-tier workplace memory that decodes the shorthand, acronyms, nicknames, and project codenames in a user's requests so they are understood like a colleague would. Use whenever a request contains an unfamiliar name, initialism, or codename to look up (e.g. "ask todd about the PSR for phoenix"); when the user says "remember this", "X means Y", "who is X", or "what does X stand for"; when capturing a person's role, a project's details, or a preference for later; or when promoting frequently-used terms into working memory and demoting stale ones. Working memory lives in CRABCODE.md (the hot cache), full knowledge base in the memory/ directory.
 user-invocable: false
 ---
 

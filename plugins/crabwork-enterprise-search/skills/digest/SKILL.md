@@ -1,6 +1,6 @@
 ---
 name: digest
-description: Generate a daily or weekly digest of activity across all connected sources. Use when catching up after time away, starting the day and wanting a summary of mentions and action items, or reviewing a week's decisions and document updates grouped by project.
+description: Generates a daily or weekly digest of activity across all connected work sources (chat, email, cloud storage, project tracker, CRM, wiki), grouped by project with action items first. Trigger with "what did I miss", "catch me up", "what happened this week", "give me a summary of today", "what's on my plate", "any action items", "what came in while I was out", or when starting the day or returning from time off and wanting mentions, decisions, and document updates rolled up. Accepts --daily, --weekly, or --since <date>.
 argument-hint: "[--daily | --weekly | --since <date>]"
 ---
 

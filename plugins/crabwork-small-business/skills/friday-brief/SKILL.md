@@ -1,6 +1,6 @@
 ---
 name: friday-brief
-description: Delivers the Friday end-of-week pulse — revenue vs prior week, top sellers, wins and watches. Accepts optional lookback window of 7 or 14 days.
+description: Delivers the Friday end-of-week pulse from PayPal and HubSpot — revenue vs prior week, top sellers, wins and watches. Trigger when the owner runs /friday-brief or says "how did we do this week," "end-of-week recap," "Friday recap," "wrap up the week," "wins and watches," or wants a week-in-review summary. Accepts optional lookback window of 7 or 14 days.
 allowed-tools: Read, WebFetch, Bash
 ---
 

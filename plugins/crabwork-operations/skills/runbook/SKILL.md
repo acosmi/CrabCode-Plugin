@@ -1,6 +1,6 @@
 ---
 name: runbook
-description: Create or update an operational runbook for a recurring task or procedure. Use when documenting a task that on-call or ops needs to run repeatably, turning tribal knowledge into exact step-by-step commands, adding troubleshooting and rollback steps to an existing procedure, or writing escalation paths for when things go wrong.
+description: Creates or updates an operational runbook for a recurring task or procedure — prerequisites, exact step-by-step commands, verification, troubleshooting, rollback, and escalation. Use when documenting a task that on-call or ops needs to run repeatably, turning tribal knowledge into exact commands, adding troubleshooting or rollback steps to an existing procedure, writing escalation paths for when things go wrong, or when the user says "write a runbook", "document the on-call steps", "how do we run this", or "what do we do when this breaks". For higher-level process docs with RACI and flowcharts rather than commands, use the process-doc skill instead.
 argument-hint: "<process or task name>"
 ---
 

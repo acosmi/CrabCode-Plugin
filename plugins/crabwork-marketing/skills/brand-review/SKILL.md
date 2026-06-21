@@ -1,6 +1,6 @@
 ---
 name: brand-review
-description: Review content against your brand voice, style guide, and messaging pillars, flagging deviations by severity with specific before/after fixes. Use when checking a draft before it ships, when auditing copy for voice consistency and terminology, or when screening for unsubstantiated claims, missing disclaimers, and other legal flags.
+description: Reviews content against your brand voice, style guide, and messaging pillars, flagging deviations by severity with specific before/after fixes. Use when asked to "review this draft", "check this against our brand", "is this on-brand?", "proofread this copy", or "does this match our voice?"; before a draft ships; when auditing copy for voice consistency, terminology, or capitalization of product names; or when screening for unsubstantiated superlatives, missing disclaimers, risky comparative claims, and other legal or compliance flags.
 argument-hint: "<content to review>"
 ---
 

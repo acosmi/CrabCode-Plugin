@@ -1,6 +1,6 @@
 ---
 name: capacity-plan
-description: Plan resource capacity — workload analysis and utilization forecasting. Use when heading into quarterly planning, the team feels overallocated and you need the numbers, deciding whether to hire or deprioritize, or stress-testing whether upcoming projects fit the people you have.
+description: Plans resource capacity — workload analysis, utilization forecasting, and headcount scenarios. Use when heading into quarterly or annual planning, the team feels overallocated and you need the numbers, deciding whether to hire, contract, or deprioritize, stress-testing whether upcoming projects fit the people you have, or when the user asks "do we have the capacity for this", "are we overallocated", "how many people do we need", or wants a resource/staffing/utilization plan.
 argument-hint: "<team or project scope>"
 ---
 

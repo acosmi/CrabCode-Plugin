@@ -1,6 +1,6 @@
 ---
 name: customer-research
-description: Multi-source research on a customer question or topic with source attribution. Use when a customer asks something you need to look up, investigating whether a bug has been reported before, checking what was previously told to a specific account, or gathering background before drafting a response.
+description: Researches a customer question, product topic, or account inquiry across knowledge base, CRM, support tickets, chat, email, and web, then synthesizes findings with source attribution and confidence scoring. Use when a customer asks something you need to look up, you are checking whether a bug has been reported before or has a known workaround, finding what was previously told to a specific account, or gathering background before drafting a response. Trigger with "look this up", "has anyone reported this", "what did we tell Acme last time", "find out if we support X", "do some research on", "what's the known workaround for", or "dig into this question".
 argument-hint: "<question or topic>"
 ---
 

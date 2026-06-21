@@ -1,6 +1,6 @@
 ---
 name: update
-description: Sync tasks and refresh memory from your current activity. Use when pulling new assignments from your project tracker into TASKS.md, triaging stale or overdue tasks, filling memory gaps for unknown people or projects, or running a comprehensive scan to catch todos buried in chat and email.
+description: Sync tasks and refresh memory from current activity. Use when pulling new assignments from a project tracker (Asana, Linear, Jira) or GitHub Issues into TASKS.md, when the user says "sync my tasks", "what's new", "refresh", "catch me up", or "clean up my list"; when triaging stale or overdue tasks; when filling memory gaps for unknown people, projects, or terms found in tasks; or when running a comprehensive deep scan of chat, email, calendar, and docs to surface todos and new memories buried in activity. Invoked as /crabwork-productivity:update (add --comprehensive for the deep scan).
 argument-hint: "[--comprehensive]"
 ---
 

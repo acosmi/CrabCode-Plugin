@@ -1,6 +1,6 @@
 ---
 name: close-month
-description: Closes the month — reconciles QB vs payment processors, flags gaps, writes P&L narrative, exports close packet. Accepts optional month and save-to arguments.
+description: Closes the month — reconciles QuickBooks against payment processors (PayPal, Stripe, Square), flags gaps and uncategorized transactions, writes a plain-English P&L narrative, and exports an xlsx + PDF close packet. Trigger when the owner runs /close-month or says "close the month," "close the books," "month-end close," "reconcile last month," "do the monthly close," or hands the books off to their accountant. Accepts optional month and save-to arguments.
 allowed-tools: Read, WebFetch, Bash
 ---
 

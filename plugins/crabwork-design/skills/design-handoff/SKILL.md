@@ -1,6 +1,6 @@
 ---
 name: design-handoff
-description: Generate developer handoff specs from a design. Use when a design is ready for engineering and needs a spec sheet covering layout, design tokens, component props, interaction states, responsive breakpoints, edge cases, and animation details.
+description: Generates developer handoff specs from a design. Trigger with "create a handoff spec", "spec this for engineering", "dev handoff", "redlines", "what do developers need to build this?", or when a design is ready for engineering and needs a spec sheet covering layout and measurements, design tokens, component props and variants, interaction and hover states, responsive breakpoints, edge cases, and animation/motion details.
 argument-hint: "<Figma URL or design description>"
 ---
 

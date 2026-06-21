@@ -4,8 +4,10 @@ version: 0.1.1
 description: >
   Scores inbound HubSpot leads by engagement signals, company fit, and urgency
   markers to produce a "call these 5 today" list with talking points, drafts
-  the follow-ups, and blocks Calendar time. Use when the user asks to
-  prioritize leads, who to call first, or about their pipeline.
+  the follow-ups, and blocks Calendar time. Use when the user asks to prioritize
+  leads, "who should I call first," "who are my hottest leads," "what's in my
+  pipeline," "which deals need attention," "who do I follow up with," or wants
+  inbound prospects ranked by who's most worth contacting now.
 ---
 
 # Lead Triage

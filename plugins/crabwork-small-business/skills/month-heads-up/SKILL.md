@@ -1,6 +1,6 @@
 ---
 name: month-heads-up
-description: Runs on the 25th — shows the next 30-day cash-flow outlook and flags anything that needs attention before month-end. Accepts optional 30 or 60 day horizon.
+description: Shows the next 30-day forward cash-flow outlook from QuickBooks and PayPal and flags anything that needs attention before month-end — designed to run around the 25th. Trigger when the owner runs /month-heads-up or asks "what does next month look like," "cash forecast," "what's my runway," "anything I need to watch before month-end," "will I be okay on cash," or wants a look-ahead at upcoming cash. Accepts optional 30 or 60 day horizon.
 allowed-tools: Read, WebFetch, Bash
 ---
 

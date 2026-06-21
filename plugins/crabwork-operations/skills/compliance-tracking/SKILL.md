@@ -1,6 +1,6 @@
 ---
 name: compliance-tracking
-description: Track compliance requirements and audit readiness. Trigger with "compliance", "audit prep", "SOC 2", "ISO 27001", "GDPR", "regulatory requirement", or when the user needs help tracking, preparing for, or documenting compliance activities.
+description: Tracks compliance requirements and audit readiness — control inventories, gap analyses, evidence collection, and audit-prep checklists. Use when preparing for an audit, building or updating a control inventory or risk register for a framework, figuring out what evidence to collect and where it lives, doing a gap analysis against requirements, or when the user mentions "compliance", "audit prep", "controls", "evidence", "SOC 2", "ISO 27001", "GDPR", "HIPAA", "PCI DSS", or a regulatory/certification requirement.
 ---
 
 # Compliance Tracking

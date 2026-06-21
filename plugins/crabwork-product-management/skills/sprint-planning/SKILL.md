@@ -1,6 +1,6 @@
 ---
 name: sprint-planning
-description: Plan a sprint — scope work, estimate capacity, set goals, and draft a sprint plan. Use when kicking off a new sprint, sizing a backlog against team availability (accounting for PTO and meetings), deciding what's P0 vs. stretch, or handling carryover from the last sprint.
+description: Plans a sprint — scopes work, estimates capacity, sets goals, and drafts a sprint plan. Use when kicking off a new sprint or iteration, sizing a backlog against team availability (accounting for PTO, on-call, and meetings), setting a sprint goal, deciding what's P0 vs. P1 vs. stretch, or handling carryover from the last sprint. Triggers on "plan our sprint", "what can we fit this sprint?", "sprint planning", "how much capacity do we have?", or "scope the next iteration".
 argument-hint: "[sprint name or date range]"
 ---
 

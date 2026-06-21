@@ -1,6 +1,6 @@
 ---
 name: create-viz
-description: Create publication-quality visualizations with Python. Use when turning query results or a DataFrame into a chart, selecting the right chart type for a trend or comparison, generating a plot for a report or presentation, or needing an interactive chart with hover and zoom.
+description: Create a publication-quality chart with Python (matplotlib/seaborn for static, plotly for interactive). Use when the user says "plot this", "chart it", "make a graph", "visualize", "show me a bar/line/scatter/heatmap", or wants a figure saved as a PNG for a report, slide deck, or presentation. Triggers on turning query results, a DataFrame, a CSV, or pasted numbers into a chart, on "what chart type should I use", and on requests for an interactive plot with hover/zoom. For multiple charts in one shareable HTML page, prefer build-dashboard instead.
 argument-hint: "<data source> [chart type]"
 ---
 

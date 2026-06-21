@@ -1,6 +1,6 @@
 ---
 name: documentation
-description: Write and maintain technical documentation. Trigger with "write docs for", "document this", "create a README", "write a runbook", "onboarding guide", or when the user needs help with any form of technical writing — API docs, architecture docs, or operational runbooks.
+description: Write and maintain technical documentation. Trigger with "write docs for", "document this", "create a README", "write a runbook", "write an onboarding guide", "document this API", "explain how this works for the team", or when the user needs help with any form of technical writing — README, API reference, architecture docs, operational runbooks, or onboarding guides.
 ---
 
 # Technical Documentation

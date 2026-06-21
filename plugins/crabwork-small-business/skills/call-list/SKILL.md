@@ -1,6 +1,6 @@
 ---
 name: call-list
-description: Ranks the top-5 leads most worth calling today, supplies talking points from email history, blocks time on the calendar, and drafts follow-up messages. Accepts optional count and date arguments.
+description: Ranks the top-5 leads most worth calling today from HubSpot, supplies talking points from email history, blocks time on the calendar, and drafts follow-up messages. Trigger when the owner runs /call-list or asks "who should I call today," "who are my hottest leads," "build my call list," "who do I follow up with," or wants a prioritized list of prospects to phone. Accepts optional count and date arguments.
 allowed-tools: Read, WebFetch, Bash
 ---
 

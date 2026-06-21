@@ -1,6 +1,6 @@
 ---
 name: comp-analysis
-description: Analyze compensation — benchmarking, band placement, and equity modeling. Trigger with "what should we pay a [role]", "is this offer competitive", "model this equity grant", or when uploading comp data to find outliers and retention risks.
+description: Analyze compensation — market benchmarking, pay band placement, and equity modeling. Trigger with "what should we pay a [role]", "is this offer competitive", "what's the salary range for", "model this equity grant", "are we paying market", "find comp outliers", or when uploading comp data or pay bands to check placement, find outliers, and flag retention risks.
 argument-hint: "<role, level, or dataset>"
 ---
 
