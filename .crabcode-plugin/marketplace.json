@@ -311,7 +311,7 @@
       ],
       "brandColor": "#f97316",
       "description": "Maintain and improve CRABCODE.md project memory files: audit quality, capture session learnings, and keep guidance current.",
-      "category": "essentials",
+      "category": "memory",
       "tags": [
         "memory",
         "crabcode-md",
@@ -447,7 +447,7 @@
       ],
       "brandColor": "#6b7280",
       "description": "Reference CrabCode plugin demonstrating commands, agents, skills, hooks, and MCP server configuration.",
-      "category": "essentials",
+      "category": "showcase",
       "tags": [
         "example",
         "reference",
@@ -697,7 +697,7 @@
       ],
       "brandColor": "#0969da",
       "description": "Upstash Context7 MCP server for up-to-date documentation lookup. Pull version-specific docs and code examples directly from source repositories into the CrabCode session.",
-      "category": "dev-tools",
+      "category": "code-tools",
       "tags": [
         "context7",
         "documentation",
@@ -837,7 +837,7 @@
       ],
       "brandColor": "#0969da",
       "description": "Greptile MCP integration for CrabCode. View and resolve Greptile pull-request review comments from your CrabCode session.",
-      "category": "dev-tools",
+      "category": "code-tools",
       "tags": [
         "greptile",
         "code-review",
@@ -885,7 +885,7 @@
       ],
       "brandColor": "#ff2d20",
       "description": "Laravel Boost MCP integration for CrabCode. Exposes Artisan commands, Eloquent queries, routing, migrations, and framework-aware code generation through the project's local Boost server.",
-      "category": "dev-tools",
+      "category": "code-tools",
       "tags": [
         "laravel",
         "php",
@@ -953,7 +953,7 @@
       ],
       "brandColor": "#0969da",
       "description": "Serena MCP integration for CrabCode. Semantic code navigation, refactoring suggestions, and codebase understanding via language-server integration.",
-      "category": "dev-tools",
+      "category": "code-tools",
       "tags": [
         "serena",
         "code-navigation",
@@ -1285,7 +1285,7 @@
       ],
       "brandColor": "#d29922",
       "description": "User-configurable CrabCode hooks driven by markdown rule files in .crabcode/hookify.*.local.md. Block or warn on Bash, Edit/Write/MultiEdit, Stop, and UserPromptSubmit events using regex or structured conditions.",
-      "category": "security",
+      "category": "dev-tools",
       "tags": [
         "hooks",
         "rule-engine",
@@ -1428,7 +1428,7 @@
       ],
       "brandColor": "#6b7280",
       "description": "A collection of example CrabCode skills demonstrating algorithmic art, visual design, brand styling, document co-authoring, internal communications, MCP server authoring, skill authoring, GIF creation, theme styling, web artifact bundling, and Playwright-based web app testing.",
-      "category": "essentials",
+      "category": "showcase",
       "tags": [
         "examples",
         "skills",
@@ -1478,7 +1478,7 @@
       ],
       "brandColor": "#8957e5",
       "description": "Media operations toolkit: trend discovery, agent-assisted drafting, human review, platform adaptation, AI-label compliance, and approved publishing via local publish packages.",
-      "category": "content-office",
+      "category": "media-ops",
       "tags": [
         "media-ops",
         "publishing",
@@ -1830,7 +1830,7 @@
       ],
       "brandColor": "#f97316",
       "description": "Manage tasks, plan your day, and build up memory of important context about your work. Syncs with your calendar, email, and chat to keep everything organized and on track.",
-      "category": "work-platform",
+      "category": "enterprise-workbench",
       "tags": [
         "productivity",
         "task-management",
@@ -1853,7 +1853,7 @@
       ],
       "brandColor": "#f97316",
       "description": "Search across all of your company's tools in one place. Find anything across email, chat, documents, and wikis without switching between apps.",
-      "category": "work-platform",
+      "category": "enterprise-workbench",
       "tags": [
         "enterprise-search",
         "digest",
@@ -1876,7 +1876,7 @@
       ],
       "brandColor": "#f97316",
       "description": "Create, customize, and manage plugins tailored to your organization's tools and workflows. Configure MCP servers, adjust plugin behavior, and adapt templates to match how your team works.",
-      "category": "work-platform",
+      "category": "enterprise-workbench",
       "tags": [
         "plugin",
         "scaffolding",
@@ -1899,7 +1899,7 @@
       ],
       "brandColor": "#f97316",
       "description": "Connect to preclinical research tools and databases (literature search, genomics analysis, target prioritization) to accelerate early-stage life sciences R&D.",
-      "category": "work-platform",
+      "category": "enterprise-workbench",
       "tags": [
         "bioinformatics",
         "genomics",
@@ -1922,7 +1922,7 @@
       ],
       "brandColor": "#f97316",
       "description": "Pre-built small business workflows (payroll planning, month-end close, weekly briefs, growth campaigns) using your QuickBooks, PayPal, HubSpot, Docusign, and other connected tools. You approve every step that touches money or customers.",
-      "category": "work-platform",
+      "category": "enterprise-workbench",
       "tier": "workflow",
       "tags": [
         "smb",
