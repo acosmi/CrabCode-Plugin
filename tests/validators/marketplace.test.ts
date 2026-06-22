@@ -14,6 +14,12 @@ async function writeMarketplace(root: string, payload: unknown): Promise<void> {
   await writeFile(path.join(dir, "marketplace.json"), JSON.stringify(payload, null, 2));
 }
 
+async function writeCategories(root: string, categories: unknown): Promise<void> {
+  const dir = path.join(root, ".crabcode-plugin");
+  await mkdir(dir, { recursive: true });
+  await writeFile(path.join(dir, "categories.json"), JSON.stringify(categories, null, 2));
+}
+
 async function writePluginAt(
   root: string,
   relPath: string,
@@ -164,5 +170,125 @@ describe("marketplace validator", () => {
     const root = await makeTempRoot();
     const issues = await validateMarketplace(root);
     expect(issues.some((i) => i.severity === "warning")).toBe(true);
+  });
+
+  test("accepts a category declared in categories.json", async () => {
+    const root = await makeTempRoot();
+    await writeCategories(root, [{ id: "productivity", displayName: "效率" }]);
+    await writeMarketplace(root, {
+      name: "test",
+      plugins: [
+        {
+          name: "alpha-plugin",
+          source: "./plugins/alpha-plugin",
+          version: "0.1.0",
+          description: "alpha",
+          category: "productivity",
+          tags: ["a"],
+        },
+      ],
+    });
+    await writePluginAt(root, "plugins/alpha-plugin", {
+      name: "alpha-plugin",
+      version: "0.1.0",
+      description: "alpha",
+      author: { name: "CrabCode" },
+      license: "Apache-2.0",
+      keywords: ["a"],
+    });
+    const issues = await validateMarketplace(root);
+    expect(issues).toEqual([]);
+  });
+
+  test("flags a category not declared in categories.json", async () => {
+    const root = await makeTempRoot();
+    await writeCategories(root, [{ id: "productivity", displayName: "效率" }]);
+    await writeMarketplace(root, {
+      name: "test",
+      plugins: [
+        {
+          name: "alpha-plugin",
+          source: "./plugins/alpha-plugin",
+          version: "0.1.0",
+          description: "alpha",
+          category: "made-up-category",
+          tags: ["a"],
+        },
+      ],
+    });
+    await writePluginAt(root, "plugins/alpha-plugin", {
+      name: "alpha-plugin",
+      version: "0.1.0",
+      description: "alpha",
+      author: { name: "CrabCode" },
+      license: "Apache-2.0",
+      keywords: ["a"],
+    });
+    const issues = await validateMarketplace(root);
+    expect(
+      issues.some(
+        (i) => i.severity === "error" && i.field === "category" && i.message.includes("not declared"),
+      ),
+    ).toBe(true);
+  });
+
+  test("skips category whitelist when categories.json is absent (backward compatible)", async () => {
+    const root = await makeTempRoot();
+    await writeMarketplace(root, {
+      name: "test",
+      plugins: [
+        {
+          name: "alpha-plugin",
+          source: "./plugins/alpha-plugin",
+          version: "0.1.0",
+          description: "alpha",
+          category: "anything-goes",
+          tags: ["a"],
+        },
+      ],
+    });
+    await writePluginAt(root, "plugins/alpha-plugin", {
+      name: "alpha-plugin",
+      version: "0.1.0",
+      description: "alpha",
+      author: { name: "CrabCode" },
+      license: "Apache-2.0",
+      keywords: ["a"],
+    });
+    const issues = await validateMarketplace(root);
+    expect(issues.some((i) => i.field === "category")).toBe(false);
+  });
+
+  test("flags a duplicate category id in categories.json", async () => {
+    const root = await makeTempRoot();
+    await writeCategories(root, [
+      { id: "productivity", displayName: "效率" },
+      { id: "productivity", displayName: "重复" },
+    ]);
+    await writeMarketplace(root, {
+      name: "test",
+      plugins: [
+        {
+          name: "alpha-plugin",
+          source: "./plugins/alpha-plugin",
+          version: "0.1.0",
+          description: "alpha",
+          category: "productivity",
+          tags: ["a"],
+        },
+      ],
+    });
+    await writePluginAt(root, "plugins/alpha-plugin", {
+      name: "alpha-plugin",
+      version: "0.1.0",
+      description: "alpha",
+      author: { name: "CrabCode" },
+      license: "Apache-2.0",
+      keywords: ["a"],
+    });
+    const issues = await validateMarketplace(root);
+    expect(
+      issues.some((i) => i.severity === "error" && i.message.includes("duplicate category id")),
+    ).toBe(true);
   });
 });

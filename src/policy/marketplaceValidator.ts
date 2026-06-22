@@ -96,6 +96,8 @@ export async function validateMarketplace(root: string): Promise<MarketplaceIssu
     return issues;
   }
 
+  const categoryWhitelist = await loadCategoryWhitelist(absRoot, issues);
+
   const seenNames = new Set<string>();
   for (const [index, raw] of parsed.plugins.entries()) {
     const prefix = `plugins[${index}]`;
@@ -155,12 +157,110 @@ export async function validateMarketplace(root: string): Promise<MarketplaceIssu
       }
     }
 
+    if (
+      categoryWhitelist &&
+      typeof entry.category === "string" &&
+      entry.category.trim() !== "" &&
+      !categoryWhitelist.has(entry.category)
+    ) {
+      issues.push({
+        severity: "error",
+        marketplacePath,
+        entryName: name,
+        field: "category",
+        message: `category "${entry.category}" is not declared in .crabcode-plugin/categories.json`,
+      });
+    }
+
     if (typeof entry.source === "string") {
       issues.push(...(await verifySource(absRoot, marketplacePath, name, entry.source)));
     }
   }
 
   return issues;
+}
+
+/**
+ * Load the set of allowed category ids from `.crabcode-plugin/categories.json`.
+ * Returns `null` when the file is absent (whitelist enforcement is skipped for
+ * backward compatibility) or when it cannot be parsed (an error is recorded and
+ * per-entry checks are skipped to avoid a flood of follow-on errors).
+ */
+async function loadCategoryWhitelist(
+  absRoot: string,
+  issues: MarketplaceIssue[],
+): Promise<Set<string> | null> {
+  const categoriesPath = path.join(absRoot, ".crabcode-plugin", "categories.json");
+
+  let text: string;
+  try {
+    text = await readFile(categoriesPath, "utf8");
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "ENOENT") {
+      return null;
+    }
+    issues.push({
+      severity: "error",
+      marketplacePath: categoriesPath,
+      message: `read error: ${err instanceof Error ? err.message : String(err)}`,
+    });
+    return null;
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch (err) {
+    issues.push({
+      severity: "error",
+      marketplacePath: categoriesPath,
+      message: `invalid JSON: ${err instanceof Error ? err.message : String(err)}`,
+    });
+    return null;
+  }
+
+  if (!Array.isArray(parsed)) {
+    issues.push({
+      severity: "error",
+      marketplacePath: categoriesPath,
+      message: "categories.json must be an array",
+    });
+    return null;
+  }
+
+  const ids = new Set<string>();
+  for (const [index, raw] of parsed.entries()) {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+      issues.push({
+        severity: "error",
+        marketplacePath: categoriesPath,
+        message: `categories[${index}] must be an object`,
+      });
+      continue;
+    }
+    const id = (raw as { id?: unknown }).id;
+    if (typeof id !== "string" || id.trim() === "") {
+      issues.push({
+        severity: "error",
+        marketplacePath: categoriesPath,
+        field: "id",
+        message: `categories[${index}] missing string "id"`,
+      });
+      continue;
+    }
+    if (ids.has(id)) {
+      issues.push({
+        severity: "error",
+        marketplacePath: categoriesPath,
+        entryName: id,
+        field: "id",
+        message: `duplicate category id "${id}"`,
+      });
+    }
+    ids.add(id);
+  }
+
+  return ids;
 }
 
 async function verifySource(
