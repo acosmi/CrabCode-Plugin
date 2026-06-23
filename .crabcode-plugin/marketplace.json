@@ -1413,7 +1413,25 @@
         "pdf",
         "document"
       ],
-      "tier": "workflow"
+      "tier": "workflow",
+      "groups": [
+        {
+          "name": "office-authoring",
+          "displayName": "文档与表格",
+          "skills": [
+            "crabcode-documents",
+            "crabcode-spreadsheets"
+          ]
+        },
+        {
+          "name": "office-present",
+          "displayName": "演示与 PDF",
+          "skills": [
+            "crabcode-presentations",
+            "crabcode-pdf"
+          ]
+        }
+      ]
     },
     {
       "name": "crabcode-example-skills",
@@ -1487,7 +1505,24 @@
         "toutiao",
         "mcp"
       ],
-      "tier": "workflow"
+      "tier": "workflow",
+      "groups": [
+        {
+          "name": "media-authoring",
+          "displayName": "内容创作与运营",
+          "skills": [
+            "media-ops"
+          ]
+        },
+        {
+          "name": "media-refine",
+          "displayName": "审校与平台适配",
+          "skills": [
+            "media-human-editor",
+            "media-platform-adapter"
+          ]
+        }
+      ]
     },
     {
       "name": "crabfin-cn",
