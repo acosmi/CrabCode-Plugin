@@ -227,7 +227,38 @@
         "legal-education",
         "bar-exam"
       ],
-      "tier": "workflow"
+      "tier": "workflow",
+      "groups": [
+        {
+          "name": "exam-strategy",
+          "displayName": "备考规划",
+          "skills": [
+            "study-plan",
+            "outline-builder",
+            "exam-forecast"
+          ]
+        },
+        {
+          "name": "learn-memorize",
+          "displayName": "讲解与记诵",
+          "skills": [
+            "study-session",
+            "flashcards",
+            "statute-recite"
+          ]
+        },
+        {
+          "name": "answer-training",
+          "displayName": "答题训练",
+          "skills": [
+            "exam-question-practice",
+            "essay-practice",
+            "mock-interview",
+            "case-study",
+            "legal-writing"
+          ]
+        }
+      ]
     },
     {
       "name": "builder-hub",
@@ -249,7 +280,29 @@
         "skills",
         "meta-tooling"
       ],
-      "tier": "workflow"
+      "tier": "workflow",
+      "groups": [
+        {
+          "name": "discover-install",
+          "displayName": "发现与安装",
+          "skills": [
+            "registry-browser",
+            "related-skills-surfacer",
+            "skill-installer"
+          ]
+        },
+        {
+          "name": "manage-maintain",
+          "displayName": "管理与维护",
+          "skills": [
+            "skill-manager",
+            "uninstall",
+            "disable",
+            "auto-updater",
+            "skills-qa"
+          ]
+        }
+      ]
     },
     {
       "name": "crabcode-security-review",
@@ -1665,7 +1718,43 @@
         "architecture",
         "incident-response"
       ],
-      "tier": "workflow"
+      "tier": "workflow",
+      "groups": [
+        {
+          "name": "arch-design",
+          "displayName": "架构与设计",
+          "skills": [
+            "architecture",
+            "system-design"
+          ]
+        },
+        {
+          "name": "code-quality",
+          "displayName": "编码与质量",
+          "skills": [
+            "code-review",
+            "debug",
+            "tech-debt",
+            "testing-strategy"
+          ]
+        },
+        {
+          "name": "delivery-ops",
+          "displayName": "交付与运维",
+          "skills": [
+            "deploy-checklist",
+            "incident-response"
+          ]
+        },
+        {
+          "name": "docs-collab",
+          "displayName": "文档与协作",
+          "skills": [
+            "documentation",
+            "standup"
+          ]
+        }
+      ]
     },
     {
       "name": "crabwork-data",
@@ -1688,7 +1777,37 @@
         "visualization",
         "dashboard"
       ],
-      "tier": "workflow"
+      "tier": "workflow",
+      "groups": [
+        {
+          "name": "data-query",
+          "displayName": "探查与查询",
+          "skills": [
+            "explore-data",
+            "data-context-extractor",
+            "sql-queries",
+            "write-query"
+          ]
+        },
+        {
+          "name": "data-analysis",
+          "displayName": "统计与分析",
+          "skills": [
+            "analyze",
+            "statistical-analysis",
+            "validate-data"
+          ]
+        },
+        {
+          "name": "data-viz",
+          "displayName": "可视化与看板",
+          "skills": [
+            "create-viz",
+            "data-visualization",
+            "build-dashboard"
+          ]
+        }
+      ]
     },
     {
       "name": "crabwork-sales",
@@ -1711,7 +1830,36 @@
         "outreach",
         "pipeline"
       ],
-      "tier": "workflow"
+      "tier": "workflow",
+      "groups": [
+        {
+          "name": "research-prep",
+          "displayName": "调研与准备",
+          "skills": [
+            "account-research",
+            "call-prep",
+            "competitive-intelligence"
+          ]
+        },
+        {
+          "name": "outreach-asset",
+          "displayName": "触达与素材",
+          "skills": [
+            "draft-outreach",
+            "call-summary",
+            "create-an-asset"
+          ]
+        },
+        {
+          "name": "pipeline-forecast",
+          "displayName": "管道与预测",
+          "skills": [
+            "pipeline-review",
+            "forecast",
+            "daily-briefing"
+          ]
+        }
+      ]
     },
     {
       "name": "crabwork-marketing",
@@ -1734,7 +1882,35 @@
         "campaign",
         "seo"
       ],
-      "tier": "workflow"
+      "tier": "workflow",
+      "groups": [
+        {
+          "name": "planning-brand",
+          "displayName": "策划与品牌",
+          "skills": [
+            "campaign-plan",
+            "brand-review",
+            "competitive-brief"
+          ]
+        },
+        {
+          "name": "content-creation",
+          "displayName": "内容创作",
+          "skills": [
+            "content-creation",
+            "draft-content",
+            "email-sequence"
+          ]
+        },
+        {
+          "name": "optimize-report",
+          "displayName": "优化与报告",
+          "skills": [
+            "seo-audit",
+            "performance-report"
+          ]
+        }
+      ]
     },
     {
       "name": "crabwork-customer-support",
@@ -1780,7 +1956,35 @@
         "user-research",
         "competitive-analysis"
       ],
-      "tier": "workflow"
+      "tier": "workflow",
+      "groups": [
+        {
+          "name": "planning-delivery",
+          "displayName": "规划与交付",
+          "skills": [
+            "roadmap-update",
+            "sprint-planning",
+            "write-spec"
+          ]
+        },
+        {
+          "name": "research-insight",
+          "displayName": "调研与洞察",
+          "skills": [
+            "product-brainstorming",
+            "synthesize-research",
+            "competitive-brief"
+          ]
+        },
+        {
+          "name": "metrics-comm",
+          "displayName": "度量与沟通",
+          "skills": [
+            "metrics-review",
+            "stakeholder-update"
+          ]
+        }
+      ]
     },
     {
       "name": "crabwork-hr",
@@ -1803,7 +2007,36 @@
         "onboarding",
         "compensation"
       ],
-      "tier": "workflow"
+      "tier": "workflow",
+      "groups": [
+        {
+          "name": "recruiting",
+          "displayName": "招聘入职",
+          "skills": [
+            "recruiting-pipeline",
+            "interview-prep",
+            "draft-offer",
+            "onboarding"
+          ]
+        },
+        {
+          "name": "perf-comp",
+          "displayName": "绩效与薪酬",
+          "skills": [
+            "performance-review",
+            "comp-analysis"
+          ]
+        },
+        {
+          "name": "org-policy",
+          "displayName": "组织与政策",
+          "skills": [
+            "org-planning",
+            "people-report",
+            "policy-lookup"
+          ]
+        }
+      ]
     },
     {
       "name": "crabwork-design",
@@ -1826,7 +2059,34 @@
         "accessibility",
         "figma"
       ],
-      "tier": "workflow"
+      "tier": "workflow",
+      "groups": [
+        {
+          "name": "design-review",
+          "displayName": "设计与评审",
+          "skills": [
+            "design-critique",
+            "design-system",
+            "accessibility-review"
+          ]
+        },
+        {
+          "name": "research-synth",
+          "displayName": "研究与综合",
+          "skills": [
+            "user-research",
+            "research-synthesis"
+          ]
+        },
+        {
+          "name": "handoff-copy",
+          "displayName": "交付与文案",
+          "skills": [
+            "design-handoff",
+            "ux-copy"
+          ]
+        }
+      ]
     },
     {
       "name": "crabwork-operations",
@@ -1849,7 +2109,36 @@
         "process",
         "vendor-management"
       ],
-      "tier": "workflow"
+      "tier": "workflow",
+      "groups": [
+        {
+          "name": "process-docs",
+          "displayName": "流程与文档",
+          "skills": [
+            "process-doc",
+            "process-optimization",
+            "runbook"
+          ]
+        },
+        {
+          "name": "risk-compliance",
+          "displayName": "风险与合规",
+          "skills": [
+            "risk-assessment",
+            "compliance-tracking",
+            "change-request",
+            "vendor-review"
+          ]
+        },
+        {
+          "name": "planning-report",
+          "displayName": "规划与报告",
+          "skills": [
+            "capacity-plan",
+            "status-report"
+          ]
+        }
+      ]
     },
     {
       "name": "crabwork-productivity",
