@@ -12,6 +12,5 @@
     "code-review",
     "static-analysis",
     "pretooluse"
-  ],
-  "hooks": "./hooks/hooks.json"
+  ]
 }

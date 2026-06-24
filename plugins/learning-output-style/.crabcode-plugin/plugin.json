@@ -11,6 +11,5 @@
     "output-style",
     "learning",
     "educational"
-  ],
-  "hooks": "./hooks/hooks.json"
+  ]
 }

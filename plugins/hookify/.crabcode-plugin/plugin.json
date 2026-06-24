@@ -12,8 +12,5 @@
     "pretooluse",
     "stop",
     "guardrails"
-  ],
-  "hooks": "./hooks/hooks.json",
-  "skills": "./skills",
-  "agents": "./agents"
+  ]
 }
