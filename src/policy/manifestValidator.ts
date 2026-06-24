@@ -23,6 +23,28 @@ const LEGACY_RELAXED_PLUGINS = new Set([
   "crabcode-security-review",
 ]);
 
+// CrabCode loader auto-loads these standard locations when the manifest OMITS the
+// field. Declaring a field whose value equals its standard auto-load path is always
+// redundant and, for hooks/agents, actively breaks runtime loading:
+//   - hooks: ./hooks/hooks.json is loaded unconditionally -> a manifest reference to
+//     the same path triggers "Duplicate hooks file detected" (loader strict error).
+//   - agents: the standard ./agents directory is auto-scanned; the manifest `agents`
+//     field is .md-file-only by schema, so a directory value fails manifest validation.
+//   - commands/skills: directory auto-loaded when omitted -> declaring the standard
+//     directory is redundant noise.
+// This lint catches the recurring porting mistake (upstream plugins that ship an
+// explicit standard-path declaration) at source-repo CI time, before it reaches users.
+const STANDARD_AUTOLOAD_DECLARATIONS: ReadonlyArray<{ field: string; standard: readonly string[] }> = [
+  { field: "hooks", standard: ["./hooks/hooks.json"] },
+  { field: "agents", standard: ["./agents"] },
+  { field: "commands", standard: ["./commands"] },
+  { field: "skills", standard: ["./skills"] },
+];
+
+function stripTrailingSlash(value: string): string {
+  return value.replace(/\/+$/, "");
+}
+
 export async function validateManifests(root: string): Promise<ManifestIssue[]> {
   const records = await findPluginManifests(root);
   const issues: ManifestIssue[] = [];
@@ -103,6 +125,20 @@ function inspectRecord(record: ManifestRecord, root: string): ManifestIssue[] {
         pluginDir: record.pluginDir,
         field: "name",
         message: `manifest name "${name}" must equal plugin directory "${dirBase}"`,
+      });
+    }
+  }
+
+  const manifestFields = manifest as Record<string, unknown>;
+  for (const { field, standard } of STANDARD_AUTOLOAD_DECLARATIONS) {
+    const value = manifestFields[field];
+    if (typeof value === "string" && standard.includes(stripTrailingSlash(value))) {
+      issues.push({
+        severity: "error",
+        manifestPath: record.manifestPath,
+        pluginDir: record.pluginDir,
+        field,
+        message: `manifest "${field}" declares the standard auto-loaded path "${value}"; the standard ${field}/ location is loaded automatically — remove this redundant declaration (it triggers duplicate-load / schema errors at runtime)`,
       });
     }
   }

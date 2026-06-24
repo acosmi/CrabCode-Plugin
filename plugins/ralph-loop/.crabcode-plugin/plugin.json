@@ -11,6 +11,5 @@
     "iterative-development",
     "stop-hook",
     "ralph"
-  ],
-  "hooks": "./hooks/hooks.json"
+  ]
 }

@@ -125,6 +125,56 @@ describe("manifest validator", () => {
     expect(issues.some((i) => i.severity === "error" && i.message.includes("directory"))).toBe(true);
   });
 
+  test("flags manifest declaring the standard auto-loaded hooks path as error", async () => {
+    const root = await makeTempRoot();
+    await writePlugin(root, "hooky", {
+      name: "hooky",
+      version: "0.1.0",
+      description: "x",
+      author: { name: "CrabCode" },
+      license: "Apache-2.0",
+      keywords: ["tag"],
+      hooks: "./hooks/hooks.json",
+    });
+    const issues = await validateManifests(root);
+    expect(issues.some((i) => i.severity === "error" && i.field === "hooks")).toBe(true);
+  });
+
+  test("flags standard agents/commands/skills directory declarations", async () => {
+    const root = await makeTempRoot();
+    await writePlugin(root, "redundant-dirs", {
+      name: "redundant-dirs",
+      version: "0.1.0",
+      description: "x",
+      author: { name: "CrabCode" },
+      license: "Apache-2.0",
+      keywords: ["tag"],
+      agents: "./agents",
+      commands: "./commands",
+      skills: "./skills/",
+    });
+    const issues = await validateManifests(root);
+    const fields = issues.filter((i) => i.severity === "error").map((i) => i.field);
+    expect(fields).toContain("agents");
+    expect(fields).toContain("commands");
+    expect(fields).toContain("skills");
+  });
+
+  test("does NOT flag a legitimate additional (non-standard) hook file reference", async () => {
+    const root = await makeTempRoot();
+    await writePlugin(root, "extra-hook", {
+      name: "extra-hook",
+      version: "0.1.0",
+      description: "x",
+      author: { name: "CrabCode" },
+      license: "Apache-2.0",
+      keywords: ["tag"],
+      hooks: "./hooks/extra-hooks.json",
+    });
+    const issues = await validateManifests(root);
+    expect(issues.some((i) => i.field === "hooks")).toBe(false);
+  });
+
   test("rejects malformed JSON", async () => {
     const root = await makeTempRoot();
     const dir = path.join(root, "plugins", "broken", ".crabcode-plugin");
