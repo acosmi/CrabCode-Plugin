@@ -36,15 +36,15 @@
       "source": "./plugins/crablaw-cn",
       "version": "0.1.0",
       "displayName": "法律工作流",
-      "shortDescription": "中国法律实务工作流:案件底座、合同、诉讼、知产、公司、劳动、数据合规、AI 治理、监管、产品与法援",
-      "longDescription": "CrabLaw-CN 中国法律实务工作流伞插件。一次安装即获得 11 个实务板块(案件管理底座、合同、数据合规、劳动用工、公司、诉讼、知识产权、监管、AI 治理、产品、法律援助)共 86 项技能,板块以分组形式在能力区展示、按需带入。",
+      "shortDescription": "中国法律实务工作流:案件管理、合同、诉讼、知产、公司、劳动、数据合规、AI 治理、监管、产品与法援",
+      "longDescription": "CrabLaw-CN 中国法律实务工作流伞插件。一次安装即获得 11 个实务板块(案件管理、合同、数据合规、劳动用工、公司、诉讼、知识产权、监管、AI 治理、产品、法律援助)共 86 项技能,板块以分组形式在能力区展示、按需带入。",
       "defaultPrompt": [
         "新建一个案件并做利益冲突筛查",
         "起草一份符合中国法的合同并审查风险",
         "梳理这起诉讼的证据清单与时间线"
       ],
       "brandColor": "#b5462f",
-      "description": "CrabLaw-CN 中国法律实务工作流伞插件。一次安装即获得 11 个实务板块(案件管理底座、合同、数据合规、劳动用工、公司、诉讼、知识产权、监管、AI 治理、产品、法律援助)共 86 项技能,板块以分组形式在能力区展示、按需带入。",
+      "description": "CrabLaw-CN 中国法律实务工作流伞插件。一次安装即获得 11 个实务板块(案件管理、合同、数据合规、劳动用工、公司、诉讼、知识产权、监管、AI 治理、产品、法律援助)共 86 项技能,板块以分组形式在能力区展示、按需带入。",
       "category": "legal-workflow",
       "tier": "workflow",
       "tags": [
@@ -55,7 +55,7 @@
       "groups": [
         {
           "name": "matter-core",
-          "displayName": "案件管理底座",
+          "displayName": "案件管理",
           "skills": [
             "compliance-deadline-watcher",
             "conflict-check",
@@ -1581,16 +1581,16 @@
       "name": "crabfin-cn",
       "source": "./plugins/crabfin-cn",
       "version": "0.1.0",
-      "displayName": "财务分析工作流",
-      "shortDescription": "中国财务/金融工作流:基金管理底座、股票研究、投行、私募股权、财富管理、基金行政与 KYC",
-      "longDescription": "CrabFin-CN 中国财务/金融工作流伞插件。一次安装即获得 7 个板块(基金管理底座、股票研究、投资银行、私募股权、财富管理、基金行政、KYC 运营)共 54 项技能,板块以分组形式在能力区展示、按需带入。",
+      "displayName": "金融·投行资管工作流",
+      "shortDescription": "中国金融工作流:财务建模、股票研究、投行、私募股权、财富管理、基金行政与 KYC",
+      "longDescription": "CrabFin-CN 中国金融工作流伞插件。一次安装即获得 7 个板块(财务建模、股票研究、投资银行、私募股权、财富管理、基金行政、KYC 运营)共 54 项技能,板块以分组形式在能力区展示、按需带入。",
       "defaultPrompt": [
         "对这家公司做一份股票研究报告",
         "梳理这单私募股权交易的尽调清单",
         "执行本月基金行政月末结账流程"
       ],
       "brandColor": "#0ea5e9",
-      "description": "CrabFin-CN 中国财务/金融工作流伞插件。一次安装即获得 7 个板块(基金管理底座、股票研究、投资银行、私募股权、财富管理、基金行政、KYC 运营)共 54 项技能,板块以分组形式在能力区展示、按需带入。",
+      "description": "CrabFin-CN 中国金融工作流伞插件。一次安装即获得 7 个板块(财务建模、股票研究、投资银行、私募股权、财富管理、基金行政、KYC 运营)共 54 项技能,板块以分组形式在能力区展示、按需带入。",
       "category": "finance",
       "tier": "workflow",
       "tags": [
@@ -1601,7 +1601,7 @@
       "groups": [
         {
           "name": "fin-core",
-          "displayName": "CrabFin 财务建模底座",
+          "displayName": "CrabFin 财务建模",
           "skills": [
             "audit-xls",
             "clean-data-xls",
