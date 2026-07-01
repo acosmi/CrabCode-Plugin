@@ -13,7 +13,7 @@
   { "id": "security", "displayName": "安全", "description": "安全审查与安全实践指引。" },
   { "id": "session-style", "displayName": "会话风格", "description": "调整会话输出风格的能力(讲解型、学习型)。" },
   { "id": "eng-data", "displayName": "工程与数据", "description": "工程与数据方向的专业工作流。" },
-  { "id": "media-ops", "displayName": "媒体运营", "description": "媒体内容运营,独立于内容与办公。" },
+  { "id": "media-ops", "displayName": "新媒体运营", "description": "新媒体/自媒体内容运营(公众号、小红书、头条等),独立于内容与办公。" },
   { "id": "memory", "displayName": "记忆管理", "description": "项目记忆(CRABCODE.md)的维护与改进,独立成类。" },
   { "id": "legal-workflow", "displayName": "法律工作流", "description": "中国法律实务工作流伞插件。" },
   { "id": "finance", "displayName": "金融", "description": "金融业(证券/投行/私募/财富/基金)工作流伞插件。" },
