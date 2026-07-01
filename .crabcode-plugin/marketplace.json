@@ -2353,6 +2353,51 @@
           ]
         }
       ]
+    },
+    {
+      "name": "crabcopyright-cn",
+      "source": "./plugins/crabcopyright-cn",
+      "version": "0.1.0",
+      "displayName": "软著申请管家",
+      "shortDescription": "中国版权保护中心软件著作权登记的知识产权材料管理工作流:板块拆分规划、源码与说明书鉴别材料、一致性校验、申请包与在线填报",
+      "longDescription": "软著申请管家:面向中国版权保护中心软件著作权登记的知识产权材料管理伞插件。一个总编排管家统筹全流程,按职能分 2 组共 8 项技能——申请编排(板块拆分规划、材料清单、一致性校验、申请包生成、在线填报指导)与鉴别材料制作(源代码、说明书,引导调用 crabcode-office-suite 办公套件处理 Word/PDF)。支持按第一性原理分析本地仓库,规划一份代码拆成几个软著、每块截哪些前端页面及开发环境访问地址。",
+      "defaultPrompt": [
+        "帮我把这个项目登记软件著作权,先规划一下能拆几个软著",
+        "整理软著源代码鉴别材料,弄成规范的 60 页 PDF",
+        "软著说明书怎么排版,要截哪些页面"
+      ],
+      "brandColor": "#d97706",
+      "description": "软著申请管家:面向中国版权保护中心软件著作权登记的知识产权材料管理伞插件,按职能分 2 组共 8 项技能,支持按第一性原理规划仓库拆成多个软著申请。",
+      "category": "ip-management",
+      "tier": "workflow",
+      "tags": [
+        "software-copyright",
+        "ip-management",
+        "copyright-registration",
+        "umbrella"
+      ],
+      "groups": [
+        {
+          "name": "apply-core",
+          "displayName": "申请编排",
+          "skills": [
+            "apply-manager",
+            "application-planning",
+            "materials-checklist",
+            "consistency-check",
+            "package-build",
+            "filing-guide"
+          ]
+        },
+        {
+          "name": "identification-material",
+          "displayName": "鉴别材料制作",
+          "skills": [
+            "source-code-material",
+            "manual-material"
+          ]
+        }
+      ]
     }
   ]
 }
