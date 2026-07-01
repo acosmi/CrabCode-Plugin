@@ -16,6 +16,6 @@
   { "id": "media-ops", "displayName": "媒体运营", "description": "媒体内容运营,独立于内容与办公。" },
   { "id": "memory", "displayName": "记忆管理", "description": "项目记忆(CRABCODE.md)的维护与改进,独立成类。" },
   { "id": "legal-workflow", "displayName": "法律工作流", "description": "中国法律实务工作流伞插件。" },
-  { "id": "finance", "displayName": "财务", "description": "财务建模与分析工作流伞插件。" },
+  { "id": "finance", "displayName": "金融", "description": "金融业(证券/投行/私募/财富/基金)工作流伞插件。" },
   { "id": "ip-management", "displayName": "知识产权材料管理", "description": "知识产权申报材料的准备与管理工作流(软著登记等),独立于法律工作流。" }
 ]
