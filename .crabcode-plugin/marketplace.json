@@ -1601,7 +1601,7 @@
       "groups": [
         {
           "name": "fin-core",
-          "displayName": "CrabFin 财务建模",
+          "displayName": "财务建模",
           "skills": [
             "audit-xls",
             "clean-data-xls",

@@ -1,7 +1,7 @@
 {
   "name": "crabfin-cn",
   "version": "0.1.0",
-  "description": "CrabFin-CN PRC finance workflow umbrella: fund-administration core, equity research, investment banking, private equity, wealth management, fund admin and KYC operations for Chinese financial work.",
+  "description": "CrabFin-CN PRC finance workflow umbrella: financial-modeling core, equity research, investment banking, private equity, wealth management, fund admin and KYC operations for Chinese financial work.",
   "author": {
     "name": "CrabFin"
   },
