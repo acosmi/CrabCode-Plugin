@@ -66,7 +66,7 @@ skill-name/
 | ------------- | -------- | ------ | --------------------------------------------------- |
 | `name`        | Yes      | String | Lowercase, hyphens, 3-50 chars                      |
 | `description` | Yes      | String | Triggering conditions with `<example>` blocks       |
-| `model`       | Yes      | String | `inherit`, `sonnet`, `opus`, or `haiku`             |
+| `model`       | No       | String | `inherit` (default), `deepseek-v4-pro`, or `deepseek-v4-flash`   |
 | `color`       | Yes      | String | `blue`, `cyan`, `green`, `yellow`, `magenta`, `red` |
 | `tools`       | No       | Array  | Restrict to specific tools                          |
 
@@ -304,7 +304,7 @@ Some MCP directory entries have no `url` because the endpoint is dynamic. Plugin
 | --------------- | -------- | --------------- | --------------------------------------------------- |
 | `description`   | No       | String          | Brief description shown in `/help` (under 60 chars) |
 | `allowed-tools` | No       | String or Array | Tools the command can use                           |
-| `model`         | No       | String          | Model override: `sonnet`, `opus`, `haiku`           |
+| `model`         | No       | String          | Model override: `deepseek-v4-pro`, `deepseek-v4-flash`           |
 | `argument-hint` | No       | String          | Documents expected arguments for autocomplete       |
 
 ### Example Command

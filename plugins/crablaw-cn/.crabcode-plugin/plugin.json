@@ -126,5 +126,8 @@
     "./cn-legal-aid/skills/plain-language-letter",
     "./cn-legal-aid/skills/research-start",
     "./cn-legal-aid/skills/supervisor-review-queue"
+  ],
+  "agents": [
+    "./matter-core/agents"
   ]
 }
