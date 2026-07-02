@@ -1,13 +1,5 @@
 {
   "mcpServers": {
-    "quickbooks": {
-      "type": "http",
-      "url": "https://ai-inc.quickbooks.intuit.com/v1/mcp"
-    },
-    "paypal": {
-      "type": "sse",
-      "url": "https://mcp.paypal.com/sse"
-    },
     "hubspot": {
       "type": "http",
       "url": "https://mcp.hubspot.com/anthropic"
@@ -15,10 +7,6 @@
     "canva": {
       "type": "http",
       "url": "https://mcp.canva.com/mcp"
-    },
-    "docusign": {
-      "type": "http",
-      "url": "https://mcp.docusign.com/mcp"
     },
     "slack": {
       "type": "http",
