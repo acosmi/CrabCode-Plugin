@@ -4,8 +4,11 @@ description: 扫描源代码目录,按中国版权保护中心规范生成软著
 argument-hint: "[源代码目录] [软件全称] [版本号]"
 allowed-tools:
   - Read
+  - Write
   - Glob
   - Grep
+  - Task
+  - Bash(python3:*)
   - AskUserQuestion
 ---
 
@@ -17,14 +20,24 @@ allowed-tools:
 
 ## 步骤
 
+0. 读该申请的 `outputs/<申请名>/manifest.json`(结构见
+   `${CRABCODE_PLUGIN_ROOT}/apply-core/MANIFEST.md`)取软件全称/版本号与
+   `source.dirs`,不靠口头交接;manifest 缺字段才追问。
 1. 用 Glob 扫描代码目录,**排除**无关目录/文件:`node_modules`、`vendor`、`.git`、
    `target`、`dist`、`build`、`__pycache__`、`*.min.js`、`*.bundle.js`、`*.map`、
-   大型测试夹具、生成代码。
+   大型测试夹具、生成代码。仓库较大时,用 Task 派发 **sc-material-collector**
+   子代理(只读)完成扫描、挑选与统计,回传候选清单后由本工序核对采用。
 2. **优先**选取 `src`/`lib`/`app`/`core` 下的主力语言核心业务文件。
 3. 取前 30 页 ＋ 后 30 页(每页 ≥50 行);第 1 页为程序/模块**开头**,第 60 页为自然**结尾**。
    **总行数不足 3000 行**时,提交全部代码并在开头标注"本软件共 XX 行"。
-4. 每页加页眉 `${SOFTWARE_NAME} ${VERSION}`,右上角连续页码(`-1-`…`-60-`)。
-5. 确保末页呈现自然的程序结尾(函数/类闭合、`}`、`return`),不在语句中间截断。
+4. 用脚本核验行数/页数与注水占比,不凭目测:
+   `python3 ${CRABCODE_PLUGIN_ROOT}/scripts/check_source.py <入选文件>... --json`;
+   有 warn 先调整选文件再复跑。
+5. 每页加页眉 `${SOFTWARE_NAME} ${VERSION}`,右上角连续页码(`-1-`…`-60-`)。
+6. 确保末页呈现自然的程序结尾(函数/类闭合、`}`、`return`),不在语句中间截断。
+7. 把结果写回 manifest:`source.selected_files` / `total_lines` / `material_pages`、
+   `intermediates.source_text`(排版前的中间态文本路径)、`materials["02-源代码鉴别材料.pdf"]`,
+   `steps.source-code-material` 置 `done`。
 
 ## 用 crabcode-office-suite 办公套件排版 PDF
 
@@ -51,5 +64,6 @@ allowed-tools:
 - [ ] 每页含页眉"软件名+版本号"且与申请表一致
 - [ ] 每页右上角连续页码
 - [ ] 首页=模块开头,末页=自然结尾,无注水
+- [ ] `scripts/check_source.py` 无 fail,warn 已人工复核;结果已写回 manifest
 
-**产物**：`02-源代码鉴别材料.pdf`
+**产物**：`02-源代码鉴别材料.pdf` ＋ manifest 的 `source` 字段更新

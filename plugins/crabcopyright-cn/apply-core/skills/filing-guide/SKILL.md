@@ -4,6 +4,7 @@ description: 指导用户在中国版权保护中心登记平台(register.ccopyr
 argument-hint: "[软件全称] [版本号] [开发完成日期] [首次发表日期] [权利取得方式]"
 allowed-tools:
   - Read
+  - Write
   - AskUserQuestion
   - WebSearch
   - WebFetch
@@ -23,7 +24,11 @@ allowed-tools:
 
 ## 逐字段确认并输出卡片
 
-用 AskUserQuestion 逐项确认关键字段后,输出建议值卡片:
+先读该申请的 `outputs/<申请名>/manifest.json`(结构见
+`${CRABCODE_PLUGIN_ROOT}/apply-core/MANIFEST.md`)预填卡片(全称/简称/版本号/日期/
+著作权人等取自 manifest,与前序材料天然一致),manifest 缺的字段才用 AskUserQuestion
+逐项确认;确认值(`dates`、`applicant`、`software.short_name`/`classification_code` 等)
+写回 manifest,`steps.filing-guide` 置 `done`。输出建议值卡片:
 
 ```
 ## 软著在线填报卡片 · ${SOFTWARE_NAME} ${VERSION}

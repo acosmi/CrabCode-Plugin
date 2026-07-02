@@ -4,6 +4,7 @@ description: 分析用户本地仓库结构,按第一性原理规划把这套代
 argument-hint: "[仓库根目录] [想申请的软著数量,可选] [软件品牌/命名倾向,可选]"
 allowed-tools:
   - Read
+  - Write
   - Glob
   - Grep
   - AskUserQuestion
@@ -93,10 +94,19 @@ allowed-tools:
 - packages/shared, packages/ui：归入申请①,不在②③重复计入（避免查重）。
 
 ### 下一步
-对每个申请循环执行:materials-checklist → source-code-material(限定其源码目录)
+对每个申请执行:materials-checklist → source-code-material(限定其源码目录)
 → manual-material(按截图清单逐页截图)→ consistency-check → package-build → filing-guide。
+多申请时由软著申请管家按 fan-out 并行派发(见其"子代理与信任隔离")。
 每个申请是独立的(全称+版本),彼此不共用页眉名称。
 ```
+
+### 5. 初始化各申请的 manifest
+
+拆分与命名经用户确认后,为**每个申请**创建 `outputs/<申请名>/manifest.json`
+(结构见 `${CRABCODE_PLUGIN_ROOT}/apply-core/MANIFEST.md`),写入 `application_name`、
+`software`(全称/简称/版本号)、`source.dirs`(该申请归属的源码目录)、
+`manual.screenshot_plan`(上面的截图取证清单),`steps.application-planning` 置 `done`。
+后续工序一律从 manifest 取参数,不靠口头交接。
 
 ## 成功标准
 
@@ -104,6 +114,7 @@ allowed-tools:
 - [ ] 每个建议申请都有足够(≥3000 行经验线)且不重叠的源码,并说明公共代码归属
 - [ ] 每个申请有截图取证清单:页面 + 路由 + 开发环境地址 + 对应功能点
 - [ ] 若目标数量与代码量矛盾,明确给出调整建议与理由
+- [ ] 用户确认后,每个申请的 `outputs/<申请名>/manifest.json` 已初始化
 
 ## 检查点
 

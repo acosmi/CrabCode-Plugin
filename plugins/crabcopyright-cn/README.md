@@ -22,8 +22,24 @@
 | `source-code-material` | 扫描源码,生成 60 页规范源程序鉴别材料 PDF |
 | `manual-material` | 整理 Word 说明书为规范文档鉴别材料 PDF |
 
+### 子代理（agents/,只读,由主会话 Task 派发）
+| 子代理 | 职责 |
+|--------|------|
+| `sc-material-collector` | 收集:扫仓库挑源码文件、统计行数,回传候选清单 |
+| `manual-evidence-collector` | 收集(可选):核对细化说明书截图取证清单 |
+| `filing-reviewer` | 对抗式审查:独立做一致性校验+跨申请查重,调用 scripts/ 脚本,只报告不修改 |
+
+信任隔离:收集/审查子代理一律只读;manifest 与最终材料只由主会话工序落盘
+(最终材料仅 package-build 写)。多软著批量由 apply-manager 按申请 fan-out 并行派发。
+
+### 确定性校验脚本（scripts/,python3 纯标准库,零依赖）
+行数/页数折算、功能说明字数、注水启发式、跨申请查重、日期逻辑均由脚本机械判定,
+`check_all.py` 为总入口,均支持 `--json`;package-build 的自查对照表由脚本结果产出,
+不靠模型自述勾选。脚本用法与 manifest 结构见 `apply-core/MANIFEST.md`。
+
 共享事实源:`apply-core/GUIDE.md`(官方规范速查)——所有页数/行数/日期/红线以它为准,
-区分【官方】规定与【经验做法】。
+区分【官方】规定与【经验做法】。工序间参数交接读写 `outputs/<申请名>/manifest.json`
+(结构见 `apply-core/MANIFEST.md`),不靠口头复述。
 
 ## 与 crabcode-office-suite 办公套件的协作
 
