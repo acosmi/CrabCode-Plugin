@@ -32,7 +32,7 @@ allowed-tools:
    **总行数不足 3000 行**时,提交全部代码并在开头标注"本软件共 XX 行"。
 4. 用脚本核验行数/页数与注水占比,不凭目测:
    `python3 ${CRABCODE_PLUGIN_ROOT}/scripts/check_source.py <入选文件>... --json`;
-   有 warn 先调整选文件再复跑。
+   有 warn 先调整选文件再复跑——"文件级注水疑点"会点名具体文件,优先剔除它。
 5. 每页加页眉 `${SOFTWARE_NAME} ${VERSION}`,右上角连续页码(`-1-`…`-60-`)。
 6. 确保末页呈现自然的程序结尾(函数/类闭合、`}`、`return`),不在语句中间截断。
 7. 把结果写回 manifest:`source.selected_files` / `total_lines` / `material_pages`、
