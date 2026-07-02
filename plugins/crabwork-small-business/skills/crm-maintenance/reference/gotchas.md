@@ -79,7 +79,7 @@ Surface the evidence, hold the write.
 
 ## Gotcha: Overwriting an owner-set next-step during cleanup
 
-**Why it matters:** The owner may have set a next step that reflects context the skill can't see — a phone call, a Slack thread, a private note. Overwriting it because a recent email suggests something different erases real work.
+**Why it matters:** The owner may have set a next step that reflects context the skill can't see — a phone call, a DingTalk or Feishu thread, a private note. Overwriting it because a recent email suggests something different erases real work.
 
 ### ✗ Bad
 

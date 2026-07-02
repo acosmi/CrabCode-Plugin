@@ -88,7 +88,7 @@ cause or advance notice.
 To accept this offer, please sign and return this letter by **[OFFER EXPIRATION DATE]**.
 We've enclosed a copy for your records.
 
-[DOCUSIGN ENVELOPE LINK — paste here before sending]
+[SIGNING INSTRUCTIONS — e.g. "You'll receive a 众律宝 signing link separately" — the owner sends the letter via 众律宝 or on paper; delete this line if not needed]
 
 We are excited about the prospect of you joining [COMPANY NAME] and look forward
 to welcoming you to the team. Please don't hesitate to reach out to [HR CONTACT NAME]
@@ -136,4 +136,4 @@ and should be reviewed by qualified legal counsel.*
 | [BONUS FIELDS] | Delete entire section if no bonus |
 | [OFFER EXPIRATION DATE] | Typically 3–5 business days from send |
 | [HR CONTACT] | Who candidate should call with questions |
-| [DOCUSIGN ENVELOPE LINK] | Paste after uploading .docx to DocuSign |
+| [SIGNING INSTRUCTIONS] | How the candidate signs — the owner sends a 众律宝 signing link (manually; no connector yet) or uses paper. Delete if not needed |

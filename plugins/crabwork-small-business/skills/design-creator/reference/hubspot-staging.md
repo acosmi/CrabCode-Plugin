@@ -12,7 +12,7 @@ Auth: Bearer token (OAuth 2.0 or private app token).
 2. [Create a campaign](#create-a-campaign)
 3. [Create a social post](#create-a-social-post)
 4. [Verify the scheduled queue](#verify-the-scheduled-queue)
-5. [CSV fallback (non-Professional users)](#csv-fallback-non-professional-users)
+5. [Scheduling CSV (domestic platforms and non-Professional users)](#scheduling-csv-domestic-platforms-and-non-professional-users)
 6. [Field reference](#field-reference)
 
 ---
@@ -40,7 +40,7 @@ POST /marketing/v3/campaigns
   "name": "Summer Sale 2026 — Social",
   "startDate": "2026-06-01",
   "endDate":   "2026-06-30",
-  "currencyCode": "USD",
+  "currencyCode": "CNY",
   "utm": {
     "source": "social",
     "medium": "owned",
@@ -55,7 +55,14 @@ Response: `{ "id": "<campaign_id>", ... }` — save this for social post associa
 
 ## Create a social post
 
-One call per calendar row. Stage as `SCHEDULED`, never `PUBLISHED`.
+**Only for channels connected in HubSpot Social.** HubSpot's connectable
+channel types are `INSTAGRAM`, `FACEBOOK`, `TWITTER`, `LINKEDIN` — domestic
+platforms (公众号, 小红书, 抖音, 视频号) cannot be connected. Rows for
+domestic platforms never go through this endpoint; they get the
+[scheduling CSV](#scheduling-csv-domestic-platforms-and-non-professional-users)
+and a publish-ready package instead, and the owner publishes natively.
+
+One call per eligible calendar row. Stage as `SCHEDULED`, never `PUBLISHED`.
 
 ```
 POST /marketing/v3/social/posts
@@ -68,12 +75,17 @@ POST /marketing/v3/social/posts
   "scheduledAt": "2026-06-03T10:00:00Z",
   "attachments": [
     {
-      "url": "<canva_export_png_url>"
+      "url": "<hosted_url_of_verified_rendered_asset>"
     }
   ],
   "status": "SCHEDULED"
 }
 ```
+
+**`attachments[].url`** — a publicly accessible URL of the final rendered
+asset (verified against its design brief). If the owner only has a local
+file, stage the post without the attachment and tell them to add the image
+in HubSpot before send time.
 
 **`channelId`** — the HubSpot Social account ID (not the platform name).
 Retrieve connected accounts:
@@ -105,23 +117,32 @@ cancel or edit any post in HubSpot before the send time."
 
 ---
 
-## CSV fallback (non-Professional users)
+## Scheduling CSV (domestic platforms and non-Professional users)
 
-When HubSpot staging is not available, export a CSV the user can import into
-Buffer, Later, or their scheduler of choice.
+Used in two cases:
+
+1. **Domestic-platform rows** (公众号, 小红书, 抖音, 视频号) — always, since
+   HubSpot cannot publish to them. The owner publishes natively; 公众号
+   supports scheduled publishing in its own editor.
+2. **Non-Professional HubSpot plans** — when Social staging isn't available
+   at all.
 
 Column headers:
 ```
-Date,Time,Channel,Caption,ImageURL,Status
+Date,Time,Channel,Caption,ImageFile,Status
 ```
 
 Example row:
 ```
-2026-06-03,10:00 AM CDT,Instagram,"Summer Sale: 30% off candles ☀️ ...",https://canva.com/export/...,Scheduled
+2026-06-03,10:00 CST,Xiaohongshu,"Summer sale: 30% off candles ☀️ ...",./assets/jun03_xhs_cover.png,Ready to publish
 ```
 
-Tell the user: "I've prepared a scheduling CSV since your HubSpot plan doesn't
-include social staging. You can import this into Buffer or Later. [file path]"
+`ImageFile` is the verified rendered asset — a local file path or hosted
+URL, whichever the owner provided.
+
+Tell the user: "I've prepared a scheduling CSV for the posts HubSpot can't
+publish (domestic platforms). Publish each natively at the listed time —
+公众号 posts can be scheduled inside the 公众号 editor. [file path]"
 
 ---
 
@@ -133,5 +154,5 @@ include social staging. You can import this into Buffer or Later. [file path]"
 | `channelId` | string | From `GET /social/channels` |
 | `content.body` | string | Caption text; max 2,000 chars |
 | `scheduledAt` | ISO 8601 | Must be future time; include timezone offset |
-| `attachments[].url` | string | Public URL (Canva export URL works) |
+| `attachments[].url` | string | Publicly accessible URL of the verified rendered asset |
 | `status` | enum | Always `"SCHEDULED"` — never `"PUBLISHED"` |

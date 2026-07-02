@@ -1,6 +1,7 @@
 ---
 name: friday-brief
-description: Delivers the Friday end-of-week pulse from PayPal and HubSpot — revenue vs prior week, top sellers, wins and watches. Trigger when the owner runs /friday-brief or says "how did we do this week," "end-of-week recap," "Friday recap," "wrap up the week," "wins and watches," or wants a week-in-review summary. Accepts optional lookback window of 7 or 14 days.
+version: 0.3.0
+description: Delivers the Friday end-of-week pulse from the owner's 支付宝商家平台 bill export and HubSpot — revenue vs prior week, top sellers, wins and watches. Trigger when the owner runs /friday-brief or says "how did we do this week," "end-of-week recap," "Friday recap," "wrap up the week," "wins and watches," or wants a week-in-review summary. Accepts optional lookback window of 7 or 14 days.
 allowed-tools: Read, WebFetch, Bash
 ---
 
@@ -13,7 +14,7 @@ Parse arguments:
 
 Using the `business-pulse` skill workflow:
 
-1. Pull PayPal transactions for the lookback period.
+1. Load transaction data for the lookback period from the owner's 支付宝商家平台 bill export (CSV) or pasted data. The alipay connector cannot export transaction history, so ask the owner for the export if it hasn't been provided. If they take 微信支付 too, ask for that export as well (WeChat Pay connector pending).
 2. Pull any HubSpot deal closes for the same window.
 3. Calculate week-over-week revenue delta.
 4. Surface top 3 revenue sources (product / customer / channel) ranked by contribution.
@@ -43,9 +44,9 @@ WATCHES
 Revenue this week: ${amount} ({+/-}X% vs last week)
 ```
 
-## Connector failures
+## Data failures
 
-Run with whatever is connected — this command degrades gracefully. If PayPal is missing, skip transaction data and note "PayPal not connected — revenue data from HubSpot deals only." If HubSpot is missing, skip deal closes and note it. If neither is connected, stop and tell the owner: "No revenue sources connected. Connect PayPal or HubSpot to run the Friday brief."
+Run with whatever is available — this command degrades gracefully. If no 支付宝 bill export was provided, skip transaction data and note "no 支付宝 bill export this week — revenue data from HubSpot deals only." If HubSpot is missing, skip deal closes and note it. If neither is available, stop and tell the owner: "No revenue sources available. Upload a 支付宝商家平台 bill export (CSV) or connect HubSpot to run the Friday brief."
 
 ## Approval gates
 
@@ -54,4 +55,4 @@ Run with whatever is connected — this command degrades gracefully. If PayPal i
 
 ## Output
 
-End with the formatted brief and ask the owner: "Want me to post this to Slack, email it to yourself, or save it?"
+End with the formatted brief and ask the owner: "Want me to send this as a DingTalk/Feishu message, save it to 腾讯文档 or your Desktop, or leave it here?"

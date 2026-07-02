@@ -1,31 +1,34 @@
 # Gotchas
 
-## 1. DocuSign login state
+## 1. Claiming the offer was sent for signature
 
-✗ **Bad:** CrabCode navigates to `https://app.docusign.com` and immediately tries
-to upload the offer letter without checking whether the user is logged in.
+✗ **Bad:** CrabCode finishes Phase 6 and says "I've sent the offer to the candidate
+via 众律宝 — you'll be notified when they sign."
 
-✓ **Good:** Immediately after navigating to DocuSign, check for a login screen.
-If a login prompt appears, pause and ask the user to log in, then wait for
-confirmation before continuing.
+✓ **Good:** CrabCode finalizes the offer letter, presents the cover message, and
+says: "The letter is final at [path]. Upload it to 众律宝 and send it yourself —
+I can't send it for you yet (the 众律宝 connector is pending)."
 
-**Why it matters:** DocuSign redirects unauthenticated sessions silently. If the
-login check is skipped, the automation tries to click UI elements that don't exist
-and fails mid-flow with no clear error.
+**Why it matters:** There is no e-sign connector in this plugin. Claiming a send
+happened means the candidate never receives the offer and the owner finds out days
+later. The skill's job ends at a signature-ready document plus a clear handoff.
 
 ---
 
-## 2. Missing candidate details before entering the browser
+## 2. Missing candidate details before finalizing
 
-✗ **Bad:** CrabCode reaches Phase 6, opens DocuSign in Chrome, and then asks mid-flow:
-"What's the candidate's email address?"
+✗ **Bad:** CrabCode reaches Phase 6, "finalizes" the letter, and hands it off with
+`[CANDIDATE FULL NAME]` still blank — then asks afterwards: "By the way, who is
+the candidate?"
 
-✓ **Good:** If the user chose DocuSign delivery in Phase 1, collect the candidate's
-full name and email address before Phase 6 begins — either in Phase 1 or at the
-end of Phase 5. Never enter the browser flow without both fields.
+✓ **Good:** If the user chose signature-ready delivery in Phase 1, collect the
+candidate's full name (and email, if it goes in the cover message) before Phase 6
+finalization begins — either in Phase 1 or at the end of Phase 5. Never hand off
+a letter with a blank signer.
 
-**Why it matters:** Interrupting an open browser session to collect missing data
-disrupts the automation state and confuses the user.
+**Why it matters:** A "final" document with the signer missing isn't final — the
+owner uploads it to 众律宝, notices the blank, and has to round-trip back. Collect
+the details up front so the handoff is one clean step.
 
 ---
 

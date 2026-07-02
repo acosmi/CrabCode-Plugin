@@ -2235,7 +2235,7 @@
     {
       "name": "crabwork-small-business",
       "source": "./plugins/crabwork-small-business",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "CrabWork 小微企业",
       "shortDescription": "小微企业一体化助手:财务、营销、客户、招聘与经营简报全包",
       "longDescription": "面向小微企业主的 CrabCode 一体化插件,内置 31 个技能与工作流,覆盖现金流预测、月末结账、报税准备、线索打分、营销活动、客户投诉处理与每周经营简报。用大白话提需求,路由器自动匹配工作流;凡涉及钱或客户的步骤,执行前都先等你确认。",
@@ -2245,7 +2245,7 @@
         "给我做个周一晨报:现金、销售、管道和本周 Top 3 待办"
       ],
       "brandColor": "#f97316",
-      "description": "Pre-built small business workflows (payroll planning, month-end close, weekly briefs, growth campaigns) using your QuickBooks, PayPal, HubSpot, Docusign, and other connected tools. You approve every step that touches money or customers.",
+      "description": "Pre-built small business workflows (payroll planning, month-end close, weekly briefs, growth campaigns) using Alipay, DingTalk, Feishu, Tencent Docs, your accounting software, and other connected tools. You approve every step that touches money or customers.",
       "category": "enterprise-workbench",
       "tier": "workflow",
       "tags": [
@@ -2312,7 +2312,7 @@
           "skills": [
             "run-campaign",
             "content-strategy",
-            "canva-creator"
+            "design-creator"
           ]
         },
         {

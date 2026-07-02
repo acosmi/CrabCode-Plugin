@@ -1,13 +1,15 @@
 ---
 name: smb-onboard
+version: 0.3.0
 description: >
   CrabCode as the trainer. Walks an SMB owner through connecting their first two
-  tools, runs one recipe to prove immediate value, interviews them about their
-  business (industry, size, top three headaches), stores that context
-  persistently so every other skill benefits, and sets a weekly check-in
-  cadence. Use when the owner is getting started or says any of: "set me up,"
-  "setup," "help me get set up," "get started," "help me get started," "get me
-  started," "what can you do," "I'm new to this," or is in their first session.
+  tools (支付宝, 钉钉/飞书, 腾讯文档, HubSpot), runs one recipe to prove immediate
+  value, interviews them about their business (industry, size, top three
+  headaches), stores that context persistently so every other skill benefits,
+  and sets a weekly check-in cadence. Use when the owner is getting started or
+  says any of: "set me up," "setup," "help me get set up," "get started," "help
+  me get started," "get me started," "what can you do," "I'm new to this," or is
+  in their first session.
 ---
 
 # SMB Onboard
@@ -19,17 +21,23 @@ Four moves: connect two tools → run one recipe → capture business context �
 ```
 User: "get me started"
 → Assess what's already connected; pick the best 2 tools to connect first
-→ Guide connection of each tool (one at a time)
+→ Guide connection of each tool (one at a time, via /plugin → Manage plugins → Configure)
 → Run one recipe against live data to prove value
 → Ask 5 business questions one at a time; store answers to persistent memory
 → "Each Monday, say 'weekly check-in' — I'll pull your numbers and flag anything urgent."
 ```
 
+## Connector reality
+
+Shipped connectors: **alipay (支付宝)** — payment links, single-payment lookup, refunds (it cannot export transaction history); **dingtalk (钉钉)** and **feishu (飞书)** — messages, schedule; **tencent-docs (腾讯文档)** — online docs and sheets; **hubspot** — CRM. Each needs credentials, configured via /plugin → Manage plugins → Configure; an unconfigured connector simply doesn't show up.
+
+Pending (be upfront, never fake them): accounting software (用友好会计 / 金蝶精斗云), 微信支付 (WeChat Pay), 众律宝 (e-sign), 自营云端设计 (design), 腾讯企业邮 (email), 阿里云盘. Until those land, the covered areas run on CSV/Excel exports, pasted data, or manual handoff — say so honestly when the owner's headache lands there.
+
 ## Tone for connectors
 
-Whenever a connector comes up — recommending one, naming what to try next, or clarifying mid-flow — describe **what CrabCode will be able to do once it's connected**, not what the platform itself is or sells. Owners already know what HubSpot, QuickBooks, Gmail, and Calendar do; they don't need a product pitch from us.
+Whenever a connector comes up — recommending one, naming what to try next, or clarifying mid-flow — describe **what CrabCode will be able to do once it's connected**, not what the platform itself is or sells. Owners already know what HubSpot, 支付宝, 钉钉, and 飞书 do; they don't need a product pitch from us.
 
-- Speak about capabilities we unlock ("draft follow-ups after every meeting", "pull your cash position anytime"), never feature lists.
+- Speak about capabilities we unlock ("draft follow-ups after every meeting", "create a payment link the moment you need one", "pull today's schedule before you ask"), never feature lists.
 - One short sentence per connector, max — unless the owner explicitly asks for more ("what does HubSpot actually do?"), in which case answer that directly.
 - This rule applies to every step below.
 
@@ -39,15 +47,15 @@ Whenever a connector comes up — recommending one, naming what to try next, or 
 
 2. **Pick two functions, then check what the owner uses.** Ask: *"What are your biggest day-to-day headaches — money, customers, scheduling, or getting organized?"* Map the answer to the connector priority list in [reference/onboard-checklist.md](reference/onboard-checklist.md).
 
-   Name the two **functions** we want (e.g. "a place to track customers and deals" and "your inbox") — not the platform features. One short sentence each, max. Then ask whether the owner uses a supported tool for each.
+   Name the two **functions** we want (e.g. "a place to track customers and deals" and "your team chat and schedule") — not the platform features. One short sentence each, max. Then ask whether the owner uses a supported tool for each.
 
    For each function, branch:
-   - **Owner uses a supported connector** (e.g. they say "HubSpot"): say one sentence about what CrabCode will be able to do together with it, then guide the connection.
-   - **Owner uses an unsupported tool or nothing yet**: list 2–3 concrete things CrabCode will be able to do *with* the supported alternative, and 1–2 things that won't work without it. Then let the owner decide whether to switch or add it. Do not push.
+   - **Owner uses a supported connector** (e.g. they say "HubSpot" or "钉钉"): say one sentence about what CrabCode will be able to do together with it, then guide the connection (via /plugin → Manage plugins → Configure).
+   - **Owner uses an unsupported tool or nothing yet**: list 2–3 concrete things CrabCode will be able to do *with* the supported alternative, and 1–2 things that won't work without it. If the area's connector is still pending (accounting, email, WeChat Pay), say so and explain the export/paste workaround instead of pretending. Then let the owner decide. Do not push.
 
    Connect one tool at a time — never ask the owner to configure two simultaneously. See [reference/gotchas.md](reference/gotchas.md) for the failure pattern this replaces.
 
-3. **Run one recipe to prove value.** Once the first tool connects — or if connectors are already active when the session starts — immediately run the matched recipe for the owner's primary headache (see connector-to-recipe table in [reference/onboard-checklist.md](reference/onboard-checklist.md)). Narrate what CrabCode is doing and why — this is the "aha" moment. Do not skip it to get to the interview faster. For a worked example of the full arc, see [reference/examples/happy-path.md](reference/examples/happy-path.md).
+3. **Run one recipe to prove value.** Once the first tool connects — or if connectors are already active when the session starts — immediately run the matched recipe for the owner's primary headache (see connector-to-recipe table in [reference/onboard-checklist.md](reference/onboard-checklist.md)). For cash-flow headaches this means asking for a 支付宝商家平台 bill export (CSV) or a pasted accounting report and analyzing that — the alipay connector can't export history. Narrate what CrabCode is doing and why — this is the "aha" moment. Do not skip it to get to the interview faster. For a worked example of the full arc, see [reference/examples/happy-path.md](reference/examples/happy-path.md).
 
 4. **Interview the owner.** Ask the five questions from [reference/onboard-checklist.md](reference/onboard-checklist.md), one at a time, conversationally. Wait for the full answer before moving to the next. If the owner seems pressed for time, compress to three: industry, headaches, tools — but never fewer.
 
@@ -59,7 +67,8 @@ Whenever a connector comes up — recommending one, naming what to try next, or 
 
 - **Show context before writing.** Display the full owner profile draft before storing it. Wait for explicit approval.
 - **Never overwrite existing context silently.** If a `## Business context` block already exists, show current vs. proposed before writing any changes.
-- **Never connect a tool on the owner's behalf.** Guide; do not act. Connector auth is always owner-initiated.
+- **Never connect a tool on the owner's behalf.** Guide; do not act. Connector credentials are always entered by the owner (via /plugin → Manage plugins → Configure).
+- **Never create a payment or refund during onboarding without explicit owner approval.** The alipay connector acts on real money; demos default to read-only lookups or analyzing an exported bill.
 
 ## Reference
 

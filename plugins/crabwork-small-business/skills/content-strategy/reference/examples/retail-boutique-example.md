@@ -2,7 +2,7 @@
 
 **Business:** Vintage clothing boutique
 **Trigger:** "What should I push this month?"
-**Data source:** QuickBooks (18 months)
+**Data source:** 金蝶精斗云 revenue-by-product export, Excel (18 months) — cross-checked against 支付宝商家平台 bill CSV
 **User's metric:** Revenue
 **User's seasonality:** "We peak April–May and November–December. Dead in July–August."
 
@@ -10,11 +10,11 @@
 
 ## Input data summary
 
-- Total revenue (18 months): $67,500
-- Top product category: Vintage leather jackets ($18,200 / 27% of revenue)
-- Second: 90s band tees ($12,400 / 18%)
-- Third: High-waisted denim ($9,800 / 14%)
-- Slowest: Vintage hats ($2,100 / 3%)
+- Total revenue (18 months): ¥467,500
+- Top product category: Vintage leather jackets (¥126,200 / 27% of revenue)
+- Second: 90s band tees (¥84,100 / 18%)
+- Third: High-waisted denim (¥65,400 / 14%)
+- Slowest: Vintage hats (¥14,000 / 3%)
 
 **Trending up:** Band tees (growing 12% month-over-month for 3 months)
 **Trending down:** Vintage accessories (declining 8% month-over-month)
@@ -68,4 +68,4 @@ Your bestseller is vintage leather jackets — they consistently drive 27% of re
 ## Next steps
 
 - **Owner approval:** "Does this feel right? Anything to adjust?"
-- **Feed to canva-creator:** Once approved, pass this brief to `canva-creator` to generate social posts, emails, and graphics for the next 30 days.
+- **Feed to design-creator:** Once approved, pass this brief to `design-creator` to build the posting calendar, draft the copy and emails, and write the design briefs for the next 30 days (the owner renders the visuals in their design tool).

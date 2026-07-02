@@ -2,7 +2,7 @@
 
 面向小微企业主的 CrabCode 一体化插件:涵盖财务现金流、销售营销、客户运营、招聘与经营简报。安装即获得 15 个原子技能、15 个开箱即用的工作流命令,以及一个能听懂大白话的路由器(`smb-router`)。
 
-> 基于 [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态。
+> 基于 [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态;连接器已替换为国内设施(阶段 1 试点,详见仓库 docs/audit/ 2026-06-23 替换方案)。
 
 你不需要记任何命令。直接告诉 CrabCode 你的需求 ——「下周发工资有点紧」「有个客户生气了」「我该定多少价?」—— 它会自动判断该用哪个工作流并一步步带你走完。每个工作流在执行任何动作前都会暂停等你确认,凡是涉及钱或客户的步骤,都需要你点头才会进行。
 
@@ -18,21 +18,23 @@
 
 运行 `/smb-onboard` 或直接对 CrabCode 说「帮我设置」。
 
-**核心工具**(优先连接,体验最佳):
-- **HubSpot** —— CRM、线索、营销活动与客服工单
+**已内置的国内直连**(凭证在 `/plugin → 管理插件 → 配置` 中按需填写,填哪个启用哪个;未配置的连接器不启动、工作流自动降级):
 
-**营销与沟通:**
-- **Canva** —— 生成符合品牌调性的社媒与邮件素材
-- **Gmail / Outlook** —— 邮件草拟、工单处理、合同审阅
-- **Google Calendar / Outlook 日历** —— 会议准备、电话时段、每周事项
-- **Slack** —— 简报推送与通知
+- **支付宝** —— 创建收款链接、按单号查单、退款(每步先经你确认;需开放平台应用凭证)
+- **钉钉 / 飞书** —— 消息推送、简报通知、日程/日历(需开放平台应用凭证)
+- **腾讯文档** —— 模板、报表、导出物(需 API 访问令牌)
+- **HubSpot** —— CRM、线索、营销活动与客服工单(国内 CRM 选型待定,暂保留)
 
-**可选**(连接后能力更深入):
-- **Stripe** —— 收款与订阅数据
-- **Square** —— POS 交易数据
-- **Google Drive / OneDrive** —— 文件存储与模板
+**待接入**(国内替代落地前,技能按提示走导出/粘贴/人工路径,功能不掉线):
 
-> **暂时下线的连接器**:QuickBooks、PayPal、DocuSign 因当前网络环境下端点不可用(2026-07-01 实测),已从内置 MCP 配置中移除。相关财务/合同工作流仍可使用 —— 按技能内提示改用 CSV 导出或手动粘贴数据;待国内替代方案(见仓库 docs/audit/ 2026-06-23 替换方案)落地后恢复。
+- **用友好会计 / 金蝶精斗云**(记账)—— 当前:从记账软件导出 CSV/Excel 或粘贴报表
+- **微信支付**(收款补充)—— 当前:商户平台账单导出
+- **众律宝**(自营电子签)—— 当前:产出终稿,由你发起签署
+- **自营云端设计** —— 当前:产出设计说明与文案,由你在设计工具执行
+- **腾讯企业邮** —— 当前:邮件粘贴进来,草稿由你复制发送
+- **阿里云盘** —— 当前:本地文件 / 腾讯文档
+
+> **收款数据口径**:支付宝官方 MCP 只做「建收款链接 / 查单 / 退款」,不提供交易流水批量导出。现金流、对账类技能所需的交易数据,请从支付宝商家平台 / 微信支付商户平台导出账单(CSV)交给技能分析。
 
 不必一次全部连上。先连一两个就能立刻看到价值 —— 插件会在「再连一个工具能解锁更多」时主动提示你。
 
@@ -52,36 +54,36 @@
 
 | 命令 | 作用 | 你可以直接说 | 调用技能 | 必需 | 可选 |
 |---|---|---|---|---|---|
-| `/plan-payroll` | 现金预测 + 逾期发票催收,确认工资有着落 | 「能发出工资吗」「现金紧张」「谁欠我钱」 | cash-flow-snapshot、invoice-chase | QuickBooks | PayPal、Stripe、Square、邮箱 |
-| `/month-heads-up` | 30 天现金展望,提前标记风险 | 「下个月什么情况」「现金预测」「跑道」 | cash-flow-snapshot | QuickBooks | PayPal |
-| `/close-month` | 月末结账:对账、标差异、出 P&L、导出结账包 | 「结账」「月末」「对账」 | month-end-prep | QuickBooks | PayPal、Stripe、Square |
-| `/price-check` | 按产品的毛利表与三套定价情景 | 「我的毛利多少」「该涨价吗」「单位成本」 | margin-analyzer | QuickBooks | PayPal |
-| `/tax-prep` | 给会计的报税材料(季度预缴或年终 1099) | 「税的事」「预缴税」「1099」「会计要……」 | tax-season-organizer | QuickBooks | PayPal、Stripe |
+| `/plan-payroll` | 现金预测 + 逾期发票催收,确认工资有着落 | 「能发出工资吗」「现金紧张」「谁欠我钱」 | cash-flow-snapshot、invoice-chase | 记账导出(用友/金蝶) | 支付宝账单导出、支付宝(收款链接)、钉钉/飞书 |
+| `/month-heads-up` | 30 天现金展望,提前标记风险 | 「下个月什么情况」「现金预测」「跑道」 | cash-flow-snapshot | 记账导出(用友/金蝶) | 支付宝账单导出 |
+| `/close-month` | 月末结账:对账、标差异、出 P&L、导出结账包 | 「结账」「月末」「对账」 | month-end-prep | 记账导出(用友/金蝶) | 支付宝/微信支付账单导出 |
+| `/price-check` | 按产品的毛利表与三套定价情景 | 「我的毛利多少」「该涨价吗」「单位成本」 | margin-analyzer | 记账导出(用友/金蝶) | 支付宝账单导出 |
+| `/tax-prep` | 给会计的报税材料整理与交接包 | 「税的事」「预缴税」「会计要……」 | tax-season-organizer | 记账导出(用友/金蝶) | 支付宝账单导出 |
 
 ### 销售与营销
 
 | 命令 | 作用 | 你可以直接说 | 调用技能 | 必需 | 可选 |
 |---|---|---|---|---|---|
-| `/call-list` | 今日该打的 5 个重点线索,含话术与日历时段 | 「该给谁打电话」「有没有热线索」「管道」 | lead-triage | HubSpot | 邮箱、Google Calendar |
-| `/run-campaign` | 端到端营销:销售分析 → 内容简报 → Canva 素材 → HubSpot 发送 | 「跑个营销」「销售下滑」「我要更多客户」 | content-strategy、canva-creator、lead-triage | HubSpot、Canva | QuickBooks、PayPal |
-| `/sales-brief` | 畅销与滞销榜 + 两周内容简报 | 「什么在卖」「我该主推什么」 | content-strategy | QuickBooks 或 PayPal | HubSpot |
+| `/call-list` | 今日该打的 5 个重点线索,含话术与日程时段 | 「该给谁打电话」「有没有热线索」「管道」 | lead-triage | HubSpot | 钉钉/飞书日历 |
+| `/run-campaign` | 端到端营销:销售分析 → 内容简报 → 设计说明 → HubSpot 发送 | 「跑个营销」「销售下滑」「我要更多客户」 | content-strategy、design-creator、lead-triage | HubSpot | 记账/支付宝账单导出 |
+| `/sales-brief` | 畅销与滞销榜 + 两周内容简报 | 「什么在卖」「我该主推什么」 | content-strategy | 记账导出 或 支付宝账单导出 | HubSpot |
 
 ### 客户与运营
 
 | 命令 | 作用 | 你可以直接说 | 调用技能 | 必需 | 可选 |
 |---|---|---|---|---|---|
-| `/customer-pulse-check` | 客户反馈主题归纳 + 回复模板 | 「客户在说什么」「投诉」「评价」 | customer-pulse、ticket-deflector | PayPal 或 HubSpot | —— |
-| `/handle-complaint` | 端到端投诉处理:拉背景、起草回复、提运营改进建议 | 「有客户不满」「处理这条投诉」「愤怒邮件」 | ticket-deflector、customer-pulse | ——(可直接粘贴文本) | Gmail、HubSpot、PayPal |
+| `/customer-pulse-check` | 客户反馈主题归纳 + 回复模板 | 「客户在说什么」「投诉」「评价」 | customer-pulse、ticket-deflector | ——(可直接粘贴文本) | HubSpot、支付宝账单导出 |
+| `/handle-complaint` | 端到端投诉处理:拉背景、起草回复、提运营改进建议 | 「有客户不满」「处理这条投诉」「愤怒邮件」 | ticket-deflector、customer-pulse | ——(可直接粘贴文本) | HubSpot、支付宝(查单/退款) |
 | `/crm-cleanup` | HubSpot 清理:停滞商机、重复、缺字段 —— 经你批准后修复 | 「清理 CRM」「HubSpot 一团乱」「停滞商机」 | crm-maintenance | HubSpot | —— |
-| `/review-contract` | 大白话合同审阅,含红旗与严重度评级 | 「审一下这份合同」「NDA」「该签吗」 | contract-review | ——(可上传文件) | DocuSign |
+| `/review-contract` | 大白话合同审阅,含红旗与严重度评级 | 「审一下这份合同」「NDA」「该签吗」 | contract-review | ——(可上传文件) | 众律宝(签署由你发起) |
 
 ### 经营洞察
 
 | 命令 | 作用 | 你可以直接说 | 调用技能 | 必需 | 可选 |
 |---|---|---|---|---|---|
-| `/monday-brief` | 周一晨报:现金、销售、管道、本周展望、Top 3 待办 | 「周一简报」「我手头有啥」「开周」 | business-pulse | ——(优雅降级) | QuickBooks、PayPal、HubSpot、日历、Gmail、Slack |
-| `/friday-brief` | 周五收官:本周对比上周收入、亮点与需关注项 | 「周末了」「我们这周如何」「周五复盘」 | business-pulse | PayPal 或 HubSpot | —— |
-| `/quarterly-review` | 完整季度回顾(QBR):收入、毛利、客户健康度、机会与风险 | 「季度回顾」「董事会材料」「QBR」 | business-pulse | QuickBooks | PayPal、HubSpot |
+| `/monday-brief` | 周一晨报:现金、销售、管道、本周展望、Top 3 待办 | 「周一简报」「我手头有啥」「开周」 | business-pulse | ——(优雅降级) | 记账/支付宝账单导出、HubSpot、钉钉/飞书(日历与推送) |
+| `/friday-brief` | 周五收官:本周对比上周收入、亮点与需关注项 | 「周末了」「我们这周如何」「周五复盘」 | business-pulse | 支付宝账单导出 或 HubSpot | 钉钉/飞书推送 |
+| `/quarterly-review` | 完整季度回顾(QBR):收入、毛利、客户健康度、机会与风险 | 「季度回顾」「董事会材料」「QBR」 | business-pulse | 记账导出(用友/金蝶) | 支付宝账单导出、HubSpot |
 
 ## 全部 15 个技能
 
@@ -91,40 +93,40 @@
 
 | 技能 | 作用 | 你可以直接说 | 必需 | 可选 |
 |---|---|---|---|---|
-| **cash-flow-snapshot** | 30/60/90 天现金预测,含置信区间与具名风险标记;聊天摘要 + XLSX | 「预测我的现金流」「能发工资吗」「跑道」「现金吃紧」 | QuickBooks、PayPal、Stripe 或 Square(任一) | 其它作为次级数据源 |
-| **invoice-chase** | 按每位客户的付款历史与语气起草逾期催款提醒,经批准后经 PayPal 发送 | 「谁欠我钱」「逾期发票」「催未付款」 | QuickBooks | PayPal、Stripe、Gmail |
-| **margin-analyzer** | 按产品/服务的单位经济模型,含通胀基准与三套定价情景 | 「我的毛利多少」「该涨价吗」「成本吃掉利润」「该定多少价」 | QuickBooks | PayPal、Square、CSV 上传 |
-| **month-end-prep** | 月末结账:QB 与收款渠道对账、标差异、写 P&L 说明、导出结账包 | 「结这个月账」「对账」「P&L」「收入为啥变了」 | QuickBooks | PayPal、Stripe、Square |
-| **tax-season-organizer** | 季度预缴税测算或年终 1099-NEC 准备,含给会计的交接包 | 「季度税」「预缴税款」「1099」「1099-NEC」「年终报税准备」 | QuickBooks | PayPal、Stripe |
+| **cash-flow-snapshot** | 30/60/90 天现金预测,含置信区间与具名风险标记;聊天摘要 + XLSX | 「预测我的现金流」「能发工资吗」「跑道」「现金吃紧」 | 记账导出 或 支付宝/微信支付账单导出(任一) | 其它作为次级数据源 |
+| **invoice-chase** | 按每位客户的付款历史与语气起草逾期催款提醒,经批准后发出支付宝收款链接 | 「谁欠我钱」「逾期发票」「催未付款」 | 记账导出(用友/金蝶) | 支付宝(收款链接)、支付宝账单导出、钉钉/飞书 |
+| **margin-analyzer** | 按产品/服务的单位经济模型,含通胀基准与三套定价情景 | 「我的毛利多少」「该涨价吗」「成本吃掉利润」「该定多少价」 | 记账导出(用友/金蝶) | 支付宝账单导出、CSV 上传 |
+| **month-end-prep** | 月末结账:记账数据与收款渠道对账、标差异、写 P&L 说明、导出结账包 | 「结这个月账」「对账」「P&L」「收入为啥变了」 | 记账导出(用友/金蝶) | 支付宝/微信支付账单导出 |
+| **tax-season-organizer** | 报税准备:整理数据、对齐口径,产出给会计的交接包 | 「季度税」「预缴税款」「年终报税准备」 | 记账导出(用友/金蝶) | 支付宝账单导出 |
 
 ### 销售与营销
 
 | 技能 | 作用 | 你可以直接说 | 必需 | 可选 |
 |---|---|---|---|---|
-| **lead-triage** | 按互动、契合度与紧迫度给 HubSpot 线索打分,产出含话术的排序通话清单 | 「给线索排序」「先打给谁」「管道」 | HubSpot | Gmail、Google Calendar |
-| **content-strategy** | 分析销售数据找出畅销与滞销品,产出优先排序的 30 天内容简报 | 「我该发什么」「内容计划」「什么在卖」「该推什么」 | QuickBooks 或 PayPal | Square |
-| **canva-creator** | 拿到内容简报后执行整套营销:排期、Canva 素材、文案、HubSpot 暂存 | 「做内容」「生成帖子」「做素材」「把这个变成营销活动」 | Canva、HubSpot | —— |
+| **lead-triage** | 按互动、契合度与紧迫度给 HubSpot 线索打分,产出含话术的排序通话清单 | 「给线索排序」「先打给谁」「管道」 | HubSpot | 钉钉/飞书日历 |
+| **content-strategy** | 分析销售数据找出畅销与滞销品,产出优先排序的 30 天内容简报 | 「我该发什么」「内容计划」「什么在卖」「该推什么」 | 记账导出 或 支付宝账单导出 | 微信支付账单导出 |
+| **design-creator** | 拿到内容简报后执行整套营销:排期、逐素材设计说明与文案、HubSpot 暂存 | 「做内容」「生成帖子」「做素材」「把这个变成营销活动」 | HubSpot | 自营云端设计(待接入,当前由你执行设计说明) |
 
 ### 客户与运营
 
 | 技能 | 作用 | 你可以直接说 | 必需 | 可选 |
 |---|---|---|---|---|
-| **customer-pulse** | 汇总争议、工单、邮件情绪与评价,归纳主题报告 + 「本周做这三件事」清单 | 「客户感受如何」「大家在说什么」「争议」「评价分析」 | ——(优雅降级) | PayPal、HubSpot、Gmail |
-| **ticket-deflector** | 读取客户邮件或工单,拉订单/退款状态,起草语气匹配的回复;经批准可发起 PayPal 退款 | 「起草回复」「回这个客户」「我的订单到哪了」「我要退款」 | PayPal、HubSpot、邮箱 | Intercom、Square |
-| **crm-maintenance** | 保持 HubSpot 最新:建/更新联系人与商机、记录通话与备注、标记停滞记录 | 「更新 CRM」「记一通电话」「清理 HubSpot」「给商机补背景」 | HubSpot | Gmail、Google Calendar |
-| **contract-review** | 大白话合同审阅,含风险红旗、严重度评级与带批注的 redline DOCX | 「审一下这份合同」「我签的是什么」「标出隐患」「看下付款条款」 | ——(可上传文件) | Gmail、DocuSign |
+| **customer-pulse** | 汇总工单、邮件情绪与评价,归纳主题报告 + 「本周做这三件事」清单 | 「客户感受如何」「大家在说什么」「评价分析」 | ——(优雅降级,可粘贴文本) | HubSpot、支付宝账单导出 |
+| **ticket-deflector** | 读取客户邮件或工单,查订单/退款状态,起草语气匹配的回复;经批准可发起支付宝退款 | 「起草回复」「回这个客户」「我的订单到哪了」「我要退款」 | ——(可粘贴邮件/工单) | 支付宝(查单/退款)、HubSpot |
+| **crm-maintenance** | 保持 HubSpot 最新:建/更新联系人与商机、记录通话与备注、标记停滞记录 | 「更新 CRM」「记一通电话」「清理 HubSpot」「给商机补背景」 | HubSpot | 钉钉/飞书日历 |
+| **contract-review** | 大白话合同审阅,含风险红旗、严重度评级与带批注的 redline DOCX | 「审一下这份合同」「我签的是什么」「标出隐患」「看下付款条款」 | ——(可上传文件) | 众律宝(签署由你发起) |
 
 ### 招聘
 
 | 技能 | 作用 | 你可以直接说 | 必需 | 可选 |
 |---|---|---|---|---|
-| **job-post-builder** | 生成完整招聘包:岗位发布、含评分量表的结构化面试指南、录用通知模板 | 「帮我招人」「写个岗位」「职位描述」「招聘岗」「面试题」「起草录用通知」 | ——(可独立使用) | DocuSign、Google Drive |
+| **job-post-builder** | 生成完整招聘包:岗位发布、含评分量表的结构化面试指南、录用通知模板 | 「帮我招人」「写个岗位」「职位描述」「招聘岗」「面试题」「起草录用通知」 | ——(可独立使用) | 众律宝(签署由你发起)、腾讯文档 |
 
 ### 经营洞察与上手
 
 | 技能 | 作用 | 你可以直接说 | 必需 | 可选 |
 |---|---|---|---|---|
-| **business-pulse** | 一页经营快照:现金、销售、管道、承诺事项、关注清单,以及今天最该处理的那件事 | 「生意怎么样」「快照」「每周总结」「给我对一下进度」 | ——(优雅降级) | QuickBooks、PayPal、HubSpot、Google Calendar、Gmail、Slack |
+| **business-pulse** | 一页经营快照:现金、销售、管道、承诺事项、关注清单,以及今天最该处理的那件事 | 「生意怎么样」「快照」「每周总结」「给我对一下进度」 | ——(优雅降级) | 记账/支付宝账单导出、HubSpot、钉钉/飞书(日历与推送) |
 | **smb-onboard** | 带你连接工具、跑一个演示配方、采集业务背景,并设定每周复盘节奏 | 「帮我设置」「设置」「开始」「帮我上手」「我是新手」「你能做什么」 | —— | 全部连接器 |
 
 > 注:另有若干别名技能(如 `month-heads-up`、`monday-brief`、`friday-brief`、`call-list`、`price-check` 等)与上述命令同名,作为路由入口,均由 `smb-router` 统一调度。
@@ -141,4 +143,4 @@
 
 ## MCP 连接器
 
-> 如遇占位符或需确认已连接的工具,请参阅 [CONNECTORS.md](CONNECTORS.md)。
+> 连接器清单、凭证配置方式与「待接入」过渡口径,见 [CONNECTORS.md](CONNECTORS.md)。

@@ -40,12 +40,12 @@ Total:         $10,628 + $15,331 = $25,959
 
 ## 1099 threshold
 
-**BAD:** Only flag vendors with a QuickBooks "1099 eligible" tag.
-Many QuickBooks users never set this flag. Silently missing contractors is worse
-than over-flagging.
+**BAD:** Only flag vendors carrying a "1099 eligible" tag in the owner's accounting
+software export. Many owners never set this flag. Silently missing contractors is
+worse than over-flagging.
 
-**GOOD:** Pull ALL vendors with ≥ $600 in payments, then note which ones are
-1099-eligible per QuickBooks and which are flagged by category heuristics.
+**GOOD:** Work from ALL vendors with ≥ $600 in payments, then note which ones are
+tagged 1099-eligible in the export and which are flagged by category heuristics.
 Let the accountant make the final call.
 
 ---
@@ -61,14 +61,16 @@ These could be different people or the same person's sole-prop vs. LLC.
 
 ---
 
-## PayPal / Stripe 1099-K overlap
+## Incomplete payment-rail coverage
 
-**BAD:** Instruct the user to file 1099-NECs for all contractors paid via PayPal.
+**BAD:** Build the 1099 list from the accounting-software export alone and present it
+as complete when the owner also pays contractors through 支付宝 or 微信支付.
 
-**GOOD:** Flag the overlap and defer to the accountant.
-> "Contractors paid via PayPal or Stripe may already receive a 1099-K from those
-> platforms. Your accountant should confirm whether you also need to issue a
-> 1099-NEC — double-reporting is an issue some accountants handle differently."
+**GOOD:** Ask which payment rails the owner used, and state coverage explicitly.
+> "This list covers your accounting-software export and the 支付宝商家平台 bill you
+> uploaded. You mentioned some contractors are paid via 微信支付 — that export wasn't
+> provided, so those payments are not included. Upload the 微信支付商户平台 bill and
+> I'll re-run the aggregation."
 
 ---
 

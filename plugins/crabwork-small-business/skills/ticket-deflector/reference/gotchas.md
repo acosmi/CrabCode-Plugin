@@ -24,34 +24,34 @@ Draft in the owner's actual register. If no prior emails from the owner are avai
 
 ## Gotcha: Flagging data gaps inline, not at the end
 
-**Why it matters:** If PayPal has no matching transaction and the draft says "your refund of $X is being processed," the owner will send a false claim. Data gaps must be visible at the point they affect the message.
+**Why it matters:** If the order number is missing — or `query-alipay-payment` returns no match for it — and the draft says "your refund of ¥X is being processed," the owner will send a false claim. Data gaps must be visible at the point they affect the message.
 
 ### ✗ Bad
 
-Draft the reply as if all data is available, then add a footnote: "Note: I couldn't find a PayPal transaction."
+Draft the reply as if all data is available, then add a footnote: "Note: I couldn't find the Alipay payment."
 
 ### ✓ Good
 
 Insert the gap notice inside the draft at the exact sentence where it matters:
 
-> Hi Sarah, thanks for reaching out. I've looked into your order *[Note: No PayPal transaction found for this email — verify order ID before sending]* and want to get this sorted.
+> Hi Sarah, thanks for reaching out. I've looked into your order *[Note: No Alipay payment found for this order number — verify it before sending]* and want to get this sorted.
 
-The owner sees the problem before clicking send.
+The owner sees the problem before hitting send.
 
 ---
 
-## Gotcha: Multiple PayPal transactions for the same customer
+## Gotcha: The customer has multiple orders and no order number in the message
 
-**Why it matters:** A customer with two orders — one refunded, one not — will break a simple "most recent" lookup and produce the wrong draft.
+**Why it matters:** Alipay lookups are single-order by number — there is no search-by-email. When the owner checks 支付宝商家平台 and finds two orders — one refunded, one not — a "just use the most recent" assumption produces the wrong draft.
 
 ### ✗ Bad
 
-Auto-pick the most recent transaction and proceed without telling the owner.
+Assume the complaint is about the most recent order and proceed without telling the owner.
 
 ### ✓ Good
 
-Surface all matching transactions and pause:
+Surface all candidate orders and pause:
 
-> *"Found 2 PayPal transactions for this customer: (1) $49.00 · 2026-03-14 · Completed · (2) $129.00 · 2026-04-01 · Completed. Which one is this about?"*
+> *"Your 商家平台 lookup shows 2 orders for this customer: (1) ¥49.00 · 2026-03-14 · paid · (2) ¥129.00 · 2026-04-01 · paid. Which one is this about?"*
 
-Wait for the owner to confirm before writing the draft.
+Wait for the owner to confirm the order number before writing the draft.

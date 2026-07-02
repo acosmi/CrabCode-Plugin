@@ -54,7 +54,7 @@ Any threshold marked `# TODO: confirm with owner` should produce a note at the t
 
 ## Watch List
 
-No numeric thresholds — any escalation or complaint in Gmail/Slack gets surfaced. Severity is contextual; surface and let the owner decide.
+No numeric thresholds — any escalation or complaint in DingTalk/Feishu messages gets surfaced. Severity is contextual; surface and let the owner decide.
 
 ---
 

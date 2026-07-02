@@ -8,7 +8,7 @@ Work through every item. Present findings as a review list; write only what the 
 
 **Check:** Is the deal's `hs_lastactivitydate` older than the most recent real interaction (email or meeting) involving its associated contacts?
 
-**Evidence to flag:** An email thread or calendar event in the last 14 days with one of the deal's contacts, newer than `hs_lastactivitydate`.
+**Evidence to flag:** A pasted email thread or a DingTalk/Feishu calendar event in the last 14 days with one of the deal's contacts, newer than `hs_lastactivitydate`.
 
 **Proposed action:** Offer to log the missing activity. Don't mark the deal itself; logging the activity updates `hs_lastactivitydate` automatically.
 
@@ -48,7 +48,7 @@ Work through every item. Present findings as a review list; write only what the 
 
 **Check:** Are there people on recent emails or meetings with the deal's contacts who aren't themselves associated to the deal?
 
-**Evidence to flag:** An email CC or meeting attendee whose domain matches an existing deal contact's domain but who isn't on the deal.
+**Evidence to flag:** An email CC (in a pasted thread) or a DingTalk/Feishu meeting attendee whose domain matches an existing deal contact's domain but who isn't on the deal.
 
 **Proposed action:** Propose adding the missing contact(s) to the deal. Create the contact in HubSpot first if they don't exist yet.
 

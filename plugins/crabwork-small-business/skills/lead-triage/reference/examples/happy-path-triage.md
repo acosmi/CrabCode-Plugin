@@ -52,14 +52,16 @@ Would that work?
 
 [Owner name]
 ```
-Draft shown. Not sent.
+Draft shown in chat. Not sent — the owner copies it into their own email
+tool (or WeChat) and sends it.
 
 ---
 
 ## Calendar proposal — Sarah Chen
 
 ```
-Open 30-min slots (next 2 business days):
+Open 30-min slots (next 2 business days, checked via your Feishu
+calendar connector):
   • Thu Apr 25 · 10:00–10:30 AM
   • Thu Apr 25 · 2:00–2:30 PM
   • Fri Apr 26 · 9:00–9:30 AM

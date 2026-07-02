@@ -7,8 +7,8 @@ User message:
 > the roadmap for our checkout experience. We want 5+ years of PM experience,
 > ideally with a fintech or payments background. Remote-friendly, NYC preferred.
 > Comp is $160–185k base. Three interview rounds: recruiter screen, hiring manager
-> deep-dive, and a panel with two senior PMs. Send the offer via DocuSign when
-> we get there."
+> deep-dive, and a panel with two senior PMs. Get the offer ready to send for
+> signature when we get there."
 
 ---
 
@@ -24,7 +24,7 @@ User message:
 | Location | Remote-friendly, NYC preferred |
 | Compensation | $160–185k base |
 | Interview process | 3 rounds: recruiter screen, HM deep-dive, senior PM panel (2 people) |
-| Offer delivery | DocuSign |
+| Offer delivery | Signature-ready (owner sends via 众律宝 or on paper) |
 
 CrabCode confirms and asks exactly one question:
 > "Got it — hiring packet for a Senior PM on the payments team, $160–185k,
@@ -94,17 +94,23 @@ Based on `references/offer-letter-template.md`. Pre-filled where data is availab
 
 ---
 
-## Phase 6 — Expected browser flow
+## Phase 6 — Expected signature handoff
 
-1. CrabCode navigates to `https://app.docusign.com` and confirms login state.
-2. Clicks "Start → Send an Envelope".
-3. Uploads `Senior-PM-Offer-Letter.docx`.
-4. Asks: "What's the candidate's full name and email address?"
-5. Adds candidate as Signer; adds user as CC if requested.
-6. Sets subject: `Offer of Employment — Senior Product Manager at [Company Name]`.
-7. Places Signature and Date Signed fields on the acceptance line.
-8. Saves as draft — does NOT send.
-9. Returns draft URL and tells the user to review before confirming Send.
+1. CrabCode asks: "What's the candidate's full name (and email, if you want it in
+   the cover message)?"
+2. Finalizes `Senior-PM-Offer-Letter.docx`: fills the candidate name, keeps
+   `[ANNUAL SALARY — confirm with HR]` as a marked placeholder, and confirms the
+   acceptance section has clear Signature and Date lines.
+3. Drafts a cover message in chat — subject
+   `Offer of Employment — Senior Product Manager at [Company Name]` plus a short
+   warm note — for the user to paste when sending.
+4. Hands off: "The offer letter is final at [path]. Upload it to 众律宝 and send
+   it to [Candidate Name] for signature — or print it for a wet signature. I can't
+   send it for you yet (the 众律宝 connector is pending)."
+5. Does NOT send anything — no email, no signing link. If the user asks for a
+   reminder, CrabCode offers a DingTalk/Feishu message via the connected connector
+   and shows the text before sending.
 
-**Pass criteria:** User opens the draft URL, sees correct signature placement,
-and can send with one click. Envelope status is "Draft" until the user acts.
+**Pass criteria:** User receives a final .docx with the signer filled in, marked
+placeholders called out, and a paste-ready cover message. Nothing has been sent
+on the user's behalf, and CrabCode said so explicitly.

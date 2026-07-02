@@ -1,6 +1,7 @@
 ---
 name: tax-prep
-description: Prepares tax-season materials — quarterly estimated tax calculation or year-end 1099 prep — and produces an accountant handoff packet (framed as deliverables, not tax advice). Trigger when the owner runs /tax-prep or mentions "estimated taxes," "quarterly taxes," "how much to set aside for taxes," "1099s," "1099-NEC," "contractor payments," "W-9s," "year-end tax prep," or "my accountant needs..." Accepts optional mode and year arguments.
+version: 0.3.0
+description: Prepares tax-season materials — quarterly estimated tax calculation or year-end 1099 prep — and produces an accountant handoff packet (framed as deliverables, not tax advice). Works from owner-provided exports — accounting software (用友好会计 / 金蝶精斗云) CSV/Excel plus 支付宝商家平台 / 微信支付商户平台 bill exports. Trigger when the owner runs /tax-prep or mentions "estimated taxes," "quarterly taxes," "how much to set aside for taxes," "1099s," "1099-NEC," "contractor payments," "W-9s," "year-end tax prep," or "my accountant needs..." Accepts optional mode and year arguments.
 allowed-tools: Read, WebFetch, Bash
 ---
 
@@ -20,8 +21,8 @@ If `--mode` was not provided:
 
 ## Step 2 — Quarterly estimated tax (if mode includes quarterly)
 
-1. Pull YTD Profit & Loss from QuickBooks (Jan 1 through last completed quarter).
-2. If QuickBooks is not connected, ask the user to paste net income or upload a CSV.
+1. Ask the owner for a YTD Profit & Loss (Jan 1 through last completed quarter) exported from their accounting software (用友好会计 / 金蝶精斗云) as CSV/Excel — or pasted net income. There is no accounting-software connector yet; this is always an owner-provided export.
+2. If the owner can't export right now, work from pasted key numbers (gross revenue, total expenses, net income).
 3. Ask: "How much have you already paid in estimated taxes this year?"
 4. Calculate: SE tax, adjusted net income, federal income tax estimate (default 22% bracket), quarterly payment due.
 5. State every assumption explicitly — bracket, business type, exclusions.
@@ -29,11 +30,11 @@ If `--mode` was not provided:
 
 ## Step 3 — Year-end 1099 prep (if mode includes 1099)
 
-1. Pull contractor/vendor payments from all connected sources: QuickBooks, PayPal, Stripe.
+1. Gather contractor/vendor payments from owner-provided exports: the accounting-software vendor payment report (CSV/Excel) plus 支付宝商家平台 bill export — and 微信支付商户平台 bill export if the owner pays contractors via WeChat Pay (微信支付, not yet connected). Note: the alipay connector cannot export payment history, so bill data always comes from the 商家平台 export or pasted records.
 2. Aggregate by payee across sources. Flag likely duplicates for human review — never auto-merge.
 3. Apply the $600 threshold. Flag near-threshold payees ($400–$599).
-4. Check W-9 status in QuickBooks for each flagged payee.
-5. Deliver the 1099-NEC candidate list with missing W-9 action items and the PayPal/Stripe 1099-K overlap note.
+4. Check W-9 status from the accounting-software export for each flagged payee.
+5. Deliver the 1099-NEC candidate list with missing W-9 action items and a data coverage note stating which exports were provided.
 
 ## Approval gates
 

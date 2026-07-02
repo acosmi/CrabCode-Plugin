@@ -1,5 +1,6 @@
 ---
 name: job-post-builder
+version: 0.3.0
 description: >
   Builds end-to-end hiring packets — job post, structured interview guide with
   scoring rubric, and offer letter template — from a hiring brief. Triggers on:
@@ -7,15 +8,16 @@ description: >
   "JD", "open role", "create a job ad", "interview questions", "scoring rubric",
   "draft an offer letter", "send an offer", "make a hiring packet", or any
   request to recruit for a position. When in doubt, trigger — covers the full
-  hiring workflow from job post through DocuSign envelope creation via browser.
-  Does NOT screen or rank applicants.
+  hiring workflow from job post through a signature-ready offer letter the
+  owner sends via 众律宝 (or on paper). Does NOT screen or rank applicants.
 ---
 
 # Job Post Builder
 
 Produces a complete hiring packet — job post, interview guide, and offer letter
-— from a brief conversation about the role. Optionally routes the offer letter
-to DocuSign via CrabCode in Chrome.
+— from a brief conversation about the role. Optionally finalizes the offer
+letter as a signature-ready document for the owner to send via 众律宝 (the
+in-house e-sign service — its connector is pending) or sign on paper.
 
 ---
 
@@ -24,7 +26,7 @@ to DocuSign via CrabCode in Chrome.
 Invoke when a user says they need to hire someone or produce any hiring document.
 The skill walks a 6-phase workflow: gather context → research the market → write
 the job post → draft the interview guide → assemble the offer letter → (optionally)
-route to DocuSign.
+prepare it for signature.
 
 **Example trigger:**
 > "We're hiring a senior product manager. Can you put together the job post and
@@ -35,11 +37,11 @@ route to DocuSign.
 ## Workflow
 
 1. **Gather role context** — Ask for role title, responsibilities, qualifications,
-   location, comp, interview process, and offer delivery preference (Word doc vs.
-   DocuSign). Source: conversation / AskUserQuestion.
-2. **Research comparable posts** — Search Google Drive / Desktop for existing JDs
-   and templates; run web search for 3–5 live postings for this role. Sources:
-   file MCP, web search.
+   location, comp, interview process, and offer delivery preference (plain Word doc
+   vs. signature-ready for 众律宝). Source: conversation / AskUserQuestion.
+2. **Research comparable posts** — Search 腾讯文档 (via the tencent-docs connector)
+   and Desktop for existing JDs and templates; run web search for 3–5 live postings
+   for this role. Sources: tencent-docs MCP, local files, web search.
 3. **Write the job post** — Draft a market-informed job description using
    `reference/job-post-structure.md`. Output: `[Role]-Job-Post.docx` via docx skill.
 4. **Draft interview guide + scoring rubric** — Build a stage-by-stage guide using
@@ -48,25 +50,24 @@ route to DocuSign.
 5. **Assemble offer letter** — Build offer letter with bracketed placeholders using
    `reference/offer-letter-template.md`. Output: `[Role]-Offer-Letter.docx` via
    docx skill.
-6. **Route to DocuSign (if requested)** — Use CrabCode in Chrome to navigate DocuSign,
-   upload the offer letter, configure the envelope, and save a draft. Requires
-   explicit user approval before the envelope is sent.
+6. **Prepare for signature (if requested)** — Finalize the offer letter with
+   signature and date blocks and a draft cover message. The owner sends it for
+   signature via 众律宝 (or on paper) manually — there is no e-sign connector yet.
 
 ---
 
 ## Approval gates
 
-This skill performs externally-visible actions in Phase 6. The following rules apply:
-
-- **Never send a DocuSign envelope without approval.** Save the envelope as a draft
-  and return the URL. The user must review and confirm before CrabCode clicks Send.
-- **Never send the Gmail fallback email without approval.** If the DocuSign browser
-  flow fails, draft the fallback email and show it to the user before sending.
+- **Never claim the offer was sent or routed for signature.** The skill prepares
+  the final document; sending it via 众律宝 (or printing it) is the owner's manual
+  step. Say so explicitly at handoff.
+- **Never send any email.** There is no email connector yet (腾讯企业邮 pending).
+  Any cover message or note is drafted in chat for the owner to copy and send.
+  Where a simple notification suffices (e.g., telling the owner or a teammate the
+  packet is ready), offer to send a DingTalk/Feishu message via the connected
+  connector — show the message and get approval first.
 - **Never publish the job post.** Produce the .docx file only. Posting to any job
   board is the user's responsibility.
-
-Phase 6 will not advance past "Save as draft" without the user explicitly confirming
-they have reviewed the envelope and want it sent.
 
 ---
 
@@ -82,10 +83,13 @@ Ask the user (via conversation or AskUserQuestion) for:
 - **Nice-to-have qualifications** — preferred but not required
 - **Location / remote policy** — on-site, hybrid, or fully remote; location if relevant
 - **Compensation range** — salary band if they have one (flag that this needs HR/legal sign-off)
-- **Existing JD or template?** — ask if there's a prior version in Google Drive or on their Desktop to use as a starting point
+- **Existing JD or template?** — ask if there's a prior version in 腾讯文档 or on their Desktop to use as a starting point
 - **Offer letter delivery preference** — ask how they'd like the offer letter delivered:
-  - *Send directly via DocuSign* — skill opens DocuSign in Chrome, uploads the letter, sets up the envelope, and saves a draft for review before sending
-  - *Just the Word doc* — skill saves the offer letter as a .docx and stops there; the user handles routing themselves
+  - *Signature-ready for 众律宝* — skill finalizes the letter with signature and
+    date blocks plus a draft cover message; the user uploads and sends it in
+    众律宝 themselves (the 众律宝 connector is pending — the skill cannot send it)
+  - *Just the Word doc* — skill saves the offer letter as a .docx and stops there;
+    the user handles routing themselves
 
 - **Interview process** — ask how their hiring process is structured:
   - How many rounds/stages are there?
@@ -107,8 +111,9 @@ Ask the user (via conversation or AskUserQuestion) for:
   | Final / culture interview | Skip-level or exec | Values, long-term trajectory |
 
 Capture the delivery preference in Phase 1 so the right Phase 5/6 path is clear
-before any writing starts. If the user already indicated a preference (e.g. "send
-it to DocuSign"), extract it from their message rather than asking again.
+before any writing starts. If the user already indicated a preference (e.g. "get
+it ready to send for signature"), extract it from their message rather than
+asking again.
 
 If the user has already provided most of this in their message, extract it and
 confirm before moving on rather than asking redundant questions. One focused
@@ -122,16 +127,16 @@ Good job posts are grounded in what the market actually says for this role.
 Do both of the following in parallel:
 
 **A. Check existing files first**
-Search Google Drive and Desktop for prior JDs, offer letter templates, or
-interview guides the user may already have. Use file search tools with terms like
-the role title, "job description", "JD", "offer letter", "interview". If found,
+Search 腾讯文档 (via the tencent-docs connector) and Desktop for prior JDs, offer
+letter templates, or interview guides the user may already have. Search with terms
+like the role title, "job description", "JD", "offer letter", "interview". If found,
 read them and use them as the baseline — preserving any existing language,
-structure, or requirements the user has established.
+structure, or requirements the user has established. If tencent-docs isn't
+connected, ask the user to upload any existing templates or point to local files.
 
 **B. Web search for comparable posts**
-Search for current job postings for this role at comparable companies. Good
-sources include LinkedIn, Greenhouse, Lever, Workday, and company career pages.
-Look for 3–5 real postings and note:
+Search for current job postings for this role at comparable companies. Look for
+3–5 real postings on mainstream job boards and company career pages, and note:
 - Common responsibilities listed for this role
 - Qualifications that appear consistently (these are table stakes)
 - How companies describe the role's impact/scope
@@ -255,55 +260,44 @@ Build from scratch using `reference/offer-letter-template.md` as the full templa
 Save as `[Role]-Offer-Letter.docx` using the docx skill.
 
 **Then branch based on the delivery preference captured in Phase 1:**
-- If the user chose **DocuSign** → proceed to Phase 6
+- If the user chose **signature-ready for 众律宝** → proceed to Phase 6
 - If the user chose **Word doc only** → skip Phase 6, deliver the .docx and close out
 
 ---
 
-## Phase 6 — Route the Offer Letter Directly to DocuSign
+## Phase 6 — Prepare the Offer Letter for Signature
 
-Use CrabCode in Chrome to upload the offer letter into DocuSign and set up the
-envelope, so the user doesn't have to touch DocuSign manually.
+There is no e-sign connector yet — the 众律宝 connector is pending. This phase
+gets the document to the point where the owner's only remaining step is to send
+it via 众律宝 (or print it for a wet signature).
 
-**Step-by-step browser flow:**
+1. **Collect candidate details.** Confirm the candidate's full name (and email,
+   if the owner wants it in the cover message) before finalizing — never hand off
+   a letter with a blank signer.
 
-1. Navigate to `https://app.docusign.com` — the user should already be logged in.
-   If a login screen appears, pause and ask the user to log in, then continue.
+2. **Finalize the DOCX.** Fill in every field that has a confirmed value; make
+   sure the acceptance section has clear Signature and Date lines. Any field that
+   still needs HR confirmation stays as a clearly marked `[BRACKETED]` placeholder
+   and is called out at handoff.
 
-2. Click **"Start" → "Send an Envelope"** (or the equivalent "New" / "Use a Template"
-   button depending on the UI version).
-
-3. **Upload the offer letter:** Click "Upload Documents" and upload the
-   `[Role]-Offer-Letter.docx` file that was just created.
-
-4. **Add the signer:** In the Recipients section, add the candidate as a signer.
-   Ask the user for the candidate's name and email if not already provided.
-   Set their role to "Signer".
-
-5. **Add the sender as a CC recipient** if the user wants a copy (ask if unsure).
-
-6. **Set the subject line:** `Offer of Employment — [Role Title] at [Company Name]`
-
-7. **Add a message:**
+3. **Draft a cover message** the owner can paste when sending — subject line
+   `Offer of Employment — [Role Title] at [Company Name]` and a short warm note:
    > "Hi [Candidate First Name], we're thrilled to extend this offer and look
    > forward to having you join the team. Please review and sign at your
    > earliest convenience. Don't hesitate to reach out if you have any questions."
 
-8. **Place signature fields:** On the document, place a Signature field and a
-   Date Signed field on the candidate acceptance line at the bottom of the letter.
+   Present it in chat. Do not send it — there is no email connector.
 
-9. **Save as draft** — do NOT send. Return the envelope URL to the user so they
-   can review before sending.
+4. **Hand off.** Tell the user:
+   > "The offer letter is final at [file path]. Upload it to 众律宝 and send it to
+   > [Candidate Name] for signature — or print it for a wet signature. I can't
+   > send it for you yet (the 众律宝 connector is pending). The cover message
+   > above is ready to paste."
 
-Tell the user:
-> "The DocuSign envelope has been set up with the offer letter and candidate
-> details. Here's the draft link: [ENVELOPE URL]. Review the signature placement,
-> then confirm here when you're ready to send."
-
-**Fallback:** If DocuSign is unavailable or the browser flow fails at any step,
-fall back to the Gmail draft approach: draft an email via the Gmail MCP with the
-offer letter attached and a note to upload it to DocuSign manually. Show the
-draft to the user before sending.
+**Optional notification:** If the user wants to nudge themselves or a teammate
+(e.g., "remind me to send this tonight"), offer to send a DingTalk/Feishu message
+via the connected connector. Show the message text and wait for approval before
+sending.
 
 ---
 
@@ -313,7 +307,8 @@ Once all three files are created, present them together:
 
 Present a summary listing the three deliverables by role title: the job post
 docx (ready to post), the interview guide docx (share with interviewers), and
-the offer letter docx (routed to DocuSign draft or ready for manual upload).
+the offer letter docx (signature-ready for 众律宝, or a plain template if the
+user chose Word doc only).
 
 Remind the user:
 - The offer letter template needs legal review before use in any jurisdiction

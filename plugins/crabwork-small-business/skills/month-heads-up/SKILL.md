@@ -1,10 +1,11 @@
 ---
 name: month-heads-up
-description: Shows the next 30-day forward cash-flow outlook from QuickBooks and PayPal and flags anything that needs attention before month-end — designed to run around the 25th. Trigger when the owner runs /month-heads-up or asks "what does next month look like," "cash forecast," "what's my runway," "anything I need to watch before month-end," "will I be okay on cash," or wants a look-ahead at upcoming cash. Accepts optional 30 or 60 day horizon.
+version: 0.3.0
+description: Shows the next 30-day forward cash-flow outlook from the owner's accounting-software export (用友好会计 / 金蝶精斗云) and 支付宝商家平台 bill data, and flags anything that needs attention before month-end — designed to run around the 25th. Trigger when the owner runs /month-heads-up or asks "what does next month look like," "cash forecast," "what's my runway," "anything I need to watch before month-end," "will I be okay on cash," or wants a look-ahead at upcoming cash. Accepts optional 30 or 60 day horizon.
 allowed-tools: Read, WebFetch, Bash
 ---
 
-Run the month-end heads-up. Pull forward-looking cash data and give the owner a clear "here's what the next 30 days look like" picture with specific things to watch.
+Run the month-end heads-up. Gather forward-looking cash data and give the owner a clear "here's what the next 30 days look like" picture with specific things to watch.
 
 Parse arguments:
 - `--horizon` (default: `30`) — forecast window in days (`30` or `60`)
@@ -13,15 +14,15 @@ Parse arguments:
 
 Using the `cash-flow-snapshot` skill workflow:
 
-1. Pull QuickBooks current cash and receivables balance.
-2. Pull PayPal settled balance and pending payouts.
+1. Ask the owner for current cash and receivables balances — a CSV/Excel export or pasted report from their accounting software (用友好会计 / 金蝶精斗云). There is no accounting-software connector yet.
+2. Ask for the 支付宝 settled balance and pending settlements — pasted from 支付宝商家平台 or as a bill export (CSV). The alipay connector cannot pull balances or export history, so this is always owner-provided. Same for 微信支付商户平台 if the owner takes WeChat Pay (微信支付, not yet connected).
 3. Combine for total available + incoming cash.
 
 ## Step 2 — Upcoming obligations
 
-1. Pull recurring expenses from QuickBooks (payroll, subscriptions, rent/lease) due in the next 30 days.
-2. Pull any outstanding invoices past due or due within 14 days.
-3. Flag any payment that would push the balance below a comfortable buffer (default: <$2,000 or owner's QB average monthly expense × 0.5).
+1. From the accounting export, list recurring expenses (payroll, subscriptions, rent/lease) due in the next 30 days — ask the owner to confirm or fill gaps.
+2. List any outstanding invoices past due or due within 14 days.
+3. Flag any payment that would push the balance below a comfortable buffer (default: <$2,000 or the owner's average monthly expense × 0.5, computed from the export).
 
 ## Step 3 — Cash-flow forecast
 
@@ -50,15 +51,15 @@ TWO THINGS TO WATCH
 2. {item} — {why it matters} — suggested action: {action}
 ```
 
-## Connector failures
+## Missing data
 
-If QuickBooks is unreachable, stop — the cash forecast requires QB as the source of truth. If PayPal is missing, run the forecast from QB-only data and note "PayPal not connected — PayPal receivables excluded from forecast." Same for Stripe/Square if missing.
+If the owner cannot provide accounting data (export or pasted balances), stop — the cash forecast requires the books as the source of truth. If 支付宝 balance/bill data is missing, run the forecast from the accounting data only and note "支付宝 data not provided — 支付宝 receivables excluded from forecast." Same for 微信支付 if missing. Because all inputs are point-in-time exports, state the as-of date of the data in the brief.
 
 ## Approval gates
 
-- **Never initiate payments or send emails automatically.** Surface the data and actions for the owner to take.
-- **Never project revenue that hasn't been confirmed in QB or PayPal.** Use conservative estimates only.
+- **Never initiate payments or send anything automatically.** Surface the data and actions for the owner to take.
+- **Never project revenue that hasn't been confirmed in the books or the 支付宝/微信支付 bills.** Use conservative estimates only.
 
 ## Output
 
-Present the formatted brief and offer to draft chase emails for any flagged overdue invoices.
+Present the formatted brief and offer to draft chase reminders for any flagged overdue invoices — drafted in chat for the owner to copy and send (no email connector yet), or sent as a DingTalk/Feishu message via the connected connector if the owner wants an internal nudge instead.

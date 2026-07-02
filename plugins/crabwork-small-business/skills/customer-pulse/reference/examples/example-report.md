@@ -8,27 +8,27 @@
 ## Customer Pulse — April 1–30, 2026
 
 ### Sources pulled
-- PayPal disputes: 4
+- Payment disputes/refunds (支付宝商家平台 export): 4
 - HubSpot tickets: 9
-- Gmail threads: 14
+- Pasted emails: 14
 - Intercom conversations: 6
 - Pasted reviews: 0
 
 ### Themes
 
 **1. Shipping delays causing repeat complaints** (11 signals)
-> "Ordered 2 weeks ago and still nothing — this is unacceptable." — [Gmail]
+> "Ordered 2 weeks ago and still nothing — this is unacceptable." — [Email]
 > "Package was 10 days late and support never responded." — [Intercom]
 > "Where is my order? The tracking hasn't updated in 5 days." — [HubSpot]
 
 **2. Refund process too slow** (8 signals)
-> "I filed a dispute because I never got a response to my refund request." — [PayPal]
-> "It's been two weeks since I asked for a refund. Still waiting." — [Gmail]
+> "I opened a refund complaint because I never got a response to my refund request." — [Payments]
+> "It's been two weeks since I asked for a refund. Still waiting." — [Email]
 > "Your return policy says 5 days but it's been 12." — [HubSpot]
 
 **3. Product quality below expectations** (5 signals)
 > "The stitching came apart after one wash." — [Intercom]
-> "Looks nothing like the photo." — [Gmail]
+> "Looks nothing like the photo." — [Email]
 > "Would not buy again — quality is not what I expected for the price." — [HubSpot]
 
 ### Do these 3 things this week
@@ -38,15 +38,15 @@
 
 ---
 
-## Example: PayPal rate-limited run
+## Example: run without a payment export
 
 **Trigger used:** "Customer pulse for last 30 days"
 
 ### Sources pulled
-- PayPal disputes: rate-limited — not included
+- Payment disputes/refunds: not provided — not included
 - HubSpot tickets: 7
-- Gmail threads: 11
+- Pasted emails: 11
 - Intercom conversations: 4
 - Pasted reviews: 3
 
-*(Report continues normally with available sources. PayPal note appears only in Sources — no error message in the body.)*
+*(Report continues normally with available sources. The payments note appears only in Sources — no error message in the body.)*

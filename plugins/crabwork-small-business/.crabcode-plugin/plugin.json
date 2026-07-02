@@ -1,7 +1,7 @@
 {
   "name": "crabwork-small-business",
-  "version": "0.1.0",
-  "description": "Pre-built small business workflows (including payroll planning, month-end close, weekly briefs, and growth campaigns) using your QuickBooks, PayPal, HubSpot, Docusign, Gsuite, O365, Canva, and other connected tools. You approve every step that touches money or customers.",
+  "version": "0.2.0",
+  "description": "Pre-built small business workflows (including payroll planning, month-end close, weekly briefs, and growth campaigns) using Alipay, DingTalk, Feishu, Tencent Docs, your accounting software, and other connected tools. You approve every step that touches money or customers.",
   "author": {
     "name": "CrabCode"
   },
@@ -16,10 +16,57 @@
     "small-business",
     "accounting"
   ],
+  "userConfig": {
+    "alipay_app_id": {
+      "type": "string",
+      "title": "支付宝应用 APPID",
+      "description": "支付宝开放平台申请的应用 ID。不配置则支付宝连接器不启动,收款相关技能改用账单导出/手动数据。"
+    },
+    "alipay_app_key": {
+      "type": "string",
+      "title": "支付宝应用私钥",
+      "description": "开放平台应用私钥(RSA2)。仅存本机安全存储,不进模型上下文。",
+      "sensitive": true
+    },
+    "alipay_public_key": {
+      "type": "string",
+      "title": "支付宝公钥",
+      "description": "用于验签的支付宝公钥,在开放平台获取。",
+      "sensitive": true
+    },
+    "dingtalk_client_id": {
+      "type": "string",
+      "title": "钉钉应用 Client ID",
+      "description": "钉钉开放平台应用的 AppKey。不配置则钉钉连接器不启动。"
+    },
+    "dingtalk_client_secret": {
+      "type": "string",
+      "title": "钉钉应用 Client Secret",
+      "description": "钉钉开放平台应用的 AppSecret。",
+      "sensitive": true
+    },
+    "lark_app_id": {
+      "type": "string",
+      "title": "飞书应用 App ID",
+      "description": "飞书开放平台自建应用的 App ID。不配置则飞书连接器不启动。"
+    },
+    "lark_app_secret": {
+      "type": "string",
+      "title": "飞书应用 App Secret",
+      "description": "飞书开放平台自建应用的 App Secret。",
+      "sensitive": true
+    },
+    "tencent_docs_token": {
+      "type": "string",
+      "title": "腾讯文档访问令牌",
+      "description": "docs.qq.com 开放平台的 API 访问令牌(Bearer)。不配置则腾讯文档连接器不启动。",
+      "sensitive": true
+    }
+  },
   "skills": [
     "./skills/business-pulse",
     "./skills/call-list",
-    "./skills/canva-creator",
+    "./skills/design-creator",
     "./skills/cash-flow-snapshot",
     "./skills/close-month",
     "./skills/content-strategy",

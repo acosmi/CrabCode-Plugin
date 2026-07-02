@@ -1,13 +1,15 @@
 ---
 name: lead-triage
-version: 0.1.1
+version: 0.3.0
 description: >
   Scores inbound HubSpot leads by engagement signals, company fit, and urgency
   markers to produce a "call these 5 today" list with talking points, drafts
-  the follow-ups, and blocks Calendar time. Use when the user asks to prioritize
-  leads, "who should I call first," "who are my hottest leads," "what's in my
-  pipeline," "which deals need attention," "who do I follow up with," or wants
-  inbound prospects ranked by who's most worth contacting now.
+  the follow-ups for the owner to send, and proposes call slots against the
+  owner's DingTalk (钉钉日程) or Feishu (飞书日历) calendar. Use when the user
+  asks to prioritize leads, "who should I call first," "who are my hottest
+  leads," "what's in my pipeline," "which deals need attention," "who do I
+  follow up with," or wants inbound prospects ranked by who's most worth
+  contacting now.
 ---
 
 # Lead Triage
@@ -43,9 +45,9 @@ User: "prioritize my leads"
 
    For each lead: name, company, score, one-paragraph talking point, last activity summary. If engagement signals are all >30 days old, flag: *"Engagement signals are stale — approach as cold outreach."*
 
-5. **Offer follow-up drafts.** Ask: *"Draft follow-ups for any of these?"* If yes, write one email per selected lead, matching the tone of their last outbound thread in Mail. Show draft; do not send.
+5. **Offer follow-up drafts.** Ask: *"Draft follow-ups for any of these?"* If yes, write one email per selected lead, drawing tone and context from the lead's HubSpot notes and logged activity — there is no email connector, so if the owner wants the last thread matched exactly, ask them to paste it. Show the draft in chat; the owner copies it into their own email tool or WeChat and sends it. Never send.
 
-6. **Offer calendar slots.** Ask: *"Propose call slots for any of these?"* If yes, check Calendar for open 30-minute windows in the next two business days (avoid slots with existing events ±15 min). Propose two options per lead. Do not create events — the owner books.
+6. **Offer calendar slots.** Ask: *"Propose call slots for any of these?"* If yes, check the owner's calendar via the connected DingTalk (钉钉日程) or Feishu (飞书日历) connector for open 30-minute windows in the next two business days (avoid slots with existing events ±15 min). Propose two options per lead. Do not create events — the owner books. If neither calendar connector is configured, propose reasonable times as a plain list and flag that availability wasn't checked.
 
 ## Approval gates
 

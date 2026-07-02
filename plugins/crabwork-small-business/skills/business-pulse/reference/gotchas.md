@@ -4,68 +4,65 @@ Known failure modes for the business-pulse skill. Good / Bad pairs.
 
 ---
 
-## Gotcha: QuickBooks returns unexpected state
+## Gotcha: No accounting export provided
 
-**Why it matters:** QuickBooks can return empty results, a sync-in-progress state, or an auth error without throwing a hard exception. Treating silence as "no data" causes the pulse to skip Cash entirely without telling the owner — they assume their business has no QuickBooks data.
+**Why it matters:** There is no connector for the owner's accounting software (用友好会计 / 金蝶精斗云) — cash and AR data only exist if the owner uploaded an export or pasted figures this session. Skipping the Cash section silently makes the owner assume the pulse checked their books and found nothing.
 
 ### ✗ Bad
 
 ```
-CrabCode: [QuickBooks returns empty response]
+CrabCode: [no accounting export in session]
         → skips Cash section silently
-        → pulse presents no cash data; owner assumes QB isn't connected
+        → pulse presents no cash data; owner assumes the books were checked
 ```
 
-The owner spends 10 minutes reconnecting QuickBooks before realizing it was always connected — just in a transient state.
+The owner acts on an "all clear" that was never actually verified.
 
 ### ✓ Good
 
 ```
-CrabCode: [QuickBooks returns empty response or error]
-        → Cash section header present with: "n/a — QuickBooks unavailable (sync error or auth required)"
-        → "Sources unavailable: QuickBooks — returned empty response" in appendix
+CrabCode: [no accounting export in session]
+        → Cash section header present with: "n/a — no accounting export provided this session"
+        → "Sources unavailable: accounting software — no export provided" in appendix
+        → one line at the end: "Upload a 用友好会计/金蝶精斗云 export and I'll fill in the finance sections."
 ```
 
-The owner sees the gap explicitly and can decide whether to reconnect or proceed with a partial pulse.
+The owner sees the gap explicitly and can provide the export or proceed with a partial pulse.
 
 ---
 
-## Gotcha: Gmail auth failure mid-pulse
+## Gotcha: Trying to pull sales history through the alipay connector
 
-**Why it matters:** Gmail auth is intermittently flaky in workshop environments. Surfacing a raw auth error in the middle of the pulse looks broken and breaks the owner's trust in the skill.
+**Why it matters:** The alipay connector's only tools create payment links, query a single payment by order number, and process refunds. It cannot bulk-export transactions, settlements, or AR. Attempting a "pull 7-day settlements" call against it fails or, worse, produces a misleading single-payment answer.
 
 ### ✗ Bad
 
 ```
-CrabCode: [Gmail auth error mid-composition]
-        → "Error: Gmail authentication failed. Please re-authenticate."
-        → pulse output stops or shows raw error in Watch List section
+CrabCode: [calls query-alipay-payment hoping for a transaction list]
+        → gets a single-payment lookup error or an unrelated record
+        → reports "支付宝 revenue: $0" in the pulse
 ```
-
-The owner sees a broken tool, not a useful briefing.
 
 ### ✓ Good
 
 ```
-CrabCode: [Gmail auth error]
-        → continues pulse without Watch List section
-        → appendix: "Gmail — auth error; Watch List unavailable this run"
-        → all other sections unaffected
+CrabCode: [needs sales trend]
+        → uses the 支付宝商家平台 bill export the owner provided
+        → if none provided: Revenue section shows "n/a — no bill export provided"
+        → alipay connector is only used when the owner asks about one specific payment by order number
 ```
-
-The pulse still delivers value. The owner is informed, not alarmed.
 
 ---
 
-## Gotcha: Asking permission before pulling data
+## Gotcha: Asking permission before pulling connector data
 
-**Why it matters:** The skill's core value is doing the work without prompting. An owner who invoked the pulse already implicitly approved the data pull. Asking "should I check QuickBooks?" or "can I read your emails?" defeats the purpose and erodes trust in the skill as an autonomous assistant.
+**Why it matters:** The skill's core value is doing the work without prompting. An owner who invoked the pulse already implicitly approved the data pull from connected tools. Asking "should I check HubSpot?" or "can I look at your Feishu messages?" defeats the purpose and erodes trust in the skill as an autonomous assistant.
 
 ### ✗ Bad
 
 ```
 Owner: "catch me up on the business"
-CrabCode: "Should I check QuickBooks for your cash balance? And is it okay to look at your HubSpot pipeline?"
+CrabCode: "Should I check your HubSpot pipeline? And is it okay to look at your DingTalk messages?"
 ```
 
 Three more round trips before anything useful is delivered.
@@ -74,30 +71,32 @@ Three more round trips before anything useful is delivered.
 
 ```
 Owner: "catch me up on the business"
-CrabCode: [immediately dispatches all parallel tool calls]
-        → presents pulse in one response
+CrabCode: [immediately dispatches all parallel connector calls: HubSpot + DingTalk/Feishu]
+        → presents pulse in one response, finance sections filled from any exports already provided
 ```
+
+Note the distinction: requesting a finance export (which no connector can reach) is a data handoff, not a permission question — do it once, at the end, without blocking the pulse.
 
 ---
 
-## Gotcha: Slack write requires explicit confirmation
+## Gotcha: DingTalk/Feishu message send requires explicit confirmation
 
-**Why it matters:** Slack write is not tested in the standard validation path and posts to channels other people can see. Auto-posting without confirmation could embarrass the owner or spam a team.
+**Why it matters:** Sending a DingTalk/Feishu message posts into chats other people can see. Auto-sending the pulse without confirmation could embarrass the owner or broadcast financials to the whole team.
 
 ### ✗ Bad
 
 ```
 CrabCode: [at end of pulse]
-        "I've posted this to #general."
+        "I've sent this to your team's DingTalk group."
 ```
 
-Owner never asked for a Slack post; now the whole team has the financial data.
+Owner never asked for it; now the whole team has the financial data.
 
 ### ✓ Good
 
 ```
 CrabCode: [at end of pulse]
-        "Want me to post this to Slack? If so, which channel?"
+        "Want me to send this via DingTalk or Feishu? If so, to which chat?"
 ```
 
-Slack write only happens with a specific "yes + channel name" from the owner. Never assume.
+A message is sent only with a specific "yes + destination" from the owner. Never assume.

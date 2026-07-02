@@ -1,28 +1,28 @@
-# Example: Refund request — PayPal transaction found
+# Example: Refund request — Alipay payment found
 
-**Scenario:** A customer emails saying their product arrived damaged and they want a full refund. The owner forwards the email and says "answer this customer."
+**Scenario:** A customer emails saying their product arrived damaged and they want a full refund. The owner pastes the email and says "answer this customer."
 
 ---
 
-## Customer email (forwarded)
+## Customer email (pasted by the owner)
 
 > **Subject:** Damaged product — need refund
 >
-> Hi, I ordered a cutting board set last month and it arrived cracked. I'd like a full refund please. My order number is PP-3847-XXXX.
+> Hi, I ordered a cutting board set last month and it arrived cracked. I'd like a full refund please. My order number is 20260328001847.
 >
 > — Sarah M.
 
 ---
 
-## Step 2 — PayPal lookup result
+## Step 2 — Alipay lookup result
 
-Found 1 transaction matching sarah.m@email.com:
+`query-alipay-payment` with order number 20260328001847 returns:
 
-- **Transaction ID:** PP-3847-XXXX
-- **Amount:** $64.00
+- **Order number (out_trade_no):** 20260328001847
+- **Amount:** ¥64.00
 - **Date:** 2026-03-28
-- **Status:** Completed
-- **Refund issued:** No
+- **Trade status:** paid
+- **Refund check (`query-alipay-refund`):** no refund on record
 
 ---
 
@@ -41,7 +41,7 @@ Contact found: Sarah M. (sarah.m@email.com)
 >
 > Hi Sarah,
 >
-> So sorry to hear your cutting board set arrived cracked — that's definitely not okay. I've pulled up your order and I'm issuing a full refund of $64.00. You should see it back on your original payment method within 3–5 business days.
+> So sorry to hear your cutting board set arrived cracked — that's definitely not okay. I've pulled up your order and I'm issuing a full refund of ¥64.00. You should see it back on your original payment method within 3–5 business days.
 >
 > Thanks for letting me know, and I appreciate your patience. Really sorry about this.
 >
@@ -55,23 +55,23 @@ Contact found: Sarah M. (sarah.m@email.com)
 
 ## Step 6 — Refund approval prompt
 
-> *"Issue refund of $64.00 to Sarah M. (sarah.m@email.com) for transaction PP-3847-XXXX? Reply Y to proceed."*
+> *"Issue refund of ¥64.00 to Sarah M. (sarah.m@email.com) for order 20260328001847? Reply Y to proceed."*
 
 Owner replies: **Y**
 
-→ Refund issued via PayPal.
+→ Refund issued via `refund-alipay-payment`.
 
 ---
 
-## Step 7 — Send + HubSpot note
+## Step 7 — Hand-off + HubSpot note
 
-Reply sent via Gmail.
+Final reply handed to the owner, who sends it from their own mailbox (no email connector).
 
 HubSpot note logged on Sarah M.'s contact:
-> "Ticket Deflector — 2026-04-23: Customer reported damaged product. Full refund of $64.00 issued via PayPal (PP-3847-XXXX). Reply sent via email."
+> "Ticket Deflector — 2026-04-23: Customer reported damaged product. Full refund of ¥64.00 issued via Alipay (order 20260328001847). Reply drafted and handed to owner to send."
 
 ---
 
 ## Step 8 — Report
 
-> Reply sent to Sarah M. · Refund of $64.00 issued (PP-3847-XXXX) · HubSpot note logged.
+> Reply finalized for Sarah M. (owner to send) · Refund of ¥64.00 issued via Alipay (20260328001847) · HubSpot note logged.

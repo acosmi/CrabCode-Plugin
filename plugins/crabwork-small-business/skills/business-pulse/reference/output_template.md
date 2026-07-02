@@ -39,7 +39,7 @@ Variables in `{{double braces}}` are placeholders — replace with computed valu
 ## 📈 Revenue & Sales — {{🟢|🟡|🔴}}
 
 - **7-day settlements**: ${{SETTLEMENTS}} ({{▲|▼|▬}} {{PCT}}% vs. prior 7 days)
-- **PayPal**: ${{PAYPAL_TOTAL}} | **Square**: ${{SQUARE_TOTAL}} {{omit if not connected}}
+- **Alipay (支付宝)**: ${{ALIPAY_TOTAL}} | **WeChat Pay (微信支付)**: ${{WECHATPAY_TOTAL}} {{omit if no bill export provided}}
 
 **Unusual transactions**
 - {{amount}} — {{counterparty}} — {{status: failed/pending/large}}
@@ -89,9 +89,9 @@ overdue. Call Sarah Chen at 415-555-0192 today."}}
 
 **Window**: {{date range}}
 
-**Sources pulled**: {{list of connectors that returned data}}
+**Sources pulled**: {{list of connectors that returned data and owner-provided exports used}}
 
-**Sources unavailable**: {{list with reason, e.g. "Gmail — auth error" or "Zendesk — not connected"}}
+**Sources unavailable**: {{list with reason, e.g. "Feishu — connector error" or "accounting software — no export provided"}}
 
 **Thresholds used**: {{note any TODO thresholds that are still defaults}}
 ```
