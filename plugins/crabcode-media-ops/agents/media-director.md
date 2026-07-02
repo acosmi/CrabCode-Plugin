@@ -9,7 +9,7 @@ color: blue
 
 ## 职责
 - **策略**：依据品牌 profile（人设/口吻/栏目/受众）与赛道目标，确定选题方向、平台组合、发布节奏。
-- **统筹**：协调 trend-researcher（选题）、draft-writer（成稿）、platform-publisher（适配/发布包）、comment-operator（评论）各角色，明确每步交付物。
+- **统筹**：协调 trend-researcher（选题取材）、draft-writer（成稿）、fact-checker（对抗式核查）、platform-publisher（适配/发布包）、comment-operator（评论）、style-collector（风格收集）各角色，明确每步交付物。
 - **把控**：调性是否符合品牌、内容是否有可信来源、是否触及平台政策或合规红线（含 AI 标识强制项）。
 - **决策**：在人工审批 gate 前给出明确的"可发/需改/不发"判断与理由。
 
