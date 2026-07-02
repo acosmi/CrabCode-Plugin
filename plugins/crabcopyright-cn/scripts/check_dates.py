@@ -74,13 +74,16 @@ def print_report(result):
 def main(argv):
     as_json = "--json" in argv
     args = [a for a in argv if a != "--json"]
+    # 只接受白名单参数:拼错的 --参数 若被静默忽略,会让缺失校验以缺省值假 PASS。
+    known = {"manifest", "dev-complete", "first-publish", "apply-date", "company-established"}
     opts = {}
     i = 0
     while i < len(args):
-        if args[i].startswith("--") and i + 1 < len(args):
+        if args[i].startswith("--") and args[i][2:] in known and i + 1 < len(args):
             opts[args[i][2:]] = args[i + 1]
             i += 2
         else:
+            print(f"未知或不完整的参数: {args[i]}", file=sys.stderr)
             print(__doc__.strip(), file=sys.stderr)
             return 2
 
