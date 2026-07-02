@@ -1,6 +1,6 @@
 import { ok, type Envelope } from '../envelope.ts'
 import { PLATFORMS } from '../platforms/registry.ts'
-import { availableSourceIds } from '../sources/index.ts'
+import { buildSources } from '../sources/index.ts'
 
 export const name = 'mediaops.capabilities'
 export const description =
@@ -9,6 +9,7 @@ export const description =
 export const inputSchema = {}
 
 export async function handler(): Promise<Envelope> {
+  const registry = buildSources()
   return ok({
     version: '0.1.0',
     phase: 'gate-a (skeleton + creation loop)',
@@ -18,10 +19,10 @@ export async function handler(): Promise<Envelope> {
       formats: p.formats,
       apiPublishGate: p.apiPublishGate,
     })),
-    availableSources: availableSourceIds(),
+    availableSources: Object.keys(registry.sources),
     dangerousCapabilities: {
       publish: false,
       autoComment: false,
     },
-  })
+  }, registry.warnings)
 }

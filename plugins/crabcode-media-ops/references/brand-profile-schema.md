@@ -1,6 +1,6 @@
 # 品牌 Profile Schema
 
-品牌 profile 定义"这个号"的人设、口吻、禁用词、栏目与受众，供选题、写作、审稿、平台适配各环节统一遵循。建议以 YAML 存放于 `${CRABCODE_PLUGIN_DATA}` 下，按账号/品牌组织。
+品牌 profile 定义"这个号"的人设、口吻、禁用词、栏目与受众，供选题、写作、审稿、平台适配各环节统一遵循。由 `mediaops.profile.save/get/list` 工具管理：按本 schema 代码校验后，以 JSON 存于 `${CRABCODE_PLUGIN_DATA}/profiles/<brand_id>.json`（服务器零依赖，故用 JSON 而非 YAML 落盘；本文的 YAML 示例仅作字段说明）。用 `/media-style-collect` 从历史作品收集生成。
 
 ## 字段说明
 
@@ -55,6 +55,8 @@ compliance:
 ```
 
 ## 使用约定
-- 写作前加载对应 `brand_id` 的 profile；`voice` 决定语气，`banned_words` 进 readiness 校验。
+- 写作前经 `mediaops.profile.get` 加载对应 `brand_id` 的 profile（硬步骤）；`voice` 决定语气。
+- `banned_words` 与 `compliance.ai_label_text` 由 `mediaops.readiness.inspect` 硬校验——调用时传 `brandId` 即自动读通，无需手抄清单。
 - `compliance.ai_label_text` 是成稿末尾固定 AI 辅助标识来源（详见 `ai-labeling-compliance.md`）。
+- `content.save` 时带 `profileId`，留稿件与 profile 的关联痕迹。
 - profile 是配置不是稿件来源；事实仍以 brief 的可信来源为准。

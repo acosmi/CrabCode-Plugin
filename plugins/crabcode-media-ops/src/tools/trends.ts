@@ -1,12 +1,12 @@
 import { z } from 'zod'
 import { ok, type Envelope } from '../envelope.ts'
-import { RegisteredSources, availableSourceIds, type TopicSignal } from '../sources/index.ts'
+import { buildSources, type TopicSignal } from '../sources/index.ts'
 
 // ---- mediaops.trends.search -------------------------------------------------
 
 export const searchName = 'mediaops.trends.search'
 export const searchDescription =
-  'Fetch hot-topic signals from registered free, no-auth sources. Does not call any LLM; pure feed retrieval.'
+  'Fetch hot-topic signals from registered free, no-auth sources (built-in examples plus <data>/sources.config.json entries). Does not call any LLM; pure feed retrieval. Sources without an official API belong to the trend-researcher agent, not here.'
 
 export const searchInputSchema = {
   query: z.string().optional().describe('Optional keyword filter passed to sources that support search.'),
@@ -22,12 +22,13 @@ type SearchArgs = {
 
 export async function searchHandler(args: SearchArgs): Promise<Envelope> {
   const limit = args.limit ?? 20
-  const wanted = args.sources && args.sources.length ? args.sources : availableSourceIds()
-  const warnings: string[] = []
+  const registry = buildSources()
+  const wanted = args.sources && args.sources.length ? args.sources : Object.keys(registry.sources)
+  const warnings: string[] = [...registry.warnings]
   const signals: TopicSignal[] = []
 
   for (const id of wanted) {
-    const source = RegisteredSources[id]
+    const source = registry.sources[id]
     if (!source) {
       warnings.push(`unknown source: ${id}`)
       continue

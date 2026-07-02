@@ -19,6 +19,7 @@ import * as doctor from './tools/doctor.ts'
 import * as policy from './tools/policy.ts'
 import * as trends from './tools/trends.ts'
 import * as content from './tools/content.ts'
+import * as profiles from './tools/profiles.ts'
 import * as preview from './tools/preview.ts'
 import * as readiness from './tools/readiness.ts'
 import * as approval from './tools/approval.ts'
@@ -59,6 +60,10 @@ register(trends.clusterName, trends.clusterDescription, trends.clusterInputSchem
 register(content.saveName, content.saveDescription, content.saveInputSchema, content.saveHandler)
 register(content.getName, content.getDescription, content.getInputSchema, content.getHandler)
 register(content.listName, content.listDescription, content.listInputSchema, content.listHandler)
+
+register(profiles.saveName, profiles.saveDescription, profiles.saveInputSchema, profiles.saveHandler)
+register(profiles.getName, profiles.getDescription, profiles.getInputSchema, profiles.getHandler)
+register(profiles.listName, profiles.listDescription, profiles.listInputSchema, profiles.listHandler)
 
 register(preview.name, preview.description, preview.inputSchema, preview.handler)
 register(readiness.name, readiness.description, readiness.inputSchema, readiness.handler)

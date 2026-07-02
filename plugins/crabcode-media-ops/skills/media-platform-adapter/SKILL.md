@@ -19,7 +19,7 @@ user-invocable: true
   - `news`（图文消息）：标准长文章，支持富排版、封面图、正文配图、原文链接。
   - `newspic`（图片消息）：以图为主、短文案，多图卡片式。
   - 二选一取决于内容形态：长文/教程用 news，图集/速览用 newspic。
-- 标题 ≤64 字（建议更短以保完整展示）；需摘要、封面图（建议 900×500 或 1:1）。
+- 标题 ≤32 字（以 platform registry 为准；建议更短以保完整展示）；需摘要、封面图（建议 900×500 或 1:1）。
 - 正文段落不宜过长，配图穿插；外链受限（注意平台对跳转的限制）。
 
 ### 小红书（图文笔记）
@@ -37,7 +37,7 @@ user-invocable: true
 2. 按上述规范改写：标题、正文结构、图片占位/要求、标签。
 3. 保留成稿末尾的 **AI 辅助显式标识**（适配时不可丢失，`references/ai-labeling-compliance.md`）。
 4. `mediaops.content.save`（kind=variant）落库。
-5. `mediaops.readiness.inspect` 按平台规则校验（标题/正文长度、禁用词、图片占位、引用完整性），按返回问题项修订至通过。
+5. `mediaops.readiness.inspect` 按平台规则校验（标题/正文长度、禁用词、图片占位、引用完整性）；传 `brandId` 可自动带出品牌 profile 的禁用词与 AI 标识文案。按返回问题项修订至通过。
 6. 需要的话由 `/media-preview` 调 `mediaops.preview.create` 生成可视预览。
 
 ## 注意

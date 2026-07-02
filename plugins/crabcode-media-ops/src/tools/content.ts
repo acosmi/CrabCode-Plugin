@@ -12,13 +12,18 @@ export const saveDescription =
 
 export const saveInputSchema = {
   kind: z.enum(['brief', 'draft', 'variant']),
-  payload: z.record(z.unknown()).describe('The content body the agent produced (title, bodyMarkdown, notes, etc.).'),
+  payload: z.record(z.unknown()).describe('The content body the agent produced (title, bodyMarkdown, citations, notes, etc.).'),
+  profileId: z.string().optional().describe('brand_id of the brand profile the content was written against.'),
 }
 
-type SaveArgs = { kind: 'brief' | 'draft' | 'variant'; payload: Record<string, unknown> }
+type SaveArgs = { kind: 'brief' | 'draft' | 'variant'; payload: Record<string, unknown>; profileId?: string }
 
 export async function saveHandler(args: SaveArgs): Promise<Envelope> {
-  const record = await appendRecord('content', { kind: args.kind, payload: args.payload })
+  const record = await appendRecord('content', {
+    kind: args.kind,
+    payload: args.payload,
+    ...(args.profileId ? { profileId: args.profileId } : {}),
+  })
   return ok({ id: record.id, kind: args.kind, createdAt: record.createdAt }, storageWarnings())
 }
 
