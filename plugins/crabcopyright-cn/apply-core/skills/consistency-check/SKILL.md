@@ -4,25 +4,30 @@ description: 逐字核对软著各材料(申请表、源代码鉴别材料页眉
 argument-hint: "[申请包目录或各材料路径]"
 allowed-tools:
   - Read
+  - Write
   - Grep
   - Glob
+  - Bash(python3:*)
 ---
 
 # 软著材料一致性校验
 
-软著登记最高频的驳回原因就是**名称/版本号在三处对不上**。本技能逐字比对
-所有已生成材料的元信息,把不一致项高亮出来。**先读**
-`${CRABCODE_PLUGIN_ROOT}/apply-core/GUIDE.md` §5、§6(名称版本号规范与日期逻辑)。
+软著登记最高频的驳回原因就是**名称/版本号在三处对不上**。本技能对 **manifest ＋
+生成 PDF 之前的中间态文件**做机械逐字比对,把不一致项高亮出来——最终 PDF 无法
+Grep,所以比对对象是 manifest 字段与 `intermediates` 里的中间材料,PDF 必须由这些
+中间态生成,两者一致即传递到成品。**先读**
+`${CRABCODE_PLUGIN_ROOT}/apply-core/GUIDE.md` §5、§6(名称版本号规范与日期逻辑)与
+`${CRABCODE_PLUGIN_ROOT}/apply-core/MANIFEST.md`(manifest 结构)。
 
 ## 校验矩阵
 
-| 检查项 | 比对来源 |
+| 检查项 | 比对来源(manifest ⇔ 中间态) |
 |--------|----------|
-| 软件全称 | 申请表 ⇔ 源代码页眉 ⇔ 说明书封面/页眉 |
-| 版本号(含有无"V") | 申请表 ⇔ 源代码页眉 ⇔ 说明书封面/页眉 |
-| 开发完成日期 | 申请表(如实) |
-| 首次发表日期 | 申请表(须 ≥ 开发完成日期;未发表则应为空) |
-| 申请人名称 | 申请表 ⇔ 身份证明(企业须=营业执照全称) |
+| 软件全称 | manifest `software.full_name` ⇔ 源码材料文本页眉行 ⇔ 说明书定稿封面/页眉 ⇔ 功能说明 |
+| 版本号(含有无"V") | manifest `software.version` ⇔ 源码材料文本页眉行 ⇔ 说明书定稿封面/页眉 |
+| 开发完成日期 | manifest `dates.dev_complete`(申请表按它填,如实) |
+| 首次发表日期 | manifest `dates.first_publish`(须 ≥ 开发完成日期;未发表则为"未发表") |
+| 申请人名称 | manifest `applicant.copyright_owner` ⇔ 身份证明(企业须=营业执照全称,后者由用户口头确认) |
 
 **额外逻辑校验**：
 - 首次发表日期 ≥ 开发完成日期(未发表则不应有发表日期)。
@@ -31,14 +36,22 @@ allowed-tools:
 
 ## 执行
 
-用 Grep/Read 从各 PDF/源文件提取上述字段做逐字比对(注意大小写、空格、全半角)。
-文档已转 PDF 无法直接 Grep 时,读取生成前的源文件或让用户确认字段值。
+1. 读该申请的 `outputs/<申请名>/manifest.json`,以其字段为基准值。
+2. 用 Grep/Read 从 `intermediates.source_text`、`intermediates.manual_docx`
+   (或其抽取文本)、`func_description_path` 提取名称/版本号/日期,与 manifest
+   逐字比对(注意大小写、空格、全半角)。中间态文件缺失时标 ⚠️ 并要求补齐,
+   不得拿"PDF 里大概是对的"充数。
+3. 日期与字段规范交给确定性脚本,不凭目测:
+   `python3 ${CRABCODE_PLUGIN_ROOT}/scripts/check_dates.py --manifest <manifest.json> --json`
+   (需要整体核验时可直接跑 `scripts/check_all.py --manifest <manifest.json> --json`)。
+4. 报告写入 `outputs/<申请名>/一致性校验报告.md`,并把结论写回
+   `steps.consistency-check`(全部一致为 `done`,有不一致为 `blocked`)。
 
 ## 输出：校验报告
 
 ```
 ## 一致性校验报告 · ${SOFTWARE_NAME} ${VERSION}
-| 检查项 | 申请表 | 源码页眉 | 说明书 | 结果 |
+| 检查项 | manifest | 源码材料(中间态) | 说明书(中间态) | 结果 |
 |--------|--------|----------|--------|------|
 | 软件全称 | ... | ... | ... | ✅/❌ |
 | 版本号   | ... | ... | ... | ✅/❌ |

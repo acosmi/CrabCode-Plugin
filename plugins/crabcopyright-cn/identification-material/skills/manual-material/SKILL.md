@@ -4,6 +4,8 @@ description: 把软件说明书/用户手册的 Word 文档(.doc/.docx)整理成
 argument-hint: "[说明书doc/docx路径] [软件全称] [版本号]"
 allowed-tools:
   - Read
+  - Write
+  - Task
   - AskUserQuestion
 ---
 
@@ -12,6 +14,14 @@ allowed-tools:
 把 `$MANUAL_PATH` 指向的 Word 说明书整理成规范的文档鉴别材料 PDF。**先读**
 `${CRABCODE_PLUGIN_ROOT}/apply-core/GUIDE.md` §4——文档类型、页数行数、章节、截图、
 一致性红线以它为准。
+
+开工先读该申请的 `outputs/<申请名>/manifest.json`(结构见
+`${CRABCODE_PLUGIN_ROOT}/apply-core/MANIFEST.md`)取软件全称/版本号、`manual.source_path`
+与 `manual.screenshot_plan`,不靠口头交接。截图清单缺失或粗糙时,可用 Task 派发
+**manual-evidence-collector** 子代理(只读)从路由表与 dev 配置核对细化,核对采用后
+写回 `manual.screenshot_plan`。完工把 `manual.doc_type`、`intermediates.manual_docx`
+(定稿 docx 路径)、`materials["03-说明书鉴别材料.pdf"]` 写回 manifest,
+`steps.manual-material` 置 `done`。
 
 ## 何时用 crabcode-office-suite 办公套件、用哪个技能
 
