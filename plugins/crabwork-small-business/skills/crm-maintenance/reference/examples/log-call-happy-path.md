@@ -1,10 +1,10 @@
 # Example: log a call with a missing contact
 
-Worked scenario for the call path — calendar event has three attendees, one of them isn't in HubSpot yet.
+Worked scenario for the call path — a DingTalk calendar event has three attendees, one of them isn't in HubSpot yet.
 
 ## Setup
 
-- User just finished a 30-minute Google Meet titled "Acme — technical deep dive" at 10:00am
+- User just finished a 30-minute video call titled "Acme — technical deep dive" at 10:00am, scheduled via DingTalk calendar
 - Attendees on the calendar invite: the user, `sarah.lin@acme.com`, `ben.rivera@acme.com`
 - Sarah Lin is an existing HubSpot contact on the "Acme Q2 Expansion" deal
 - Ben Rivera is NOT in HubSpot
@@ -20,7 +20,7 @@ Worked scenario for the call path — calendar event has three attendees, one of
 Call path. No specific event named — falls back to the most recent completed meeting in the last 24 hours.
 
 **Step 2 — Gather context.**
-Finds the "Acme — technical deep dive" event from 10:00am. Confirms with the user before proceeding:
+Finds the "Acme — technical deep dive" event from 10:00am via the connected DingTalk calendar connector. Confirms with the user before proceeding:
 
 > *"Logging the 'Acme — technical deep dive' call from 10:00am this morning — correct?"*
 

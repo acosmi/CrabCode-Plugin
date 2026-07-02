@@ -1,7 +1,7 @@
 # Example: Retail Boutique — Apparel
 
-**Business:** Small women's clothing boutique, brick-and-mortar + Shopify
-**Connectors:** QuickBooks (costs), PayPal (online sales)
+**Business:** Small women's clothing boutique, brick-and-mortar + online shop
+**Data provided:** 用友好会计 export (costs), 支付宝商家平台 bill export (online sales)
 **Data:** 14 months of transactions
 
 ---
@@ -14,7 +14,7 @@
 
 ## Step 1: Pre-flight
 
-`company-info` returns Industry: "Retail — Apparel". Pre-flight passes.
+Owner confirms industry: "Retail — Apparel". Pre-flight passes.
 
 ---
 
@@ -31,10 +31,12 @@ Metric priority: gross margin % (she wants to understand profitability, not just
 
 ---
 
-## Step 3–4: Data pulled
+## Step 3–4: Data collected
 
-- **QuickBooks:** 14 months of COGS by product category
-- **PayPal:** 14 months of transaction history (online sales only; in-store via Square separately)
+- **用友好会计 export:** 14 months of COGS by product category
+- **支付宝商家平台 bill export:** 14 months of transaction history (online sales
+  only; in-store sales collected via WeChat Pay are tracked separately and were
+  not provided)
 
 ---
 
@@ -42,11 +44,11 @@ Metric priority: gross margin % (she wants to understand profitability, not just
 
 | Category | Revenue | COGS | Gross Profit | Margin % |
 |---|---|---|---|---|
-| Dresses | $42,800 | $18,200 | $24,600 | 57.5% |
-| Tops | $31,500 | $15,100 | $16,400 | 52.1% |
-| Denim | $18,900 | $11,300 | $7,600 | 40.2% |
-| Accessories | $9,400 | $2,800 | $6,600 | 70.2% |
-| Knitwear | $14,200 | $9,600 | $4,600 | 32.4% ⚠️ |
+| Dresses | ¥42,800 | ¥18,200 | ¥24,600 | 57.5% |
+| Tops | ¥31,500 | ¥15,100 | ¥16,400 | 52.1% |
+| Denim | ¥18,900 | ¥11,300 | ¥7,600 | 40.2% |
+| Accessories | ¥9,400 | ¥2,800 | ¥6,600 | 70.2% |
+| Knitwear | ¥14,200 | ¥9,600 | ¥4,600 | 32.4% ⚠️ |
 
 ⚠️ Knitwear is flagged: 32.4% is below the 40–55% typical range for apparel retail.
 
@@ -60,13 +62,13 @@ Metric priority: gross margin % (she wants to understand profitability, not just
 
 ## Step 7: Pricing scenarios — Knitwear (low-margin item)
 
-Current average Knitwear price: $89. Current cost: ~$61.
+Current average Knitwear price: ¥89. Current cost: ~¥61.
 
 | Scenario | New Price | Est. Revenue* | Gross Margin % |
 |---|---|---|---|
-| +5% ($93) | $93 | ~$14,560 (−3% vol) | 34.4% |
-| +10% ($98) | $98 | ~$14,130 (−6% vol) | 37.8% |
-| +15% ($102) | $102 | ~$13,700 (−8% vol) | 40.2% |
+| +5% (¥93) | ¥93 | ~¥14,560 (−3% vol) | 34.4% |
+| +10% (¥98) | ¥98 | ~¥14,130 (−6% vol) | 37.8% |
+| +15% (¥102) | ¥102 | ~¥13,700 (−8% vol) | 40.2% |
 
 *Volume estimates based on 14-month elasticity: historical data shows ~0.6 volume drop per 1% price increase for this category.
 
@@ -82,5 +84,5 @@ The owner received the full unit economics table, the benchmarking paragraph, an
 
 ## Notes for skill author
 
-- This example shows graceful handling of mixed data sources (PayPal online + Square in-store noted as limitation)
-- Elasticity was computable because the owner had raised Knitwear prices once 8 months ago (from $79 → $89) and volume dipped 5% the following month — that's the one-data-point limitation referenced in gotchas.md
+- This example shows graceful handling of partial data sources (Alipay online sales analyzed; WeChat Pay in-store sales noted as a limitation in the Data Quality Notes)
+- Elasticity was computable because the owner had raised Knitwear prices once 8 months ago (from ¥79 → ¥89) and volume dipped 5% the following month — that's the one-data-point limitation referenced in gotchas.md

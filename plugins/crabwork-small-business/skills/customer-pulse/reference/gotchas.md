@@ -1,14 +1,14 @@
 # Gotchas — customer-pulse
 
-## Gotcha: PayPal rate limits on dispute queries
+## Gotcha: Missing payment dispute/refund export treated as a blocker
 
-**Why it matters:** PayPal's disputes API throttles aggressively on date windows with many disputes. Silent retries burn the user's time with no feedback.
+**Why it matters:** Dispute and refund history has no connector — the Alipay MCP only does single-payment lookups and refunds, so bulk data must come from a 支付宝商家平台 / 微信支付商户平台 export or pasted records. Owners often don't have the export handy; the report must still ship.
 
 ### ✗ Bad
-Retry 3× automatically with no feedback. User sees a spinner for 30+ seconds before an error.
+Stop the run and demand the export: "Cannot generate pulse report — payment data missing." User gets nothing.
 
 ### ✓ Good
-On the first rate-limit error, skip PayPal, add `PayPal: rate-limited — not included` to the Sources section, and continue with the remaining connectors. Mention that the user can try again with a narrower date window.
+Ask once for the export or pasted records. If nothing is provided, add `Payments: not provided — not included` to the Sources section and continue with the remaining sources. Mention that the owner can rerun with a merchant-platform CSV for fuller coverage.
 
 ---
 
@@ -22,7 +22,7 @@ On the first rate-limit error, skip PayPal, add `PayPal: rate-limited — not in
 
 ### ✓ Good
 **Theme: Slow shipping** (8 signals)
-> "Ordered 2 weeks ago and still nothing — this is unacceptable." — [Gmail]
+> "Ordered 2 weeks ago and still nothing — this is unacceptable." — [Email]
 > "Package was 10 days late and support never responded." — [Intercom]
 
 ---
@@ -39,12 +39,12 @@ Record `HubSpot tickets: 0` in the Sources section and continue. Only flag a con
 
 ---
 
-## Gotcha: Gmail keyword list too narrow
+## Gotcha: Email keyword list too narrow
 
 **Why it matters:** Customers don't use standard complaint keywords. A 1-star experience often surfaces as "took forever" or "never again," not "disappointed."
 
 ### ✗ Bad
-Search only for: `refund cancel unhappy`
+Scan pasted emails only for: `refund cancel unhappy`
 
 ### ✓ Good
 Use the full seed list from Workflow step 4: `refund cancel unhappy issue problem disappointed frustrated broken late slow wrong missing`. Let theme-extraction filter signal from noise — over-inclusion is cheaper than missed themes.

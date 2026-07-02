@@ -18,8 +18,8 @@ Desktop; use the user's preferred path if specified.
 
 ### Sheet 1: P&L
 
-A formatted copy of the QuickBooks P&L for the target month. Two-column layout:
-**Category** and **Amount**.
+A formatted copy of the accounting software's P&L for the target month.
+Two-column layout: **Category** and **Amount**.
 
 Required rows (in order):
 1. Revenue subtotal
@@ -31,27 +31,27 @@ Required rows (in order):
 7. **Net Income** (bold)
 
 Include a MoM comparison column if prior-month data is available. Format amounts as
-currency (`$#,##0.00`). Negative values in red.
+currency (`¥#,##0.00`). Negative values in red.
 
 ### Sheet 2: Reconciliation
 
-Side-by-side comparison of QuickBooks deposits vs. processor settlements.
+Side-by-side comparison of book deposits vs. payment platform settlements.
 
 Columns:
 | Column | Source |
 |---|---|
-| Date (QB) | QuickBooks deposit date |
-| Amount (QB) | QuickBooks deposit amount |
-| Processor | PayPal / Square / Stripe |
-| Date (Processor) | Processor arrival date |
-| Amount (Processor) | Processor net payout |
-| Delta | QB amount minus processor amount |
-| Status | RECONCILED / MISSING_IN_QB / UNMATCHED_DEPOSIT / DATE_MISMATCH |
+| Date (Books) | Deposit date in the accounting register |
+| Amount (Books) | Deposit amount in the accounting register |
+| Platform | Alipay / WeChat Pay |
+| Date (Platform) | Settlement/arrival date from the bill export |
+| Amount (Platform) | Net settlement amount from the bill export |
+| Delta | Book amount minus platform amount |
+| Status | RECONCILED / MISSING_IN_BOOKS / UNMATCHED_DEPOSIT / DATE_MISMATCH |
 
 Color-code the Status column:
 - RECONCILED → green fill
 - DATE_MISMATCH → yellow fill
-- MISSING_IN_QB or UNMATCHED_DEPOSIT → red fill
+- MISSING_IN_BOOKS or UNMATCHED_DEPOSIT → red fill
 
 ### Sheet 3: Action Items
 
@@ -60,7 +60,7 @@ Any open flags from the checklist. Columns:
 |---|---|
 | Category | Uncategorized Txn / Missing Receipt / Duplicate / Reconciliation Flag |
 | Date | Transaction date |
-| Amount | Dollar amount |
+| Amount | Amount (¥) |
 | Vendor / Customer | Name |
 | Description | What's wrong and what to do |
 
@@ -77,9 +77,9 @@ Layout (top to bottom):
 ────────────────────────────────────────────────────────────
 
 KEY FIGURES
-Revenue        $XX,XXX
+Revenue        ¥XX,XXX
 Gross Margin   XX%
-Net Income     $XX,XXX
+Net Income     ¥XX,XXX
 
 P&L SUMMARY
 [150–250 word plain-English narrative from Step 7]
@@ -92,10 +92,10 @@ X uncategorized transactions · X missing receipts · X open flags
 Prepared [Date] · Powered by CrabCode
 ```
 
-Use a clean sans-serif font (Helvetica or equivalent). No logo required. Keep
-margins ≥ 0.75 in on all sides so it prints cleanly.
+Use a clean sans-serif font that covers Chinese characters if any appear in the
+content (business names, vendor names). No logo required. Keep margins ≥ 0.75 in
+on all sides so it prints cleanly.
 
-**Generating the PDF:** Use the `xlsxwriter` or `reportlab` Python library if running
-a script, or instruct CrabCode to render the content and export via the Desktop
-connector's print-to-PDF capability. The user can also print the PDF from the xlsx
-P&L sheet if a script isn't available.
+**Generating the PDF:** Use the `xlsxwriter` or `reportlab` Python library from a
+local script. If a script isn't available, the user can print/export the PDF from
+the xlsx P&L sheet themselves.

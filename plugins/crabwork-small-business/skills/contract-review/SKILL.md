@@ -1,19 +1,22 @@
 ---
 name: contract-review
+version: 0.3.0
 description: >
   Lightweight NDA, MSA, and vendor contract review for SMBs without legal on
-  staff. Reads contracts from local files, Gmail attachments, or DocuSign
-  envelopes; flags non-standard terms; explains risks in plain English; and
-  outputs a marked-up redline as a separate DOCX. Use when the user says
-  "review this contract," "what am I signing," "red flags," "flag any concerns,"
-  "check the payment terms," or uploads/forwards a contract or legal agreement.
+  staff. Reads contracts from local files or pasted text (no email connector
+  yet — 腾讯企业邮 is pending, so contracts arrive by upload or paste); flags
+  non-standard terms; explains risks in plain English; and outputs a marked-up
+  redline as a separate DOCX the owner sends back themselves. Use when the user
+  says "review this contract," "what am I signing," "red flags," "flag any
+  concerns," "check the payment terms," or uploads/pastes a contract or legal
+  agreement.
 ---
 
 # Contract Review
 
 ## Quick start
 
-Attach a contract file, forward the email containing it, or paste the text directly.
+Attach a contract file or paste the text directly.
 
 ```
 User: "Review this MSA and flag anything I should push back on."
@@ -24,10 +27,10 @@ User: "Review this MSA and flag anything I should push back on."
 
 ## Workflow
 
-1. **Get the contract** — Pull from one of three sources, in order of preference:
-   - **Gmail**: Search for recent emails with contract attachments (see `reference/gmail-fetch.md`)
-   - **DocuSign**: Fetch the envelope by ID or search recent drafts awaiting signature (see `reference/docusign-fetch.md`)
-   - **Local file or paste**: Read the PDF (chunked via `pages` parameter for 10+ page files) or DOCX via Read tool. If the user pastes text directly, work with what's provided.
+1. **Get the contract** — Contracts arrive by upload or paste (see `reference/contract-intake.md`):
+   - **Local file**: Read the PDF (chunked via `pages` parameter for 10+ page files) or DOCX via Read tool.
+   - **Pasted text**: If the user pastes text directly, work with what's provided.
+   - There is no email or e-sign connector yet (腾讯企业邮 and 众律宝 connectors are pending). If the contract lives in the owner's inbox or an e-sign service, ask them to download and attach it, or paste the text.
 
    Read the full document before analyzing. Dangerous clauses are frequently in exhibits and schedules at the back.
 
@@ -105,6 +108,8 @@ User: "Review this MSA and flag anything I should push back on."
 
    Ask: "Want me to export a redlined DOCX you can send back to the counterparty?"
 
+   The skill cannot send the redline anywhere — there is no email connector yet. The owner sends the DOCX to the counterparty themselves. Once terms are settled, the owner routes the final document for signature via 众律宝 (or on paper) manually; the 众律宝 connector is pending.
+
 ## Approval gates
 
 - Never characterize the output as legal advice. Always recommend attorney review for red flags or binding decisions.
@@ -113,11 +118,10 @@ User: "Review this MSA and flag anything I should push back on."
 - Do not flag standard boilerplate. If a clause is fair and market-standard, skip it. The user wants signal, not a clause-by-clause restatement.
 - Compare to market norms when flagging: "Net-90 is uncommon in professional services — Net-30 is standard."
 - Adjust recommendations to the power dynamic. A Fortune 500 procurement MSA is a different negotiation than a small startup agreement.
-- Never send the redlined DOCX to the counterparty without explicit user confirmation.
+- Never claim the redlined DOCX was sent, or that anything was signed or routed for signature. Sending and signing are the owner's manual steps (via 众律宝 or on paper).
 
 ## Reference
 
 - `reference/gotchas.md` — edge cases in contract analysis
-- `reference/docusign-fetch.md` — pulling envelopes from DocuSign
-- `reference/gmail-fetch.md` — finding contract attachments in Gmail
+- `reference/contract-intake.md` — how contracts get into the review (upload/paste; no email or e-sign connector yet)
 - `reference/examples/flagged-summary-saas.md` — worked example: SaaS agreement review output

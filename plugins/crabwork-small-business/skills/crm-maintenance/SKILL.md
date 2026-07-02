@@ -1,24 +1,25 @@
 ---
 name: crm-maintenance
+version: 0.3.0
 description: >
   Keeps HubSpot current without the owner opening it: creates and updates
-  contacts and deals from email and calendar context, logs notes and calls,
-  and flags stale records. The "stop doing data entry" skill. Use when the user
-  asks to update the CRM, "log a call," "log this meeting," "add this contact to
-  HubSpot," "update the deal," "note what we discussed," "add context to a deal,"
-  or wants their CRM kept in sync after a conversation. (For bulk dedupe and
-  stale-deal sweeps, that is crm-cleanup.)
+  contacts and deals from pasted email threads and DingTalk/Feishu calendar
+  context, logs notes and calls, and flags stale records. The "stop doing data
+  entry" skill. Use when the user asks to update the CRM, "log a call," "log
+  this meeting," "add this contact to HubSpot," "update the deal," "note what
+  we discussed," "add context to a deal," or wants their CRM kept in sync after
+  a conversation. (For bulk dedupe and stale-deal sweeps, that is crm-cleanup.)
 ---
 
 # CRM Maintenance
 
 ## Quick start
 
-Pull context from the referenced email or calendar event, resolve the right HubSpot contact and deal, log the activity, and surface what changed. For a deal cleanup, audit the deal against recent email/calendar activity and propose updates — never apply them without approval.
+Pull context from the pasted email thread or the DingTalk/Feishu calendar event, resolve the right HubSpot contact and deal, log the activity, and surface what changed. For a deal cleanup, audit the deal against recent email/calendar activity and propose updates — never apply them without approval.
 
 ```
 User: "log this call to the Acme deal"
-→ Read the most recent completed calendar event
+→ Read the most recent completed DingTalk/Feishu calendar event
 → Confirm attendees map to the Acme deal's contacts
 → Write a call activity on the Acme deal
 → Report: "Logged call to Acme Q2 Expansion. [deal link]"
@@ -27,15 +28,15 @@ User: "log this call to the Acme deal"
 ## Workflow
 
 1. **Identify intent.** Decide which of three paths applies from the user's message and context:
-   - **Email path** — "update my CRM", "add this to the deal", or any reference to an email thread
-   - **Call path** — "log this call", "log the meeting", or any reference to a calendar event
+   - **Email path** — "update my CRM", "add this to the deal", or any reference to an email thread (there is no email connector yet — the thread arrives as pasted text)
+   - **Call path** — "log this call", "log the meeting", or any reference to a DingTalk/Feishu calendar event
    - **Cleanup path** — "clean up HubSpot", "is this deal up to date", or any request to audit a specific deal
    If the intent is ambiguous (e.g. "update HubSpot" with no referenced email/meeting/deal), ask which path before proceeding.
 
 2. **Gather context.**
-   - Email path: read the thread (subject, participants, last 1–3 messages). Identify the primary external contact.
-   - Call path: read the calendar event (title, attendees, time, description). If no event was specified, use the most recent completed meeting in the last 24 hours and confirm with the user before proceeding.
-   - Cleanup path: pull the deal (stage, amount, close date, next-step, associated contacts, activities in last 60 days), plus the last 14 days of email threads and calendar events involving the deal's contacts.
+   - Email path: read the pasted thread (subject, participants, last 1–3 messages). If the user references an email but hasn't pasted it, ask them to paste it — no email connector exists yet. Identify the primary external contact.
+   - Call path: read the calendar event via the connected DingTalk or Feishu calendar connector (title, attendees, time, description). If no event was specified, use the most recent completed meeting in the last 24 hours and confirm with the user before proceeding. If no calendar connector is configured, ask the user to describe the meeting (title, attendees, time, duration) — the skill works from that alone.
+   - Cleanup path: pull the deal (stage, amount, close date, next-step, associated contacts, activities in last 60 days), plus any email threads the owner pastes and the last 14 days of DingTalk/Feishu calendar events involving the deal's contacts.
 
 3. **Resolve the HubSpot contact and deal.** For email/call paths:
    - Search HubSpot contacts by email address. If a contact is missing, create it from email signature or calendar invite data — announce creation in chat before writing.

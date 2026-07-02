@@ -70,35 +70,32 @@ A product might be flying off the shelves, but if inventory is low, pushing hard
 
 ---
 
-## Gotcha: QuickBooks profile not set up before first use
+## Gotcha: Expecting the alipay connector to export transaction history
 
-New QuickBooks users often skip the business profile setup (industry, business name). When you try to pull P&L data, the connector returns `profile_info_required` error.
+The plugin's alipay connector creates payment links, queries a single payment by order number, and processes refunds. It cannot list or export transactions, settlements, or bills.
 
-**Why it matters:** A dead-end error frustrates the user. Pre-flight validation prevents wasted time.
+**Why it matters:** If you try to "pull sales data from Alipay" via the connector, there is no tool for it — and querying orders one-by-one only works if you already know every order number, which defeats the purpose.
 
 ### ✗ Bad
 User: "What should I post?"
-Skill: [calls profit-loss-quickbooks-account] → Error: "Profile required"
-User: [confused, doesn't know what to do next]
+Skill: [tries to fetch transaction history through the alipay connector] → no such tool → dead end, or worse, fabricated numbers
 
 ### ✓ Good
 User: "What should I post?"
-Skill: [calls company-info] → Industry = "Unknown"
-Skill: "I need your industry to pull the right benchmarks. What industry are you in?"
-User: [provides industry]
-Skill: [calls quickbooks-profile-info-update] → Profile updated
-Skill: [now calls profit-loss-quickbooks-account successfully]
+Skill: "I'll need your sales data as an export — log into 支付宝商家平台 and download the bill/transaction CSV for the last 90 days (微信支付商户平台 has the same export if you take WeChat Pay), or export revenue-by-product from 用友好会计/金蝶精斗云. A pasted report works too."
+User: [provides file or pastes data]
+Skill: [parses and analyzes]
 
 ---
 
-## Gotcha: PayPal rate-limiting on repeated calls
+## Gotcha: Payment-platform exports don't map cleanly to your product catalog
 
-If you call `list_transactions` multiple times in rapid succession (e.g., looping through date ranges), PayPal may rate-limit and return 429 errors.
+Alipay/WeChat Pay bill exports are per-transaction, and the order-title column (商品名称/订单标题) often carries checkout strings, not catalog names — and the export misses cash and other-channel sales entirely.
 
-**Why it matters:** Without retry logic, the skill fails mid-analysis when it should gracefully degrade.
+**Why it matters:** Grouping by raw order titles splits one product into five rows (or merges five products into one), and treating a payment-platform export as total revenue understates products that sell offline. The ranking — the whole point of the brief — comes out wrong.
 
 ### ✗ Bad
-Call list_transactions → 429 error → Skill crashes
+Group the Alipay CSV by the raw title column → "亚麻连衣裙-M-米白" and "亚麻连衣裙 M码" ranked as two different products → neither makes the top 5.
 
 ### ✓ Good
-Call list_transactions → 429 error → Wait 30 seconds → Retry → If still blocked, offer fallback: "PayPal is temporarily rate-limited. Would you like to switch to QuickBooks/Square, or continue with partial data?"
+Normalize titles into catalog products, confirm ambiguous groupings with the owner ("are these all the linen midi?"), and prefer the accounting-software export (用友好会计/金蝶精斗云) for item names and margins. State the coverage gap in the brief: "Based on 支付宝商家平台 export — excludes cash sales."

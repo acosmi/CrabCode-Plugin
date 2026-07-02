@@ -5,9 +5,10 @@ She asks: "How much should I pay in estimated taxes for Q2?"
 
 ---
 
-## Step 1: Pull YTD P&L from QuickBooks
+## Step 1: Gather the YTD P&L
 
-QuickBooks P&L — January 1 through March 31, 2025:
+Sarah has no accounting-software connector, so she exports a P&L from 用友好会计
+and uploads the Excel file — January 1 through March 31, 2025:
 - Gross income: $48,000
 - Operating expenses: $12,500 (software, equipment, marketing)
 - Net ordinary income: **$35,500**

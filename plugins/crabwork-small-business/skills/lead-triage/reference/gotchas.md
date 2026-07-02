@@ -64,13 +64,16 @@ If a contact has a blank lifecycle stage, include with a warning flag:
 
 ### ✗ Bad
 ```
-CrabCode proposes "Tuesday 2–2:30 PM" without checking Calendar.
-Owner already has a client call in that slot.
+CrabCode proposes "Tuesday 2–2:30 PM" without checking the owner's
+DingTalk/Feishu calendar. Owner already has a client call in that slot.
 ```
 
 ### ✓ Good
 ```
-Fetch Calendar for next two business days before proposing any slot.
-Only propose windows with no existing events ±15 minutes buffer.
-If no free window exists, say so and offer to look further out.
+Check the owner's calendar via the connected DingTalk (钉钉日程) or
+Feishu (飞书日历) connector for the next two business days before
+proposing any slot. Only propose windows with no existing events
+±15 minutes buffer. If no free window exists, say so and offer to look
+further out. If neither calendar connector is configured, propose times
+as a plain list and flag that availability wasn't checked.
 ```

@@ -6,8 +6,8 @@ Worked scenario for the cleanup path — user asks the skill to audit one specif
 
 - Deal: "Acme Q2 Expansion" — stage "Proposal Sent," amount $18K, close date May 15, next step "send pricing," `hs_lastactivitydate` 22 days ago
 - Deal has two associated contacts: Sarah Lin and Ben Rivera
-- Last 14 days of email with Sarah include an Apr 18 thread titled "Re: Acme pricing" where Sarah confirmed the pricing and said "we'll sign once our legal review wraps, should be mid-June"
-- A calendar event on Apr 20 titled "Acme — legal review walkthrough" included a new person, `maria.chen@acme.com`, who is not in HubSpot and not on the deal
+- The owner pastes the last 14 days of email with Sarah, including an Apr 18 thread titled "Re: Acme pricing" where Sarah confirmed the pricing and said "we'll sign once our legal review wraps, should be mid-June"
+- A Feishu calendar event on Apr 20 titled "Acme — legal review walkthrough" included a new person, `maria.chen@acme.com`, who is not in HubSpot and not on the deal
 - No email, meeting, or note suggests the deal has moved stage
 
 ## User says
@@ -20,7 +20,7 @@ Worked scenario for the cleanup path — user asks the skill to audit one specif
 Cleanup path, scoped to one named deal.
 
 **Step 2 — Gather context.**
-Pulls the deal record. Pulls email threads from the last 14 days involving Sarah and Ben. Pulls calendar events from the same window.
+Pulls the deal record. Reads the email threads the owner pasted (last 14 days, involving Sarah and Ben). Pulls Feishu calendar events from the same window via the connected connector.
 
 **Step 3 — Resolve.**
 Deal explicitly named — no resolution needed. Contacts on recent emails/meetings: Sarah (on deal), Ben (on deal), Maria Chen (not on deal, not in HubSpot).

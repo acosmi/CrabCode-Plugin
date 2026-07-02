@@ -2,29 +2,29 @@
 
 ## Gotcha: Treating revenue as profit
 
-An owner sees $50K in PayPal transactions and thinks that's what they made. It isn't — it's what they collected.
+An owner sees ¥50K in Alipay collections and thinks that's what they made. It isn't — it's what they collected.
 
 **Why it matters:** If you surface revenue figures without immediately pairing them with costs, the owner may misread the analysis and feel reassured when they shouldn't be.
 
 ### ✗ Bad
-"Your PayPal revenue last quarter was $50,000."
+"Your Alipay revenue last quarter was ¥50,000."
 
 ### ✓ Good
-"Your PayPal revenue last quarter was $50,000. After direct costs of $31,000, your gross profit was $19,000 — a 38% gross margin."
+"Your Alipay revenue last quarter was ¥50,000. After direct costs of ¥31,000, your gross profit was ¥19,000 — a 38% gross margin."
 
 ---
 
 ## Gotcha: Using list price instead of effective price
 
-Owners often have discounts, refunds, and promotions that reduce what they actually receive per transaction. PayPal transaction data reflects actual collected amounts, but QuickBooks invoices may show list price.
+Owners often have discounts, refunds, and promotions that reduce what they actually receive per transaction. The Alipay/WeChat Pay bill exports reflect actual collected amounts, but accounting-software invoices may show list price.
 
-**Why it matters:** If you compute margins using list price but PayPal shows actual collections, your cost-per-unit math will look better than reality.
+**Why it matters:** If you compute margins using list price but the bill export shows actual collections, your cost-per-unit math will look better than reality.
 
 ### ✗ Bad
-Use invoice amounts from QB for revenue and PayPal costs for COGS → margin appears inflated.
+Use invoice amounts from the accounting export for revenue and bill-export data for COGS → margin appears inflated.
 
 ### ✓ Good
-Use PayPal/Square transaction amounts as the revenue source (actual collected), and QB for costs. Note any discrepancy between QB invoice totals and payment totals — it's worth surfacing.
+Use the Alipay/WeChat Pay bill amounts as the revenue source (actual collected), and the accounting export for costs. Note any discrepancy between invoice totals and payment totals — it's worth surfacing.
 
 ---
 
@@ -49,38 +49,38 @@ For product businesses, COGS is usually clear (materials, manufacturing). For se
 **Why it matters:** A service business can show 80% gross margin on paper while the owner is effectively paying themselves nothing after accounting for time.
 
 ### ✗ Bad
-A freelance designer reports $0 COGS because they have no physical materials. Gross margin shows 100%.
+A freelance designer reports ¥0 COGS because they have no physical materials. Gross margin shows 100%.
 
 ### ✓ Good
 Ask service businesses: "For this service, what does it cost you in time and any direct expenses to deliver it? Including your own labor at a rough hourly rate?" Use that as COGS for the analysis.
 
 ---
 
-## Gotcha: QuickBooks COGS not broken down by product/service
+## Gotcha: COGS not broken down by product/service
 
-Many small businesses use QuickBooks but record COGS as a single line item, not broken out by product. `profit-loss-quickbooks-account` may not return item-level cost data.
+Many small businesses record COGS as a single line item, not broken out by product. A P&L export from 用友好会计 or 金蝶精斗云 may only show a lump-sum cost.
 
 **Why it matters:** You can't compute per-product margins if COGS is lumped together.
 
 ### ✗ Bad
-Call `profit-loss-quickbooks-account` → Get total COGS $22,000 → Try to divide across 12 products → Numbers are meaningless.
+Read the P&L export → Get total COGS ¥22,000 → Try to divide across 12 products → Numbers are meaningless.
 
 ### ✓ Good
-If QB doesn't have item-level COGS, ask the owner: "QuickBooks has your total costs but not a breakdown by product. Do you have a rough sense of what each item costs you to make or deliver? Even ballpark figures work." Proceed with owner-provided figures and flag the limitation in the output.
+If the export doesn't have item-level COGS, ask the owner: "Your books have your total costs but not a breakdown by product. Do you have a rough sense of what each item costs you to make or deliver? Even ballpark figures work." Proceed with owner-provided figures and flag the limitation in the output.
 
 ---
 
-## Gotcha: PayPal rate-limiting on repeated calls
+## Gotcha: Cost and revenue windows don't match
 
-Rapid repeated calls to `list_transactions` (e.g., iterating through multiple date ranges) can trigger PayPal's rate limiter.
+The cost export and the payment bill export often cover different date ranges — e.g. 12 months of costs but only the 3 months of Alipay bills the owner happened to download.
 
-**Why it matters:** Without a retry strategy, the skill fails mid-analysis.
+**Why it matters:** Dividing a year of costs into a quarter of revenue (or vice versa) produces margins that are wrong by a large, silent factor.
 
 ### ✗ Bad
-Call list_transactions in a loop → 429 error → skill crashes with no data.
+Compute margin from a 12-month cost export against a 3-month 支付宝 bill export → margins look catastrophically negative → owner panics.
 
 ### ✓ Good
-Call `list_transactions` → if 429, pause 30 seconds → retry once → if the retry succeeds, continue normally, but treat any *second* 429 in the same session as a signal to stop retrying. After a second rate-limit event (even if separated by a successful call), immediately surface the fallback: "PayPal is rate-limiting repeated calls in this session. I can switch to Square for the revenue data, or you can upload a PayPal CSV export — either works. What would you prefer?" Do not attempt a third retry.
+Check both files' date ranges before computing. If they differ, either ask the owner to re-download the bill export for the matching window, or trim the cost data to the overlapping months and say so: "I'm analyzing March–May only, since that's the window both files cover."
 
 ---
 
@@ -91,7 +91,7 @@ The pricing scenario tables are math, not predictions. Volume elasticity is esti
 **Why it matters:** An owner might act on the table as if it's a forecast, then feel misled when actual results differ.
 
 ### ✗ Bad
-"If you raise prices 10%, you'll make $55,000 next quarter."
+"If you raise prices 10%, you'll make ¥55,000 next quarter."
 
 ### ✓ Good
-"If you raise prices 10% and volume drops ~5% (based on available history), revenue would be approximately $53,000. This is a rough projection — actual results will depend on your specific customers and competitive environment."
+"If you raise prices 10% and volume drops ~5% (based on available history), revenue would be approximately ¥53,000. This is a rough projection — actual results will depend on your specific customers and competitive environment."

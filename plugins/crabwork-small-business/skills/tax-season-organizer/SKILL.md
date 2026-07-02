@@ -1,11 +1,14 @@
 ---
 name: tax-season-organizer
+version: 0.3.0
 description: >
   Prepares tax-season materials for small business owners — framed as deliverables
   for their accountant, not tax advice. Two modes: (1) quarterly estimated tax
-  calculation — pulls YTD net income from QuickBooks and calculates the federal
+  calculation — works from a YTD P&L the owner exports (CSV/Excel) or pastes from
+  their accounting software (用友好会计 / 金蝶精斗云) and calculates the federal
   income tax + self-employment tax liability and quarterly payment due; (2)
-  year-end 1099 prep — scans QuickBooks, PayPal, and Stripe for contractors paid
+  year-end 1099 prep — works from the owner's accounting-software export plus
+  bill exports from 支付宝商家平台 / 微信支付商户平台 to find contractors paid
   over $600, builds a 1099-NEC candidate list with missing W-9 flags, and
   produces a plain-English summary a CPA can work from directly.
 
@@ -29,14 +32,14 @@ and deliver a structured document the accountant can work from directly.
 
 ```
 User: "what do I owe for estimated taxes this quarter?"
-→ Pull YTD P&L from QuickBooks
+→ Ask for a YTD P&L export (CSV/Excel) or pasted report from the owner's accounting software (用友好会计 / 金蝶精斗云)
 → Calculate estimated federal income tax + SE tax
 → Subtract payments already made this year
 → Show Q-specific amount due with due date and assumptions stated
 → Output: "Estimated Q2 payment due June 16: $X — see full breakdown below"
 
 User: "I need to send out 1099s"
-→ Pull all contractor/vendor payments from QuickBooks + PayPal + Stripe
+→ Gather all contractor/vendor payments from the accounting-software export + 支付宝商家平台 / 微信支付商户平台 bill exports
 → Identify contractors paid ≥ $600 YTD
 → Flag records missing W-9 / EIN
 → Output: 1099-NEC candidate list + missing W-9 action list
@@ -56,14 +59,14 @@ If the intent is ambiguous, ask: "Are you looking at your estimated tax payment 
 
 ## Path 1: Quarterly estimated tax
 
-### 1. Pull YTD financials
+### 1. Gather YTD financials
 
-Use QuickBooks to pull a Profit & Loss report from January 1 of the current year through the last day of the most recently completed quarter. Capture:
+There is no MCP connector for the owner's accounting software (用友好会计 / 金蝶精斗云) yet. Ask the owner to export a Profit & Loss report — CSV or Excel — from January 1 of the current year through the last day of the most recently completed quarter, or to paste the key numbers directly in chat. Capture:
 - **Gross revenue** (total income)
 - **Total expenses** (operating expenses, COGS, etc.)
 - **Net ordinary income** = revenue − expenses
 
-If QuickBooks is not connected, ask the user to upload a P&L as CSV or paste the key numbers. For field names and query approach, see [reference/connector-queries.md](reference/connector-queries.md).
+For field names and export tips, see [reference/connector-queries.md](reference/connector-queries.md).
 
 ### 2. Ask about prior estimated payments
 
@@ -116,29 +119,27 @@ Structure the output as a document with these sections in order:
 
 ## Path 2: Year-end 1099 prep
 
-### 1. Pull contractor payments from all sources
+### 1. Gather contractor payments from all sources
 
-Query each connected source for **all payments made to individuals or businesses for services** in the tax year. Do not include payments for goods, refunds, or internal transfers.
+Collect **all payments made to individuals or businesses for services** in the tax year. Do not include payments for goods, refunds, or internal transfers. All sources below are owner-provided exports — none of them come from a live connector.
 
-**QuickBooks — try live connector first, fall back to CSV if needed:**
+**Accounting software (用友好会计 / 金蝶精斗云) — CSV/Excel export:**
 
-1. **Try live connector.** Attempt to pull vendor-level payment records via the QuickBooks MCP. If the connector returns individual payee records with name, amount, and account category, use them directly and skip the CSV step.
+1. **Request the export.** Prompt the owner:
 
-2. **Detect aggregate-only response.** If the MCP returns only category-level totals (e.g. "Contract labor: $7,500" with no payee breakdown), the connector does not yet support vendor-level queries. In this case, prompt the user:
+   > "I need payee-level detail to build your 1099 list. Please export a vendor payment report (a transaction list grouped by vendor, filtered to this tax year) from your accounting software as CSV or Excel and upload it here. I'll process it automatically."
 
-   > "QuickBooks returned summary data only — I need payee-level detail to build your 1099 list. Please export a **Transaction List by Vendor** report (QuickBooks → Reports → Expenses → Transaction List by Vendor, filtered to this tax year) and upload the CSV here. I'll process it automatically."
+2. **Process the export.** Map columns: payee name, amount, date, payment method, EIN/SSN status. Follow the same aggregation and threshold logic below.
 
-3. **Process CSV via Desktop connector.** Map columns: payee name, amount, date, payment method, EIN/SSN status. Follow the same aggregation and threshold logic below regardless of whether data came from the live connector or CSV.
+> **Note for future connector versions:** If an accounting-software MCP connector ships later and exposes vendor payment records directly, the export step can be skipped — the aggregation logic below is unchanged either way.
 
-> **Note for future connector versions:** If the QuickBooks MCP is upgraded to expose vendor payment records directly, step 1 will succeed and the CSV fallback will be skipped automatically. No changes to this skill are needed — the try-first logic handles it.
+For field names and export tips, see [reference/connector-queries.md](reference/connector-queries.md).
 
-For field names and query approach, see [reference/connector-queries.md](reference/connector-queries.md).
+**Alipay (支付宝):** Ask the owner for a bill export (CSV) from 支付宝商家平台 covering payments **sent** to contractors in the tax year. The alipay MCP connector cannot export transaction history — it only creates payment links, queries a single payment by order number, and processes refunds — so this data must come from the 商家平台 export or pasted records.
 
-**PayPal:** Pull all "Goods & Services" payments sent. Note: PayPal issues its own 1099-K to contractors above the threshold — flag these separately in output so the accountant can determine whether a 1099-NEC is also needed.
+**WeChat Pay (微信支付) — not yet connected:** If the owner also pays contractors via WeChat Pay, ask for a bill export (CSV) from 微信支付商户平台 for the same period.
 
-**Stripe:** Pull all transfers/payouts made to external parties. Same 1099-K caveat as PayPal applies.
-
-**Desktop/CSV:** If the user uploads a CSV directly (without going through QuickBooks export), map columns: payee name, amount, date, payment method, EIN/SSN status.
+**Direct CSV:** If the user uploads any other payment CSV directly, map columns the same way: payee name, amount, date, payment method, EIN/SSN status.
 
 ### 2. Aggregate by payee
 
@@ -154,8 +155,8 @@ Corporations (Inc., Corp., LLC taxed as C or S corp) generally do not need a 109
 
 ### 4. Check W-9 status
 
-For each flagged payee, note whether a W-9 / EIN is on file in QuickBooks. Mark as:
-- ✅ W-9 on file (EIN/SSN recorded in QuickBooks)
+For each flagged payee, note whether a W-9 / EIN appears in the accounting-software export (vendor profile / tax ID column). Mark as:
+- ✅ W-9 on file (EIN/SSN recorded in the accounting software)
 - ⚠️ Missing — W-9 not on file; must collect before filing
 - ❓ Unknown — cannot determine from available data
 
@@ -173,9 +174,8 @@ Structure the 1099 prep output as a document with these sections:
    deadline note for Jan 31), and number near-threshold flagged for review.
 
 3. **1099-NEC candidates table** — Columns: payee name, total paid, data
-   sources, W-9 status (on file / missing / unknown), and notes. Flag any
-   payee paid via PayPal or Stripe with a note that the platform may issue
-   its own 1099-K.
+   sources (accounting export / 支付宝 bill / 微信支付 bill), W-9 status
+   (on file / missing / unknown), and notes.
 
 4. **Missing W-9 action list** — Numbered list of contractors who need to
    provide a W-9 before filing, with amounts paid and a reminder to request
@@ -184,13 +184,13 @@ Structure the 1099 prep output as a document with these sections:
 5. **Near-threshold table** — Payees paid $400-$599 flagged for accountant
    review, with a note to verify no additional payments were missed.
 
-6. **Payment processor note** — Explain that PayPal and Stripe issue their own
-   1099-K forms and the accountant should confirm whether a 1099-NEC is also
-   needed for contractors paid exclusively through those platforms.
+6. **Data coverage note** — State which bill exports were provided (支付宝商家平台,
+   微信支付商户平台, accounting software) and which were not, so the accountant
+   knows whether any payment rail is missing from the list.
 
 7. **Next steps checklist** — Action items for the accountant: collect missing
    W-9s, confirm unknowns, review near-threshold payees, verify corporation
-   exemptions, confirm 1099-K overlap handling, file by January 31.
+   exemptions, file by January 31.
 
 ---
 
@@ -205,7 +205,7 @@ Structure the 1099 prep output as a document with these sections:
 ## Reference files
 
 - [reference/calculation-assumptions.md](reference/calculation-assumptions.md) — full tax math, bracket table, and SE tax walkthrough
-- [reference/connector-queries.md](reference/connector-queries.md) — how to pull data from QuickBooks, PayPal, and Stripe
+- [reference/connector-queries.md](reference/connector-queries.md) — what to request from the accounting software (用友好会计 / 金蝶精斗云) and the 支付宝 / 微信支付 bill exports
 - [reference/gotchas.md](reference/gotchas.md) — Good / Bad patterns for common failure modes
 - [reference/examples/quarterly-estimate.md](reference/examples/quarterly-estimate.md) — worked quarterly estimate example
 - [reference/examples/year-end-1099.md](reference/examples/year-end-1099.md) — worked year-end 1099 prep example

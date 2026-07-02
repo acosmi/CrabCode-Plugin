@@ -4,7 +4,7 @@ A worked scenario for the email path — contact exists, deal resolves unambiguo
 
 ## Setup
 
-- User is viewing an email thread with subject "Acme Q2 pricing follow-up"
+- User pastes an email thread with subject "Acme Q2 pricing follow-up" (no email connector — threads arrive as pasted text)
 - Thread has three messages between the user and `sarah.lin@acme.com` over the last two days
 - `sarah.lin@acme.com` is an existing contact in HubSpot
 - She is associated to exactly one open deal: "Acme Q2 Expansion" (proposal sent, $18K, close date May 15)
@@ -19,7 +19,7 @@ A worked scenario for the email path — contact exists, deal resolves unambiguo
 Email path (user said "this thread").
 
 **Step 2 — Gather context.**
-Reads the thread. Subject: "Acme Q2 pricing follow-up." Latest message (yesterday, 4:12pm) from Sarah: *"Confirmed, 50 seats at $360/seat works. Sending the signed SOW Friday."* Primary external contact: `sarah.lin@acme.com`.
+Reads the pasted thread. Subject: "Acme Q2 pricing follow-up." Latest message (yesterday, 4:12pm) from Sarah: *"Confirmed, 50 seats at $360/seat works. Sending the signed SOW Friday."* Primary external contact: `sarah.lin@acme.com`.
 
 **Step 3 — Resolve contact + deal.**
 Looks up `sarah.lin@acme.com` → contact exists (Sarah Lin, Acme Corp). Finds open deals associated to her: exactly one, "Acme Q2 Expansion." Match is unambiguous.

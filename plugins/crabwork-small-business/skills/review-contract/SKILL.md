@@ -1,21 +1,22 @@
 ---
 name: review-contract
-description: Reviews a contract in plain English, surfaces red flags with severity ratings, and produces a marked-up docx/PDF with suggested redlines. Trigger when the owner runs /review-contract or says "review this contract," "what am I signing," "should I sign this," "check this NDA/MSA/agreement," "any red flags in this," "look at these terms," or uploads/forwards a contract or legal document. Accepts optional file path or DocuSign envelope ID.
+version: 0.3.0
+description: Reviews a contract in plain English, surfaces red flags with severity ratings, and produces a marked-up docx/PDF with suggested redlines. Trigger when the owner runs /review-contract or says "review this contract," "what am I signing," "should I sign this," "check this NDA/MSA/agreement," "any red flags in this," "look at these terms," or uploads/pastes a contract or legal document. Accepts an optional file path; works fully offline with a local file or pasted text (no email or e-sign connector yet).
 allowed-tools: Read, WebFetch, Bash
 ---
 
 Run the contract review. Read the document, explain what it says, flag anything risky, and produce marked-up redlines for the owner to use in negotiations.
 
 Parse arguments:
-- `FILE_PATH_OR_DOCUSIGN_ENVELOPE_ID` — path to a local PDF/docx file, or a DocuSign envelope ID; if omitted, check the most recent envelope awaiting signature in DocuSign
+- `FILE_PATH` — path to a local PDF/docx file; if omitted, ask the owner to attach the contract or paste the text. There is no email or e-sign connector yet (腾讯企业邮 and 众律宝 are pending), so the contract always comes from the owner directly.
 
 ## Step 1 — Load the contract
 
 Using the `contract-review` skill workflow:
 
 1. If a file path is given: read the document from Files or Desktop.
-2. If a DocuSign envelope ID is given: pull the document from DocuSign.
-3. If neither: check DocuSign for the most recent envelope with status `waiting for signature` and confirm with the owner before proceeding.
+2. If the owner pasted the contract text: work with what's provided.
+3. If neither: ask the owner to attach the contract as a PDF or docx, or paste the text. If it lives in their inbox or an e-sign service, they download it and attach it — the skill cannot fetch it.
 
 ## Step 2 — Plain-English summary
 
@@ -54,11 +55,11 @@ Offer to export this as a marked-up docx or PDF to Files or Desktop.
 
 ## Connector failures
 
-If DocuSign is not connected and no file path was given, ask the owner to upload the contract as a PDF or docx. If DocuSign is connected but the envelope ID is invalid, report the error and ask the owner to check the ID. This command works fully offline with a local file — connectors are optional.
+This command works fully offline — it needs no connectors. If no file path was given and nothing was pasted, ask the owner to upload the contract as a PDF or docx. Sending the redline to the counterparty and routing the final document for signature are the owner's manual steps: 众律宝 (connector pending) or paper.
 
 ## Approval gates
 
-- **Never sign, send, or modify the actual DocuSign envelope.** Present the review and wait for the owner to act.
+- **Never claim to send, sign, or route anything for signature.** Prepare the final document; the owner sends it for signature via 众律宝 (or on paper) manually.
 - **Always caveat:** "This is not legal advice. Review with your attorney before signing."
 - **Never delete or overwrite the original document.**
 

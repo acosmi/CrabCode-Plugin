@@ -1,20 +1,20 @@
 # Firm Reminder — Repeat Late Payer Example
 
-**Scenario:** Smith LLC, $450 invoice, 47 days past due. Paid late in 3 of last 4 invoices.
+**Scenario:** Smith LLC, ¥450 invoice, 47 days past due. Paid late in 3 of last 4 invoices.
 
 **Score:** `repeat-late` · **Tone:** Firm
 
 ---
 
-**Subject:** Past due notice: Invoice #1038 — $450 (47 days overdue)
+**Subject:** Past due notice: Invoice #1038 — ¥450 (47 days overdue)
 
 Hi Tom,
 
-Invoice #1038 for $450 is now 47 days past due. The original due date was March 11.
+Invoice #1038 for ¥450 is now 47 days past due. The original due date was March 11.
 
-Please remit payment by May 2. You can pay online here: [Pay Invoice #1038 — $450]
+Please remit payment by May 2. You can pay via Alipay here: [Alipay payment link — Invoice #1038 — ¥450]
 
-If there's a question about this invoice, reply to this email and I'll sort it out quickly.
+If there's a question about this invoice, reply to this message and I'll sort it out quickly.
 
 [Owner name]
 

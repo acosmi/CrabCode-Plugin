@@ -1,93 +1,88 @@
-# Connector Query Guide
+# Data Source Guide
 
-How to pull the right data from each connector for each mode.
+How to gather the right data for each mode. **None of these sources have a live MCP
+connector** — everything comes from owner-provided exports (CSV/Excel) or pasted
+reports. The alipay MCP connector cannot export transaction history (it only creates
+payment links, queries a single payment by order number, and processes refunds), so
+do not attempt to pull bulk payment data through it.
 
 ---
 
-## QuickBooks — Quarterly mode (P&L)
+## Accounting software (用友好会计 / 金蝶精斗云) — Quarterly mode (P&L)
 
-Pull a **Profit & Loss** report for the period January 1 through the last day of the most recently completed quarter.
+Ask the owner to export a **Profit & Loss** report for the period January 1 through
+the last day of the most recently completed quarter, as CSV or Excel — or to paste
+the key numbers directly.
 
 Key fields to capture:
-- `Total Income` (gross revenue)
-- `Total Expenses` (all operating expenses)
-- `Net Ordinary Income` (= income − expenses; this is the basis for tax calculation)
+- `Total Income` / 收入合计 (gross revenue)
+- `Total Expenses` / 费用合计 (all operating expenses)
+- `Net Ordinary Income` / 净利润 (= income − expenses; this is the basis for tax calculation)
 
-If QuickBooks returns multiple income/expense categories, sum them. You want the single
+If the report shows multiple income/expense categories, sum them. You want the single
 bottom-line net profit figure.
 
-**If the user's QuickBooks is on cash basis**, use that. If accrual, note it in output —
+**If the owner's books are on cash basis**, use that. If accrual, note it in output —
 the accountant should confirm which basis to use for estimated taxes.
 
 ---
 
-## QuickBooks — Year-end mode (contractor payments)
+## Accounting software — Year-end mode (contractor payments)
 
-Pull all **bill payments and checks** to vendors for the full tax year (Jan 1 – Dec 31).
+Ask the owner to export all **vendor payments** (bill payments, checks, transfers to
+vendors) for the full tax year (Jan 1 – Dec 31) — a transaction list grouped by vendor.
 
 Filter for:
-- Vendor type = "1099 eligible" (if the user has tagged vendors in QuickBooks)
+- Any vendor flagged as a contractor/1099-eligible (if the owner tags vendors)
 - OR any vendor whose category is: consulting, contract labor, subcontractor, freelance, design, legal, accounting, marketing, staffing
 
 For each vendor record, capture:
 - Vendor name (legal name if available)
-- EIN / SSN (from vendor profile — indicates W-9 on file)
+- EIN / SSN (from vendor profile / tax ID column — indicates W-9 on file)
 - Total payments for the year
 - Payment dates and amounts (for cross-reference)
 - Vendor type / 1099 eligibility flag
 
-**Common issue:** Many QuickBooks users do not tag vendors as 1099-eligible. If
-`1099 eligible` returns few or no results, pull ALL vendors with significant payment
-totals and let the user / accountant classify them. Note this in output.
+**Common issue:** Many owners never tag vendors as 1099-eligible in their accounting
+software. If the eligibility flag yields few or no results, work from ALL vendors with
+significant payment totals and let the user / accountant classify them. Note this in output.
 
 ---
 
-## PayPal — Year-end mode
+## Alipay (支付宝) — Year-end mode
 
-Pull all **"Goods & Services" payments sent** (not received) for the tax year.
+Ask the owner to export a **bill/transaction report (CSV)** from 支付宝商家平台 covering
+payments **sent** (not received) for the tax year.
 
 Key fields:
-- Recipient name / email
+- Counterparty name / account (email or phone)
 - Total amount per recipient (aggregate for the year)
-- Transaction type = "Payment" or "Business Payment"
+- Transaction type (keep payments for services; see exclusions)
 - Date
 
-**Exclude:** personal payments ("Friends & Family"), refunds, disputes, transfers
-to own accounts.
-
-**1099-K note:** PayPal issues its own 1099-K to any recipient who receives ≥ $600
-in goods & services payments. Flag this in output — the accountant determines whether
-the business must also issue a 1099-NEC or can rely on PayPal's 1099-K.
+**Exclude:** refunds, disputes, transfers between the owner's own accounts, and
+payments for goods.
 
 ---
 
-## Stripe — Year-end mode
+## WeChat Pay (微信支付) — Year-end mode — not yet connected
 
-Pull all **transfers to external accounts** (payouts to contractors, not payouts to the
-business owner's own bank).
-
-Key fields:
-- Recipient name / ID
-- Total transferred per recipient for the year
-- Payment description / metadata (to confirm these are for services)
-
-**Exclude:** Stripe payouts to the business's own bank account.
-
-**1099-K note:** Same as PayPal — Stripe issues 1099-K to contractors above the
-threshold. Flag and defer to accountant.
+If the owner also pays contractors via WeChat Pay, ask for a bill export (CSV) from
+微信支付商户平台 for the same period. Same fields and exclusions as the Alipay export.
 
 ---
 
-## Desktop / CSV fallback
+## CSV handling
 
-If any connector is unavailable, ask the user to:
-1. Export a P&L from QuickBooks as CSV (Reports → Profit & Loss → Export)
-2. Export a transaction history from PayPal (Activity → Download → CSV)
-3. Export a payout report from Stripe (Dashboard → Payouts → Export)
+Typical export paths to suggest:
+1. Accounting software: 用友好会计 / 金蝶精斗云 → reports → Profit & Loss (or vendor
+   transaction list) → export CSV/Excel
+2. 支付宝商家平台 → 账单/对账中心 → download bill CSV for the date range
+3. 微信支付商户平台 → 交易账单 → download CSV for the date range
 
 When reading uploaded CSVs, look for these columns (names vary by export):
-- P&L: `Description`, `Amount`, `Type` (Income / Expense)
-- PayPal: `Name`, `Type`, `Amount`, `Date`, `Transaction ID`
-- Stripe: `Description`, `Amount`, `Created date`, `Status`
+- P&L: `Description`/摘要, `Amount`/金额, `Type`/类型 (Income / Expense)
+- Alipay bill: counterparty name/account, transaction type, amount, date, transaction ID
+- WeChat Pay bill: counterparty, amount, transaction time, transaction ID
 
 If columns don't match, ask the user to identify the payee name and amount columns.

@@ -1,36 +1,50 @@
 {
   "mcpServers": {
+    "alipay": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@alipay/mcp-server-alipay"],
+      "env": {
+        "AP_APP_ID": "${user_config.alipay_app_id}",
+        "AP_APP_KEY": "${user_config.alipay_app_key}",
+        "AP_PUB_KEY": "${user_config.alipay_public_key}",
+        "AP_CURRENT_ENV": "prod",
+        "AP_LOG_ENABLED": "false"
+      }
+    },
+    "dingtalk": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "dingtalk-mcp@latest"],
+      "env": {
+        "DINGTALK_Client_ID": "${user_config.dingtalk_client_id}",
+        "DINGTALK_Client_Secret": "${user_config.dingtalk_client_secret}",
+        "ACTIVE_PROFILES": "ALL"
+      }
+    },
+    "feishu": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@larksuiteoapi/lark-mcp",
+        "mcp",
+        "-a",
+        "${user_config.lark_app_id}",
+        "-s",
+        "${user_config.lark_app_secret}"
+      ]
+    },
+    "tencent-docs": {
+      "type": "http",
+      "url": "https://docs.qq.com/openapi/mcp",
+      "headers": {
+        "Authorization": "Bearer ${user_config.tencent_docs_token}"
+      }
+    },
     "hubspot": {
       "type": "http",
       "url": "https://mcp.hubspot.com/anthropic"
-    },
-    "canva": {
-      "type": "http",
-      "url": "https://mcp.canva.com/mcp"
-    },
-    "slack": {
-      "type": "http",
-      "url": "https://mcp.slack.com/mcp"
-    },
-    "stripe": {
-      "type": "http",
-      "url": "https://mcp.stripe.com"
-    },
-    "square": {
-      "type": "http",
-      "url": "https://mcp.squareup.com/sse"
-    },
-    "gmail": {
-      "type": "http",
-      "url": "https://gmailmcp.googleapis.com/mcp/v1"
-    },
-    "google calendar": {
-      "type": "http",
-      "url": "https://calendarmcp.googleapis.com/mcp/v1"
-    },
-    "google drive": {
-      "type": "http",
-      "url": "https://drivemcp.googleapis.com/mcp/v1"
     }
   }
 }

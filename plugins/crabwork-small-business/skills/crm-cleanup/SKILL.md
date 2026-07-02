@@ -1,5 +1,6 @@
 ---
 name: crm-cleanup
+version: 0.3.0
 description: Scans HubSpot for stale deals, duplicate contacts, and missing fields, then fixes what the owner approves. Trigger when the owner runs /crm-cleanup or says "clean up the CRM," "HubSpot is a mess," "dedupe my contacts," "fix stale deals," "tidy up my pipeline," or wants their CRM data cleaned. Accepts optional scope argument for deals, contacts, or all.
 allowed-tools: Read, WebFetch, Bash
 ---
@@ -44,7 +45,7 @@ Present all duplicate sets before merging anything.
 
 ## Connector failures
 
-If HubSpot is unreachable, stop — this command requires HubSpot as the data source. Tell the owner: "HubSpot isn't connected. Connect it in CrabCode settings, then rerun /crm-cleanup."
+If HubSpot is unreachable, stop — this command requires HubSpot as the data source. Tell the owner: "HubSpot isn't connected. Configure it under /plugin → Manage plugins → Configure, then rerun /crm-cleanup."
 
 ## Approval gates
 
