@@ -128,6 +128,8 @@
     "./cn-legal-aid/skills/supervisor-review-queue"
   ],
   "agents": [
-    "./matter-core/agents"
+    "./matter-core/agents/diligence-reader.md",
+    "./matter-core/agents/diligence-analyzer.md",
+    "./matter-core/agents/diligence-writer.md"
   ]
 }

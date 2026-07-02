@@ -79,11 +79,14 @@ Custom component paths can be specified (supplements, does not replace, auto-dis
 ```json
 {
   "commands": "./custom-commands",
-  "agents": ["./agents", "./specialized-agents"],
+  "agents": ["./extra/reviewer.md", "./extra/collector.md"],
+  "skills": ["./section-a/skills/foo"],
   "hooks": "./config/hooks.json",
   "mcpServers": "./.mcp.json"
 }
 ```
+
+Path rules (enforced by the manifest schema; a violation fails validation and the whole plugin is rejected): `agents` entries must be individual `.md` **files**; `skills` and `commands` entries may be directories; `hooks`/`mcpServers` must be `.json` files; all paths must start with `./`.
 
 ### Component Schemas
 
