@@ -21,7 +21,7 @@ allowed-tools: [Read, Glob, Grep, Bash, Task]
 - **审批是硬 gate**：未获人工批准不得生成发布包。向用户清楚展示待批内容摘要，等待确认。
 
 ### 3. 生成发布包（确定性）
-- 获批后调 `mediaops.publish.package`，生成对应平台的发布包（结构化内容 + 资源 + 发布元数据 + 审计痕迹）。
+- 获批后调 `mediaops.publish.package`（传 `brandId`——它的 AI 标识终检以 profile 的 `compliance.ai_label_text` 为准，不传会按默认文案校验），生成对应平台的发布包（结构化内容 + 资源 + 发布元数据 + 审计痕迹）。
 - 发布包模式 vs 浏览器辅助的差异见 `references/publish-runbook.md`。
 
 ### 4. 真发布（Gate B — 当前不可用）

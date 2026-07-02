@@ -4,6 +4,7 @@ import { dataDir, ensureDir, appendRecord, storageWarnings } from '../storage.ts
 import { getPlatform, platformIds } from '../platforms/registry.ts'
 import { renderDocument, toPlainText } from '../markdown.ts'
 import { DEFAULT_AI_LABEL } from './readiness.ts'
+import { loadProfile } from './profiles.ts'
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
@@ -24,6 +25,7 @@ export const inputSchema = {
   // the AI-assist disclosure label is absent, even if readiness.inspect was skipped.
   aiAssisted: z.boolean().optional(),
   aiLabelText: z.string().optional(),
+  brandId: z.string().optional().describe('Brand profile id; its compliance.ai_label_text becomes the expected label when aiLabelText is not given.'),
 }
 
 type Args = {
@@ -36,6 +38,7 @@ type Args = {
   approvalId?: string
   aiAssisted?: boolean
   aiLabelText?: string
+  brandId?: string
 }
 
 function dateStamp(): string {
@@ -52,7 +55,18 @@ export async function handler(args: Args): Promise<Envelope> {
   // explicit disclosure label. This is independent of readiness.inspect so the
   // legal requirement holds even if the caller skipped the readiness step.
   if (args.aiAssisted !== false) {
-    const label = (args.aiLabelText ?? DEFAULT_AI_LABEL).trim()
+    // Same label resolution as readiness.inspect: explicit arg > brand profile's
+    // compliance.ai_label_text > default. Otherwise a profile with a custom label
+    // would be wrongly refused here despite passing readiness.
+    let profileLabel: string | undefined
+    if (args.brandId) {
+      const profile = await loadProfile(args.brandId)
+      if (!profile) {
+        return err('profile_not_found', `no valid profile for brand '${args.brandId}'; save one via mediaops.profile.save or omit brandId.`)
+      }
+      profileLabel = profile.compliance.ai_label_text
+    }
+    const label = (args.aiLabelText ?? profileLabel ?? DEFAULT_AI_LABEL).trim()
     if (label.length === 0 || !args.bodyMarkdown.includes(label)) {
       return err(
         'ai_label_missing',
