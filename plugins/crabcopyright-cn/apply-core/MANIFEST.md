@@ -92,7 +92,7 @@
 
 | 脚本 | 检查 | 用法 |
 |------|------|------|
-| `check_source.py` | 行数统计、页数折算(每页 50 行/60 页)、注水启发式(空行/注释/重复占比,经验阈值) | `python3 check_source.py <文件或目录>... [--json]` |
+| `check_source.py` | 行数统计、页数折算(每页 50 行/60 页)、注水启发式(空行/注释/重复占比,经验阈值;全语料+逐文件两个粒度,≥50 行的文件单独判定,防单文件注水被整体稀释) | `python3 check_source.py <文件或目录>... [--json]` |
 | `check_func_desc.py` | 功能说明字数(500–1300,GUIDE §8 口径) | `python3 check_func_desc.py <文本文件> [--json]` |
 | `check_dates.py` | 开发完成/首次发表/申请/企业成立日期先后关系 | `python3 check_dates.py --manifest <manifest.json> [--json]` |
 | `check_overlap.py` | 跨申请相同文件与高重复内容 | `python3 check_overlap.py <申请A路径>... --vs <申请B路径>... [--json]` |

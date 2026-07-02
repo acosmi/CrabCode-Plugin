@@ -3,6 +3,8 @@
 
 官方口径见 apply-core/GUIDE.md §3:每页不少于 50 行,前 30 页 + 后 30 页共 60 页;
 总行数不足 3000 行(即不足 60 页)时提交全部。注水阈值为经验值,超限只告警,由人工复核。
+注水启发式在两个粒度上跑:全语料占比 + 逐文件占比(≥50 行的文件),
+避免单个注水文件混进大语料后被整体占比稀释。
 
 用法:
     python3 check_source.py <源码文件或目录>... [--json]
@@ -22,10 +24,14 @@ REQUIRED_PAGES = 60                              # 前 30 页 + 后 30 页
 REQUIRED_LINES = LINES_PER_PAGE * REQUIRED_PAGES  # 3000 行才够 60 页
 
 # ---- 注水启发式阈值(经验值,非官方口径) ----
+# 全局与逐文件共用同一组阈值:全局占比抓整体注水,逐文件抓混在大语料里
+# 被稀释的单个注水文件(逐文件的重复行只统计文件内部副本)。
 BLANK_RATIO_MAX = 0.25    # 空行占比上限
 COMMENT_RATIO_MAX = 0.40  # 注释行占比上限
 DUP_RATIO_MAX = 0.30      # 重复行(多余副本)占比上限
 DUP_MIN_LINE_LEN = 6      # 短于此长度的行(如单个花括号)不计入重复统计
+PER_FILE_MIN_LINES = 50   # 不足一页(50 行)的文件占比不稳定,不做逐文件判定
+PER_FILE_WARN_LIMIT = 15  # 逐文件告警最多逐条列出的文件数,超出部分汇总一条
 
 EXCLUDE_DIRS = {"node_modules", "vendor", "target", "dist", "build",
                 "__pycache__", "out", "coverage", "venv"}
@@ -63,24 +69,60 @@ def read_lines(path):
         return fh.read().splitlines()
 
 
+def analyze_lines(lines):
+    """单个文件的空行/注释/文件内重复统计。返回 (blank, comment, 文件内多余重复行数, 计入重复统计的行 Counter)。"""
+    blank = comment = 0
+    counter = Counter()
+    for line in lines:
+        s = line.strip()
+        if not s:
+            blank += 1
+        elif s.startswith(COMMENT_PREFIXES):
+            comment += 1
+        if len(s) >= DUP_MIN_LINE_LEN:
+            counter[s] += 1
+    extra_dup = sum(c - 1 for c in counter.values() if c > 1)
+    return blank, comment, extra_dup, counter
+
+
+def file_flags(n, blank, comment, extra_dup):
+    """逐文件注水判定:返回 [(指标名, 占比, 阈值)];不足 PER_FILE_MIN_LINES 行不判定。"""
+    if n < PER_FILE_MIN_LINES:
+        return []
+    nonblank = n - blank
+    flags = []
+    for name, ratio, limit in (("空行", blank / n, BLANK_RATIO_MAX),
+                               ("注释行", comment / n, COMMENT_RATIO_MAX),
+                               ("重复行", extra_dup / nonblank if nonblank else 0.0,
+                                DUP_RATIO_MAX)):
+        if ratio > limit:
+            flags.append((name, ratio, limit))
+    return flags
+
+
 def run_check(paths):
-    """统计行数并折算页数,跑注水启发式。返回统一结果字典。"""
+    """统计行数并折算页数,跑注水启发式(全局占比 + 逐文件占比)。返回统一结果字典。"""
     files = collect_files(paths)
     total = blank = comment = 0
     line_counter = Counter()
     per_file = []
     for f in files:
         lines = read_lines(f)
-        per_file.append({"path": f, "lines": len(lines)})
-        total += len(lines)
-        for line in lines:
-            s = line.strip()
-            if not s:
-                blank += 1
-            elif s.startswith(COMMENT_PREFIXES):
-                comment += 1
-            if len(s) >= DUP_MIN_LINE_LEN:
-                line_counter[s] += 1
+        n = len(lines)
+        f_blank, f_comment, f_dup, f_counter = analyze_lines(lines)
+        f_nonblank = n - f_blank
+        flags = file_flags(n, f_blank, f_comment, f_dup)
+        per_file.append({
+            "path": f, "lines": n,
+            "blank_ratio": round(f_blank / n, 4) if n else 0.0,
+            "comment_ratio": round(f_comment / n, 4) if n else 0.0,
+            "dup_ratio": round(f_dup / f_nonblank, 4) if f_nonblank else 0.0,
+            "flagged": [name for name, _, _ in flags],
+        })
+        total += n
+        blank += f_blank
+        comment += f_comment
+        line_counter.update(f_counter)
 
     nonblank = total - blank
     extra_dup = sum(c - 1 for c in line_counter.values() if c > 1)
@@ -103,7 +145,22 @@ def run_check(paths):
                                ("重复行", dup_ratio, DUP_RATIO_MAX)):
         if ratio > limit:
             items.append({"level": "warn",
-                          "message": f"{name}占比 {ratio:.1%} 超过经验阈值 {limit:.0%},疑似注水,请人工复核"})
+                          "message": f"全语料{name}占比 {ratio:.1%} 超过经验阈值 {limit:.0%},疑似注水,请人工复核"})
+
+    flagged_files = [pf for pf in per_file if pf["flagged"]]
+    for pf in flagged_files[:PER_FILE_WARN_LIMIT]:
+        detail = "、".join(
+            f"{name} {pf[key]:.1%}(阈值 {limit:.0%})"
+            for name, key, limit in (("空行", "blank_ratio", BLANK_RATIO_MAX),
+                                     ("注释行", "comment_ratio", COMMENT_RATIO_MAX),
+                                     ("重复行", "dup_ratio", DUP_RATIO_MAX))
+            if name in pf["flagged"])
+        items.append({"level": "warn",
+                      "message": f"文件级注水疑点 {pf['path']}: {detail},疑似注水,请人工复核"})
+    if len(flagged_files) > PER_FILE_WARN_LIMIT:
+        items.append({"level": "warn",
+                      "message": f"另有 {len(flagged_files) - PER_FILE_WARN_LIMIT} 个文件超逐文件阈值,"
+                                 f"完整清单见 --json 输出 data.files 的 flagged 字段"})
 
     if any(i["level"] == "fail" for i in items):
         status = "fail"
