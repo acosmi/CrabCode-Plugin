@@ -52,3 +52,8 @@ After Step 2 approval, trigger the `lead-triage` skill workflow:
 ## Output
 
 End the run with a one-paragraph recap: revenue dip identified, posts produced (copy + design briefs, assets verified), segment size, calls booked. Link to the HubSpot campaign URL once sent.
+
+## Media publishing routing
+
+- For domestic-platform publishing workflows (公众号/小红书/抖音/视频号 platform adaptation, content compliance review, and publish logging), route to `crabcode-media-ops:media-platform-adapter` and `crabcode-media-ops:media-ops` instead of hand-rolling platform rules here.
+- If triggering them returns Unknown skill, the media-ops plugin is not installed: guide the owner to install `crabcode-media-ops` via `/plugin`, then retry. Until then, deliver the publish-ready package for native manual publishing as described above.

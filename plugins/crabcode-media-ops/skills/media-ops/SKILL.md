@@ -66,3 +66,8 @@ user-invocable: true
 - 内容与审计落在 `${CRABCODE_PLUGIN_DATA}` 下，按 content id 组织。
 - 插件资源（platform registry、模板）在 `${CRABCODE_PLUGIN_ROOT}` 下。
 - 会话关联用 `${CRABCODE_SESSION_ID}`。
+
+## 能力路由(法律风险审查)
+
+- 稿件涉及营销宣称或存在内容侵权疑虑时,在人工审批 gate 之前路由法律审查:营销宣称合规调用 `crablaw-cn:marketing-claims-review`,内容侵权分诊调用 `crablaw-cn:infringement-triage`;
+- 若触发时报 Unknown skill,说明法律插件未安装:提示用户通过 `/plugin` 安装 `crablaw-cn`,或将稿件标注"法律风险未审"交由人工 gate 决断,不得静默跳过。

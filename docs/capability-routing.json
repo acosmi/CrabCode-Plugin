@@ -62,8 +62,33 @@
           "plugin": "crabcode-media-ops",
           "agent": "trend-researcher",
           "scope": "媒体热点取材与溯源留痕,media-ops 域内专用,不与通用插件合并——保持取材溯源硬约束设计"
+        },
+        {
+          "plugin": "crabwork-bio-research",
+          "scope": "生物医学文献检索(PubMed/HCLS 第三方 MCP 连接器),域内专用检索设施,不与通用插件合并"
         }
       ]
+    },
+    {
+      "id": "media-publishing",
+      "domain": "媒体发布",
+      "keywords": ["公众号", "自媒体"],
+      "providers": [
+        { "skill": "crabcode-media-ops:media-ops", "status": "available" },
+        { "skill": "crabcode-media-ops:media-platform-adapter", "status": "available" }
+      ],
+      "providerPlugins": ["crabcode-media-ops"]
+    },
+    {
+      "id": "legal-content-review",
+      "domain": "内容法律风险审查(反向路由)",
+      "keywords": [],
+      "providers": [
+        { "skill": "crablaw-cn:marketing-claims-review", "status": "available" },
+        { "skill": "crablaw-cn:infringement-triage", "status": "available" }
+      ],
+      "providerPlugins": ["crablaw-cn"],
+      "note": "keywords 留空=不做关键词强制,仅登记供发现与死链保护:营销宣称/内容侵权风险审查由 crablaw-cn 供给,媒体与营销侧技能按需引用;'侵权/法律风险'等词过泛,列为关键词会大面积误伤(如 crabcopyright 全域),故只登记不执法"
     }
   ]
 }

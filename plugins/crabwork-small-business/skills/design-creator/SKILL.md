@@ -351,3 +351,8 @@ Anything to change before we're done?
   every failure mode this skill has hit in production
 - [reference/examples/boutique-brief-campaign.md](reference/examples/boutique-brief-campaign.md)
   — full worked example (single-image note, multi-slot carousel)
+
+## Media publishing routing
+
+- For domestic-platform publishing workflows (公众号/小红书/抖音/视频号 platform adaptation, content compliance review, and publish logging), route to `crabcode-media-ops:media-platform-adapter` and `crabcode-media-ops:media-ops` instead of hand-rolling platform rules here.
+- If triggering them returns Unknown skill, the media-ops plugin is not installed: guide the owner to install `crabcode-media-ops` via `/plugin`, then retry. Until then, deliver the publish-ready package for native manual publishing as described above.

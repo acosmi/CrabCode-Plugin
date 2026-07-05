@@ -98,6 +98,21 @@ CrabCode 运行时的事实约束(源码取证见实施方案第二部分§3):
 7. `pending` 标记对应的 provider 已就位(该升级成全限定名路由了);
 8. 标记语法错误或引用了不存在的能力 id。
 
-## 5. dependencies 语义警示(写给插件作者)
+## 5. 能力路由全景矩阵(G3-1 扫描裁决,2026-07-04)
+
+以注册表为轴对全 73 插件的横向能力 × 垂直域缺口扫描结论:
+
+| 能力域 | 需求侧证据 | 供给方 | 裁决 |
+|---|---|---|---|
+| 办公文档产出(四子域) | 65+ 技能命中 | `crabcode-office-suite` 四技能 | **已执法**:keywords 强制,G1 铺开后全库路由/豁免覆盖 100% |
+| 深度调研 | 31+ 技能提及 | `crabcode-deep-research`(planned) | **pending 机制托管**:设计稿待评审,就位后 lint:refs 自动提示切换;bio-research(PubMed MCP)/matter-deep-analysis/trend-researcher 登记为域内专用不合并 |
+| 媒体发布 | small-business 2 技能(公众号/自媒体投放) | `crabcode-media-ops`(media-ops/media-platform-adapter) | **已执法**:注册 keywords(公众号/自媒体),需求侧已路由 |
+| 内容法律风险审查(反向) | media-ops 稿件营销宣称/侵权疑虑 | `crablaw-cn`(marketing-claims-review/infringement-triage) | **登记不执法**:media-ops 已加审批前路由;"侵权/法律风险"等关键词过泛会误伤 crabcopyright 全域,故 keywords 留空,靠登记发现 + 死链保护 |
+| 数据可视化 | marketing/product-management/operations 等 4-5 技能(报表图表) | 分散:office-suite 图表(工作簿内)、crabwork-data(分析)、example-skills(HTML 产物) | **候选暂缓**:工作簿内图表已被 office-spreadsheets 覆盖;独立"HTML 仪表盘"无单一干净供给方,现在注册会制造无处路由的告警。待出现专职 provider 再登记 |
+| marketplace `groups` 工作流编排(如"法律文书流"组合) | — | marketplace schema 支持 | **暂缓**:属锦上添花,未经运行时实测,不在本批引入;后续需要时按 07-01 试点流程验证再上 |
+
+新插件准入:`lint:refs` 已挂 `bun run validate` 与 CI(ci.yml),死链拦截与路由告警自动执行,规范即 CI 强制(G3-2)。
+
+## 6. dependencies 语义警示(写给插件作者)
 
 `plugin.json` 的 `dependencies` 是**强依赖**:安装期会 DFS 闭包自动安装(跨 marketplace 默认阻断),装载期任一依赖未启用则**本插件整体降级不可用**。只在"缺了它主流程无法交付"时使用;可选产出一律走正文路由段,否则会出现"没装办公套件的用户连法律插件都用不了"的过度伤害。
