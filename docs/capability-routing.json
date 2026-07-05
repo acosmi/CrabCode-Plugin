@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "comment": "能力路由注册表:能力域 → provider 全限定技能名 → 触发关键词。lint:refs(scripts/validate-references.ts)以本文件为数据源;新增能力域或调整关键词只改本文件,校验器零改码。语义说明见同目录 capability-routing.md。",
+  "capabilities": [
+    {
+      "id": "office-spreadsheets",
+      "domain": "办公文档产出/电子表格",
+      "keywords": ["xlsx", "excel", "电子表格"],
+      "providers": [{ "skill": "crabcode-office-suite:crabcode-spreadsheets", "status": "available" }],
+      "providerPlugins": ["crabcode-office-suite"]
+    },
+    {
+      "id": "office-documents",
+      "domain": "办公文档产出/Word 文档",
+      "keywords": ["docx", "word 文档", "word文档", "word document", "word 版"],
+      "providers": [{ "skill": "crabcode-office-suite:crabcode-documents", "status": "available" }],
+      "providerPlugins": ["crabcode-office-suite"]
+    },
+    {
+      "id": "office-presentations",
+      "domain": "办公文档产出/演示文稿",
+      "keywords": ["pptx", "ppt", "幻灯片", "演示文稿", "路演材料", "slide deck"],
+      "providers": [{ "skill": "crabcode-office-suite:crabcode-presentations", "status": "available" }],
+      "providerPlugins": ["crabcode-office-suite"]
+    },
+    {
+      "id": "office-pdf",
+      "domain": "办公文档产出/PDF",
+      "keywords": ["pdf"],
+      "providers": [{ "skill": "crabcode-office-suite:crabcode-pdf", "status": "available" }],
+      "providerPlugins": ["crabcode-office-suite"]
+    },
+    {
+      "id": "deep-research",
+      "domain": "深度调研",
+      "keywords": [
+        "深度调研",
+        "深度研究",
+        "联网检索",
+        "联网搜索",
+        "网络检索",
+        "web search",
+        "在线检索",
+        "实时检索",
+        "市场调研"
+      ],
+      "providers": [
+        {
+          "skill": "crabcode-deep-research:deep-research",
+          "status": "planned",
+          "note": "通用深度调研插件,设计稿见 docs/audit/2026-07-04-crabcode-deep-research-设计稿.md;就位前需求侧用 deep-research=pending 标记 + 调研升级路径措辞,就位后 lint:refs 会提示改为全限定名路由"
+        }
+      ],
+      "providerPlugins": ["crabcode-deep-research"],
+      "domainSpecific": [
+        {
+          "plugin": "crablaw-cn",
+          "skill": "matter-deep-analysis",
+          "scope": "案件文档深度尽调(基于案卷材料,非联网检索),CrabLaw 域内专用,不与通用插件合并——保持三层信任隔离设计"
+        },
+        {
+          "plugin": "crabcode-media-ops",
+          "agent": "trend-researcher",
+          "scope": "媒体热点取材与溯源留痕,media-ops 域内专用,不与通用插件合并——保持取材溯源硬约束设计"
+        }
+      ]
+    }
+  ]
+}

@@ -258,9 +258,22 @@ cd /path/to/plugin-dir && zip -r /tmp/plugin-name.plugin . -x "*.DS_Store" && cp
 
 The `.plugin` file will appear in the chat as a rich preview where the user can browse the files and accept the plugin by pressing a button.
 
+## Cross-plugin capability routing (引用引导)
+
+When a skill's deliverable can or must leave markdown (Word/Excel/PPT/PDF files, deep research, media publishing…), do not rebuild that capability — route to the provider plugin. CrabCode injects a skill's body only when it is invoked, and at that moment the model can still trigger other plugins' skills by fully-qualified name (`plugin-name:skill-name`). Triggering a skill from a plugin that is not installed returns an `Unknown skill` error and nothing is auto-installed, so routing text must include an install fallback.
+
+Pick the layer by dependency strength:
+
+1. **Hard dependency** — the plugin cannot deliver its main workflow without another plugin: declare it in `plugin.json` `dependencies`. Warning: this is strong semantics — at load time a missing/disabled dependency demotes YOUR ENTIRE plugin. Never use it for optional outputs.
+2. **Optional output** — the deliverable has an optional file upgrade (e.g. a legal memo optionally delivered as .docx): add a short "产出物路由" paragraph in the SKILL.md body containing the provider's fully-qualified skill name verbatim (e.g. `crabcode-office-suite:crabcode-documents`) plus the `/plugin` install fallback.
+3. **Heavy multi-step workflows** — probe required capabilities at the start of the workflow and guide the user to install missing plugins before work begins (see `crabcopyright-cn` `apply-manager` for the proven pattern).
+
+Consult the capability registry at `docs/capability-routing.md` (repo root) for registered capability domains, provider FQNs, and the exact paragraph templates. `bun run lint:refs` enforces this: dead FQN references, undeclared `mcp__server__` tools, and upstream `/mnt/skills/` paths are errors; capability keywords without routing raise warnings unless explicitly exempted with `<!-- capability-route: <id>=none(reason) -->`.
+
 ## Best Practices
 
 - **Start small**: Begin with the minimum viable set of components. A plugin with one well-crafted skill is more useful than one with five half-baked components.
+- **Route, don't rebuild**: When output needs Office files, deep research, or another registered capability, reference the provider plugin by fully-qualified skill name per `docs/capability-routing.md` instead of embedding a parallel implementation.
 - **Progressive disclosure for skills**: Core knowledge in SKILL.md, detailed reference material in `references/`, working examples in `examples/`.
 - **Clear trigger phrases**: Skill descriptions should include specific phrases users would say. Agent descriptions should include `<example>` blocks.
 - **Skills are for CrabCode**: Write skill body content as instructions for CrabCode to follow, not documentation for the user to read.
