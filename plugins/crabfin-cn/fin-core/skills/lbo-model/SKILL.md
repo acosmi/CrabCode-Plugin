@@ -33,7 +33,7 @@ Before starting any LBO model:
 
 **If generating a standalone .xlsx file (no live Excel session):**
 - Use Python/openpyxl as described below
-- Write formula strings (`ws["D20"] = "=B5*B6"`), then run `recalc.py` before delivery
+- Write formula strings (`ws["D20"] = "=B5*B6"`), then run engine recalculation before delivery via the `crabcode-office-suite:crabcode-spreadsheets` workflow(headless 写入的公式没有计算值,交付前必须引擎重算;若当前环境无重算适配器,在交付说明中注明公式值将在 Excel/WPS 打开时计算)
 
 The rest of this skill is written with openpyxl examples, but the same principles apply to Office JS — just translate the API calls.
 
@@ -163,10 +163,11 @@ The following calculation patterns frequently cause issues across LBO models. Pa
 ## VERIFICATION CHECKLIST - RUN AFTER COMPLETION
 
 ### Run Formula Validation
-```bash
-python /mnt/skills/public/xlsx/recalc.py model.xlsx
-```
-Must return success with zero errors.
+Recalculate the workbook via the `crabcode-office-suite:crabcode-spreadsheets` engine
+workflow and scan every cell for Excel errors (#REF!, #DIV/0!, #VALUE!, #NAME?, #NULL!,
+#NUM!, #N/A). The workbook must be delivered with zero error cells. If no recalculation
+adapter is available, do a static sweep of the formula strings (references, ranges,
+cross-sheet forms) and note in the delivery message that values compute on first open.
 
 ### Section Balancing
 - [ ] Any sections that must balance (Sources/Uses, Assets/Liabilities) balance exactly

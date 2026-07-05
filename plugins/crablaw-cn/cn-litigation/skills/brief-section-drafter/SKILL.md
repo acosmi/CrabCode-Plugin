@@ -48,3 +48,8 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 - 需准备开庭质证与发问配合本文书：移交 `/cn-litigation:deposition-prep`。
 - 文书涉及证据调取请求：移交 `/cn-litigation:subpoena-triage`。
 - 律师定稿后对外提交：通过 matter-core review queue 升级审批，本技能不执行提交或发送。
+
+## 产出物路由
+
+- 需要将诉讼文书章节交付为 Word 成品时,调用 `crabcode-office-suite:crabcode-documents` 生成 .docx;
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;安装完成前先以 markdown 呈现全文供用户确认。

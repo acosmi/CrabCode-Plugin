@@ -39,3 +39,8 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 - 据时间线评估争点与策略：移交 `/cn-litigation:matter-briefing`。
 - 需固定/保全缺口证据：移交 `/cn-litigation:legal-hold`。
 - 事实更新（新证据/新进展）：回到本 skill 或 `/cn-litigation:matter-update`。
+
+## 产出物路由
+
+- 需要将事件时间线交付为 Excel 成品时,调用 `crabcode-office-suite:crabcode-spreadsheets` 生成 .xlsx;
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;安装完成前先以 markdown 表格呈现内容供用户确认。

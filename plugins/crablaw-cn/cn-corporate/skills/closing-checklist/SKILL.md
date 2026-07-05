@@ -40,3 +40,8 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 - 交易文件条款审查：转交 `/cn-contract:review`。
 - 尽调缺口转化为交割条件时：转交 `/cn-corporate:diligence-issue-extraction`。
 - 交割后整合：转交 `/cn-corporate:integration-management`。
+
+## 产出物路由
+
+- 需要将交割清单交付为 Excel 成品时,调用 `crabcode-office-suite:crabcode-spreadsheets` 生成 .xlsx;
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;安装完成前先以 markdown 表格呈现内容供用户确认。

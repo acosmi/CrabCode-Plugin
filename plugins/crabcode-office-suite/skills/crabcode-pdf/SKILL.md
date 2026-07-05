@@ -1,6 +1,6 @@
 ---
 name: crabcode-pdf
-description: "Use this skill whenever the user wants to work with PDF files: read or extract text and tables, merge or split documents, rotate pages, add watermarks, create new PDFs, fill out forms, encrypt or decrypt, extract images, or run OCR on a scanned PDF to make it searchable. Trigger whenever the user mentions a .pdf filename or asks to produce one."
+description: "Read, extract, merge, split, watermark, create, fill, encrypt, or OCR PDF files. 中文场景:PDF 读取与表格抽取、合并拆分、加水印、表单填写、加密解密、扫描件 OCR。Trigger whenever the user mentions a .pdf filename or asks to produce or process one."
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---
 

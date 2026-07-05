@@ -268,7 +268,7 @@ Pick the layer by dependency strength:
 2. **Optional output** — the deliverable has an optional file upgrade (e.g. a legal memo optionally delivered as .docx): add a short "产出物路由" paragraph in the SKILL.md body containing the provider's fully-qualified skill name verbatim (e.g. `crabcode-office-suite:crabcode-documents`) plus the `/plugin` install fallback.
 3. **Heavy multi-step workflows** — probe required capabilities at the start of the workflow and guide the user to install missing plugins before work begins (see `crabcopyright-cn` `apply-manager` for the proven pattern).
 
-Consult the capability registry at `docs/capability-routing.md` (repo root) for registered capability domains, provider FQNs, and the exact paragraph templates. `bun run lint:refs` enforces this: dead FQN references, undeclared `mcp__server__` tools, and upstream `/mnt/skills/` paths are errors; capability keywords without routing raise warnings unless explicitly exempted with `<!-- capability-route: <id>=none(reason) -->`.
+Consult the capability registry at `docs/capability-routing.md` (repo root) for registered capability domains, provider FQNs, and the exact paragraph templates. `bun run lint:refs` enforces this: dead FQN references, bare MCP tool references (`mcp__<server>__…`) whose server is not declared in the plugin's `.mcp.json`, and upstream container mount paths (`/mnt/…`) are errors; capability keywords without routing raise warnings unless explicitly exempted with `<!-- capability-route: <id>=none(reason) -->`.
 
 ## Best Practices
 

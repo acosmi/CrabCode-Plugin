@@ -1,6 +1,6 @@
 # DCF Model Troubleshooting Guide
 
-**When to read this file:** If recalc.py shows errors OR valuation results seem unreasonable OR case selector not working properly.
+**When to read this file:** If engine recalculation (office-suite spreadsheets workflow) reports errors OR valuation results seem unreasonable OR case selector not working properly.
 
 ## Model Returns Error Values
 

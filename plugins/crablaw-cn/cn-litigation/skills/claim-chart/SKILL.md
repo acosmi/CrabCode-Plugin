@@ -44,3 +44,8 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 - 涉及不公开材料（国家秘密/商业秘密/个人隐私）的证据分级：移交 `/cn-litigation:privilege-log-review`。
 - 证据缺口需向法院申请调查取证：移交 `/cn-litigation:subpoena-triage`。
 - 跨域问题（合同效力、数据合规、劳动争议）升级至对应板块技能。
+
+## 产出物路由
+
+- 需要将争点对照表交付为 Excel 成品时,调用 `crabcode-office-suite:crabcode-spreadsheets` 生成 .xlsx;
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;安装完成前先以 markdown 表格呈现内容供用户确认。

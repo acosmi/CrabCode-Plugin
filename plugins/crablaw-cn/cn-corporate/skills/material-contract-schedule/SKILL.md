@@ -38,3 +38,8 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 - 大批量同类合同：转交 `/cn-corporate:tabular-review`。
 - 触发条款转化为交割条件：转交 `/cn-corporate:closing-checklist`。
 - 纳入整体尽调发现：转交 `/cn-corporate:diligence-issue-extraction`。
+
+## 产出物路由
+
+- 需要将重大合同清单交付为 Excel 成品时,调用 `crabcode-office-suite:crabcode-spreadsheets` 生成 .xlsx;
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;安装完成前先以 markdown 表格呈现内容供用户确认。

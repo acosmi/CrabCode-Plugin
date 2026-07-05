@@ -1,6 +1,6 @@
 ---
 name: crabcode-presentations
-description: "Use this skill any time a .pptx file is involved as input, output, or both. Trigger when the user wants to create a slide deck, pitch deck, or presentation; read, parse, or extract text from a .pptx file; edit or update an existing presentation; combine or split slide files; or work with templates, layouts, speaker notes, or comments. Trigger whenever the user mentions \"deck\", \"slides\", \"presentation\", or a .pptx filename. Do not trigger when the deliverable is a spreadsheet, word document, or PDF and no slide artifact is involved."
+description: "Create, edit, parse, or merge .pptx slide decks: pitch decks, templates, layouts, speaker notes. 中文场景:演示文稿、幻灯片、路演材料、PPT 制作与内容提取。Trigger whenever a .pptx file or the words \"deck\", \"slides\", \"presentation\" are involved as input or output."
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---
 

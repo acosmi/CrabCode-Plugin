@@ -37,3 +37,8 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 - 单份高风险文件深审：转交 `/cn-contract:review`。
 - 纳入尽调发现：转交 `/cn-corporate:diligence-issue-extraction` 或 `/cn-corporate:material-contract-schedule`。
 - 面向业务团队汇总：转交 `/cn-corporate:deal-team-summary`。
+
+## 产出物路由
+
+- 需要将表格化审查底稿交付为 Excel 成品时,调用 `crabcode-office-suite:crabcode-spreadsheets` 生成 .xlsx;
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;安装完成前先以 markdown 表格呈现内容供用户确认。
