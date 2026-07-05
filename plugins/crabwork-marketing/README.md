@@ -2,7 +2,7 @@
 
 面向市场营销团队的 CrabCode 插件:内容创作、活动策划、品牌声音管理、竞品分析与效果复盘。可独立使用(直接描述需求、粘贴文案、上传资料),连接设计、营销自动化、SEO 与分析工具后能力更强。
 
-> 基于 [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态。
+> 基于上游开源知识工作插件(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态;上游出处与许可信息见 [docs/legal/THIRD_PARTY_NOTICES.md](docs/legal/THIRD_PARTY_NOTICES.md)。
 
 ## 安装
 

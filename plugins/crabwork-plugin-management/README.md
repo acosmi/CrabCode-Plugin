@@ -2,7 +2,7 @@
 
 面向插件作者与团队管理员的 CrabCode 插件:从零创建新插件,以及按组织的工具与工作流定制现有插件。通过引导式对话完成发现、规划、设计、实现与打包,最终交付可直接安装的 `.plugin` 文件。
 
-> 基于 [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态。
+> 基于上游开源知识工作插件(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态;上游出处与许可信息见 [docs/legal/THIRD_PARTY_NOTICES.md](docs/legal/THIRD_PARTY_NOTICES.md)。
 
 ## 安装
 

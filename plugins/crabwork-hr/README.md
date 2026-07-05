@@ -2,7 +2,7 @@
 
 面向人力资源团队的 CrabCode 插件:招聘、入职、绩效评估、薪酬分析与政策解答,帮助团队保持合规、运转顺畅。可独立使用(描述需求、粘贴内容、上传数据),连接 HRIS、ATS、薪酬数据等工具后能力更强。
 
-> 基于 [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态。
+> 基于上游开源知识工作插件(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态;上游出处与许可信息见 [docs/legal/THIRD_PARTY_NOTICES.md](docs/legal/THIRD_PARTY_NOTICES.md)。
 
 ## 安装
 

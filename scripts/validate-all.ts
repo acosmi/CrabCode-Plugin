@@ -1,5 +1,9 @@
 import path from "node:path";
-import { formatBrandViolations, scanPath } from "../src/policy/brandGuard.ts";
+import {
+  formatBrandViolations,
+  formatStaleAllowlistEntries,
+  scanPathDetailed,
+} from "../src/policy/brandGuard.ts";
 import {
   formatManifestIssues,
   validateManifests,
@@ -19,10 +23,14 @@ const root = path.resolve(process.argv[2] ?? ".");
 let hasError = false;
 let hasOutput = false;
 
-const brand = await scanPath(root);
-if (brand.length > 0) {
+const brand = await scanPathDetailed(root);
+if (brand.staleAllowlistEntries.length > 0) {
   hasOutput = true;
-  process.stderr.write(`[brand]\n${formatBrandViolations(brand)}\n`);
+  process.stderr.write(`[brand]\n${formatStaleAllowlistEntries(brand.staleAllowlistEntries)}\n`);
+}
+if (brand.violations.length > 0) {
+  hasOutput = true;
+  process.stderr.write(`[brand]\n${formatBrandViolations(brand.violations)}\n`);
   hasError = true;
 }
 

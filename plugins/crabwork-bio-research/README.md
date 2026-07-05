@@ -2,7 +2,7 @@
 
 连接临床前研究工具与数据库(文献检索、基因组学分析、靶点优先级排序),加速生命科学早期研发。可独立使用,也可在 CrabCode 中直接安装使用。
 
-> 基于 [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态。
+> 基于上游开源知识工作插件(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态;上游出处与许可信息见 [docs/legal/THIRD_PARTY_NOTICES.md](docs/legal/THIRD_PARTY_NOTICES.md)。
 
 本插件将 11 个 MCP 服务集成与 5 个分析技能整合到一个面向生命科学研究者的统一包中。
 

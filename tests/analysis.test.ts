@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { analyzeProject, renderReport } from "../src/index.ts";
-import { scanText, scanPath } from "../src/policy/brandGuard.ts";
+import { scanText, scanPath, scanPathDetailed } from "../src/policy/brandGuard.ts";
 import { assertAnalyzerSourcesReadOnly } from "../src/policy/readOnlyGuard.ts";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -103,6 +103,77 @@ describe("policy checks", () => {
 
   test("brand guard passes repository product files", async () => {
     expect(await scanPath(root)).toEqual([]);
+  });
+
+  test("brand allowlist suppresses tracked file+term hits", async () => {
+    const tempRoot = await mkdtemp(path.join(os.tmpdir(), "crabcode-brand-allow-"));
+    const token = ["c", "la", "ude"].join("");
+    await mkdir(path.join(tempRoot, "plugins", "alpha"), { recursive: true });
+    await writeFile(path.join(tempRoot, "plugins", "alpha", ".mcp.json"), `{"url": "https://x.${token}.com/mcp"}`);
+    await writeFile(
+      path.join(tempRoot, "brand-allowlist.json"),
+      JSON.stringify([
+        {
+          file: "plugins/alpha/.mcp.json",
+          terms: [token, `.${token}`],
+          reason: "第三方功能性端点",
+          tracking: "P4-4",
+        },
+      ]),
+    );
+
+    const report = await scanPathDetailed(tempRoot);
+    expect(report.violations).toEqual([]);
+    expect(report.staleAllowlistEntries).toEqual([]);
+  });
+
+  test("brand allowlist keeps unlisted terms in the same file", async () => {
+    const tempRoot = await mkdtemp(path.join(os.tmpdir(), "crabcode-brand-allow-partial-"));
+    const allowed = ["c", "la", "ude"].join("");
+    const unlisted = ["anth", "ropic"].join("");
+    await mkdir(path.join(tempRoot, "plugins", "alpha"), { recursive: true });
+    await writeFile(
+      path.join(tempRoot, "plugins", "alpha", ".mcp.json"),
+      `{"a": "https://x.${allowed}.com/mcp", "b": "https://y.com/${unlisted}"}`,
+    );
+    await writeFile(
+      path.join(tempRoot, "brand-allowlist.json"),
+      JSON.stringify([
+        {
+          file: "plugins/alpha/.mcp.json",
+          terms: [allowed, `.${allowed}`],
+          reason: "第三方功能性端点",
+          tracking: "P4-4",
+        },
+      ]),
+    );
+
+    const violations = await scanPath(tempRoot);
+    expect(violations).toHaveLength(1);
+    expect(violations[0]?.term).toBe(unlisted);
+  });
+
+  test("brand allowlist reports stale entries whose hits no longer exist", async () => {
+    const tempRoot = await mkdtemp(path.join(os.tmpdir(), "crabcode-brand-allow-stale-"));
+    const token = ["c", "la", "ude"].join("");
+    await mkdir(path.join(tempRoot, "plugins", "alpha"), { recursive: true });
+    await writeFile(path.join(tempRoot, "plugins", "alpha", ".mcp.json"), `{"url": "https://cn.example.com/mcp"}`);
+    await writeFile(
+      path.join(tempRoot, "brand-allowlist.json"),
+      JSON.stringify([
+        {
+          file: "plugins/alpha/.mcp.json",
+          terms: [token],
+          reason: "第三方功能性端点",
+          tracking: "P4-4",
+        },
+      ]),
+    );
+
+    const report = await scanPathDetailed(tempRoot);
+    expect(report.violations).toEqual([]);
+    expect(report.staleAllowlistEntries).toHaveLength(1);
+    expect(report.staleAllowlistEntries[0]?.tracking).toBe("P4-4");
   });
 
   test("analyzer sources stay read-only", async () => {

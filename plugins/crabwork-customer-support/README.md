@@ -2,7 +2,7 @@
 
 面向客户支持团队的 CrabCode 插件:工单分流、问题升级、回复撰写、客户调研与知识库建设。可独立使用(直接粘贴工单、描述问题、上传记录),连接工单系统、CRM 与知识库工具后能力更强。
 
-> 基于 [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态。
+> 基于上游开源知识工作插件(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态;上游出处与许可信息见 [docs/legal/THIRD_PARTY_NOTICES.md](docs/legal/THIRD_PARTY_NOTICES.md)。
 
 ## 安装
 

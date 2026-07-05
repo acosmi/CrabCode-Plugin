@@ -2,7 +2,7 @@
 
 面向小微企业主的 CrabCode 一体化插件:涵盖财务现金流、销售营销、客户运营、招聘与经营简报。安装即获得 15 个原子技能、15 个开箱即用的工作流命令,以及一个能听懂大白话的路由器(`smb-router`)。
 
-> 基于 [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态;连接器已替换为国内设施(阶段 1 试点,详见仓库 docs/audit/ 2026-06-23 替换方案)。
+> 基于上游开源知识工作插件(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态;连接器已替换为国内设施(阶段 1 试点,详见仓库 docs/audit/ 2026-06-23 替换方案);上游出处与许可信息见 [docs/legal/THIRD_PARTY_NOTICES.md](docs/legal/THIRD_PARTY_NOTICES.md)。
 
 你不需要记任何命令。直接告诉 CrabCode 你的需求 ——「下周发工资有点紧」「有个客户生气了」「我该定多少价?」—— 它会自动判断该用哪个工作流并一步步带你走完。每个工作流在执行任何动作前都会暂停等你确认,凡是涉及钱或客户的步骤,都需要你点头才会进行。
 

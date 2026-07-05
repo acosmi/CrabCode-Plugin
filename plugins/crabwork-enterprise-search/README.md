@@ -2,7 +2,7 @@
 
 面向知识工作者的 CrabCode 插件:一次提问,跨邮件、聊天、文档、知识库等所有已连接工具同时检索,自动归并去重并附带来源标注地综合成一个答案——不必在多个应用之间来回切换。
 
-> 基于 [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态。
+> 基于上游开源知识工作插件(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态;上游出处与许可信息见 [docs/legal/THIRD_PARTY_NOTICES.md](docs/legal/THIRD_PARTY_NOTICES.md)。
 
 ## 安装
 

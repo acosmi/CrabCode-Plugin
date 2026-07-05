@@ -2,7 +2,7 @@
 
 面向个人工作流的 CrabCode 插件:任务管理、工作记忆与可视化看板。CrabCode 会逐步记住你身边的人、项目和术语,像同事一样理解你的需求,而不只是一个聊天机器人。
 
-> 基于 [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态。
+> 基于上游开源知识工作插件(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态;上游出处与许可信息见 [docs/legal/THIRD_PARTY_NOTICES.md](docs/legal/THIRD_PARTY_NOTICES.md)。
 
 ## 安装
 

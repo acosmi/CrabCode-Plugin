@@ -2,7 +2,7 @@
 
 面向产品经理的 CrabCode 插件,覆盖完整的产品管理工作流:撰写功能规格、规划路线图、与干系人沟通、综合用户研究、分析竞品、跟踪产品指标。可独立使用(直接粘贴内容、描述问题、上传文件),连接项目管理与协作工具后能力更强。
 
-> 基于 [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态。
+> 基于上游开源知识工作插件(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态;上游出处与许可信息见 [docs/legal/THIRD_PARTY_NOTICES.md](docs/legal/THIRD_PARTY_NOTICES.md)。
 
 ## 安装
 

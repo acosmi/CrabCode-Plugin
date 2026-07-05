@@ -2,7 +2,7 @@
 
 面向销售团队的 CrabCode 插件:挖掘潜客、撰写触达、管理销售管道、准备客户通话与制定成交策略。可独立使用(联网搜索 + 你的输入),连接 CRM、邮件等工具后能力更强。
 
-> 基于 [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态。
+> 基于上游开源知识工作插件(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态;上游出处与许可信息见 [docs/legal/THIRD_PARTY_NOTICES.md](docs/legal/THIRD_PARTY_NOTICES.md)。
 
 ## 安装
 
