@@ -1,6 +1,6 @@
 {
   "name": "math-olympiad",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Solve competition math (IMO, Putnam, USAMO) with adversarial verification by fresh-context verifiers; calibrated abstention over bluffing.",
   "author": {
     "name": "CrabCode"

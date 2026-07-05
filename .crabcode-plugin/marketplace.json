@@ -4,7 +4,7 @@
     "name": "CrabCode"
   },
   "metadata": {
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Official CrabCode plugin marketplace hosted at acosmi/CrabCode-Plugin."
   },
   "plugins": [
@@ -34,7 +34,7 @@
     {
       "name": "crablaw-cn",
       "source": "./plugins/crablaw-cn",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "法律工作流",
       "shortDescription": "中国法律实务工作流:案件管理、合同、诉讼、知产、公司、劳动、数据合规、AI 治理、监管、产品与法援",
       "longDescription": "CrabLaw-CN 中国法律实务工作流伞插件。一次安装即获得 11 个实务板块(案件管理、合同、数据合规、劳动用工、公司、诉讼、知识产权、监管、AI 治理、产品、法律援助)共 86 项技能,板块以分组形式在能力区展示、按需带入。",
@@ -210,7 +210,7 @@
     {
       "name": "cn-legal-study",
       "source": "./plugins/cn-legal-study",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "中国法考法硕备考",
       "shortDescription": "法考与法律硕士备考辅助:学习计划、知识大纲、记忆卡片、案例研习、真题与主观题训练(教育用途)",
       "longDescription": "面向国家统一法律职业资格考试(法考)与法律硕士的备考辅助模块。覆盖备考计划、学科大纲、记忆卡片、指导性案例研习、客观题与主观题训练、法条背诵、考点预测与法律写作。教育备考用途,非针对个案的法律意见。",
@@ -263,7 +263,7 @@
     {
       "name": "builder-hub",
       "source": "./plugins/builder-hub",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "插件与技能管理中心",
       "shortDescription": "CrabCode 插件市场的插件/技能管理元工具:安装、卸载、启停、浏览、推荐、更新与质检",
       "longDescription": "面向 CrabCode 插件市场的通用管理元工具。覆盖技能/插件的安装、卸载、启用禁用、市场目录浏览、关联技能推荐、更新检查与质量答疑,帮助用户管理本地已装技能与发现新技能。",
@@ -422,7 +422,7 @@
     {
       "name": "code-simplifier",
       "source": "./plugins/code-simplifier",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "代码精简",
       "shortDescription": "在保持功能不变的前提下,精简与优化代码的清晰度、一致性与可维护性",
       "longDescription": "一个在保持功能不变前提下精简和优化代码的智能体,提升代码的清晰度、一致性与可维护性,适合重构与代码质量改进。",
@@ -558,7 +558,7 @@
     {
       "name": "math-olympiad",
       "source": "./plugins/math-olympiad",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "数学奥林匹克",
       "shortDescription": "求解竞赛数学(IMO、Putnam、USAMO),以独立验证者对抗式校验,宁可弃权不蒙混",
       "longDescription": "求解竞赛数学题(IMO、Putnam、USAMO 等),由全新上下文的验证者做对抗式校验;在没有把握时校准地选择弃权,而非蒙混作答。",
@@ -626,7 +626,7 @@
     {
       "name": "plugin-dev",
       "source": "./plugins/plugin-dev",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "插件开发",
       "shortDescription": "CrabCode 插件开发工具箱:智能体、命令、钩子、MCP 集成与插件结构指引",
       "longDescription": "CrabCode 插件开发工具箱,提供创建智能体、命令、钩子、MCP 集成与插件结构的技能与指引,帮助从零开发一个完整的 CrabCode 插件。",
@@ -673,7 +673,7 @@
     {
       "name": "session-report",
       "source": "./plugins/session-report",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "会话报告",
       "shortDescription": "从本地转录文件生成带样式的 CrabCode 会话 HTML 报告,便于分享与复盘",
       "longDescription": "从本地转录(transcript)文件生成带样式的 CrabCode 会话 HTML 报告,适合分享与事后复盘(post-mortem)。",
@@ -694,7 +694,7 @@
     {
       "name": "skill-creator",
       "source": "./plugins/skill-creator",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "技能创建器",
       "shortDescription": "创建、改进与评估 CrabCode 技能,配分析/评分/对比辅助智能体",
       "longDescription": "用于创建、改进与评估 CrabCode 技能的工具,内置分析器、评分器与对比器辅助智能体,帮助快速产出高质量、可评估的技能。",
@@ -1445,7 +1445,7 @@
     {
       "name": "crabcode-office-suite",
       "source": "./plugins/crabcode-office-suite",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "CrabCode 办公套件",
       "shortDescription": "撰写与编辑 Office 文档的技能与工具:表格、Word、演示文稿与 PDF",
       "longDescription": "用于撰写和编辑 Office 文档的 CrabCode 技能与 TypeScript 辅助工具,覆盖电子表格(xlsx)、Word 文档(docx)、演示文稿(pptx)与 PDF 的创建与编辑。",
@@ -1489,7 +1489,7 @@
     {
       "name": "crabcode-example-skills",
       "source": "./plugins/crabcode-example-skills",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "CrabCode 示例技能集",
       "shortDescription": "演示算法艺术、视觉设计、文档协作、MCP 编写、GIF 制作等的示例技能集合",
       "longDescription": "一组示例 CrabCode 技能,涵盖算法艺术、视觉设计、品牌样式、文档协同撰写、内部沟通、MCP 服务编写、技能编写、GIF 制作、主题样式、Web 制品打包与基于 Playwright 的 Web 应用测试,适合学习技能写法。",
@@ -1513,7 +1513,7 @@
     {
       "name": "ai-api-dev",
       "source": "./plugins/ai-api-dev",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "AI API 开发",
       "shortDescription": "厂商中立的 LLM 应用构建、调试与迁移指引",
       "longDescription": "厂商中立(provider-neutral)的指引,帮助构建、调试与迁移基于大语言模型的应用,覆盖 API 调用、工具使用(tool use)、提示词缓存与智能体设计等主题。",
@@ -1538,7 +1538,7 @@
     {
       "name": "crabcode-media-ops",
       "source": "./plugins/crabcode-media-ops",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "CrabCode 新媒体运营",
       "shortDescription": "新媒体运营工具箱:选题、智能体辅助撰写、人工审核、多平台适配、AI 标识合规与审批发布",
       "longDescription": "面向新媒体/自媒体内容运营的工具箱:趋势选题发现、智能体辅助起草、人工审核、多平台(微信、小红书、今日头条等)适配、AI 生成内容标识合规,以及经审批后通过本地发布包发布。",
@@ -1580,7 +1580,7 @@
     {
       "name": "crabfin-cn",
       "source": "./plugins/crabfin-cn",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "金融·投行资管工作流",
       "shortDescription": "中国金融工作流:财务建模、股票研究、投行、私募股权、财富管理、基金行政与 KYC",
       "longDescription": "CrabFin-CN 中国金融工作流伞插件。一次安装即获得 7 个板块(财务建模、股票研究、投资银行、私募股权、财富管理、基金行政、KYC 运营)共 54 项技能,板块以分组形式在能力区展示、按需带入。",
@@ -1700,7 +1700,7 @@
     {
       "name": "crabwork-engineering",
       "source": "./plugins/crabwork-engineering",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "CrabWork 工程研发",
       "shortDescription": "站会、代码评审、架构决策、事故响应与技术文档一站式研发助手",
       "longDescription": "面向工程研发团队的 CrabCode 插件,覆盖日常站会、代码评审、架构决策(ADR)、事故响应、调试与技术文档。可独立使用,连接源码管理、项目管理与监控工具后能力更强。10 项技能按需自动触发。",
@@ -1759,7 +1759,7 @@
     {
       "name": "crabwork-data",
       "source": "./plugins/crabwork-data",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "CrabWork 数据分析",
       "shortDescription": "编写 SQL、探索数据、生成洞察并构建可视化看板",
       "longDescription": "面向数据分析师的 CrabCode 插件,覆盖 SQL 编写、数据探索、统计分析、可视化与交互式看板全流程。可独立使用(粘贴结果或上传 CSV/Excel),连接 Snowflake、BigQuery、Databricks 等数据仓库后实现直连查询与端到端分析。",
@@ -1812,7 +1812,7 @@
     {
       "name": "crabwork-sales",
       "source": "./plugins/crabwork-sales",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "CrabWork 销售助手",
       "shortDescription": "挖潜客、写触达、管管道、备通话,加速成交的销售工作流",
       "longDescription": "面向销售团队的 CrabCode 插件,覆盖潜客调研、个性化触达、销售管道与预测、通话准备及竞争情报。可独立使用(联网搜索 + 你的输入),连接 CRM、邮件、日历、转录等 MCP 工具后能力更强。内置 9 项按需自动触发的技能。",
@@ -1864,7 +1864,7 @@
     {
       "name": "crabwork-marketing",
       "source": "./plugins/crabwork-marketing",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "CrabWork 市场营销",
       "shortDescription": "内容创作、活动策划、品牌审查、竞品分析与效果复盘一站式营销助手",
       "longDescription": "面向市场营销团队的 CrabCode 插件,覆盖博客/社媒/邮件文案、活动简报、品牌声音审查、竞品定位与 SEO 审计。可独立使用,连接设计、营销自动化、SEO 与分析类 MCP 工具后自动拉取数据、生成报告。8 项技能按需自动触发。",
@@ -1915,7 +1915,7 @@
     {
       "name": "crabwork-customer-support",
       "source": "./plugins/crabwork-customer-support",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "CrabWork 客户支持",
       "shortDescription": "工单分流、回复撰写、问题升级与知识库建设一站式客服助手",
       "longDescription": "面向客户支持团队的 CrabCode 插件,覆盖工单分流(P1–P4)、多来源客户调研、专业回复撰写、结构化问题升级与知识库文章生成。可独立使用,连接工单系统、CRM、知识库与聊天工具后自动拉取上下文、查重并综合多来源信息。",
@@ -1938,7 +1938,7 @@
     {
       "name": "crabwork-product-management",
       "source": "./plugins/crabwork-product-management",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "CrabWork 产品管理",
       "shortDescription": "产品经理的 AI 搭档:写规格、排路线图、综合研究、跟踪指标",
       "longDescription": "覆盖完整 PM 工作流的 CrabCode 插件,涵盖功能规格/PRD、路线图规划、干系人汇报、用户研究综合、竞品分析、指标评审与产品头脑风暴。可独立使用,连接 Linear、Notion、Figma、Amplitude、Slack 等 MCP 工具后自动拉取上下文、能力更强。",
@@ -1989,7 +1989,7 @@
     {
       "name": "crabwork-hr",
       "source": "./plugins/crabwork-hr",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "CrabWork 人力资源",
       "shortDescription": "招聘、入职、绩效、薪酬与政策一体的人力资源助手",
       "longDescription": "面向 HR 团队的 CrabCode 插件,覆盖招聘漏斗、入职、绩效评估、薪酬对标与政策解答。可独立使用,也能连接 HRIS、ATS、薪酬数据、知识库等工具实现自动取数与协同。",
@@ -2041,7 +2041,7 @@
     {
       "name": "crabwork-design",
       "source": "./plugins/crabwork-design",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "CrabWork 设计协作",
       "shortDescription": "评审、设计系统、UX 文案、无障碍与研究综合一站式设计插件",
       "longDescription": "加速设计全流程——设计评审、设计系统管理、UX 文案、WCAG 无障碍审查、用户研究综合与开发交付。可独立使用(描述设计、粘贴截图),连接 Figma 等工具后从早期探索直达像素级规格交付。",
@@ -2091,7 +2091,7 @@
     {
       "name": "crabwork-operations",
       "source": "./plugins/crabwork-operations",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "CrabWork 运营管理",
       "shortDescription": "供应商、流程、变更、产能与合规一站式运营助手",
       "longDescription": "面向运营团队的 CrabCode 插件,覆盖供应商评审、流程文档(SOP/RACI)、变更管理、风险评估、合规跟踪、产能规划、状态报告与运维手册。可独立使用,连接 ITSM、项目管理、知识库等 MCP 工具后能力更强。",
@@ -2143,7 +2143,7 @@
     {
       "name": "crabwork-productivity",
       "source": "./plugins/crabwork-productivity",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "CrabWork 效率助手",
       "shortDescription": "任务管理 + 工作记忆 + 可视化看板,让 AI 像同事一样懂你",
       "longDescription": "用自然语言管理任务并自动跟踪状态,通过两层记忆系统让 CrabCode 记住你的人物、项目与简称。可与日历、邮件、聊天同步,深度扫描发现遗漏待办,并提供本地可视化看板实时呈现进展。",
@@ -2166,7 +2166,7 @@
     {
       "name": "crabwork-enterprise-search",
       "source": "./plugins/crabwork-enterprise-search",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "CrabWork 企业搜索",
       "shortDescription": "一次提问,跨邮件、聊天、文档、知识库同时检索并综合答案",
       "longDescription": "把公司散落各处的工具当作一个统一知识库。CrabCode 拆解你的自然语言问题,在所有已连接的 MCP 来源上并行检索,自动去重、按来源标注并综合成连贯答案。连接得越多,答案越完整。",
@@ -2189,7 +2189,7 @@
     {
       "name": "crabwork-plugin-management",
       "source": "./plugins/crabwork-plugin-management",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "CrabWork 插件管理",
       "shortDescription": "从零创建插件,或按团队工具与流程定制现有插件",
       "longDescription": "面向插件作者与管理员的 CrabCode 插件。通过引导式对话从零搭建新插件(发现→规划→设计→实现→打包),或按组织实际工具替换模板占位符、配置 MCP 连接器、调整技能内容,最终交付可直接安装的插件包。",
@@ -2212,7 +2212,7 @@
     {
       "name": "crabwork-bio-research",
       "source": "./plugins/crabwork-bio-research",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "CrabWork 生命科学研究",
       "shortDescription": "连接文献、基因组与药物数据库,加速生命科学早期研发",
       "longDescription": "面向生命科学研究者的一站式插件,整合多个 MCP 数据源(PubMed、bioRxiv、ChEMBL、Open Targets 等)与单细胞、测序流程等分析技能。覆盖文献综述、单细胞分析、nf-core 测序流程、仪器数据标准化与科研选题。可独立使用,连接 MCP 工具后能力更强。",
@@ -2357,7 +2357,7 @@
     {
       "name": "crabcopyright-cn",
       "source": "./plugins/crabcopyright-cn",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "displayName": "软著申请管家",
       "shortDescription": "中国版权保护中心软件著作权登记的知识产权材料管理工作流:板块拆分规划、源码与说明书鉴别材料、一致性校验、申请包与在线填报",
       "longDescription": "软著申请管家:面向中国版权保护中心软件著作权登记的知识产权材料管理伞插件。一个总编排管家统筹全流程,按职能分 2 组共 8 项技能——申请统筹(板块拆分规划、材料清单、一致性校验、申请包生成、在线填报指导)与鉴别材料制作(源代码、说明书,引导调用 crabcode-office-suite 办公套件处理 Word/PDF)。支持按第一性原理分析本地仓库,规划一份代码拆成几个软著、每块截哪些前端页面及开发环境访问地址。",

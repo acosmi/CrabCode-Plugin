@@ -1,6 +1,6 @@
 {
   "name": "ai-api-dev",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Provider-neutral guidance for building, debugging, and migrating LLM-powered applications. Covers API surface choice, prompt caching, tool use, structured output, streaming, and migration between provider SDKs.",
   "author": {
     "name": "CrabCode"
