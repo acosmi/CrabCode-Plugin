@@ -1,6 +1,6 @@
 ---
 name: crabcode-documents
-description: "Use this skill when the user wants to create, read, edit, or restructure Word documents (.docx files). Triggers include mentions of \"word doc\", \"word document\", \".docx\", or requests for professional documents with tables of contents, headings, page numbers, letterheads, or similar layout. Also trigger when extracting or rearranging content from a docx, inserting or replacing images, performing find-and-replace, working with tracked changes or comments, or producing a memo, letter, report, or template as a word document. Do not trigger for PDFs, spreadsheets, Google Docs, or coding tasks unrelated to document generation."
+description: "Create, read, edit, or restructure Word documents (.docx): headings, tables of contents, tracked changes, memos, letters, reports. 中文场景:Word 文档、合同文书、法律备忘录、审查报告、纪要决议等成文交付。Trigger on \"word doc\", \".docx\", or any professional document file request."
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---
 

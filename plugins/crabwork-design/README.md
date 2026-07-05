@@ -2,7 +2,7 @@
 
 面向设计团队的 CrabCode 插件:设计评审、设计系统管理、UX 文案、无障碍审查、用户研究综合与开发交付。可独立使用(描述设计、粘贴截图、上传素材),连接 Figma 及其它工具后能力更强——从早期探索到像素级规格交付一站搞定。
 
-> 基于 [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态。
+> 基于上游开源知识工作插件(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态;上游出处与许可信息见 [docs/legal/THIRD_PARTY_NOTICES.md](docs/legal/THIRD_PARTY_NOTICES.md)。
 
 ## 安装
 

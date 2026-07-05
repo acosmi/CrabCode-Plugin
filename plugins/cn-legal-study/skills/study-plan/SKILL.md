@@ -34,3 +34,8 @@ argument-hint: "[考试类型/目标分/可用周数/已学进度/薄弱学科]"
 - 需要把考点做成记忆卡:转 `/cn-legal-study:flashcards`。
 - 需要据计划做真题练习:转 `/cn-legal-study:exam-question-practice` 或 `/cn-legal-study:essay-practice`。
 - 需要重点法条背诵安排:转 `/cn-legal-study:statute-recite`。
+
+## 产出物路由
+
+- 需要把复习计划导出为 Excel 计划表(按周/按科目跟踪进度)时,调用 `crabcode-office-suite:crabcode-spreadsheets` 生成 .xlsx;
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;安装完成前先以 markdown 表格呈现计划供用户确认。

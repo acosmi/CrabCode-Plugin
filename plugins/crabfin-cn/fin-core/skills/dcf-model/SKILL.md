@@ -4,6 +4,8 @@ description: DCF 现金流折现估值建模(中国版底座)。为 A股/港股/
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---
 
+<!-- capability-route: deep-research=none(正文的 web search 仅用于取现价、beta、净债务等即时行情数据点,属轻量取数;本技能无多源联网深度调研流程) -->
+
 # DCF Model Builder
 
 > **中国版底座(中文优先)**:建模机制沿用下方通用英文流程,**但数据来源与关键参数改用中国口径**——上市公司数据取自巨潮资讯网/沪深北交易所定期报告与 Wind/同花顺(非 SEC EDGAR / 10-K),无风险利率用中国 10 年期国债收益率,行业用申万分类,科目按企业会计准则(CAS)。**执行英文流程前先读 [`../../references/cn-data-sources.md`](../../references/cn-data-sources.md),用其中国口径替换所有美国默认(SEC/10-K/GICS/美债)。** 模型输出须注明:数据来源、取数日期、计价货币、所用准则。文中 10-K/$ 等示例仅为通用模板占位,实操按中国对应来源取数。
@@ -22,7 +24,7 @@ These constraints apply throughout all DCF model building. Review before startin
 
 **Environment: Office JS vs Python/openpyxl:**
 - **If running inside Excel (Office Add-in / Office JS environment):** Use Office JS directly — do NOT use Python/openpyxl. Write formulas via `range.formulas = [["=D19*(1+$B$8)"]]`. No separate recalc step needed; Excel calculates natively. Use `range.format.*` for styling. The same formulas-over-hardcodes rule applies: set `.formulas`, never `.values` for derived cells.
-- **If generating a standalone .xlsx file (no live Excel session):** Use Python/openpyxl as described below, then run `recalc.py` before delivery.
+- **If generating a standalone .xlsx file (no live Excel session):** Use Python/openpyxl as described below, then run engine recalculation before delivery (see "Formula Recalculation (MANDATORY)" below).
 - The rest of this skill uses openpyxl examples — translate to Office JS API calls when in that environment, but all principles (formula strings, cell comments, section checkpoints, sensitivity table loops) apply identically.
 
 **⚠️ Office JS merged cell pitfall:** When building section headers with merged cells, do NOT call `.merge()` then set `.values` on the merged range — Office JS still reports the range's original dimensions and will throw `InvalidArgument: The number of rows or columns in the input array doesn't match the size or dimensions of the range`. Instead, write the value to the top-left cell alone, then merge and format the full range:
@@ -81,8 +83,8 @@ This applies to every merged section header in the DCF (market data, scenario bl
 - Test formulas immediately after creation
 
 **Formula Recalculation:**
-- Run `python recalc.py model.xlsx 30` before delivery
-- Fix ALL errors until status is "success"
+- Recalculate the workbook before delivery via the routed spreadsheet capability (see "Formula Recalculation (MANDATORY)" below)
+- Fix ALL errors until the workbook is clean
 - Zero formula errors required (#REF!, #DIV/0!, #VALUE!, etc.)
 
 **Scenario Blocks:**
@@ -635,7 +637,7 @@ B105: =B88/(1+(E48-0.07))      // Doesn't recalculate full DCF
 
 **Why it's wrong:**
 - Can't verify where data came from
-- Fails xlsx skill requirements
+- Fails the office-suite spreadsheets skill requirements
 - Not audit-ready
 - Wastes time fixing later
 
@@ -700,7 +702,7 @@ This vertical layout makes it hard to see the progression across years within ea
 **Why it's wrong:**
 - Can't distinguish inputs from formulas
 - Auditing becomes impossible
-- Violates xlsx skill requirements
+- Violates the office-suite spreadsheets skill requirements
 
 **Instead:** Blue text for ALL hardcoded inputs, black text for ALL formulas, green for sheet links
 
@@ -760,13 +762,13 @@ In addition, be aware of these errors:
 
 ## Excel File Creation
 
-**This skill uses the `xlsx` skill for all spreadsheet operations.** The xlsx skill provides:
+**This skill routes all spreadsheet engine operations to `crabcode-office-suite:crabcode-spreadsheets`.** That skill provides:
 - Standardized formula construction rules
 - Number formatting conventions
-- Automated formula recalculation via `recalc.py` script
+- The engine recalculation workflow (formulas written headlessly carry no computed values until recalculated)
 - Comprehensive error checking and validation
 
-All Excel files created by this skill must follow xlsx skill requirements, including zero formula errors and proper recalculation.
+All Excel files created by this skill must follow those requirements, including zero formula errors and proper recalculation. If triggering the skill returns `Unknown skill`, the office suite is not installed: ask the user to install `crabcode-office-suite` via `/plugin`, and present interim results in markdown until it is available.
 
 ## Quality Rubric
 
@@ -802,56 +804,33 @@ Create **two sheets**:
 
 ### Formula Recalculation (MANDATORY)
 
-After creating or modifying the Excel model, **recalculate all formulas** using the recalc.py script from the xlsx skill:
+After creating or modifying the Excel model, **recalculate all formulas** through the
+`crabcode-office-suite:crabcode-spreadsheets` workflow. Its runtime exposes a
+`recalculate(path)` surface backed by a LibreOffice/Excel engine adapter — run it on
+every workbook that contains formulas.
 
-```bash
-python recalc.py [path_to_excel_file] [timeout_seconds]
-```
+Why this is mandatory:
+- Formulas written headlessly (openpyxl/exceljs) are stored as formula strings with **no
+  computed values** — downstream consumers see empty cells until an engine recalculates
+  the file.
+- After recalculation, scan ALL cells for Excel errors (#REF!, #DIV/0!, #VALUE!,
+  #NAME?, #NULL!, #NUM!, #N/A).
 
-Example:
-```bash
-python recalc.py AAPL_DCF_Model_2025-10-12.xlsx 30
-```
+If no recalculation engine adapter is wired in the current environment:
+- Still perform a static error sweep on the formula strings (reference checks, range
+  off-by-one sweeps, cross-sheet reference form) before delivery, and
+- State explicitly in the delivery note that formula values are not baked into the file
+  and will compute when the user opens it in Excel/WPS.
 
-The script will:
-- Recalculate all formulas in all sheets using LibreOffice
-- Scan ALL cells for Excel errors (#REF!, #DIV/0!, #VALUE!, #NAME?, #NULL!, #NUM!, #N/A)
-- Return detailed JSON with error locations and counts
-
-**Expected output format:**
-```json
-{
-  "status": "success",           // or "errors_found"
-  "total_errors": 0,              // Total error count
-  "total_formulas": 42,           // Number of formulas in file
-  "error_summary": {}             // Only present if errors found
-}
-```
-
-**If errors are found**, the output will include details:
-```json
-{
-  "status": "errors_found",
-  "total_errors": 2,
-  "total_formulas": 42,
-  "error_summary": {
-    "#REF!": {
-      "count": 2,
-      "locations": ["DCF!B25", "DCF!C25"]
-    }
-  }
-}
-```
-
-**Fix all errors** and re-run recalc.py until status is "success" before delivering the model.
+**Fix all errors** and re-run recalculation until the workbook is clean before delivering the model.
 
 ### Formatting Standards
 
-**IMPORTANT**: Follow the xlsx skill for formula construction rules and number formatting conventions. The DCF skill adds specific visual presentation standards.
+**IMPORTANT**: Follow `crabcode-office-suite:crabcode-spreadsheets` for formula construction rules and number formatting conventions. The DCF skill adds specific visual presentation standards.
 
 **Color Scheme - Two Layers**:
 
-**Layer 1: Font Colors (MANDATORY from xlsx skill)**
+**Layer 1: Font Colors (MANDATORY from the office-suite spreadsheets skill)**
 - **Blue text (RGB: 0,0,255)**: ALL hardcoded inputs (stock price, shares, historical data, assumptions)
 - **Black text (RGB: 0,0,0)**: ALL formulas and calculations
 - **Green text (RGB: 0,128,0)**: Links to other sheets (WACC sheet references)
@@ -897,7 +876,7 @@ The script will:
 
 **Borders are mandatory** - models without professional borders are not client-ready.
 
-**Number Formats** (follows xlsx skill standards):
+**Number Formats** (follows the office-suite spreadsheets standards):
 - **Years**: Format as text strings (e.g., "2024" not "2,024")
 - **Percentages**: `0.0%` (one decimal place)
 - **Currency**: `$#,##0` for millions; `$#,##0.00` for per-share - ALWAYS specify units in headers ("Revenue ($mm)")
@@ -907,7 +886,7 @@ The script will:
 
 **Cell Comments (MANDATORY for all hardcoded inputs)**:
 
-Per the xlsx skill, ALL hardcoded values must have cell comments documenting the source. Format: "Source: [System/Document], [Date], [Reference], [URL if applicable]"
+Per the office-suite spreadsheets skill, ALL hardcoded values must have cell comments documenting the source. Format: "Source: [System/Document], [Date], [Reference], [URL if applicable]"
 
 **CRITICAL**: Add comments AS CELLS ARE CREATED. Do not defer to the end.
 
@@ -1212,7 +1191,7 @@ This approach centralizes scenario logic, making the model easier to audit and m
 ### During Model Construction
 
 1. **Build Excel model** using openpyxl with formulas (not hardcoded values)
-2. **Follow xlsx skill conventions** for formula construction and formatting
+2. **Follow the office-suite spreadsheets conventions** for formula construction and formatting
 3. **Apply fill colors only if requested** by user or if specific brand guidelines are provided
 
 ### Before Delivering Model (MANDATORY)
@@ -1225,13 +1204,13 @@ This approach centralizes scenario logic, making the model easier to audit and m
    - Cell comments on ALL hardcoded inputs
    - Professional borders around major sections
 
-2. **Recalculate formulas**: Run `python recalc.py model.xlsx 30`
+2. **Recalculate formulas**: run engine recalculation via the `crabcode-office-suite:crabcode-spreadsheets` workflow (see "Formula Recalculation (MANDATORY)")
 
 3. **Check output**:
-   - If `status` is `"success"` → Continue to step 4
-   - If `status` is `"errors_found"` → Check `error_summary` and read [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) for debugging guidance
+   - If the workbook is clean (zero error cells) → Continue to step 4
+   - If errors are found → Read [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) for debugging guidance
 
-4. **Fix errors and re-run recalc.py** until status is "success"
+4. **Fix errors and re-run recalculation** until the workbook is clean
 
 5. **Spot-check formulas**:
    - Test one FCF formula - does it reference the correct assumption rows?
@@ -1252,7 +1231,7 @@ This approach centralizes scenario logic, making the model easier to audit and m
 Before delivering DCF model:
 
 **Required:**
-- Run `python recalc.py model.xlsx 30` until status is "success" (zero formula errors)
+- Run engine recalculation (office-suite spreadsheets workflow) until the workbook is clean (zero formula errors)
 - Two sheets: DCF (with sensitivity at bottom), WACC
 - Font colors: Blue=inputs, Black=formulas, Green=sheet links
 - Cell comments on ALL hardcoded inputs

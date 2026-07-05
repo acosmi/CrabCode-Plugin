@@ -47,3 +47,8 @@ recommend the matching domain skill (`/cn-data-compliance:data-activity-triage`,
 A deep-analysis memo (reviewer note → RED/YELLOW/GREEN findings table with citation tags →
 missing facts → next-steps decision tree), a `pending-review` queue item, and an audit-log entry.
 All carry the 【AI 辅助草稿，需律师复核】 header and are internal-only drafts for lawyer review.
+
+## 产出物路由
+
+- 需要将深度尽调分析报告交付为 Word 成品时,调用 `crabcode-office-suite:crabcode-documents` 生成 .docx;
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;安装完成前先以 markdown 呈现全文供用户确认。

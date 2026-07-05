@@ -140,7 +140,7 @@ Source(s): [exports/data used]
 ```
 
 **XLSX workbook** (always):
-Read `xlsx/SKILL.md` before generating. Produce a workbook with three sheets:
+Generate the workbook via `crabcode-office-suite:crabcode-spreadsheets`. Produce a workbook with three sheets:
 
 1. **Summary** — the 30/60/90 forecast table with confidence bands. Beneath
    each window row, expand inline sub-rows showing the individual transactions
@@ -177,3 +177,10 @@ Remind the user after delivery:
 |---|---|
 | `reference/gotchas.md` | When an export contains unexpected data or variance is extreme |
 | `reference/examples/worked-example.md` | When modeling the output format for a new data shape |
+
+---
+
+## Deliverable routing
+
+- The XLSX workbook is generated via `crabcode-office-suite:crabcode-spreadsheets`; the same skill parses owner exports that arrive as Excel files (.xlsx/.xls) rather than CSV.
+- If triggering it reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin`, then retry; until then, present the forecast tables as markdown in chat.

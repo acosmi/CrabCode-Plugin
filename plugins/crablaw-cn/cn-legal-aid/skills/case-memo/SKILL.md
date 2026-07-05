@@ -45,3 +45,8 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 - 需补充法律检索：移交 `/cn-legal-aid:research-start`。
 - 期限需纳入管理：移交 `/cn-legal-aid:deadlines`。
 - 需向受援人通俗说明结论：移交 `/cn-legal-aid:plain-language-letter`。
+
+## 产出物路由
+
+- 需要将案件备忘录交付为 Word 成品时,调用 `crabcode-office-suite:crabcode-documents` 生成 .docx;
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;安装完成前先以 markdown 呈现全文供用户确认。

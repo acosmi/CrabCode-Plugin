@@ -98,3 +98,8 @@ license: Apache-2.0
 | `buyer-list` | 确定交易对手方 | 潜在买方短名单 |
 | `deal-tracker` | 流程时间表 | 审批时限 |
 | `teaser` | pitch后分发teaser | Teaser单页 |
+
+## 产出物路由
+
+- 提案需要交付 .pptx 幻灯片成品时,调用 `crabcode-office-suite:crabcode-presentations` 生成;12 页结构先以 markdown 大纲与用户确认后再落文件。
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;安装完成前先以 markdown 逐页呈现内容供用户确认。

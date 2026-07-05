@@ -47,6 +47,8 @@ bun run lint:brand
 bun run validate
 ```
 
+`dist/` is a build artifact and is not tracked in git. Run `bun run build` first when you need the `crabcode-setup` bin (`./dist/cli.js`).
+
 ## Plugin Entry
 
 The skill wrapper lives at `skills/crabcode-automation-recommender/SKILL.md`. The command wrapper lives at `commands/recommend-automation.md`.

@@ -1,0 +1,38 @@
+[
+  {
+    "file": "plugins/crabwork-bio-research/.mcp.json",
+    "terms": ["claude", ".claude"],
+    "reason": "PubMed/HCLS 为上游第三方 MCP 功能性端点;acosmi 镜像域名尚未建成(权威 DNS NXDOMAIN,2026-07-01 实测),现在替换会使 4 个连接器全部失效",
+    "tracking": "2026-07-01 总审计 P4-4 镜像部署完成后替换 URL 并删除本条"
+  },
+  {
+    "file": "plugins/crabwork-customer-support/.mcp.json",
+    "terms": ["anthropic"],
+    "reason": "HubSpot 官方 MCP 实测唯一活端点为 /anthropic 路径(/mcp 返回 404,2026-07-01 复测一致),URL 属第三方设施非品牌宣称",
+    "tracking": "2026-06-23 §3 CRM 国内替代选型落地后替换并删除本条"
+  },
+  {
+    "file": "plugins/crabwork-marketing/.mcp.json",
+    "terms": ["anthropic"],
+    "reason": "HubSpot 官方 MCP 实测唯一活端点为 /anthropic 路径(/mcp 返回 404,2026-07-01 复测一致),URL 属第三方设施非品牌宣称",
+    "tracking": "2026-06-23 §3 CRM 国内替代选型落地后替换并删除本条"
+  },
+  {
+    "file": "plugins/crabwork-sales/.mcp.json",
+    "terms": ["anthropic"],
+    "reason": "HubSpot 官方 MCP 实测唯一活端点为 /anthropic 路径(/mcp 返回 404,2026-07-01 复测一致),URL 属第三方设施非品牌宣称",
+    "tracking": "2026-06-23 §3 CRM 国内替代选型落地后替换并删除本条"
+  },
+  {
+    "file": "plugins/crabwork-small-business/.mcp.json",
+    "terms": ["anthropic"],
+    "reason": "HubSpot 官方 MCP 实测唯一活端点为 /anthropic 路径(/mcp 返回 404,2026-07-01 复测一致),URL 属第三方设施非品牌宣称",
+    "tracking": "2026-06-23 §3 CRM 国内替代选型落地后替换并删除本条"
+  },
+  {
+    "file": "plugins/crabwork-bio-research/skills/nextflow-development/scripts/config/genomes.yaml",
+    "terms": ["opus"],
+    "reason": "物种学名 Xenopus tropicalis(热带爪蟾)含 opus 子串,纯假阳性",
+    "tracking": "永久豁免(生物物种名,无需跟进)"
+  }
+]

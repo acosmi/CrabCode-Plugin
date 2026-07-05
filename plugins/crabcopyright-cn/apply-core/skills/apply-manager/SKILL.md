@@ -26,12 +26,14 @@ allowed-tools:
 
 ## 开场依赖自检（第一步就做,别拖到排版才失败）
 
-工序 2/3 的 PDF 排版全部依赖 **crabcode-office-suite** 插件(`crabcode-pdf` /
-`crabcode-documents` 技能)。开场先探测它是否可用:检查当前可用技能列表中是否存在
-`crabcode-pdf` 与 `crabcode-documents`(即 office-suite 已安装并启用)。不可用时**立即
-告知用户**:"源代码/说明书转规范 PDF 的环节需要 crabcode-office-suite,请先通过
-`/plugin` 从 marketplace 安装启用",并问清是现在装还是先推进不依赖它的工序(0/1/4/6),
-不要走到排版环节才报错。
+工序 2/3 的 PDF 排版全部依赖 **crabcode-office-suite** 插件
+(`crabcode-office-suite:crabcode-pdf` / `crabcode-office-suite:crabcode-documents` 技能)。
+开场先探测它是否可用:检查当前可用技能列表中是否存在
+`crabcode-office-suite:crabcode-pdf` 与 `crabcode-office-suite:crabcode-documents`
+(即办公套件已安装并启用)。不可用、或触发时报 Unknown skill,说明办公套件未安装:
+**立即告知用户**"源代码/说明书转规范 PDF 的环节需要办公套件,请先通过 `/plugin`
+从 marketplace 安装启用 `crabcode-office-suite` 后重试",并问清是现在装还是先推进
+不依赖它的工序(0/1/4/6),不要走到排版环节才报错。
 
 ## 输入（缺则用 AskUserQuestion 索取）
 

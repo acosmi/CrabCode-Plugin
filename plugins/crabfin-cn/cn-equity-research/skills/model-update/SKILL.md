@@ -147,3 +147,9 @@ license: Apache-2.0
 | `earnings-analysis` | 新财报需要CAS口径解读 | 盈利质量分析 |
 | `earnings-preview` | 模型输入需要前瞻预测 | 业绩前瞻数据 |
 | `initiating-coverage` | 新建模型后输出首次覆盖报告 | 完整研报 |
+
+## 产出物路由
+
+- 更新后的模型需要交付 .xlsx 工作簿时,调用 `crabcode-office-suite:crabcode-spreadsheets` 写入;headless 写入的公式没有计算值,交付前按其引擎重算流程执行,重算后再复核 BS 平衡与 CF 闭环。
+- 财报仅有 PDF 版时,解析取数用 `crabcode-office-suite:crabcode-pdf` 提取报表数据,再按 Step 2 做科目映射校验。
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;安装完成前先以 markdown 表格呈现更新内容供用户确认。

@@ -152,3 +152,15 @@ plt.show()
 - Specify "presentation" if you need larger fonts and higher contrast
 - You can request multiple charts at once (e.g., "create a 2x2 grid of charts showing...")
 - Charts are saved to your current directory as PNG files
+
+## Deliverable Routing
+
+- When a chart is destined for a slide deck, invoke
+  `crabcode-office-suite:crabcode-presentations` to assemble the .pptx
+  and embed the exported PNG charts.
+- When the user wants a native chart inside an Excel workbook rather
+  than a PNG, invoke `crabcode-office-suite:crabcode-spreadsheets` to
+  build the .xlsx with the data and chart together.
+- If those skills return an Unknown skill error, the office suite is
+  not installed: guide the user to install `crabcode-office-suite` via
+  `/plugin` and retry; deliver the PNG chart in the meantime.

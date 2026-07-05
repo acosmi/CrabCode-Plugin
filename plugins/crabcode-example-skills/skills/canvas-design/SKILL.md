@@ -4,6 +4,8 @@ description: "Create beautiful visual art in .png and .pdf documents using a des
 license: Apache-2.0. See ../../docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---
 
+<!-- capability-route: office-pdf=none(PDF here is this skill's own art-canvas rendering target alongside PNG; the file is produced by the skill's design pipeline, not an office-document deliverable to route) -->
+
 # Canvas Design
 
 This skill creates a design philosophy — an aesthetic movement — and

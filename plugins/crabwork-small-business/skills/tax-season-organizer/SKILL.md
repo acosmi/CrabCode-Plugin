@@ -209,3 +209,8 @@ Structure the 1099 prep output as a document with these sections:
 - [reference/gotchas.md](reference/gotchas.md) — Good / Bad patterns for common failure modes
 - [reference/examples/quarterly-estimate.md](reference/examples/quarterly-estimate.md) — worked quarterly estimate example
 - [reference/examples/year-end-1099.md](reference/examples/year-end-1099.md) — worked year-end 1099 prep example
+
+## Spreadsheet input routing
+
+- When the P&L or vendor-payment export arrives as an Excel file (.xlsx/.xls), parse it via `crabcode-office-suite:crabcode-spreadsheets`; CSV files and pasted numbers need no extra tooling. Use the same skill if the owner wants the 1099-NEC candidate list delivered as a spreadsheet file for their accountant.
+- If that skill reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin` and retry — or ask for a CSV export instead and deliver the prep material as markdown.

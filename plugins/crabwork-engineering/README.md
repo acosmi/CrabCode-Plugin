@@ -2,7 +2,7 @@
 
 面向工程研发团队的 CrabCode 插件:日常站会、代码评审、架构决策、事故响应、调试与技术文档。可独立使用(直接粘贴代码、描述系统、上传文件),连接源码管理、项目管理与监控工具后能力更强。
 
-> 基于 [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态。
+> 基于上游开源知识工作插件(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态;上游出处与许可信息见 [docs/legal/THIRD_PARTY_NOTICES.md](docs/legal/THIRD_PARTY_NOTICES.md)。
 
 ## 安装
 

@@ -38,3 +38,8 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 - 若事项更宜召开会议或需会议记录：转交 `/cn-corporate:board-minutes`（董事会）或提示安排股东会。
 - 若决议触发工商变更登记或存续合规：转交 `/cn-corporate:entity-compliance`。
 - 若决议支撑交易交割：转交 `/cn-corporate:closing-checklist`。
+
+## 产出物路由
+
+- 需要将书面决议交付为 Word 成品时,调用 `crabcode-office-suite:crabcode-documents` 生成 .docx;
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;安装完成前先以 markdown 呈现全文供用户确认。

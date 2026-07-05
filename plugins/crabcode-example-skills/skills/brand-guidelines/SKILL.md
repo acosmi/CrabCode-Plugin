@@ -64,11 +64,17 @@ choice and the brand specification is silent:
 This skill supports applying brand styling to:
 
 - Presentations: drive `pptxgenjs` or unpack-edit-repack workflows
-  through the `crabcode-presentations` skill.
-- Documents: drive the `docx` library through the `crabcode-documents`
-  skill.
+  through the `crabcode-office-suite:crabcode-presentations` skill.
+- Documents: drive the `docx` library through the
+  `crabcode-office-suite:crabcode-documents` skill.
 - HTML and web artifacts: drive CSS variables or Tailwind theme
   extensions through the `frontend-design` skill.
+
+If invoking an office-suite skill returns an Unknown skill error, the
+office suite is not installed: guide the user to install
+`crabcode-office-suite` via `/plugin`, then retry. Until it is
+installed, present the styling plan in markdown for the user to
+confirm.
 
 ## Do Not
 

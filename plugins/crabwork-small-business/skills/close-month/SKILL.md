@@ -76,6 +76,11 @@ If the owner cannot provide the accounting-software export, stop — reconciliat
 - **Never delete duplicates without explicit confirmation.** Show both records side-by-side (and the fix itself happens in the owner's accounting software).
 - **Saving the packet locally is auto** — it stays on the owner's own machine. Creating a 腾讯文档 copy requires the owner's confirmation.
 
+## Deliverable routing
+
+- Build `close-packet-{YYYY-MM}.xlsx` via `crabcode-office-suite:crabcode-spreadsheets` and the one-page `close-packet-{YYYY-MM}.pdf` via `crabcode-office-suite:crabcode-pdf`. The spreadsheets skill also parses owner exports that arrive as Excel files rather than CSV.
+- If either skill reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin`, then retry; until then, present the close packet as markdown tables in chat for confirmation.
+
 ## Output
 
 End the run with a one-paragraph recap: revenue, margin, gap count remaining (if any), file paths to the saved packet. If gaps were not all resolved, list them so the owner can revisit.

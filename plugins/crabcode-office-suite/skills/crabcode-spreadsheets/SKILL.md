@@ -1,6 +1,6 @@
 ---
 name: crabcode-spreadsheets
-description: "Use this skill whenever a spreadsheet file is the primary input or output. Trigger when the user wants to open, read, edit, or repair an existing .xlsx, .xlsm, .csv, or .tsv file (add columns, compute formulas, format cells, build charts, clean messy rows). Trigger when creating a new spreadsheet from scratch or from other tabular sources. Trigger when converting between tabular formats. Trigger when the user mentions a spreadsheet file by name or path. Do not trigger when the deliverable is a word document, PDF, presentation, HTML report, standalone data pipeline, or a Google Sheets API integration even if tabular data is involved."
+description: "Create, read, edit, or repair spreadsheets (.xlsx/.xlsm/.csv/.tsv): formulas, formatting, charts, recalculation. 中文场景:电子表格、Excel 文件、财务报表、财务模型、数据清单的创建与编辑。Trigger whenever a spreadsheet file is the input or output."
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---
 

@@ -46,3 +46,8 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 - 律师定稿后如需对外：通过 matter-core review queue 升级审批（approved-external / sent 需记录 externalDestination），由律师与委托人决定，本技能不执行发送。
 - 预判对方可能回函：可预先用 `/cn-litigation:demand-received` 推演应对。
 - 若发函后转入诉讼：移交 `/cn-litigation:brief-section-drafter` 起草起诉状分段。
+
+## 产出物路由
+
+- 需要将催告函/律师函交付为 Word 成品时,调用 `crabcode-office-suite:crabcode-documents` 生成 .docx;
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;安装完成前先以 markdown 呈现全文供用户确认。

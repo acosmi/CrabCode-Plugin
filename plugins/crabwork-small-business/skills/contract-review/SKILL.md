@@ -101,7 +101,7 @@ User: "Review this MSA and flag anything I should push back on."
 
    **💡 Negotiation playbook** — For each red and yellow flag: what to ask for, how to frame the ask, and what a reasonable compromise looks like.
 
-5. **Export redline DOCX** — After presenting the summary, offer to export a redlined DOCX with the suggested changes marked up. Use the `docx` skill to generate a Word document that:
+5. **Export redline DOCX** — After presenting the summary, offer to export a redlined DOCX with the suggested changes marked up. Use `crabcode-office-suite:crabcode-documents` to generate a Word document that:
    - Preserves the original contract structure
    - Marks suggested deletions in strikethrough and additions in underline
    - Adds a cover page summarizing the changes
@@ -125,3 +125,8 @@ User: "Review this MSA and flag anything I should push back on."
 - `reference/gotchas.md` — edge cases in contract analysis
 - `reference/contract-intake.md` — how contracts get into the review (upload/paste; no email or e-sign connector yet)
 - `reference/examples/flagged-summary-saas.md` — worked example: SaaS agreement review output
+
+## Deliverable routing
+
+- Reading and extracting text from PDF contracts is handled by `crabcode-office-suite:crabcode-pdf`; the redlined Word deliverable is generated with `crabcode-office-suite:crabcode-documents`.
+- If either skill reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin`, then retry. Until it is installed, ask for the contract as pasted text and present the redline suggestions as markdown instead of a DOCX.

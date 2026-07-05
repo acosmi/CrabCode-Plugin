@@ -66,6 +66,11 @@ If no accounting export or pasted P&L is provided, stop — the QBR requires the
 - **Never publish or send the QBR automatically.** Always display for owner review first.
 - **Flag if any data source returns incomplete data** — note gaps in the narrative.
 
+## Deliverable routing
+
+- Generate `qbr-{YYYY-QN}.pdf` via `crabcode-office-suite:crabcode-pdf`. Accounting or settlement exports that arrive as Excel files (.xlsx/.xls) rather than CSV are parsed via `crabcode-office-suite:crabcode-spreadsheets`.
+- If either skill reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin`, then retry; until then, present the QBR narrative as markdown in chat (the 腾讯文档 copy per `--save-to` still works).
+
 ## Output
 
 Present the narrative in-line, then confirm export. End with a one-paragraph "what to focus on next quarter" summary.

@@ -10,6 +10,8 @@ allowed-tools:
   - Bash(python3:*)
 ---
 
+<!-- capability-route: office-pdf=none(成品 PDF 明确不在比对范围——PDF 无法 Grep,比对对象是生成 PDF 之前的中间态材料,本技能不产出也不解析 PDF) -->
+
 # 软著材料一致性校验
 
 软著登记最高频的驳回原因就是**名称/版本号在三处对不上**。本技能对 **manifest ＋
@@ -70,3 +72,11 @@ Grep,所以比对对象是 manifest 字段与 `intermediates` 里的中间材料
 ## 检查点
 
 发现任何不一致,立即暂停并醒目提示用户修正对应材料,修正后重跑本技能。
+
+## 产出物路由
+
+- 本技能的报告以 markdown 交付,不产出 Office 文件;但当 `intermediates.manual_docx`
+  只有 .docx 定稿、没有现成抽取文本时,调用 `crabcode-office-suite:crabcode-documents`
+  读取定稿的封面/页眉文本再做比对,不得跳过该检查项充数。
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装
+  `crabcode-office-suite` 后重试;安装完成前把该检查项标 ⚠️ 待补,不得凭猜测判定一致。

@@ -77,3 +77,8 @@ Use `references/report-format.md` as the structure. Categorize by severity:
 - **Minor** — font sizes, spacing, date formats. Polish.
 
 Lead with criticals. If there aren't any, say so explicitly — "no number inconsistencies found" is a finding, not an absence of one.
+
+## Capability routing
+
+- In chat mode, extracting slide-by-slide text from the uploaded .pptx uses `crabcode-office-suite:crabcode-presentations` (read-only parsing; this skill never edits the deck).
+- If triggering it returns Unknown skill, the office suite is not installed: guide the user to install `crabcode-office-suite` via `/plugin` and retry, or ask the user for a text export of the deck as a stopgap.

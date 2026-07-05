@@ -4,6 +4,8 @@ description: Creates self-contained PPT template SKILLS (not presentations) from
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---
 
+<!-- capability-route: office-presentations=none(meta-skill: analyzes user templates and emits self-contained template skills via embedded python-pptx code; deck production is not delegated to the office suite) -->
+
 # PPT Template Creator
 
 **This skill creates SKILLS, not presentations.** Use this when a user wants to turn their PowerPoint template into a reusable skill that can generate presentations later. If the user just wants to create a presentation, use the `pptx` skill instead.

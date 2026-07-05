@@ -2,7 +2,7 @@
 
 面向数据分析师的 CrabCode 插件:编写 SQL、探索数据集、生成洞察,构建可视化图表与交互式看板,把原始数据变成面向干系人的清晰叙事。可独立使用(粘贴 SQL 结果、上传 CSV/Excel),连接数据仓库与分析工具后能力更强。适配任意数据仓库、任意 SQL 方言与任意分析技术栈。
 
-> 基于 [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态。
+> 基于上游开源知识工作插件(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态;上游出处与许可信息见 [docs/legal/THIRD_PARTY_NOTICES.md](docs/legal/THIRD_PARTY_NOTICES.md)。
 
 ## 安装
 

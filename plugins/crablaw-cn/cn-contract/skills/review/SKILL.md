@@ -49,3 +49,8 @@ Depending on the review outcome:
 - For a business-facing summary derived from this review: hand off to `/cn-contract:risk-summary` with this review item id.
 - For confidentiality-only documents: prefer `/cn-contract:nda-review` instead of this generic review.
 - When data, labor, or other regulatory issues surface, escalate to the matching domain skill (`/cn-data-compliance:data-activity-triage`, `/cn-labor-employment:employment-contract-review`).
+
+## 产出物路由
+
+- 需要将合同审查备忘录交付为 Word 成品时,调用 `crabcode-office-suite:crabcode-documents` 生成 .docx;
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;安装完成前先以 markdown 呈现全文供用户确认。

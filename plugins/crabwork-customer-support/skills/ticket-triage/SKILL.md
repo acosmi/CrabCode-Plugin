@@ -4,6 +4,8 @@ description: Triages an incoming support ticket or customer issue — categorize
 argument-hint: "<ticket or issue description>"
 ---
 
+<!-- capability-route: office-pdf=none(the only "pdf" mention is an illustrative customer feature request — "export reports as PDF"; this skill outputs a markdown triage assessment and neither generates nor parses a PDF) -->
+
 # /ticket-triage
 
 > If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../../CONNECTORS.md).

@@ -1,12 +1,12 @@
 ---
 name: xlsx-author
-description: Produce a .xlsx file on disk (headless) instead of driving a live Excel workbook — for managed-agent sessions with no open Office app.
+description: Produce a .xlsx file on disk with finance conventions (inputs tab, blue/black/green color coding, checks tab); engine work and recalculation route to crabcode-office-suite.
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---
 
 # xlsx-author
 
-Use this skill when running **headless** (managed-agent / CMA mode) and you need to deliver an Excel workbook as a **file artifact** rather than editing a live workbook via `mcp__office__excel_*`.
+Use this skill when a fin-core workflow needs to deliver an Excel workbook as a **file artifact**. 本技能层叠在通用电子表格能力之上:引擎规则、公式校验与交付前重算统一以 `crabcode-office-suite:crabcode-spreadsheets` 为准,这里只补充金融建模侧的约定。
 
 ## Output contract
 
@@ -38,6 +38,11 @@ wb.save("./out/model.xlsx")
 - **Balance checks.** Include a Checks tab that ties (BS balances, CF ties to cash, etc.) and surfaces TRUE/FALSE.
 - **One model per file.** Do not append to an existing workbook unless explicitly asked.
 
+## 产出物路由
+
+- 引擎选型、公式构造规则、零错误校验与交付前重算,统一执行 `crabcode-office-suite:crabcode-spreadsheets` 的流程(headless 写入的公式没有计算值,交付前必须走它的引擎重算步骤);
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;安装完成前可先交付公式经静态排错的工作簿,并在交付说明中注明公式值将在 Excel/WPS 打开时计算。
+
 ## When NOT to use
 
-If `mcp__office__excel_*` tools are available (Cowork plugin mode), use those instead — they drive the user's live workbook with review checkpoints. This skill is the file-producing fallback for headless runs.
+If the deliverable is a generic (non-finance) spreadsheet with no modeling conventions involved, invoke `crabcode-office-suite:crabcode-spreadsheets` directly instead of this skill.

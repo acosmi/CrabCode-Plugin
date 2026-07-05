@@ -3,6 +3,8 @@ name: skill-creator
 description: Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.
 ---
 
+<!-- capability-route: office-spreadsheets=none(xlsx appears in example eval queries and output-inspection notes for skills under test; this skill builds and evaluates skills and ships no spreadsheet deliverable), office-documents=none(docx appears as an example of test-run output files a user might inspect; no document deliverable from this skill), office-pdf=none(pdf appears in example trigger queries used to teach eval design; no PDF deliverable from this skill) -->
+
 # Skill Creator
 
 A skill for creating new skills and iteratively improving them.

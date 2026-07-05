@@ -21,6 +21,8 @@ description: |
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---
 
+<!-- capability-route: deep-research=none(正文仅在数据源优先级中禁止把 web search 当主数据源,属反向提及;本技能无联网深度调研流程) -->
+
 # Comparable Company Analysis
 
 > **中国版底座(中文优先)**:分析机制沿用下方通用英文流程,**数据来源与行业分类改用中国口径**——公司数据取自巨潮资讯网/沪深北交易所披露与 Wind/同花顺(非 SEC),可比公司按**申万行业**划分并区分板块(主板/科创板/创业板/北交所/港股)。**先读 [`../../references/cn-data-sources.md`](../../references/cn-data-sources.md);下方英文 Data Source Priority 中的 SEC 层级一律以本适配器的中国来源替换。** 输出注明数据来源、取数日期、计价货币。
@@ -663,3 +665,8 @@ After completing a comp analysis, ask:
 5. What would make this more useful next time?
 
 The best comp analyses evolve with each iteration. Save templates, learn from feedback, and refine the structure based on what decision-makers actually use.
+
+## 产出物路由
+
+- comps 需要交付 .xlsx 成品时,调用 `crabcode-office-suite:crabcode-spreadsheets` 生成;headless 写入的公式没有计算值,交付前按其引擎重算流程执行,重算后再核对统计行与估值倍数区。
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;安装完成前先以 markdown 表格呈现 comps 供用户确认。

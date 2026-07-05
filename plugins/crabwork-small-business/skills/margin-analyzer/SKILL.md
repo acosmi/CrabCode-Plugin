@@ -166,3 +166,8 @@ The Alipay MCP connector is for payment links and refunds only — revenue histo
 - `reference/industry-benchmarks.md` — gross margin ranges by SMB category
 - `reference/csv-schema.md` — expected columns when the owner uploads a CSV
 - `reference/examples/` — worked scenarios (retail, services, product-based)
+
+## Spreadsheet input routing
+
+- When the cost or revenue export arrives as an Excel file (.xlsx/.xls), parse it via `crabcode-office-suite:crabcode-spreadsheets`; CSV files and pasted data need no extra tooling. Use the same skill if the owner asks for the unit-economics or scenario tables as a spreadsheet file.
+- If that skill reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin` and retry — or ask for a CSV export instead and present the analysis as markdown.

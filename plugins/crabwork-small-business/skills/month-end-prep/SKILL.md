@@ -191,3 +191,8 @@ specs and PDF layout details.
   transactions, partial-month edge cases
 - [reference/examples/pl-narrative.md](reference/examples/pl-narrative.md) — worked
   P&L narrative example
+
+## Deliverable routing
+
+- Build `close-packet-[YYYY-MM].xlsx` via `crabcode-office-suite:crabcode-spreadsheets` and the one-page `close-packet-[YYYY-MM]-summary.pdf` via `crabcode-office-suite:crabcode-pdf`. The spreadsheets skill also parses owner exports that arrive as Excel files rather than CSV.
+- If either skill reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin`, then retry; until then, present the close packet as markdown tables in chat for confirmation.

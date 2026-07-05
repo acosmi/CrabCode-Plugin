@@ -8,7 +8,7 @@ This repository builds a CrabCode-native plugin that analyzes a target codebase 
 - Analyze a project: `bun run analyze -- --cwd /path/to/project --format markdown`
 - Typecheck: `bun run typecheck`
 - Test: `bun test`
-- Build: `bun run build`
+- Build: `bun run build` (`dist/` is not tracked in git; run this before using the `crabcode-setup` bin)
 - Brand scan: `bun run lint:brand`
 - Validate plugin with a built CrabCode CLI: `crabcode plugin validate /Users/fushihua/Desktop/CrabCode-Plugin`
 

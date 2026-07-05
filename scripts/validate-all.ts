@@ -1,5 +1,9 @@
 import path from "node:path";
-import { formatBrandViolations, scanPath } from "../src/policy/brandGuard.ts";
+import {
+  formatBrandViolations,
+  formatStaleAllowlistEntries,
+  scanPathDetailed,
+} from "../src/policy/brandGuard.ts";
 import {
   formatManifestIssues,
   validateManifests,
@@ -13,16 +17,24 @@ import {
   formatMatterGateIssues,
   validateMatterGate,
 } from "../src/policy/matterGateValidator.ts";
+import {
+  formatReferenceIssues,
+  validateReferences,
+} from "../src/policy/referenceValidator.ts";
 
 const root = path.resolve(process.argv[2] ?? ".");
 
 let hasError = false;
 let hasOutput = false;
 
-const brand = await scanPath(root);
-if (brand.length > 0) {
+const brand = await scanPathDetailed(root);
+if (brand.staleAllowlistEntries.length > 0) {
   hasOutput = true;
-  process.stderr.write(`[brand]\n${formatBrandViolations(brand)}\n`);
+  process.stderr.write(`[brand]\n${formatStaleAllowlistEntries(brand.staleAllowlistEntries)}\n`);
+}
+if (brand.violations.length > 0) {
+  hasOutput = true;
+  process.stderr.write(`[brand]\n${formatBrandViolations(brand.violations)}\n`);
   hasError = true;
 }
 
@@ -52,6 +64,13 @@ if (matterGate.length > 0) {
   hasOutput = true;
   process.stderr.write(`[tool-scope]\n${formatMatterGateIssues(matterGate, root)}\n`);
   if (matterGate.some((issue) => issue.severity === "error")) hasError = true;
+}
+
+const references = await validateReferences(root);
+if (references.length > 0) {
+  hasOutput = true;
+  process.stderr.write(`[refs]\n${formatReferenceIssues(references, root)}\n`);
+  if (references.some((issue) => issue.severity === "error")) hasError = true;
 }
 
 if (!hasOutput) {

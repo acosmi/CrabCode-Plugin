@@ -2,7 +2,7 @@
 
 面向运营团队的 CrabCode 插件:供应商管理、流程文档、变更管理、产能规划、合规跟踪与资源规划。可独立使用(直接提供信息、上传文件、描述流程),连接 ITSM、项目管理与知识库等工具后能力更强。
 
-> 基于 [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins)(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态。
+> 基于上游开源知识工作插件(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态;上游出处与许可信息见 [docs/legal/THIRD_PARTY_NOTICES.md](docs/legal/THIRD_PARTY_NOTICES.md)。
 
 ## 安装
 

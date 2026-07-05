@@ -44,3 +44,8 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 - 需走平台投诉/通知删除路径:转 `/cn-ip:takedown`。
 - 权利稳定性存疑或对方可能提无效/不侵权抗辩:转 `/cn-ip:fto-triage` 或 `/cn-ip:clearance` 复核。
 - 拟进入诉讼/仲裁:升级至诉讼板块由律师评估,本草稿不作发函决定。
+
+## 产出物路由
+
+- 需要将警告函交付为 Word 成品时,调用 `crabcode-office-suite:crabcode-documents` 生成 .docx;
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;安装完成前先以 markdown 呈现全文供用户确认。

@@ -100,3 +100,8 @@ The owner may ask for a narrower cut:
 - `reference/thresholds.md` — 🟢/🟡/🔴 cutoffs, tunable per owner
 - `reference/output_template.md` — exact markdown structure; do not deviate
 - `reference/gotchas.md` — known failure modes (missing exports, connector errors, message-send approval)
+
+## Spreadsheet input routing
+
+- When an owner-provided export (accounting software or 支付宝/微信支付 bill) arrives as an Excel file (.xlsx/.xls), parse it via `crabcode-office-suite:crabcode-spreadsheets`; CSV files and pasted reports need no extra tooling. The pulse itself is delivered as markdown — no spreadsheet output.
+- If that skill reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin` and retry — or ask for a CSV export instead and continue the pulse from that.

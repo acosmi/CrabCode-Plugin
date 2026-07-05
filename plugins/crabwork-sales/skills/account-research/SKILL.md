@@ -280,6 +280,14 @@ Focus on: Attendee backgrounds, recent news, relationship history
 
 ---
 
+## Research Upgrade Path
+<!-- capability-route: deep-research=pending(general-purpose deep-research plugin is planned but not shipped yet; see docs/capability-routing.json) -->
+
+- This skill's research runs on the WebSearch/WebFetch tools available in your session; if they are unavailable, paste whatever research material you have and I'll work within it.
+- Once the planned general-purpose deep-research plugin (`crabcode-deep-research`) ships, this section will be upgraded to a fully qualified skill route — `lint:refs` will flag the pending marker at that point.
+
+---
+
 ## Related Skills
 
 - **call-prep** — Full meeting prep with this research plus context

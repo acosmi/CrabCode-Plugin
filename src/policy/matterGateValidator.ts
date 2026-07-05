@@ -63,7 +63,7 @@ export async function validateMatterGate(root: string): Promise<MatterGateIssue[
   for (const skillFile of skillFiles) {
     const relToFamily = path.relative(familyDir, skillFile);
     const segments = relToFamily.split(path.sep);
-    const board = segments[0];
+    const board = segments[0] ?? "";
     // skill id = the directory immediately containing SKILL.md
     const skillName = path.basename(path.dirname(skillFile));
     const skillKey = `${board}/${skillName}`;

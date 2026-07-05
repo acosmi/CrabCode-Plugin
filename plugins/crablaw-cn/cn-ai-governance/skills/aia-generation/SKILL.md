@@ -52,3 +52,8 @@ Return:
 - 涉及个人信息保护影响评估本体:hand off to `/cn-data-compliance:pia-generation`。
 - 涉及数据出境:escalate to `/cn-data-compliance:cross-border-transfer-check`。
 - 备案/复评期限登记后:由 `/matter-core:compliance-deadline-watcher` 跟踪。
+
+## 产出物路由
+
+- 需要将算法/AI 影响评估报告交付为 Word 成品时,调用 `crabcode-office-suite:crabcode-documents` 生成 .docx;
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;安装完成前先以 markdown 呈现全文供用户确认。

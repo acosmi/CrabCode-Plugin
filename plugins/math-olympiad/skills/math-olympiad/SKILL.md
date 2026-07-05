@@ -14,6 +14,8 @@ description:
 version: 0.1.0
 ---
 
+<!-- capability-route: office-pdf=none(the PDF is compiled from LaTeX via the skill's own pdflatex toolchain in scripts/compile_pdf.sh for proper mathematical typesetting; the office-suite PDF generator is not a substitute for LaTeX math rendering) -->
+
 # Math Olympiad Solver
 
 ## The five things that change outcomes

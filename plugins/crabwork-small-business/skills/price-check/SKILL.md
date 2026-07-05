@@ -63,6 +63,11 @@ If the owner cannot provide the accounting export or pasted revenue/cost numbers
 - **Flag if COGS data is incomplete** (many small-business books don't track per-product COGS) and note the gap.
 - **Never update any prices in the owner's accounting software, 支付宝, or any connected system.**
 
+## Spreadsheet input routing
+
+- When the revenue/cost export arrives as an Excel file (.xlsx/.xls), parse it via `crabcode-office-suite:crabcode-spreadsheets`; CSV files and pasted reports need no extra tooling. Use the same skill if the owner asks for the margin or scenario tables as a spreadsheet file.
+- If that skill reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin` and retry — or ask for a CSV export instead.
+
 ## Output
 
 Present the margin table, then the three scenario tables side-by-side. If a price increase scenario is being considered, append the customer messaging brief. End with: "Which scenario would you like to explore further?"

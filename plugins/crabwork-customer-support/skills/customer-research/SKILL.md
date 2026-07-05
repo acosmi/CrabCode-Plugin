@@ -250,3 +250,9 @@ After completing research, capture the knowledge for future use.
 - Review and update entries quarterly
 - Archive entries that are no longer relevant
 - Tag entries for searchability (by topic, product area, customer segment)
+
+## Research Escalation Path
+<!-- capability-route: deep-research=pending(general deep-research plugin is in planning; see docs/capability-routing.json) -->
+
+- This skill's research is bounded by the sources reachable in-session: connected tools (knowledge base, CRM, tickets, chat, email) plus whatever web search the current session exposes. For deeper, multi-source online investigation, ask the user to supply reference material, or run the searches in a session equipped with WebSearch/WebFetch tools — keeping the source attribution and confidence scoring discipline this skill already requires.
+- When a general deep-research plugin ships, this section switches to a fully-qualified route; until then lint:refs tracks the pending marker.

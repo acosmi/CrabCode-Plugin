@@ -14,6 +14,23 @@ export type BrandScanOptions = {
   ignore?: string[];
 };
 
+// A reviewed exception: a functional third-party endpoint or false positive that
+// must keep a prohibited term until the tracked follow-up lands. Precision is
+// file+term so any NEW term appearing in the same file still gets reported.
+export type BrandAllowlistEntry = {
+  file: string;
+  terms: string[];
+  reason: string;
+  tracking: string;
+};
+
+export type BrandScanReport = {
+  violations: BrandViolation[];
+  staleAllowlistEntries: BrandAllowlistEntry[];
+};
+
+const ALLOWLIST_FILE = "brand-allowlist.json";
+
 const TERM_PARTS = [
   ["c", "la", "ude"],
   ["c", "la", "ude", " ", "code"],
@@ -30,6 +47,7 @@ const TERM_PARTS = [
 
 const DEFAULT_IGNORES = [
   ".git/**",
+  "brand-allowlist.json",
   ".window-*-workdir/**",
   "bangong/**",
   "coverage/**",
@@ -77,21 +95,96 @@ export function scanText(text: string, file = "input"): BrandViolation[] {
 }
 
 export async function scanPath(targetPath: string, options: BrandScanOptions = {}): Promise<BrandViolation[]> {
+  return (await scanPathDetailed(targetPath, options)).violations;
+}
+
+export async function scanPathDetailed(
+  targetPath: string,
+  options: BrandScanOptions = {},
+): Promise<BrandScanReport> {
   const root = path.resolve(targetPath);
   const ignores = [...DEFAULT_IGNORES, ...(options.ignore ?? [])];
   const stats = await stat(root);
   if (stats.isFile()) {
-    return scanFile(root, path.dirname(root), ignores);
+    return { violations: await scanFile(root, path.dirname(root), ignores), staleAllowlistEntries: [] };
   }
 
   const files = await listFiles(root, root, ignores);
   const results = await Promise.all(files.map((file) => scanFile(file, root, ignores)));
-  return results.flat();
+  const raw = results.flat();
+
+  const allowlist = await loadAllowlist(root);
+  if (allowlist.length === 0) {
+    return { violations: raw, staleAllowlistEntries: [] };
+  }
+
+  const usedEntries = new Set<BrandAllowlistEntry>();
+  const violations = raw.filter((violation) => {
+    const entry = allowlist.find(
+      (candidate) =>
+        candidate.file === violation.file &&
+        candidate.terms.some((term) => term.toLowerCase() === violation.term.toLowerCase()),
+    );
+    if (entry) {
+      usedEntries.add(entry);
+      return false;
+    }
+    return true;
+  });
+
+  return {
+    violations,
+    staleAllowlistEntries: allowlist.filter((entry) => !usedEntries.has(entry)),
+  };
+}
+
+// Malformed files and malformed entries are dropped (fail closed): the hits they
+// were meant to cover resurface as violations instead of being silently allowed.
+async function loadAllowlist(root: string): Promise<BrandAllowlistEntry[]> {
+  let raw: string;
+  try {
+    raw = await readFile(path.join(root, ALLOWLIST_FILE), "utf8");
+  } catch {
+    return [];
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(parsed)) return [];
+  return parsed.filter(isAllowlistEntry).map((entry) => ({
+    ...entry,
+    file: normalizePath(entry.file),
+  }));
+}
+
+function isAllowlistEntry(value: unknown): value is BrandAllowlistEntry {
+  if (typeof value !== "object" || value === null) return false;
+  const entry = value as Record<string, unknown>;
+  return (
+    typeof entry.file === "string" &&
+    Array.isArray(entry.terms) &&
+    entry.terms.length > 0 &&
+    entry.terms.every((term) => typeof term === "string") &&
+    typeof entry.reason === "string" &&
+    typeof entry.tracking === "string"
+  );
 }
 
 export function formatBrandViolations(violations: BrandViolation[]): string {
   return violations
     .map((violation) => `${violation.file}:${violation.line}:${violation.column} ${violation.term} ${violation.excerpt}`)
+    .join("\n");
+}
+
+export function formatStaleAllowlistEntries(entries: BrandAllowlistEntry[]): string {
+  return entries
+    .map(
+      (entry) =>
+        `STALE-ALLOWLIST ${entry.file} [${entry.terms.join(", ")}] 未命中任何违规,条目已失效请清理(tracking: ${entry.tracking})`,
+    )
     .join("\n");
 }
 

@@ -151,3 +151,8 @@ for the current export-based path and what a future connector would change.
 ## Examples
 
 See [`reference/examples/`](reference/examples/) for worked examples (SaaS, retail, services).
+
+## Spreadsheet input routing
+
+- When a revenue export (支付宝商家平台 / 微信支付商户平台 bill, or accounting software) arrives as an Excel file (.xlsx/.xls), parse it via `crabcode-office-suite:crabcode-spreadsheets`; CSV files and pasted reports need no extra tooling. The brief itself stays markdown/JSON — no spreadsheet output.
+- If that skill reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin` and retry — or ask for a CSV export instead.
