@@ -12,6 +12,8 @@ description: >
   in their first session.
 ---
 
+<!-- capability-route: office-spreadsheets=none(excel appears only in the pending-connector workaround description — CSV/Excel exports as a stopgap; onboarding delegates any export analysis to the matched recipe skill and produces no spreadsheet files itself) -->
+
 # SMB Onboard
 
 ## Quick start

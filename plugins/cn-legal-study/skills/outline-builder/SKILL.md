@@ -33,3 +33,8 @@ argument-hint: "[学科/专题,如 民法物权 / 刑法总则犯罪构成]"
 - 针对某节点深入答疑:转 `/cn-legal-study:study-session`。
 - 据大纲安排背诵:转 `/cn-legal-study:statute-recite`。
 - 把大纲纳入整体进度:转 `/cn-legal-study:study-plan`。
+
+## 产出物路由
+
+- 需要把知识体系大纲导出为 Word 讲义时,调用 `crabcode-office-suite:crabcode-documents` 生成 .docx;
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;安装完成前先以 markdown 呈现大纲供用户确认。

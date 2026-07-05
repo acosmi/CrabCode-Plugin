@@ -44,12 +44,15 @@ allowed-tools:
 源码转 PDF、批量加页眉页码、合并成单一文件,交给办公套件处理——不要自己硬拼
 (**点名对应办公套件技能**,它们各有触发词会在相应场景被唤起):
 
-- **转 PDF / 加页眉页码 / 合并**:用 `crabcode-pdf` 技能。把整理好的代码文本
-  (含每页页眉与页码规则)交给它生成 `02-源代码鉴别材料.pdf`。
-- 若需要先把代码灌进带页眉页脚的 Word 版式再导出,可先用 `crabcode-documents`
-  生成 .docx,再用 `crabcode-pdf` 转 PDF。
+- **转 PDF / 加页眉页码 / 合并**:用 `crabcode-office-suite:crabcode-pdf` 技能。
+  把整理好的代码文本(含每页页眉与页码规则)交给它生成 `02-源代码鉴别材料.pdf`。
+- 若需要先把代码灌进带页眉页脚的 Word 版式再导出,可先用
+  `crabcode-office-suite:crabcode-documents` 生成 .docx,再用
+  `crabcode-office-suite:crabcode-pdf` 转 PDF。
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装
+  `crabcode-office-suite` 后重试;安装完成前先把入选文件清单与中间态文本交用户确认。
 
-选择原则:纯文本代码直接走 crabcode-pdf 最省事;需要精细版式(封面、样式)才绕 Word。
+选择原则:纯文本代码直接走 `crabcode-office-suite:crabcode-pdf` 最省事;需要精细版式(封面、样式)才绕 Word。
 
 ## 规则
 

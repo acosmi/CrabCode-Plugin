@@ -81,3 +81,8 @@ Do not ask again on subsequent runs.
 - [reference/gotchas.md](reference/gotchas.md) — known failure modes
 - [reference/examples/gentle-reminder.md](reference/examples/gentle-reminder.md) — good-payer reminder example
 - [reference/examples/firm-reminder.md](reference/examples/firm-reminder.md) — repeat-late-payer reminder example
+
+## Spreadsheet input routing
+
+- When the AR aging or bill export arrives as an Excel file (.xlsx/.xls), parse it via `crabcode-office-suite:crabcode-spreadsheets`; CSV files and pasted reports need no extra tooling. Reminders themselves are chat drafts — no spreadsheet output.
+- If that skill reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin` and retry — or ask for a CSV export instead.

@@ -177,8 +177,8 @@ Build from scratch using `reference/job-post-structure.md` as the full template.
 - Keep the required qualifications list tight — every line is a reason someone doesn't apply
 - If compensation isn't provided, omit the range rather than invent one
 
-Save as `[Role]-Job-Post.docx` using the docx skill.
-Read `docx/SKILL.md` before generating the file.
+Save as `[Role]-Job-Post.docx` using the docx skill —
+`crabcode-office-suite:crabcode-documents` (see Deliverable routing below).
 
 ---
 
@@ -328,3 +328,16 @@ Load these when reaching the relevant phase — don't load all upfront:
 | `reference/offer-letter-template.md` | Phase 5 — before writing the offer letter |
 | `reference/gotchas.md` | Any phase — non-obvious edge cases |
 | `reference/examples/worked-example.md` | For reference on expected output shape |
+
+---
+
+## Deliverable routing
+
+- All three .docx deliverables (job post, interview guide, offer letter) are generated via `crabcode-office-suite:crabcode-documents` — that is the "docx skill" referenced in the phases above.
+- If triggering it reports Unknown skill, the office suite is not installed: guide the user to install `crabcode-office-suite` via `/plugin`, then retry; until then, present the drafts as markdown in chat for review.
+
+## Research upgrade path
+<!-- capability-route: deep-research=pending(general research plugin is planned; see docs/capability-routing.json) -->
+
+- Phase 2's market research runs on the web search available in the current session, plus any templates the user provides. If web search is unavailable in the session, ask the user to paste 3–5 comparable job postings and work from those.
+- Once the planned general deep-research plugin (`crabcode-deep-research`) ships, this section switches to a fully-qualified skill route; lint:refs will flag the pending marker for upgrade at that point.

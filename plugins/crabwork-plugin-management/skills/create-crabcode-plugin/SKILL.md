@@ -260,6 +260,8 @@ The `.plugin` file will appear in the chat as a rich preview where the user can 
 
 ## Cross-plugin capability routing (引用引导)
 
+<!-- capability-route: office-spreadsheets=none(teaching doc — file formats are mentioned as routing examples; this skill delivers plugins), office-presentations=none(same — example mention only), office-pdf=none(same — example mention only) -->
+
 When a skill's deliverable can or must leave markdown (Word/Excel/PPT/PDF files, deep research, media publishing…), do not rebuild that capability — route to the provider plugin. CrabCode injects a skill's body only when it is invoked, and at that moment the model can still trigger other plugins' skills by fully-qualified name (`plugin-name:skill-name`). Triggering a skill from a plugin that is not installed returns an `Unknown skill` error and nothing is auto-installed, so routing text must include an install fallback.
 
 Pick the layer by dependency strength:

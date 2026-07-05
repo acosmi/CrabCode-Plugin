@@ -63,6 +63,11 @@ This command works fully offline — it needs no connectors. If no file path was
 - **Always caveat:** "This is not legal advice. Review with your attorney before signing."
 - **Never delete or overwrite the original document.**
 
+## Deliverable routing
+
+- Reading a PDF contract is handled by `crabcode-office-suite:crabcode-pdf`; the marked-up export is generated with `crabcode-office-suite:crabcode-documents` for docx, or `crabcode-office-suite:crabcode-pdf` for PDF.
+- If either skill reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin`, then retry. Until then, work from pasted text and present the redlines as markdown in chat.
+
 ## Output
 
 Present the plain-English summary, red-flag list, and redline suggestions. Ask the owner whether to export a marked-up copy and where to save it.

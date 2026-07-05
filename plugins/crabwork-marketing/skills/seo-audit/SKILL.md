@@ -188,3 +188,9 @@ After presenting the audit, ask:
 - Build a content calendar based on the gap analysis?
 - Dive deeper into any specific section of the audit?
 - Run this same analysis for a different competitor or domain?"
+
+## Research Escalation Path
+<!-- capability-route: deep-research=pending(general deep-research plugin is in planning; see docs/capability-routing.json) -->
+
+- Keyword, competitor, and SERP research here is bounded by the sources reachable in-session; connect an SEO tool via MCP for precise volume and difficulty data. For deeper, multi-source online investigation, ask the user to supply source material, or run the searches in a session equipped with WebSearch/WebFetch tools.
+- When a general deep-research plugin ships, this section switches to a fully-qualified route; until then lint:refs tracks the pending marker.

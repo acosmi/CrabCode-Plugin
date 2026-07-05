@@ -3,6 +3,8 @@ name: instrument-data-to-allotrope
 description: Converts laboratory instrument output files (PDF, CSV, Excel/XLSX, TXT, XML) into Allotrope Simple Model (ASM) JSON or flattened 2D CSV, with auto-detection of instrument type. Use when scientists need to standardize, harmonize, or normalize lab instrument data for LIMS/ELN/SDMS systems, data lakes, or downstream analysis, or when they hand off a parser to data engineering. Outputs full ASM JSON, flattened CSV for easy import, and exportable Python (allotropy) parser code. Triggers on "convert this instrument file", "to Allotrope/ASM format", standardize/normalize lab data, prepare data for LIMS/ELN upload, allotropy, or specific instruments such as Vi-CELL, NanoDrop, TapeStation, SoftMax Pro, QuantStudio, CFX, EnVision, Lunatic, Empower, or Chromeleon (cell counters, spectrophotometers, plate readers, ELISA, qPCR, electrophoresis, chromatography).
 ---
 
+<!-- capability-route: office-spreadsheets=none(Excel/XLSX is an instrument input format parsed via openpyxl; the deliverables are ASM JSON and flattened CSV, so no spreadsheet file is produced) -->
+
 # Instrument Data to Allotrope Converter
 
 Convert instrument files into standardized Allotrope Simple Model (ASM) format for LIMS upload, data lakes, or handoff to data engineering teams.
@@ -167,6 +169,8 @@ Use flexible parser with:
 
 ### Tier 3: PDF extraction
 For PDF-only files, extract tables using pdfplumber, then apply Tier 2 parsing.
+
+When pdfplumber is unavailable, or the instrument report is a complex or scanned PDF, route the extraction to `crabcode-office-suite:crabcode-pdf` (PDF text/table extraction and OCR) and feed its output into Tier 2 parsing. If that call reports Unknown skill, the office suite is not installed: guide the user to install `crabcode-office-suite` via `/plugin`, then retry — until then fall back to pdfplumber.
 
 ## Pre-Parsing Checklist
 

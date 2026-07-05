@@ -394,6 +394,14 @@ Competitive intel gets stale. Recommended refresh:
 
 ---
 
+## Research Upgrade Path
+<!-- capability-route: deep-research=pending(general-purpose deep-research plugin is planned but not shipped yet; see docs/capability-routing.json) -->
+
+- The research phases above run on the WebSearch/WebFetch tools available in your session; if they are unavailable, paste existing battlecards, field notes, or competitor material and I'll build from that.
+- Once the planned general-purpose deep-research plugin (`crabcode-deep-research`) ships, this section will be upgraded to a fully qualified skill route — `lint:refs` will flag the pending marker at that point.
+
+---
+
 ## Related Skills
 
 - **account-research** — Research a specific prospect before reaching out

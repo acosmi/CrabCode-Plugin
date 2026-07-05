@@ -438,3 +438,11 @@ Best,
 ## Email Draft Status
 Draft created - check ~~email
 ```
+
+---
+
+## Research Upgrade Path
+<!-- capability-route: deep-research=pending(general-purpose deep-research plugin is planned but not shipped yet; see docs/capability-routing.json) -->
+
+- The research-first step runs on the WebSearch/WebFetch tools available in your session; if they are unavailable, paste what you know about the prospect and I'll draft within that.
+- Once the planned general-purpose deep-research plugin (`crabcode-deep-research`) ships, this section will be upgraded to a fully qualified skill route — `lint:refs` will flag the pending marker at that point.

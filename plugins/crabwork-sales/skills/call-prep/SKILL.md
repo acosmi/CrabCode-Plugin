@@ -251,6 +251,14 @@ Run **call-follow-up** to:
 
 ---
 
+## Research Upgrade Path
+<!-- capability-route: deep-research=pending(general-purpose deep-research plugin is planned but not shipped yet; see docs/capability-routing.json) -->
+
+- The research supplement in Step 2 runs on the WebSearch/WebFetch tools available in your session; if they are unavailable, paste prior notes, emails, or research material and I'll prep from that.
+- Once the planned general-purpose deep-research plugin (`crabcode-deep-research`) ships, this section will be upgraded to a fully qualified skill route — `lint:refs` will flag the pending marker at that point.
+
+---
+
 ## Related Skills
 
 - **account-research** — Deep dive on a company before first contact

@@ -117,3 +117,15 @@ When a chart would communicate results more effectively than a table:
 - If you know the table names, mention them to speed up the process
 - For complex questions, CrabCode may break them into multiple queries
 - Results are always validated before presentation -- if something looks off, CrabCode will flag it
+
+## Deliverable Routing
+
+- When the user wants analysis results delivered as a spreadsheet
+  (result tables, pivot-ready extracts), invoke
+  `crabcode-office-suite:crabcode-spreadsheets` to produce the .xlsx;
+  for a formal stakeholder report delivered as a Word document, invoke
+  `crabcode-office-suite:crabcode-documents` to produce the .docx.
+- If those skills return an Unknown skill error, the office suite is
+  not installed: guide the user to install `crabcode-office-suite` via
+  `/plugin` and retry. Until then, present the results in markdown for
+  the user to confirm.

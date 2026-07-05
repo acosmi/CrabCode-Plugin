@@ -12,6 +12,8 @@ allowed-tools:
   - Bash(python3:*)
 ---
 
+<!-- capability-route: office-pdf=none(归档工序只按命名规范拷贝前序工序已生成的 PDF 文件,不生成、不合并、不解析 PDF 内容;自查对照表为 markdown) -->
+
 # 软著申请包生成
 
 把已完成的各项材料统一命名、归入一个规范目录,并产出一份**材料自查对照表**——

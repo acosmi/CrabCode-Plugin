@@ -17,6 +17,10 @@ import {
   formatMatterGateIssues,
   validateMatterGate,
 } from "../src/policy/matterGateValidator.ts";
+import {
+  formatReferenceIssues,
+  validateReferences,
+} from "../src/policy/referenceValidator.ts";
 
 const root = path.resolve(process.argv[2] ?? ".");
 
@@ -60,6 +64,13 @@ if (matterGate.length > 0) {
   hasOutput = true;
   process.stderr.write(`[tool-scope]\n${formatMatterGateIssues(matterGate, root)}\n`);
   if (matterGate.some((issue) => issue.severity === "error")) hasError = true;
+}
+
+const references = await validateReferences(root);
+if (references.length > 0) {
+  hasOutput = true;
+  process.stderr.write(`[refs]\n${formatReferenceIssues(references, root)}\n`);
+  if (references.some((issue) => issue.severity === "error")) hasError = true;
 }
 
 if (!hasOutput) {

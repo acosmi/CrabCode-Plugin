@@ -4,6 +4,8 @@ description: Profile a table or file to understand its shape, quality, and patte
 argument-hint: "<table or file>"
 ---
 
+<!-- capability-route: office-spreadsheets=none(Excel appears only as an input file format to profile; the deliverable is a markdown data profile summary, not a workbook) -->
+
 # /explore-data - Profile and Explore a Dataset
 
 > If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../../CONNECTORS.md).

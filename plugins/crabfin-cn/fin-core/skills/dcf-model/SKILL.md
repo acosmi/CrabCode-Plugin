@@ -4,6 +4,8 @@ description: DCF 现金流折现估值建模(中国版底座)。为 A股/港股/
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---
 
+<!-- capability-route: deep-research=none(正文的 web search 仅用于取现价、beta、净债务等即时行情数据点,属轻量取数;本技能无多源联网深度调研流程) -->
+
 # DCF Model Builder
 
 > **中国版底座(中文优先)**:建模机制沿用下方通用英文流程,**但数据来源与关键参数改用中国口径**——上市公司数据取自巨潮资讯网/沪深北交易所定期报告与 Wind/同花顺(非 SEC EDGAR / 10-K),无风险利率用中国 10 年期国债收益率,行业用申万分类,科目按企业会计准则(CAS)。**执行英文流程前先读 [`../../references/cn-data-sources.md`](../../references/cn-data-sources.md),用其中国口径替换所有美国默认(SEC/10-K/GICS/美债)。** 模型输出须注明:数据来源、取数日期、计价货币、所用准则。文中 10-K/$ 等示例仅为通用模板占位,实操按中国对应来源取数。

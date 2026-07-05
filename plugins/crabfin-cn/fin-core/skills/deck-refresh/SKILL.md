@@ -110,3 +110,9 @@ Run standard visual verification checks on every edited slide. A number that got
 - **Not rebuilding slides** — if a slide's narrative no longer makes sense with the new numbers ("margins compressed" but margins went up), flag it, don't rewrite it.
 - **Not recalculating unless asked** — derived numbers are the user's call. Your Phase 1 question covers this.
 - **Not touching formatting** — if the deck uses `$MM` and the user's mapping says `$M`, match the deck, not the mapping. Values change; style stays.
+
+## Capability routing
+
+- In chat mode, editing the uploaded deck (regenerating the affected slides and writing the file back) follows `crabcode-office-suite:crabcode-presentations`.
+- When the new numbers arrive as an uploaded Excel workbook, read and extract the old/new mapping via `crabcode-office-suite:crabcode-spreadsheets` before building the change list.
+- If triggering either returns Unknown skill, the office suite is not installed: guide the user to install `crabcode-office-suite` via `/plugin` and retry; until then, present the change plan in markdown for approval.

@@ -41,6 +41,11 @@ After Step 1 approval, trigger the `invoice-chase` skill workflow:
 - Never commit a forecast as authoritative without owner sign-off.
 - If required data is missing (no accounting export, no 支付宝 bill), stop, report what's missing, and ask whether the owner can provide it or wants to proceed with a partial forecast (flagged as such).
 
+## Deliverable routing
+
+- The Step 1 forecast workbook (XLSX) is generated via `crabcode-office-suite:crabcode-spreadsheets`; the same skill parses accounting or bill exports that arrive as Excel files rather than CSV.
+- If it reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin`, then retry; until then, present the forecast as markdown tables in chat.
+
 ## Output
 
 End the run with a one-paragraph recap: forecast verdict (covered / gap / risk), reminders drafted and payment links created (and for whom), projected new cash position if reminders convert.

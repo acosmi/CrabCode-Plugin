@@ -4,6 +4,8 @@ description: This skill should be used when the user wants to "create a skill", 
 version: 0.1.0
 ---
 
+<!-- capability-route: office-presentations=none(pptx is cited as a teaching example of bundled skill assets; this skill authors plugin skills and ships no presentation deliverable), office-pdf=none(pdf appears in example scripts and example skill names for teaching; this skill produces no PDF deliverable) -->
+
 # Skill Development for CrabCode plugins
 
 This skill provides guidance for creating effective skills for CrabCode plugins.

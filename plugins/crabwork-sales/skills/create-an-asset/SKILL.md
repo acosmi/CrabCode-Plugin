@@ -476,6 +476,13 @@ After delivery, be ready to iterate:
 
 ---
 
+## Deliverable Routing
+
+- The primary deliverable is a self-contained HTML file. When the user asks for a PDF version (print-optimized export, leave-behind), invoke `crabcode-office-suite:crabcode-pdf` to produce the .pdf from the finished asset.
+- If that call returns Unknown skill, the office suite isn't installed: guide the user to install `crabcode-office-suite` via `/plugin` and retry; until then, deliver the self-contained HTML file as-is.
+
+---
+
 ## Quality Checklist
 
 Before delivering, run the pre-delivery checklist (content / visual / functional / professional) in [references/appendices.md](references/appendices.md#quality-checklist).

@@ -49,3 +49,8 @@ Show a summary table before changing anything:
 - For destructive operations (removing duplicates, filling blanks, overwriting originals), confirm with the user first
 - After each category of fix (whitespace → casing → number conversion → dates → dedup), show the user a sample of what changed and get confirmation before moving to the next category
 - Report a before/after summary of what changed
+
+## Output routing
+
+- When operating on a standalone .xlsx file, engine work (reading the workbook, writing helper-column formulas, saving the cleaned file) follows `crabcode-office-suite:crabcode-spreadsheets`. Formulas written headless carry no computed values — run that engine's recalculation flow before delivering the file.
+- If triggering it returns Unknown skill, the office suite is not installed: guide the user to install `crabcode-office-suite` via `/plugin` and retry; until then, present the proposed fixes as a markdown table for confirmation.

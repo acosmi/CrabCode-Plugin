@@ -23,3 +23,4 @@ jobs:
       - run: bun run build
       - run: bun run lint:brand
       - run: bun run scripts/lint-brand.ts dist
+      - run: bun run validate

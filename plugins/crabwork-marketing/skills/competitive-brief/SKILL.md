@@ -164,3 +164,9 @@ After the brief, ask:
 - Draft messaging that exploits the positioning gaps identified?
 - Dive deeper into any specific competitor?
 - Set up a competitive monitoring plan?"
+
+## Research Escalation Path
+<!-- capability-route: deep-research=pending(general deep-research plugin is in planning; see docs/capability-routing.json) -->
+
+- The competitor research above is bounded by the sources reachable in-session. For deeper, systematic multi-source monitoring, ask the user to supply source material, or run the searches in a session equipped with WebSearch/WebFetch tools, and always date-stamp findings so their freshness is clear.
+- When a general deep-research plugin ships, this section switches to a fully-qualified route; until then lint:refs tracks the pending marker.

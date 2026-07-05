@@ -43,6 +43,11 @@ If `--mode` was not provided:
 - **Don't merge payees automatically.** Flag duplicates for human review.
 - **Don't file anything.** Output is prep material only.
 
+## Spreadsheet input routing
+
+- When the P&L or vendor-payment export arrives as an Excel file (.xlsx/.xls), parse it via `crabcode-office-suite:crabcode-spreadsheets`; CSV files and pasted numbers need no extra tooling. Use the same skill if the owner wants the 1099 candidate list delivered as a spreadsheet file for their accountant.
+- If that skill reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin` and retry — or ask for a CSV export instead and deliver the prep material as markdown.
+
 ## Output
 
 End with a next-steps checklist for the accountant: missing W-9s to collect, assumptions to verify, deadlines to hit.

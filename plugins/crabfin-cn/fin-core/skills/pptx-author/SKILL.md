@@ -4,6 +4,8 @@ description: Produce a .pptx file on disk with finance deck conventions (one ide
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---
 
+<!-- capability-route: office-spreadsheets=none(model.xlsx 仅作为数字溯源脚注的来源文件名出现,表格由建模侧技能生成,本技能只产出 .pptx) -->
+
 # pptx-author
 
 Use this skill when a fin-core workflow needs to deliver a PowerPoint deck as a **file artifact**. 本技能层叠在通用演示文稿能力之上:引擎与通用制作规范统一以 `crabcode-office-suite:crabcode-presentations` 为准,这里只补充金融路演侧的约定。

@@ -4,6 +4,8 @@ description: "Toolkit for styling artifacts with a theme. Artifacts include slid
 license: Apache-2.0. See ../../docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---
 
+<!-- capability-route: office-pdf=none(pdf refers to the bundled theme-showcase.pdf preview asset rendered for theme selection; this skill styles existing artifacts and produces no PDF deliverable itself) -->
+
 # Theme Factory
 
 This skill provides a curated collection of professional color and

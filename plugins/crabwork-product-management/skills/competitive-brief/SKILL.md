@@ -4,6 +4,8 @@ description: Creates a competitive analysis brief for one or more competitors or
 argument-hint: "<competitor or feature area>"
 ---
 
+<!-- capability-route: office-spreadsheets=none("excel" here is the English verb in "where they genuinely excel", not the spreadsheet format; the brief is delivered as markdown tables) -->
+
 # Competitive Brief
 
 > If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../../CONNECTORS.md).
@@ -116,3 +118,9 @@ Use tables for feature comparisons. Use clear headers for each section. Keep the
 - Customer reviews are gold. They reveal what real users love and hate, unfiltered by marketing.
 - The most valuable part of competitive analysis is the "so what" — the strategic implications. Do not skip this.
 - Competitive analysis has a shelf life. Note the date and flag areas that change quickly.
+
+## Research Escalation Path
+<!-- capability-route: deep-research=pending(general deep-research plugin is in planning; see docs/capability-routing.json) -->
+
+- The competitor research above is bounded by the sources reachable in-session. For deeper, systematic multi-source investigation, ask the user to supply source material, or run the searches in a session equipped with WebSearch/WebFetch tools, and note the research date so the reader knows its shelf life.
+- When a general deep-research plugin ships, this section switches to a fully-qualified route; until then lint:refs tracks the pending marker.

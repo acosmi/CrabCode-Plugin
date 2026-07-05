@@ -280,3 +280,9 @@ Before finishing:
 - Charts are real chart objects
 
 Run standard visual verification checks on every slide — this catches overlaps, overflow, and low-contrast text that don't show up when you're reading back the XML.
+
+## 产出物路由
+
+- Chat 模式需要交付 .pptx 成品 deck 时,调用 `crabcode-office-suite:crabcode-presentations` 生成;大纲获批后再落文件。
+- 用户上传 Excel 竞对数据时,按 `crabcode-office-suite:crabcode-spreadsheets` 的读取流程取数,列名与指标的映射先与用户确认。
+- 若触发时报 Unknown skill,说明办公套件未安装:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;安装完成前先以 markdown 呈现分析内容供用户确认。

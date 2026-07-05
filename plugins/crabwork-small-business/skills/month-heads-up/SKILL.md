@@ -60,6 +60,11 @@ If the owner cannot provide accounting data (export or pasted balances), stop �
 - **Never initiate payments or send anything automatically.** Surface the data and actions for the owner to take.
 - **Never project revenue that hasn't been confirmed in the books or the 支付宝/微信支付 bills.** Use conservative estimates only.
 
+## Spreadsheet input routing
+
+- When the accounting or bill export arrives as an Excel file (.xlsx/.xls), parse it via `crabcode-office-suite:crabcode-spreadsheets`; CSV files and pasted balances need no extra tooling. The brief itself is delivered in chat — no spreadsheet output.
+- If that skill reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin` and retry — or ask for a CSV export instead.
+
 ## Output
 
 Present the formatted brief and offer to draft chase reminders for any flagged overdue invoices — drafted in chat for the owner to copy and send (no email connector yet), or sent as a DingTalk/Feishu message via the connected connector if the owner wants an internal nudge instead.
