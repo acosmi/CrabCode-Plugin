@@ -43,3 +43,10 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 - 已收到对方侵权指控:转 `/cn-ip:infringement-triage`(我方被指侵权分支)。
 - 拟向对方发函或回应:转 `/cn-ip:cease-desist`(由律师决定是否发函)。
 - 需正式 FTO 报告与无效检索:由律师统筹官方检索,本草稿不替代正式 FTO 结论。
+
+## 调研升级路径
+<!-- capability-route: deep-research=pending(通用调研插件立项中,法律域需保留境内合规渠道约束) -->
+
+- 本技能的检索与调研以国家知识产权局专利检索及分析系统等境内官方专利检索渠道为边界,不经由不合规的境外检索渠道;
+- 需要联网深度调研时,优先请用户提供检索结果材料;在具备 WebSearch/WebFetch 工具的会话中,按上述渠道边界直接检索并逐条留存出处;
+- 通用深度调研插件(crabcode-deep-research,支持域约束参数化)就位后,本段改为全限定名路由并传入本域渠道白名单(设计稿见仓库 docs/audit/2026-07-04-crabcode-deep-research-设计稿.md)。
