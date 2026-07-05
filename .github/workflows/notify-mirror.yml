@@ -1,0 +1,44 @@
+name: Notify CN mirror (plugins)
+
+# 推送 main 后即时通知 acosmi/crabcode-source 运行 sync-plugins-to-mirror,
+# 把本仓打包同步到中国镜像 updates.acosmi.com/crabcode/plugins/crabcode-plugins-official/
+# ({sha}.zip + latest 指针 + marketplace.json)。
+#
+# 双轨触发(与 crabcode TUI 镜像同构,见 cloud-agent infra/mirror/crabcode/README.md):
+#   - 本 workflow(即时):需要 secret `MIRROR_DISPATCH_TOKEN`——对 acosmi/crabcode-source
+#     有 contents:write 的 fine-grained PAT(或 repo scope 的 classic PAT)。
+#     未配置时安静跳过(绿色,不阻塞 CI),同步退化为下面的轮询兜底。
+#   - crabcode-source 的 30 分钟轮询(兜底):无需本仓任何 secret,镜像最迟 30 分钟追平。
+#
+# 配置即时触发(可选,一次性):
+#   gh secret set MIRROR_DISPATCH_TOKEN -R acosmi/CrabCode-Plugin
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Dispatch sync-plugins-to-mirror @ crabcode-source
+        env:
+          TOKEN: ${{ secrets.MIRROR_DISPATCH_TOKEN }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [ -z "${TOKEN}" ]; then
+            echo "::notice::MIRROR_DISPATCH_TOKEN 未配置 → 跳过即时触发;crabcode-source 每 30 分钟轮询会自动追平镜像。配置该 secret 后推送即秒级同步。"
+            exit 0
+          fi
+          curl -fsS -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${TOKEN}" \
+            https://api.github.com/repos/acosmi/crabcode-source/dispatches \
+            -d "{\"event_type\":\"crabcode-plugins-updated\",\"client_payload\":{\"sha\":\"${SHA}\"}}"
+          echo "已派发 crabcode-plugins-updated (sha=${SHA})"
