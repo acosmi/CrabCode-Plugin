@@ -1,79 +1,96 @@
-# Gotchas — lead-triage
+# 边界情况(Gotchas)—— 线索分诊
 
 ---
 
-## Gotcha: "Pipeline" bare trigger runs full scoring when user just wants a status check
+## 边界:光说"管道"就跑全量打分,而用户只想看看状态
 
-**Why it matters:** "Pipeline" alone is ambiguous — the owner may want deal-stage totals, not a scored call list.
+**为什么重要:** 单说"管道"是有歧义的——业主可能只想要各成交阶段的汇总,而非一份打了分的通话清单。
 
-### ✗ Bad
+### ✗ 错误
 ```
-User: "how's my pipeline?"
-CrabCode: [runs full scoring, returns 12-lead ranked list]
-```
-
-### ✓ Good
-```
-User: "how's my pipeline?"
-CrabCode: "Quick pipeline overview (deal stages + total value) or prioritized
-         call list for today?"
+用户:"我的管道怎么样?"
+CrabCode:[跑全量打分,返回 12 条线索的排序清单]
 ```
 
----
-
-## Gotcha: Stale engagement data inflates scores
-
-**Why it matters:** `hs_email_open` is cumulative — opens from a year-old campaign make a cold lead look hot.
-
-### ✗ Bad
+### ✓ 正确
 ```
-Lead has 20 opens (all 11 months ago). Scores 25/25 on engagement.
-Appears as #1. Owner calls; lead has no memory of the brand.
-```
-
-### ✓ Good
-```
-Cap engagement signals at 30 days. If all signals are older than 30 days,
-engagement score = 0 and talking point notes:
-"Engagement signals are stale (last: [date]) — approach as cold outreach."
+用户:"我的管道怎么样?"
+CrabCode:"要快速的管道概览(各成交阶段 + 总金额),还是今天用的排序通话清单?"
 ```
 
 ---
 
-## Gotcha: Customers appear in the lead list
+## 边界:过时的互动数据虚高分数
 
-**Why it matters:** Calling a `Customer` or `Evangelist` as a lead prospect is embarrassing.
+**为什么重要:** `hs_email_open` 是累计值——一年前活动攒下的打开次数,会让一条冷线索显得很热。
 
-### ✗ Bad
+### ✗ 错误
 ```
-Lifecycle filter not applied → existing customer appears as #2 on the list.
+某线索有 20 次打开(全在 11 个月前),互动拿满 25/25,
+排到第 1。业主打过去,对方对品牌毫无印象。
 ```
 
-### ✓ Good
+### ✓ 正确
 ```
-Filter strictly: lifecyclestage = Lead or MQL only.
-If a contact has a blank lifecycle stage, include with a warning flag:
-"⚠ Lifecycle stage not set — confirm this is a lead before calling."
+互动信号一律封顶在 30 天内。若所有信号都早于 30 天,
+互动分 = 0,话术要点标注:
+"互动信号已过时(最近:[日期])——按陌生拜访对待。"
 ```
 
 ---
 
-## Gotcha: Proposing calendar slots that conflict with existing events
+## 边界:客户混进了线索清单
 
-**Why it matters:** Proposing a time the owner is already booked erodes trust immediately.
+**为什么重要:** 把 `Customer` 或 `Evangelist` 当成潜在线索去打,很尴尬。
 
-### ✗ Bad
+### ✗ 错误
 ```
-CrabCode proposes "Tuesday 2–2:30 PM" without checking the owner's
-DingTalk/Feishu calendar. Owner already has a client call in that slot.
+未套用生命周期过滤 → 一个现有客户以第 2 名出现在清单上。
 ```
 
-### ✓ Good
+### ✓ 正确
 ```
-Check the owner's calendar via the connected DingTalk (钉钉日程) or
-Feishu (飞书日历) connector for the next two business days before
-proposing any slot. Only propose windows with no existing events
-±15 minutes buffer. If no free window exists, say so and offer to look
-further out. If neither calendar connector is configured, propose times
-as a plain list and flag that availability wasn't checked.
+严格过滤:lifecyclestage 仅取 Lead 或 MQL。
+若某联系人生命周期阶段为空,纳入但打警示标:
+"⚠ 未设置生命周期阶段——打电话前先确认这是不是线索。"
+```
+
+---
+
+## 边界:提议的日历时段与已有日程冲突
+
+**为什么重要:** 提议一个业主已被占用的时间,会立刻侵蚀信任。
+
+### ✗ 错误
+```
+CrabCode 没查业主的钉钉 / 飞书日历就提议"周二 14:00–14:30"。
+业主那个时段已有一个客户通话。
+```
+
+### ✓ 正确
+```
+提议任何时段前,先通过已连接的钉钉日程或飞书日历连接器
+查未来两个工作日。只提议前后 ±15 分钟无已有日程的窗口。
+若没有空窗,如实说明并提议往后再看。若两个日历连接器都
+未配置,以纯文本列出时间并标注"未核对空闲情况"。
+```
+
+---
+
+## 边界:拿来源不明的个人信息打分,或把分数用于差别待遇
+
+**为什么重要:** 对联系人打分排序是**处理个人信息**且属**自动化决策**(《个人信息保护法》第 24 条)。用未授权 / 来源不明的个人信息,或把分数用于成交价格等差别待遇,会踩 PIPL 红线。
+
+### ✗ 错误
+```
+把从第三方买来的、来源不明的名单直接倒进来打分排序;
+或据分数高低对不同客户报不同价("熟客高分就多报价")。
+```
+
+### ✓ 正确
+```
+只对合法取得(告知同意 / 合同必需等)的联系人信息打分;
+分数仅用于内部跟进优先级,不据此对客户在成交价格等条件上
+作差别待遇(不做价格歧视 / 大数据杀熟)。业主保留人工干预,
+可随时调整排序或剔除。深度合规移交 `crablaw-cn:data-activity-triage`。
 ```

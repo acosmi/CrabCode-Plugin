@@ -2,66 +2,71 @@
 name: customer-pulse
 version: 0.3.0
 description: >
-  Aggregates payment dispute/refund records (支付宝商家平台 / 微信支付商户平台
-  exports or pasted data), HubSpot feedback and tickets, Intercom
-  conversations, and pasted customer emails (plus pasted or exported
-  大众点评/淘宝 reviews) into a themes report with verbatim evidence and a
-  "do these three things this week" list. Use when the user asks how
-  customers are feeling, for review analysis, what people are saying, or
-  about disputes and refund complaints.
+  汇总支付纠纷/退款记录(支付宝商家平台 / 微信支付商户平台 导出或粘贴的数据)、
+  HubSpot 反馈与工单、Intercom 会话、粘贴进来的客户邮件,以及粘贴或导出的
+  大众点评/淘宝评价,归纳成一份带逐字证据的主题报告和一份"本周就做这三件事"清单。
+  当店主问客户情绪怎么样、要做评价分析、大家在说什么,或问起支付纠纷与退款客诉时使用。
+  触发词:how customers are feeling, review analysis, what people are saying,
+  disputes and refund complaints、"客户情绪怎么样"、"分析一下评价"、"大家在说什么"、
+  "最近的支付纠纷"、"退款客诉汇总"。
 ---
 
-# Customer Pulse
+# 客户情绪脉搏
 
-## Quick start
+## 快速上手
 
-Ask: *"How are customers feeling this month?"*
+问一句:*"这个月客户情绪怎么样?"*
 
-CrabCode pulls tickets and Intercom conversations for the last 30 days, folds in whatever the owner provides — payment dispute/refund exports, pasted customer emails, pasted reviews — groups everything into 3–5 themes with verbatim evidence, and delivers a "do these 3 things this week" action list.
+CrabCode 拉取近 30 天的工单与 Intercom 会话,叠加店主提供的一切材料——支付纠纷/退款导出、粘贴的客户邮件、粘贴的评价,把所有材料归成 3–5 个主题(每个主题配逐字证据),再交付一份"本周就做这三件事"的行动清单。
 
-To include 大众点评 or 淘宝 reviews, paste them after triggering — or say "I have some reviews to add."
+要纳入大众点评或淘宝评价,触发后把评价粘贴进来即可——或说"我有一些评价要补充"。
 
-## Workflow
+## 数据合规护栏(PIPL)
 
-1. **Set the date window.** Default: last 30 days. If the user specifies a range, use it.
+汇总客户反馈、评价与工单,本质上是在**处理个人信息**(《中华人民共和国个人信息保护法》)。全程守住四条:
 
-2. **Collect payment dispute/refund records.** There is no connector that can bulk-export disputes or transaction history — the connected Alipay MCP only handles single-payment lookups and refunds. Ask the owner for a 支付宝商家平台 and/or 微信支付商户平台 export (CSV) covering the window, or pasted dispute/refund records. If nothing is provided, add `Payments: not provided — not included` to the Sources section and continue. Do not block; do not error. See [reference/gotchas.md](reference/gotchas.md) for the missing-source pattern.
+1. **去标识化、最小必要。** 逐字引用客户原话时不改写其表达(见工作流第 7 步的"逐字引用"要求),但要**对与分析无关的可识别信息去标识化**——报告里不要暴露与主题无关的姓名、手机号、订单号、住址等;可脱敏为"某客户""尾号 XXXX""某订单"。只保留说明主题所必需的最小信息。
+2. **合法取得。** 所汇总的客户信息须**合法取得**——来自店主自有的交易、工单、评价渠道,且在告知同意 / 合同必要等合法性基础之内。来路不明或超范围收集的个人信息不纳入。
+3. **只读汇总、不外发。** 本技能**只读**,只在本地归纳成报告,**不对外发送、不回填客户、不做二次用途**。
+4. **深度合规移交。** 是否涉及敏感个人信息、要不要做个人信息保护影响评估、数据出境等判断,超出本技能范围——以文字建议移交 `crablaw-cn:data-activity-triage` 做数据活动合规分诊,或咨询专业人士。
 
-3. **Pull HubSpot tickets and feedback.** Fetch open and recently closed tickets. If 0 tickets exist, record `HubSpot tickets: 0` and continue — do not surface a warning.
+## 工作流
 
-4. **Collect customer emails.** There is no email connector yet — ask the owner to paste recent customer emails (or forward them as text). Scan the pasted material for complaint signals using this seed list: `refund cancel unhappy issue problem disappointed frustrated broken late slow wrong missing`. Extract subject lines and 1–2 sentence excerpts per thread. If no emails are pasted, record `Emails: none provided` and continue.
+1. **划定时间窗。** 默认近 30 天。店主指定区间的,用其区间。
 
-5. **Pull Intercom conversations.** Call `search_conversations` to fetch open and recently closed conversations. Then call `get_conversation` for each conversation ID returned to access the full `conversation_parts`. Extract parts where `author.type === 'user'` — these are customer messages. Exclude parts where `author.type` is `admin` or `bot`.
+2. **收集支付纠纷/退款记录。** 没有连接器能批量导出纠纷或交易流水——已接入的支付宝 MCP 只能做单笔支付查询与退款。请店主提供覆盖该时间窗的**支付宝商家平台**和/或**微信支付商户平台**导出(CSV),或粘贴的纠纷/退款记录。若什么都没有,就在"来源"一节记 `支付:未提供——未纳入` 并继续。不要阻断、不要报错。缺源处理见 [reference/gotchas.md](reference/gotchas.md)。
 
-6. **Accept pasted reviews (optional).** If the user pastes 大众点评 or 淘宝 review text (or any other review-platform export), include it in the source pool tagged as `[Review]`. No connector required.
+3. **拉取 HubSpot 工单与反馈(CRM 连接器以实际配置为准)。** 拉取未结及近期已结工单。若工单数为 0,记 `HubSpot 工单:0` 并继续——不要弹警告。
 
-7. **Extract themes.** Group all evidence into 3–5 recurring themes. Each theme must include:
-   - A one-sentence label (e.g., "Shipping delays causing repeat complaints")
-   - 2–3 verbatim quotes with source tags: `[Payments]`, `[HubSpot]`, `[Email]`, `[Intercom]`, or `[Review]`
-   - A signal count (how many items touch this theme)
+4. **收集客户邮件。** 目前尚无邮件连接器——请店主把近期客户邮件粘贴进来(或以文字转发)。用下面这组中文投诉信号种子词扫描粘贴材料:`退款 退货 取消 差评 投诉 问题 故障 破损 损坏 延误 迟到 太慢 发错 漏发 少发 不满 失望 态度差 假货 再也不来 等太久`。每个话题提取主题句与 1–2 句摘录。若没有邮件,记 `邮件:未提供` 并继续。
 
-   Verbatim quotes are non-negotiable — never paraphrase. See [reference/gotchas.md](reference/gotchas.md) for the verbatim anti-pattern.
+5. **拉取 Intercom 会话(CRM 连接器以实际配置为准)。** 调用 `search_conversations` 拉取未结及近期已结会话。再对返回的每个会话 ID 调用 `get_conversation`,取到完整的 `conversation_parts`。抽取 `author.type === 'user'` 的部分——这些是客户消息。排除 `author.type` 为 `admin` 或 `bot` 的部分。
 
-8. **Generate the "do these 3 things" list.** Rank themes by signal count. Pick the top 3 and write one concrete, owner-actionable step per theme. Format as a numbered checklist.
+6. **接受粘贴的评价(可选)。** 若店主粘贴大众点评或淘宝评价文本(或任何其他评价平台的导出),纳入来源池并标记为 `[评价]`。无需连接器。
 
-9. **Deliver the report.** Structure the output with these sections in order:
-   - **Header** — H2 with "Customer Pulse" and the date range.
-   - **Sources pulled** — Bullet list with signal counts per source (payment
-     disputes/refunds, HubSpot tickets, pasted emails, Intercom conversations,
-     pasted reviews). Note any source that was not provided and skipped.
-   - **Themes** — For each theme, show a bold numbered theme label with the
-     signal count, followed by two verbatim quotes as blockquotes, each
-     attributed to its source.
-   - **Do these 3 things this week** — Numbered list of three concrete,
-     owner-actionable steps, each tied to one of the top themes.
+7. **提炼主题。** 把全部证据归成 3–5 个反复出现的主题。每个主题须含:
+   - 一句话标签(例如"配送延误引发反复投诉")
+   - 2–3 条**逐字引用**,并标注来源:`[支付纠纷]`、`[HubSpot]`、`[邮件]`、`[Intercom]` 或 `[评价]`
+   - 信号计数(有多少条材料触及该主题)
 
-   For a complete worked example, see [reference/examples/example-report.md](reference/examples/example-report.md).
+   **逐字引用不可改写**——绝不转述客户原话的表达;但引用时须按上方"数据合规护栏(PIPL)"对与分析无关的可识别信息去标识化(把姓名、手机号、订单号脱敏为"某客户""尾号 XXXX")。逐字反模式见 [reference/gotchas.md](reference/gotchas.md)。
 
-## Approval gates
+8. **生成"本周三件事"清单。** 按信号计数给主题排序。取前 3 个,每个主题写一条具体、店主可执行的动作。用编号清单呈现。
 
-This skill is **read-only** — it does not post, send, reply, or modify any records. No approval gate is required.
+9. **交付报告。** 按以下顺序组织输出:
+   - **抬头** —— 用 H2 写"客户情绪脉搏"与日期区间。
+   - **来源盘点** —— 列出各来源的信号计数(支付纠纷/退款、HubSpot 工单、粘贴邮件、Intercom 会话、粘贴评价)。未提供而跳过的来源要注明。
+   - **主题** —— 每个主题:加粗的编号主题标签 + 信号计数,其下两条逐字引用作为引用块,各自标注来源(已按数据合规护栏去标识化)。
+   - **本周就做这三件事** —— 三条具体、店主可执行的动作,各对应一个头部主题。
+   - **末尾红线** —— 报告末尾单独一行附上:`【AI 辅助整理,客户信息请脱敏,回复依《消费者权益保护法》核实】`。
 
-## Reference
+   完整范例见 [reference/examples/example-report.md](reference/examples/example-report.md)。
 
-- [reference/gotchas.md](reference/gotchas.md) — missing payment exports, HubSpot empty state, verbatim quote requirement, email keyword drift
-- [reference/examples/example-report.md](reference/examples/example-report.md) — full worked example output
+## 审批门禁
+
+本技能**只读**——不发布、不发送、不回复、不修改任何记录,也**不外发客户信息**。无需审批门禁。(数据处理合规见上方"数据合规护栏(PIPL)"。)
+
+## 参考文件
+
+- [reference/gotchas.md](reference/gotchas.md) —— 缺支付导出、HubSpot 空结果、逐字引用要求与去标识化、邮件关键词漂移
+- [reference/examples/example-report.md](reference/examples/example-report.md) —— 完整范例输出

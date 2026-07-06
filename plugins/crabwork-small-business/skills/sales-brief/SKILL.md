@@ -1,74 +1,76 @@
 ---
 name: sales-brief
 version: 0.3.0
-description: Surfaces top and bottom sellers from the owner's Alipay merchant-platform bill exports and accounting-software data (用友好会计 / 金蝶精斗云), identifies seasonality patterns, and produces a 2-week content brief to push winners and clear slow movers. Trigger when the owner runs /sales-brief or asks "what's selling," "what should I promote," "what's my best seller," "what's not moving," "what to post about," or wants a data-backed plan for what to push next. Accepts optional lookback window of 30, 60, or 90 days.
+description: 从店主的支付宝商家平台账单导出和会计软件数据(用友好会计 / 金蝶精斗云)中,盘出卖得最好和最差的商品,识别季节性规律,产出一份 2 周内容简报——主推赢家、清掉滞销。当店主运行 /sales-brief,或问"什么在卖""该推什么""我的爆款是啥""什么不动销""该发点什么""下一步该主推什么(要有数据支撑)"时触发。Also triggers on "what's selling," "what should I promote," "what's my best seller," "what's not moving," "what to post about," or a data-backed plan for what to push next. 可选回溯窗口 30、60 或 90 天。
 allowed-tools: Read, WebFetch, Bash
 ---
 
-Run the sales analysis and content brief. Pull what sold (and what didn't), explain why, and produce a ready-to-use content plan that acts on the data.
+跑一遍销售分析和内容简报。盘出卖了什么(和没卖动什么),解释为什么,产出一份能直接照着做、且基于数据的内容计划。
 
-Parse arguments:
-- `--lookback` (default: `30d`) — `30d`, `60d`, or `90d` lookback window
+解析参数:
+- `--lookback`(默认:`30d`)—— `30d`、`60d` 或 `90d` 回溯窗口
 
-## Step 1 — Sales breakdown
+## 步骤 1 —— 销售拆解
 
-Using the `content-strategy` skill workflow for sales analysis:
+沿用 `content-strategy` 技能的销售分析工作流:
 
-1. Ask the owner for the lookback window's data: a 支付宝商家平台 bill export (CSV) — and a 微信支付商户平台 export if they take WeChat Pay — grouped by item/service/SKU, plus a revenue-by-product export from their accounting software (用友好会计 / 金蝶精斗云) if available. A pasted report works too. There is no connector that exports transaction history: the alipay connector only creates payment links, queries single payments, and processes refunds.
-2. Prefer the accounting-software export for item names and margins; normalize payment-platform order titles to catalog products and confirm ambiguous groupings. De-duplicate if the accounting data already includes the payment-platform revenue.
-3. Rank products by: total revenue, unit volume, and margin (if available in the accounting export).
-4. Calculate each product's share of total revenue vs. prior equivalent period.
+1. 向店主要回溯窗口内的数据:一份支付宝商家平台账单导出(CSV)——收微信支付的话再加一份微信支付商户平台导出——按商品/服务/SKU 归并,若有会计软件(用友好会计 / 金蝶精斗云)按商品收入导出则一并给上。粘贴报表也行。没有连接器能导出交易历史:支付宝连接器只能创建收款链接、查单笔支付、处理退款。
+2. 商品名和毛利优先用会计软件导出;把支付平台的订单标题归一到目录商品,含糊归并要确认。若会计数据已含支付平台收入,去重。
+3. 商品排名按:总收入、销量、毛利(若会计导出里有)。
+4. 算出每个商品占总收入的比重,与上一等长周期对比。
 
-Top sellers: products that grew share or maintained top-3 rank.
-Bottom sellers: products with declining volume or below 5% of revenue.
+畅销品:比重上升或稳居前三的商品。
+滞销品:销量下滑或低于 5% 收入的商品。
 
-## Step 2 — Seasonality check
+## 步骤 2 —— 季节性检查
 
-1. Compare current period to same period in prior year (if the accounting export includes that history — ask the owner to widen the export if needed).
-2. Flag any items with a seasonal pattern (e.g., spikes around 双11/双12, Spring Festival, slow summers).
-3. Note any new products with insufficient history to detect seasonality.
+1. 把当前周期与去年同期比(若会计导出含这段历史——需要就请店主把导出范围拉宽)。
+2. 标出有季节性规律的商品(如围绕 618、双11、双12、春节的尖峰,或夏季走淡)。
+3. 标注历史太短、还检测不出季节性的新品。
 
-## Step 3 — Why analysis
+## 步骤 3 —— 归因分析
 
-For each top and bottom seller, explain the likely driver:
-- Price change, promo, new channel, seasonal demand, competitor move
-- Cross-reference with HubSpot campaign activity for the period
-- Note where attribution is inferred vs. confirmed
+对每个畅销品和滞销品,解释最可能的驱动因素:
+- 调价、促销、新渠道、季节性需求、竞品动作
+- 与该周期的 HubSpot 战役活动交叉印证
+- 注明哪些是推断、哪些是确证
 
-## Step 4 — 2-week content brief
+## 步骤 4 —— 2 周内容简报
 
-Produce a ready-to-use content brief:
+产出一份能直接照着做的内容简报:
 
 ```
-2-Week Content Brief — {date range}
+2 周内容简报 —— {日期范围}
 
-PUSH THESE (winners)
-• {product}: {suggested angle} — {channel: email|social|both}
-• {product}: {suggested angle} — {channel}
+主推(赢家)
+• {商品}:{建议角度} —— {渠道:邮件|社交|两者}
+• {商品}:{建议角度} —— {渠道}
 
-CLEAR THESE (slow movers)
-• {product}: {promo angle or bundle suggestion} — {channel}
+清货(滞销)
+• {商品}:{促销角度或搭售建议} —— {渠道}
 
-CONTENT CALENDAR
-Week 1:
-  Mon: {post/email concept}
-  Wed: {post/email concept}
-  Fri: {post/email concept}
-Week 2:
-  Mon: {post/email concept}
-  Wed: {post/email concept}
-  Fri: {post/email concept}
+内容日历
+第 1 周:
+  周一:{帖子/邮件概念}
+  周三:{帖子/邮件概念}
+  周五:{帖子/邮件概念}
+第 2 周:
+  周一:{帖子/邮件概念}
+  周三:{帖子/邮件概念}
+  周五:{帖子/邮件概念}
 ```
 
-## Data availability
+**合规提示(策略层)。** 本简报只给策略方向,不出成品文案。简报里的**促销与卖点角度一旦落地成对外文案**,须经 `design-creator` 的《广告法》/《价格法》合规自检:避免极限词(最 / 第一 / 国家级 / 唯一等);不虚构原价、不做虚假折扣,买赠 / 满减写清赠品、数量、门槛、时限;医疗、保健食品、教育培训、金融等特殊行业有特别限制。**成品合规文案由 `design-creator` 把关**;拿不准的高风险宣称移交 `crablaw-cn:marketing-claims-review`。简报可加提示:`【AI 辅助策略,落地文案须过《广告法》/《价格法》合规自检】`。
 
-If no revenue data is provided at all, stop — sales analysis requires at least one source (支付宝商家平台 export, accounting-software export, or a pasted report). If only one source is available, run from it and state the coverage in the output, e.g., "Accounting export not provided — revenue data from the 支付宝商家平台 bill only; cash and other-channel sales not included" (or vice versa). If HubSpot is missing, skip campaign cross-reference in the "why analysis" and note it. Every downstream number inherits these caveats — the brief is a snapshot of the provided files, not a live feed.
+## 数据可得性
 
-## Approval gates
+若完全没有提供收入数据,停下——销售分析至少需要一个来源(支付宝商家平台导出、会计软件导出,或粘贴报表)。若只有一个来源,就用它跑,并在产出里说明覆盖范围,如"未提供会计导出——收入数据仅来自支付宝商家平台账单;不含现金和其他渠道销售"(反之亦然)。若没有 HubSpot,归因分析里跳过战役交叉印证并注明。每个下游数字都继承这些前提——简报是所给文件的快照,不是实时流。
 
-- **Never auto-schedule or publish content.** The brief is for owner review only.
-- **Never start design-brief or asset work automatically** — offer to hand off to `design-creator` after the owner approves the brief.
+## 批准闸口
 
-## Output
+- **绝不自动排期或发布内容。** 简报仅供店主审阅。
+- **绝不自动开始设计简报或素材工作**——店主批准简报后,再提出移交给 `design-creator`。
 
-Present the sales analysis, then the content brief. Ask the owner if they'd like to hand the planned posts to `design-creator` for captions and per-asset design briefs (the owner renders the visuals in their design tool).
+## 输出
+
+先给销售分析,再给内容简报。问店主是否愿意把计划好的帖子交给 `design-creator`,去做文案和逐素材设计简报(视觉素材由店主在自己的设计工具里渲染)。

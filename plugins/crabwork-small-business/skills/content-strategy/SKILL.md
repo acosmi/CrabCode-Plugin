@@ -2,157 +2,142 @@
 name: content-strategy
 version: 0.3.0
 description: >
-  Analyzes sales data from Alipay merchant-platform (支付宝商家平台) bill
-  exports and the owner's accounting software (用友好会计 / 金蝶精斗云) to
-  find top performers and slow movers, layers in seasonality, and produces
-  a prioritized 30-day content brief: what to push, what offers to run,
-  what to hold. Data arrives as CSV/Excel exports or pasted reports — no
-  live transaction feed. Strategic output only — no calendars, no assets,
-  no sends. Use when the user asks "what should I post," "what should I
-  promote this month," "what's selling," "build me a content plan," "what
-  offers should I run," or wants a data-backed marketing plan. (To turn an
-  approved brief into actual posts and design briefs, that is
-  design-creator / run-campaign.)
+  分析店主从支付宝商家平台导出的账单,以及会计软件(用友好会计 / 金蝶精斗云)
+  里的销售数据,找出畅销品与滞销品,叠加季节性,产出一份排好优先级的 30 天
+  内容简报:该主推什么、该做什么促销、什么先按住。数据以 CSV/Excel 导出或粘贴
+  报表的形式进来——没有实时交易流。只产出策略,不排日历、不出素材、不发布。当
+  店主问"这个月该发什么""该推什么""什么在卖""帮我做个内容计划""该做什么促销",
+  或想要一份有数据支撑的营销计划时使用。(要把已审批的简报变成实际帖子和设计
+  简报,那是 design-creator / run-campaign。)Also triggers on "what should I
+  post," "what should I promote this month," "what's selling," "build me a
+  content plan," "what offers should I run," or a data-backed marketing plan.
 ---
 
-# Content Strategy
+# 内容策略(Content Strategy)
 
-> **Status:** MVP draft
-> **Owner:** JJ
-> **Version:** 0.3.0 · Phase MVP
-> **Category:** Marketing & Sales
+> **状态:** MVP 草案
+> **负责人:** JJ
+> **版本:** 0.3.0 · MVP 阶段
+> **分类:** 营销与销售
 
-## Quick start
+## 快速上手
 
-When an SMB owner asks "what should I post this month?" or "what's my content plan?", this skill:
+当小微店主问"这个月该发什么?"或"我的内容计划是什么?"时,本技能:
 
-1. **Ingests sales data** the owner exports from 支付宝商家平台 (Alipay merchant platform, CSV bill export) and/or their accounting software (用友好会计 / 金蝶精斗云 — CSV/Excel export or a pasted report)
-2. **Identifies patterns** — top-selling products, slow movers, seasonal trends
-3. **Layers in context** — seasonality (user-provided or industry benchmarks), past performance
-4. **Produces a 30-day brief** — ranked recommendations of what to push, what to hold, what offers to consider
-5. **Gets owner approval** before the brief feeds into `design-creator` for calendar, copy, and design briefs
+1. **接入销售数据**——店主从支付宝商家平台(CSV 账单导出)和/或会计软件(用友好会计 / 金蝶精斗云 —— CSV/Excel 导出或粘贴报表)导出的数据
+2. **识别规律**——最畅销的商品、滞销品、季节性趋势
+3. **叠加背景**——季节性(店主提供或行业基准)、历史表现
+4. **产出 30 天简报**——按优先级排好的建议:该主推什么、什么先按住、可考虑做哪些促销
+5. **取得店主批准**,再把简报交给 `design-creator` 去排日历、写文案、出设计简报
 
-The output is strategic only — no calendar scheduling, no creative assets.
-
----
-
-## Workflow
-
-### Step 1: Pre-flight check (data sources)
-
-There is no connector that can pull transaction history. The plugin's
-alipay connector only creates payment links, queries a single payment by
-order number, and processes refunds — it **cannot** export bills or
-transaction lists. WeChat Pay (微信支付) has no connector yet. So the
-analysis runs on files the owner exports:
-
-1. Ask which sources the owner has:
-   - **支付宝商家平台** — bill/transaction export (CSV), covers Alipay revenue
-   - **微信支付商户平台** — bill export (CSV), covers WeChat Pay revenue
-   - **Accounting software (用友好会计 / 金蝶精斗云)** — revenue by
-     product/service export (CSV/Excel), usually the best source for
-     item names and margins
-   - **Pasted report** — fine for small businesses; paste totals by
-     product and month
-2. Ask them to export the lookback window (default: last 90 days) and
-   provide the file path, or paste the data.
-3. If no source is available at all, stop: the brief can't be data-backed
-   without at least one revenue source. Offer to proceed with a
-   benchmark-only brief, clearly labeled as not data-backed.
-
-### Step 2: Clarify priorities & metrics
-
-When triggered, ask the user:
-
-- **"How do you want me to measure 'top performers'?"**
-  - By total revenue?
-  - By profit margin?
-  - By sales velocity (how fast they're selling)?
-  - Combination of the above?
-
-- **"Do you have seasonality patterns in mind?"**
-  - If yes: "Tell me about them" (capture user's known seasonality)
-  - If no: "I'll use industry benchmarks for your category"
-
-### Step 3: Parse and analyze the sales data
-
-Read the provided files (CSV/Excel) or pasted report:
-
-- **Date range:** Last 90 days (or full history if <90 days available)
-- **Extract:** Product/service name, date sold, revenue, quantity
-
-**Source-specific notes:**
-
-- **支付宝商家平台 / 微信支付商户平台 bill exports:** rows are per
-  transaction; the "商品名称/订单标题" (order title) column may not map
-  cleanly to your product catalog — group carefully and confirm ambiguous
-  groupings with the owner. Payment-platform exports also miss cash and
-  other-channel sales; say so in the brief if the owner sells offline.
-- **用友好会计 / 金蝶精斗云 exports:** revenue-by-product reports carry
-  cleaner item names and (sometimes) cost/margin — prefer them for
-  ranking by margin.
-- **Multiple sources:** de-duplicate — accounting software often already
-  includes the payment-platform revenue. Ask the owner which source is
-  the system of record before summing anything across files.
-
-**Fallback:** If <3 months of data, use industry seasonality benchmarks for the SMB's category (e.g., retail, services, e-commerce)
-
-Identify:
-- **Top 3–5 performers** (by user's chosen metric)
-- **Bottom 3–5 slow movers** (consider holding or repositioning)
-- **Trending up** (gaining momentum in last 30 days)
-- **Trending down** (losing momentum)
-
-### Step 4: Layer in seasonality
-
-- **User-provided:** If they shared seasonal patterns, weight recommendations against them
-- **Industry benchmarks:** For categories without strong user data (e.g., "Q1 is strong for tax services")
-- **Timing:** Flag products that should ramp up/down in the next 30 days based on seasonal patterns
-
-### Step 5: Build the 30-day brief
-
-Structure:
-- **Executive summary** (1–2 sentences: "Your best sellers are X and Y. Seasonal shift to Z is starting.")
-- **Push hard** (Top 2–3 products + recommended content angle, e.g., "Case study on ROI", "How-to video")
-- **Hold steady** (Middle performers; maintain visibility but no heavy lift)
-- **Reposition or pause** (Slow movers; consider discounting, bundling, or pausing)
-- **Seasonal opportunities** (What's coming next month that you should position for now)
-- **Recommended offers** (Bundle, discount, or free-trial strategy based on data)
-
-Note the data source and its coverage in the brief header (e.g., "Based on
-支付宝商家平台 export, Apr 1–Jun 30 — excludes cash sales"). Downstream
-skills must not assume live API data behind these numbers.
-
-Example length: **200–400 words** (brief and actionable, not essay-length).
-
-### Step 6: Owner approval & iteration
-
-Present the brief to the owner. Ask:
-- "Does this match your gut?"
-- "Anything to adjust?"
-- "Ready to feed this to design-creator for the calendar, copy, and design briefs?"
-
-Iterate if needed; once approved, return the final brief as structured JSON (ready for downstream tools).
+产出只是策略层——不排日历、不出创意素材。
 
 ---
 
-## Gotchas & edge cases
+## 工作流
 
-See [`reference/gotchas.md`](reference/gotchas.md) for common pitfalls.
+### 步骤 1:飞行前检查(数据源)
 
-## WeChat Pay integration
+没有任何连接器能拉取交易历史。插件的支付宝连接器只能创建收款链接、按订单号查单笔支付、处理退款,**无法**导出账单或交易清单。微信支付还没有连接器。所以分析跑在店主导出的文件上:
 
-Not yet connected — see
-[`reference/wechat-pay-integration.md`](reference/wechat-pay-integration.md)
-for the current export-based path and what a future connector would change.
+1. 问店主手上有哪些数据源:
+   - **支付宝商家平台**——账单/交易导出(CSV),覆盖支付宝收入
+   - **微信支付商户平台**——账单导出(CSV),覆盖微信支付收入
+   - **会计软件(用友好会计 / 金蝶精斗云)**——按商品/服务导出的收入(CSV/Excel),通常是商品名和毛利最好的来源
+   - **粘贴报表**——小生意够用;把按商品和月份汇总的合计粘进来
+2. 请他们导出回溯窗口(默认:最近 90 天)并给出文件路径,或直接粘贴数据。
+3. 如果一个数据源都没有,停下:没有至少一个收入来源,简报无法做到有数据支撑。可以提出做一份纯基准的简报,但要明确标注"非数据支撑"。
+
+### 步骤 2:厘清优先级与口径
+
+触发后,问店主:
+
+- **"'畅销'你想怎么衡量?"**
+  - 按总收入?
+  - 按毛利率?
+  - 按动销速度(卖得多快)?
+  - 以上组合?
+
+- **"你心里有季节性规律吗?"**
+  - 有:"讲讲看"(记下店主已知的季节性)
+  - 没有:"那我用你这个品类的行业基准"
+
+### 步骤 3:解析并分析销售数据
+
+读入提供的文件(CSV/Excel)或粘贴报表:
+
+- **时间范围:** 最近 90 天(不足 90 天则用全部历史)
+- **提取:** 商品/服务名、售出日期、收入、数量
+
+**分来源的注意事项:**
+
+- **支付宝商家平台 / 微信支付商户平台 账单导出:** 每行是一笔交易;"商品名称/订单标题"列未必能干净对上你的商品目录——仔细归并,含糊的归并要和店主确认。支付平台导出还漏掉现金和其他渠道的销售;店主若有线下销售,要在简报里说明。
+- **用友好会计 / 金蝶精斗云 导出:** 按商品的收入报表商品名更干净,有时还带成本/毛利——按毛利排名时优先用它。
+- **多来源:** 去重——会计软件往往已经把支付平台的收入计进去了。跨文件加总任何数字之前,先问店主哪个是账实相符的准。
+
+**兜底:** 如果不足 3 个月数据,用该品类的行业季节性基准(如零售、服务、电商)。
+
+识别出:
+- **前 3–5 名畅销品**(按店主选定的口径)
+- **后 3–5 名滞销品**(考虑按住或重新定位)
+- **上行**(最近 30 天在起势)
+- **下行**(在走弱)
+
+### 步骤 4:叠加季节性
+
+- **店主提供:** 若他们给了季节性规律,让建议向其加权
+- **行业基准:** 对店主数据不强的品类(如"空调、防晒品在 6–8 月走强")
+- **时点:** 根据季节性,标出未来 30 天该起量/该收量的商品
+
+### 步骤 5:搭 30 天简报
+
+结构:
+- **执行摘要**(1–2 句:"你的畅销品是 X 和 Y。向 Z 的季节性切换正在开始。")
+- **重点主推**(前 2–3 个商品 + 建议的内容角度,如"客户复购案例""上手教程视频")
+- **维持**(中段商品;保持曝光但不重投入)
+- **重新定位或暂停**(滞销品;考虑打折、组合搭售或暂停)
+- **季节性机会**(下个月要来、现在就该卡位的东西,如 618、双11、双12、春节)
+- **建议促销**(基于数据的搭售、折扣或试用策略)
+
+在简报头部注明数据源及其覆盖范围(如"基于支付宝商家平台导出,4月1日–6月30日——不含现金销售")。下游技能不得假设这些数字背后有实时 API 数据。
+
+**合规提示(策略层)。** 本技能只产出策略简报,不出成品文案。但简报里的**促销与卖点建议一旦落地成对外文案**,须经 `design-creator` 的《广告法》/《价格法》合规自检:
+
+- **极限词(绝对化用语):** 避免"最/第一/国家级/唯一/最佳"等——《广告法》禁用,罚则重。
+- **价格真实:** 不虚构原价、不做虚假折扣;买赠、满减须写清赠品、数量、门槛、时限(《价格法》《消费者权益保护法》)。
+- **特殊行业:** 医疗、保健食品、教育培训、金融等有特别限制,功效/效果类卖点尤须谨慎。
+
+**本技能只给策略方向,合规成品文案由 `design-creator` 把关。** 遇到拿不准的高风险宣称(无依据的极限词、特殊行业的功效宣称、明星代言、对比竞品等),移交 `crablaw-cn:marketing-claims-review`。简报产物可加一行提示:`【AI 辅助策略,落地文案须过《广告法》/《价格法》合规自检】`。
+
+简报长度示例:**200–400 字**(简短可执行,别写成长文)。
+
+### 步骤 6:店主批准与迭代
+
+把简报给店主看。问:
+- "这跟你的直觉对得上吗?"
+- "有什么要调的?"
+- "可以把它交给 design-creator 去排日历、写文案、出设计简报了吗?"
+
+按需迭代;一旦批准,把最终简报以结构化 JSON 返回(供下游工具直接使用)。
 
 ---
 
-## Examples
+## 坑与边界情况
 
-See [`reference/examples/`](reference/examples/) for worked examples (SaaS, retail, services).
+常见坑见 [`reference/gotchas.md`](reference/gotchas.md)。
 
-## Spreadsheet input routing
+## 微信支付接入
 
-- When a revenue export (支付宝商家平台 / 微信支付商户平台 bill, or accounting software) arrives as an Excel file (.xlsx/.xls), parse it via `crabcode-office-suite:crabcode-spreadsheets`; CSV files and pasted reports need no extra tooling. The brief itself stays markdown/JSON — no spreadsheet output.
-- If that skill reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin` and retry — or ask for a CSV export instead.
+尚未接通——当前基于导出的路径,以及未来连接器会改变什么,见
+[`reference/wechat-pay-integration.md`](reference/wechat-pay-integration.md)。
+
+---
+
+## 示例
+
+已跑通的示例(零售复古店)见 [`reference/examples/`](reference/examples/)。
+
+## 表格输入路由
+
+- 当收入导出(支付宝商家平台 / 微信支付商户平台 账单,或会计软件)是 Excel 文件(.xlsx/.xls)时,用 `crabcode-office-suite:crabcode-spreadsheets` 解析;CSV 文件和粘贴报表无需额外工具。简报本身仍是 markdown/JSON——不出表格文件。
+- 若该技能报 Unknown skill,说明没装 office 套件:引导店主通过 `/plugin` 安装 `crabcode-office-suite` 后重试——或改为要一份 CSV 导出。

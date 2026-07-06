@@ -1,50 +1,64 @@
-# Gotchas — customer-pulse
+# 常见陷阱 —— customer-pulse
 
-## Gotcha: Missing payment dispute/refund export treated as a blocker
+## 陷阱:把缺失的支付纠纷/退款导出当成拦路虎
 
-**Why it matters:** Dispute and refund history has no connector — the Alipay MCP only does single-payment lookups and refunds, so bulk data must come from a 支付宝商家平台 / 微信支付商户平台 export or pasted records. Owners often don't have the export handy; the report must still ship.
+**为什么重要:** 纠纷与退款历史没有连接器——支付宝 MCP 只能做单笔支付查询与退款,批量数据只能来自**支付宝商家平台 / 微信支付商户平台**导出或粘贴记录。店主手头常常没有这份导出;但报告仍要照常交付。
 
-### ✗ Bad
-Stop the run and demand the export: "Cannot generate pulse report — payment data missing." User gets nothing.
+### ✗ 反面
+中断流程、索要导出:"拿不到支付数据,无法生成情绪报告。"店主什么都没得到。
 
-### ✓ Good
-Ask once for the export or pasted records. If nothing is provided, add `Payments: not provided — not included` to the Sources section and continue with the remaining sources. Mention that the owner can rerun with a merchant-platform CSV for fuller coverage.
-
----
-
-## Gotcha: Verbatim quotes paraphrased or summarized
-
-**Why it matters:** The owner needs to see the actual customer words — not CrabCode's interpretation. Paraphrase destroys the credibility of the report.
-
-### ✗ Bad
-**Theme: Slow shipping** (8 signals)
-> Customers reported that deliveries arrived later than expected.
-
-### ✓ Good
-**Theme: Slow shipping** (8 signals)
-> "Ordered 2 weeks ago and still nothing — this is unacceptable." — [Email]
-> "Package was 10 days late and support never responded." — [Intercom]
+### ✓ 正面
+只问一次导出或粘贴记录。若什么都没提供,就在"来源"一节记 `支付:未提供——未纳入`,用其余来源继续。顺带提示店主:日后补一份商家平台 CSV 重跑,覆盖会更全。
 
 ---
 
-## Gotcha: HubSpot returning 0 tickets treated as an error
+## 陷阱:逐字引用被转述或概括
 
-**Why it matters:** Test portals and new accounts legitimately have 0 tickets. Surfacing a warning creates noise and erodes trust.
+**为什么重要:** 店主要看到的是客户的原话——不是 CrabCode 的解读。转述会毁掉报告的可信度。
 
-### ✗ Bad
-> ⚠️ HubSpot returned 0 tickets. Check your connection or permissions.
+### ✗ 反面
+**主题:配送太慢**(8 个信号)
+> 有客户反映到货比预期晚。
 
-### ✓ Good
-Record `HubSpot tickets: 0` in the Sources section and continue. Only flag a connector issue if authentication itself fails.
+### ✓ 正面
+**主题:配送太慢**(8 个信号)
+> "下单两周了还没动静,太离谱了。" —— [邮件]
+> "包裹晚了十天,客服一直没回。" —— [Intercom]
 
 ---
 
-## Gotcha: Email keyword list too narrow
+## 陷阱:逐字引用照抄可识别信息(PIPL)
 
-**Why it matters:** Customers don't use standard complaint keywords. A 1-star experience often surfaces as "took forever" or "never again," not "disappointed."
+**为什么重要:** 汇总反馈就是在处理个人信息。逐字引用要保原话,但**不等于把姓名、手机号、订单号原样搬进报告**——与分析无关的可识别信息属过度收集,应遵循最小必要、去标识化。
 
-### ✗ Bad
-Scan pasted emails only for: `refund cancel unhappy`
+### ✗ 反面
+> "我是某某(手机 138xxxxxxxx),订单 20260430-123456,退款到现在没到账。" —— [邮件]
 
-### ✓ Good
-Use the full seed list from Workflow step 4: `refund cancel unhappy issue problem disappointed frustrated broken late slow wrong missing`. Let theme-extraction filter signal from noise — over-inclusion is cheaper than missed themes.
+### ✓ 正面
+> "退款到现在没到账。" —— [邮件,某客户,尾号 XXXX]
+
+原话表达一字不改,只把与主题无关的姓名、完整手机号 / 订单号去标识化(脱敏为"某客户""尾号 XXXX")。
+
+---
+
+## 陷阱:HubSpot 返回 0 工单被当成报错
+
+**为什么重要:** 测试门户和新账户本就可能是 0 工单。弹警告只会制造噪音、动摇信任。
+
+### ✗ 反面
+> ⚠️ HubSpot 返回 0 工单。请检查连接或权限。
+
+### ✓ 正面
+在"来源"一节记 `HubSpot 工单:0` 并继续。只有当身份认证本身失败时,才提示连接器问题。
+
+---
+
+## 陷阱:邮件关键词种子太窄
+
+**为什么重要:** 客户不会照着标准投诉词写。一次 1 星体验往往说成"等太久""再也不来了",而不是"失望"。
+
+### ✗ 反面
+只用这几个词扫描粘贴邮件:`退款 取消 不满`
+
+### ✓ 正面
+用工作流第 4 步的完整中文种子词:`退款 退货 取消 差评 投诉 问题 故障 破损 损坏 延误 迟到 太慢 发错 漏发 少发 不满 失望 态度差 假货 再也不来 等太久`。让主题提炼去噪——宁可多纳,不可漏主题。

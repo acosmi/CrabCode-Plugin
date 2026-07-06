@@ -1,83 +1,98 @@
 ---
 name: call-list
 version: 0.3.0
-description: Ranks the top-5 leads most worth calling today from HubSpot, supplies talking points from CRM activity history, blocks call slots on the owner's DingTalk (钉钉日程) or Feishu (飞书日历) calendar, and drafts follow-up messages for the owner to send. Trigger when the owner runs /call-list or asks "who should I call today," "who are my hottest leads," "build my call list," "who do I follow up with," or wants a prioritized list of prospects to phone. Accepts optional count and date arguments.
+description: >
+  从 HubSpot 中排出"今天最值得打的前 5 个线索",用 CRM 活动历史给出话术要点,
+  在业主的钉钉日程或飞书日历上预留通话时段,并起草待业主自行发送的跟进消息。
+  对联系人打分排序属于处理个人信息且为自动化决策,内置《个人信息保护法》护栏
+  (合法取得 / 最小必要 / 不作差别待遇 / 保留人工干预)。触发词:今天该打给谁、
+  谁是最热线索、排通话清单、该跟进谁,或想要一份优先拨打的客户清单。可接受可选的
+  数量与日期参数。Ranks the top-5 leads most worth calling today from HubSpot,
+  supplies talking points from CRM activity history, blocks call slots on the
+  owner's DingTalk (钉钉日程) or Feishu (飞书日历) calendar, and drafts follow-up
+  messages for the owner to send. Trigger when the owner runs /call-list or asks
+  "who should I call today," "who are my hottest leads," "build my call list,"
+  "who do I follow up with," or wants a prioritized list of prospects to phone.
+  Accepts optional count and date arguments.
 allowed-tools: Read, WebFetch, Bash
 ---
 
-Run the lead prioritization. Scan the pipeline, rank by urgency and opportunity, pull relevant context from HubSpot, and get the owner ready to make calls.
+运行线索优先级排序。扫描销售管道,按紧迫度与机会排序,从 HubSpot 拉取相关背景,让业主准备好开始打电话。
 
-Parse arguments:
-- `--n` (default: `5`) — number of leads to surface (1–10)
-- `--date` (default: today) — date to build the call list for (`YYYY-MM-DD`)
+> **合规前提(《个人信息保护法》):** 对联系人打分排序既是**处理个人信息**,也是**自动化决策**(PIPL 第 24 条)。仅使用**合法取得**(告知同意 / 合同必需等)的联系人信息;排序**仅供内部跟进优先级**,不据此对客户在成交价格等条件上作差别待遇(不做价格歧视 / 大数据杀熟)。清单产物顶部固定标注:`【AI 辅助排序,基于合法取得的客户信息,仅供内部跟进优先级】`。业主保留人工干预,可随时调整排序或剔除;深度合规移交 `crablaw-cn:data-activity-triage`。(CRM 连接器以实际配置为准。)
 
-## Step 1 — Pipeline scan
+解析参数:
+- `--n`(默认 `5`)—— 要呈现的线索数(1–10)
+- `--date`(默认今天)—— 生成通话清单的目标日期(`YYYY-MM-DD`)
 
-Using the `lead-triage` skill workflow:
+## 第 1 步 —— 扫描管道
 
-1. Pull open HubSpot deals and contacts with activity in the last 30 days.
-2. Pull each lead's recent context from HubSpot: notes, logged emails/calls, and engagement history. (There is no email connector — if the owner wants a thread referenced verbatim, ask them to paste it.)
-3. Score each lead on:
-   - **Recency**: days since last owner touchpoint (lower = better)
-   - **Stage**: how close to close (later stage = higher priority)
-   - **Signal**: any recent inbound activity in HubSpot (email open, reply, meeting hold, web visit)
-   - **Value**: deal size from HubSpot
+套用 `lead-triage` 技能的工作流:
 
-## Step 2 — Rank and select top N
+1. 拉取 HubSpot 中近 30 天有活动的未成交商机与联系人。
+2. 从 HubSpot 拉取每条线索的近期背景:备注、已记录的邮件 / 通话、互动历史。(没有邮件连接器——若业主要逐字引用某封往来,请其粘贴原文。)
+3. 给每条线索按四维打分(只用实现排序所必需的字段,**最小必要**,不引入来源不明或未授权的个人信息):
+   - **近期触达**:距业主上次触达的天数(越少越好)
+   - **阶段**:距成交的远近(越靠后优先级越高)
+   - **信号**:HubSpot 中的近期入站活动(邮件打开、回复、会议占位、网站访问)
+   - **金额**:HubSpot 中的商机金额
 
-Rank all scored leads and select the top `--n`. For ties, prefer leads with unanswered inbound signals.
+## 第 2 步 —— 排序并选出前 N
 
-For each selected lead, produce a call card:
+对所有已打分线索排序,选出前 `--n`。同分时,优先选有未回应入站信号的线索。
+
+为每条选中的线索生成一张通话卡:
 
 ```
-{Rank}. {Contact Name} — {Company}
-Deal: ¥{amount} | Stage: {stage} | Last contact: {X days ago}
-Signal: {most recent activity}
+{排名}. {联系人姓名} —— {公司}
+商机:¥{金额} | 阶段:{阶段} | 最后联系:{X 天前}
+信号:{最近一次活动}
 
-TALKING POINTS
-• {point from CRM/deal context}
-• {point from CRM/deal context}
-• {open question to ask}
+话术要点
+• {取自 CRM / 商机背景的要点}
+• {取自 CRM / 商机背景的要点}
+• {要问的开放式问题}
 
-GOAL FOR THIS CALL: {one sentence — advance to next stage / re-engage / close}
+本次通话目标:{一句话——推进到下一阶段 / 重新激活 / 促成成交}
 ```
 
-## Step 3 — Calendar block
+## 第 3 步 —— 预留日历
 
-For each lead on the list, offer to block 20 minutes on the owner's calendar for the target date, via the connected DingTalk (钉钉日程) or Feishu (飞书日历) connector.
+为清单上每条线索,提议在目标日期于业主日历上预留 20 分钟,通过已连接的钉钉日程或飞书日历连接器。
 
-Show the proposed calendar entries:
+展示拟预留的日历条目:
 ```
-{time slot} — Call: {Contact Name} ({Company})
-```
-
-Wait for owner to confirm which calls to block before creating any calendar events through the connector.
-
-## Step 4 — Draft follow-ups
-
-For any lead whose last outreach has gone unanswered for more than 3 days (per HubSpot activity history), draft a brief follow-up for the owner to copy and send from their own email tool or WeChat:
-```
-Subject: Re: {thread subject}
-
-Hi {first name},
-
-{One sentence referencing prior conversation}. {One sentence with a clear next step or question}.
-
-{Sign-off}
+{时段} —— 通话:{联系人姓名}({公司})
 ```
 
-If DingTalk or Feishu is connected and the owner prefers, the follow-up nudge to themselves (e.g., the day's call list) can be sent as a DingTalk/Feishu message via the connected connector — but outreach to leads is always copy-and-send by the owner.
+在通过连接器创建任何日程前,等业主确认要预留哪几个通话。
 
-## Connector failures
+## 第 4 步 —— 起草跟进
 
-If HubSpot is unreachable, stop and tell the owner — lead scoring requires CRM data. If neither the DingTalk nor Feishu calendar is connected, skip calendar blocking, present the proposed time slots as a plain list, and note "no calendar connector — slots not booked" in the output. Follow-up drafts (Step 4) always work: they're drafted in chat, nothing is sent.
+对任何最后一次触达已超过 3 天未获回应(按 HubSpot 活动历史)的线索,起草一条简短跟进,供业主复制后从自己的邮箱工具或微信发送:
+```
+主题:回复:{原邮件主题}
 
-## Approval gates
+{名字}你好,
 
-- **Never send emails or messages to leads automatically.** Present drafts for owner approval only; the owner sends from their own tool.
-- **Never create calendar blocks without owner confirmation** — show the proposed list first.
-- **Never update HubSpot deal stages automatically.**
+{一句话呼应此前沟通}。{一句话给出明确的下一步或问题}。
 
-## Output
+{署名}
+```
 
-Present the ranked call list with talk tracks. Then show proposed calendar blocks and ask for confirmation before booking via DingTalk/Feishu. Then show follow-up drafts and ask which the owner wants to copy and send.
+若已连接钉钉或飞书且业主愿意,发给业主自己的提醒(如当天通话清单)可通过已连接的连接器以钉钉 / 飞书消息发出——但发给线索的对外触达始终由业主自行复制发送。
+
+## 连接器故障
+
+若 HubSpot 不可达,停止并告知业主——线索打分需要 CRM 数据。若钉钉与飞书日历都未连接,跳过日历预留,以纯文本列出拟定时段,并在输出中注明"无日历连接器——时段未预订"。跟进草稿(第 4 步)始终可用:它们在对话中起草,不发送任何内容。
+
+## 审批门禁
+
+- **绝不自动向线索发送邮件或消息。** 只呈现草稿供业主批准;由业主从自己的工具发送。
+- **绝不未经业主确认就创建日历预留** —— 先展示拟定清单。
+- **绝不自动更新 HubSpot 商机阶段。**
+- **打分与跟进基于合法取得的个人信息,仅作内部优先级排序,不作价格歧视等差别待遇。**
+
+## 输出
+
+呈现带话术的排序通话清单(顶部标注 `【AI 辅助排序,基于合法取得的客户信息,仅供内部跟进优先级】`)。然后展示拟预留的日历条目,通过钉钉 / 飞书预订前先请业主确认。再展示跟进草稿,问业主想复制发送哪些。

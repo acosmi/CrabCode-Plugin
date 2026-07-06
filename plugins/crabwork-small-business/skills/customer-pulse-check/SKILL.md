@@ -1,80 +1,89 @@
 ---
 name: customer-pulse-check
 version: 0.3.0
-description: Synthesizes themes from payment dispute/refund records (支付宝商家平台 / 微信支付商户平台 exports or pasted data), HubSpot tickets, and review exports (大众点评/淘宝) into a top-3 fixable issues list with drafted response templates. Trigger when the owner runs /customer-pulse-check or asks "what are customers saying," "any complaints lately," "review my feedback," "what are people unhappy about," "summarize my reviews," or wants recurring customer issues surfaced. Accepts optional since-date argument.
+description: 把支付纠纷/退款记录(支付宝商家平台 / 微信支付商户平台 导出或粘贴的数据)、HubSpot 工单,以及评价导出(大众点评/淘宝)综合成一份"最该修的三件事"清单,并附上供店主复核发送的客户回复模板草稿。触发:店主运行 /customer-pulse-check,或问 "what are customers saying"、"any complaints lately"、"review my feedback"、"what are people unhappy about"、"summarize my reviews",或"客户在说什么"、"最近有没有客诉"、"看看我的评价"、"大家不满什么"、"汇总一下我的评价"、"客户情绪怎么样"、"最该修的是什么",或想让反复出现的客户问题浮出来。可接受可选的 since-date 参数。
 allowed-tools: Read, WebFetch, Bash
 ---
 
-Run the customer voice synthesis. Pull feedback signals from all available sources, identify the themes that are actually fixable, and produce drafted responses the owner can review and send.
+跑一遍客户之声综合。从一切可得来源汇集反馈信号,找出真正可修复的主题,产出供店主复核发送的回复草稿。
 
-Parse arguments:
-- `--since` (default: last 30 days) — start date `YYYY-MM-DD` for the lookback window
+解析参数:
+- `--since`(默认:近 30 天)—— 回溯窗口的起始日期 `YYYY-MM-DD`
 
-## Step 1 — Gather feedback signals
+## 数据合规护栏(PIPL)
 
-Using the `customer-pulse` skill workflow:
+汇集反馈、工单与评价,本质上是在**处理个人信息**(《中华人民共和国个人信息保护法》)。全程守住:**去标识化、最小必要**——报告与模板里对与分析无关的可识别信息去标识化(姓名、手机号、订单号脱敏为"某客户""尾号 XXXX");所处理的客户信息须**合法取得**;综合与起草都在本地完成,**回复草稿一律经店主复核后由店主自行发送,本技能不外发、不回填客户**。是否涉及敏感个人信息、影响评估、数据出境等深度判断,以文字建议移交 `crablaw-cn:data-activity-triage`。
 
-1. Collect payment disputes and refund complaints for the period: reason, amounts, resolution status. No connector can bulk-export these — ask the owner for a 支付宝商家平台 / 微信支付商户平台 export (CSV) or pasted records.
-2. Pull HubSpot support tickets and conversation notes for the period.
-3. If review export files are available (大众点评 export, 淘宝评价 CSV, etc.) in Files: read and parse them. Pasted review text works too.
-4. Count total signals per source.
+## 第 1 步 —— 汇集反馈信号
 
-## Step 2 — Theme extraction
+沿用 `customer-pulse` 技能的工作流:
 
-Cluster all signals into recurring themes. For each theme:
-- Count how many signals mention it
-- Classify: Product quality / Delivery / Billing / Communication / Expectation mismatch / Other
-- Rate impact: 🔴 High (revenue risk, churn) / 🟡 Medium / 🟢 Low
+1. 收集当期支付纠纷与退款客诉:事由、金额(¥)、处理状态。没有连接器能批量导出这些——请店主提供**支付宝商家平台 / 微信支付商户平台**导出(CSV)或粘贴记录。
+2. 拉取当期 HubSpot 支持工单与会话备注(CRM 连接器以实际配置为准)。
+3. 若 Files 里有评价导出文件(大众点评导出、淘宝评价 CSV 等),读取并解析。粘贴的评价文本同样可用。
+4. 统计各来源的信号总数。
 
-## Step 3 — Top-3 fixable issues
+## 第 2 步 —— 主题提炼
 
-Using the `ticket-deflector` skill workflow:
+把所有信号聚成反复出现的主题。每个主题:
+- 数一数有多少信号提到它
+- 归类:商品质量 / 配送 / 计费 / 沟通 / 预期不符 / 其他
+- 评定影响:🔴 高(营收风险、客户流失) / 🟡 中 / 🟢 低
 
-Select the top 3 themes by: frequency × impact rating. For each:
-1. State the issue in one sentence
-2. Explain the root cause (where evident)
-3. Suggest a specific operational fix
-4. Draft a customer response template
+## 第 3 步 —— 最该修的三件事
 
-Response template format:
+沿用 `ticket-deflector` 技能的工作流:
+
+按"频次 × 影响"选出前 3 个主题。每个:
+1. 一句话说清问题
+2. 说明根因(若明显)
+3. 给出一个具体的运营改进
+4. 起草一份客户回复模板
+
+**回复模板须先过消保法这一关。** 凡产出客服 / 退款回复模板,遵循《消费者权益保护法》"**先判法定应退(七天无理由 / 三包 / 欺诈退一赔三),再谈店主裁量**"的顺序,详细判断口径见 `ticket-deflector`。命中法定应退 / 应换 / 应赔的,模板先把依法处理写清楚,再谈额外让步;**不得起草违法拒退的回复。**
+
+回复模板格式:
 ```
-Subject: Re: {issue topic}
+主题:回复 {问题主题}
 
-Hi {first name},
+{脱敏称谓}(如"某客户",或客户原消息中的自称;不写完整姓名 / 手机号 / 订单号):
 
-Thank you for reaching out. {Acknowledgment of their experience in 1-2 sentences}.
+您好。感谢您的反馈。{用 1–2 句认可客户的经历}。
 
-{What we're doing about it / what happened / resolution offered}.
+{我们的处理 / 已依法核实的结论 / 提供的解决方案}。
 
-{Next step or offer}.
+{下一步或补偿}。
 
-{Sign-off}
-```
+{落款}
 
-## Step 4 — Summary table
-
-Format the output as:
-
-```
-Customer Voice — {date range}
-Total signals: {n} ({Payment disputes/refunds: n} | {HubSpot tickets: n} | {Reviews: n})
-
-TOP 3 FIXABLE ISSUES
-1. {Issue} ({frequency}) — {impact} — Fix: {one-line fix}
-2. {Issue} ({frequency}) — {impact} — Fix: {one-line fix}
-3. {Issue} ({frequency}) — {impact} — Fix: {one-line fix}
+【AI 辅助整理,客户信息请脱敏,回复依《消费者权益保护法》核实】
 ```
 
-## Connector failures
+## 第 4 步 —— 小结表
 
-Run with whatever sources are available — this command degrades gracefully. If no payment export or pasted dispute data is provided, skip dispute data and note "Payment dispute data not provided — skipped." If HubSpot is missing, skip ticket data and note it. If no sources are available at all, stop and tell the owner: "No feedback sources available. Connect HubSpot, or provide a 支付宝商家平台/微信支付商户平台 export, a review export CSV, or pasted feedback."
+把输出排成:
 
-## Approval gates
+```
+客户之声 —— {日期区间}
+信号合计:{n}({支付纠纷/退款:n} | {HubSpot 工单:n} | {评价:n})
 
-- **Never send response templates automatically.** Present drafts for owner review only — there is no email connector, so the owner copies and sends approved drafts from their own mailbox.
-- **Never close HubSpot tickets without explicit owner confirmation.** Dispute resolution happens in the merchant platforms and is entirely the owner's action.
-- **Never include customer PII in the summary** — use first name + last initial only.
+最该修的三件事
+1. {问题}({频次})—— {影响} —— 修法:{一句话改进}
+2. {问题}({频次})—— {影响} —— 修法:{一句话改进}
+3. {问题}({频次})—— {影响} —— 修法:{一句话改进}
+```
 
-## Output
+## 连接器失效
 
-Present the summary table, then each response template. Ask the owner which templates they'd like to use, then finalize the approved drafts for the owner to send.
+有什么来源就用什么来源跑——本命令优雅降级。若没有支付导出或粘贴的纠纷数据,跳过纠纷数据并注明"支付纠纷数据未提供——已跳过"。若 HubSpot 缺失,跳过工单数据并注明。若一个来源都没有,停下并告诉店主:"没有可用的反馈来源。请连接 HubSpot,或提供一份支付宝商家平台 / 微信支付商户平台导出、一份评价导出 CSV,或粘贴反馈。"
+
+## 审批门禁
+
+- **绝不自动发送回复模板。** 只呈草稿供店主复核——没有邮件连接器,由店主从自己的邮箱 / 微信复制并发送获批的草稿。
+- **先法定后裁量,不得起草违法拒退的回复。** 凡回复模板涉及退换货 / 退款,先依《消费者权益保护法》判定法定应退(七天无理由 / 三包 / 退一赔三),命中的先落实法定义务,再谈店主裁量让步;判断口径见 `ticket-deflector`。
+- **未经店主明确确认,绝不关闭 HubSpot 工单。** 纠纷处理在商家平台进行,完全是店主的动作。
+- **报告与模板不含客户可识别信息(PIPL 去标识化)。** 遵循最小必要,把与分析无关的姓名、手机号、订单号脱敏为"某客户""尾号 XXXX";所处理信息须合法取得。深度数据合规移交 `crablaw-cn:data-activity-triage`。
+
+## 输出
+
+先给小结表,再逐一给出回复模板。问店主想用哪几份,然后把获批的草稿定稿交店主发送。每份报告 / 模板产物末尾保留:`【AI 辅助整理,客户信息请脱敏,回复依《消费者权益保护法》核实】`。

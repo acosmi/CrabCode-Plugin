@@ -1,74 +1,82 @@
-# HubSpot Scoring — lead-triage
+# HubSpot 打分 —— 线索分诊(lead-triage)
 
-Field names, scoring weights, and ICP defaults.
+字段名、打分权重与 ICP 默认值。(CRM 连接器以实际配置为准;更换 CRM 时字段名按新连接器映射。)
 
----
-
-## Fields to pull
-
-| HubSpot field | Used for |
-|---|---|
-| `firstname`, `lastname` | Display |
-| `company` | Display + ICP match |
-| `email` | Follow-up draft recipient |
-| `lifecyclestage` | Filter (keep Lead, MQL) |
-| `hs_lead_status` | Filter (exclude Unqualified) |
-| `industry` | Company fit |
-| `numemployees` | Company fit — employee count on contact record. Often null; if null, treat as unknown and score accordingly. |
-| `createdate` | Urgency — lead age |
-| `hs_last_activity_date` | Recency penalty |
-| `notes_last_updated` | Urgency — note recency |
-| `hs_sales_email_last_replied` | Engagement — reply signal |
-| `hs_email_open` | Engagement — open count (use only if within 30 days) |
-| `hs_analytics_last_visit_timestamp` | Engagement — site visit |
-| `num_contacted_notes` | Engagement — outreach volume |
+> **最小必要提示(《个人信息保护法》):** 下表字段是实现"排序跟进"目的所必需的最小集合——只拉取这些字段,不为打分额外收集无关个人信息。所用联系人信息须为**合法取得**(告知同意 / 合同必需等)。
 
 ---
 
-## Scoring model (0–100 composite)
+## 要拉取的字段
 
-Four dimensions, each 0–25. Sum for composite.
-
-### Engagement (0–25)
-Only count signals from the last 30 days. Older signals score 0.
-
-| Signal | Points |
+| HubSpot 字段 | 用途 |
 |---|---|
-| Email reply in last 14 days | +15 |
-| Email open in last 7 days (no reply) | +8 |
-| Site visit in last 7 days | +5 |
-| >3 outreach attempts, no reply | −5 |
-
-### Company fit (0–25)
-Default ICP if owner hasn't stated one: any industry, 1–50 employees.
-
-| Match | Points |
-|---|---|
-| Industry + size both match ICP | 25 |
-| Size matches, industry unknown | 15 |
-| Industry matches, size unknown | 12 |
-| Neither matches or both unknown | 5 |
-
-### Urgency (0–25)
-
-| Signal | Points |
-|---|---|
-| Note contains "urgent," "ASAP," "deadline," "budget approved" | +15 |
-| Lead age 7–21 days (prime follow-up window) | +10 |
-| Lead age <7 days | +5 |
-| Lead age >60 days | −5 |
-
-### Recency penalty (subtracted from composite)
-
-| Last activity | Subtract |
-|---|---|
-| <24 hours ago | −25 |
-| 1–3 days ago | −10 |
-| 4–7 days ago | −5 |
-| >7 days ago | 0 |
+| `firstname`、`lastname` | 显示 |
+| `company` | 显示 + ICP 匹配 |
+| `email` | 跟进草稿收件人 |
+| `lifecyclestage` | 过滤(保留 Lead、MQL) |
+| `hs_lead_status` | 过滤(排除 Unqualified) |
+| `industry` | 公司匹配 |
+| `numemployees` | 公司匹配——联系人记录上的员工数。常为空;若空,按未知处理并据此打分。 |
+| `createdate` | 紧迫度——线索存续时长 |
+| `hs_last_activity_date` | 近期触达扣分 |
+| `notes_last_updated` | 紧迫度——备注新鲜度 |
+| `hs_sales_email_last_replied` | 互动——回复信号 |
+| `hs_email_open` | 互动——打开次数(仅当在 30 天内时采用) |
+| `hs_analytics_last_visit_timestamp` | 互动——网站访问 |
+| `num_contacted_notes` | 互动——触达次数 |
 
 ---
 
-## Custom ICP (runtime override)
+## 打分模型(0–100 综合分)
 
-If the owner states an ICP at runtime ("focus on SaaS, 10–100 employees"), apply it for that session only.
+四个维度,各 0–25,求和为综合分。
+
+### 互动(0–25)
+仅计入近 30 天的信号,更早的记 0。
+
+| 信号 | 分值 |
+|---|---|
+| 近 14 天内有邮件回复 | +15 |
+| 近 7 天内有邮件打开(无回复) | +8 |
+| 近 7 天内有网站访问 | +5 |
+| 触达 >3 次仍无回复 | −5 |
+
+### 公司匹配(0–25)
+业主未指定时的默认 ICP:不限行业,1–50 人。
+
+| 匹配 | 分值 |
+|---|---|
+| 行业 + 规模均命中 ICP | 25 |
+| 规模命中,行业未知 | 15 |
+| 行业命中,规模未知 | 12 |
+| 都不命中或都未知 | 5 |
+
+### 紧迫度(0–25)
+
+| 信号 | 分值 |
+|---|---|
+| 备注含紧迫措辞("急""尽快""截止""预算已批"等) | +15 |
+| 线索存续 7–21 天(黄金跟进窗口) | +10 |
+| 线索存续 <7 天 | +5 |
+| 线索存续 >60 天 | −5 |
+
+### 近期触达扣分(从综合分中扣减)
+
+| 最后活动 | 扣减 |
+|---|---|
+| 24 小时内 | −25 |
+| 1–3 天前 | −10 |
+| 4–7 天前 | −5 |
+| >7 天前 | 0 |
+
+---
+
+## 自定义 ICP(运行时覆盖)
+
+若业主在运行时指定 ICP(如"聚焦 SaaS,10–100 人"),仅对本次会话生效。
+
+---
+
+## 自动化决策提示(《个人信息保护法》第 24 条)
+
+本模型输出的是**内部跟进优先级**,属自动化决策。分数不得用于对客户在成交价格等交易条件上作差别待遇(不做价格歧视 / 大数据杀熟);业主应保留人工干预空间,可随时人工调整排序或剔除条目。深度合规评估移交 `crablaw-cn:data-activity-triage`。
