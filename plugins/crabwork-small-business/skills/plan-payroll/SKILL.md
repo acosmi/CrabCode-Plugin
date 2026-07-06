@@ -9,7 +9,7 @@ Run the payroll-confidence pipeline by chaining two skills. The owner approves a
 
 Parse arguments:
 - `--horizon` (default `30`) — forecast window in days (30, 60, or 90)
-- `--payroll-date` (optional) — the date payroll runs; defaults to next Friday
+- `--payroll-date` (optional) — the date payroll runs; 默认当月约定发薪日
 
 ## Step 1 — Cash forecast (cash-flow-snapshot)
 
@@ -17,11 +17,20 @@ Trigger the `cash-flow-snapshot` skill workflow:
 1. Ask the owner for AR, AP, and historical cash-timing data: a CSV/Excel export or pasted report from their accounting software (用友好会计 / 金蝶精斗云), plus a 支付宝商家平台 bill export (and 微信支付商户平台 export if they take WeChat Pay — 微信支付 is not yet connected). There is no live connector for any of these — the alipay connector cannot export transaction history, so the forecast is always built from owner-provided data.
 2. Layer in known fixed costs (rent, payroll, recurring vendor charges).
 3. Produce a 30/60/90-day forecast (use the requested `--horizon`) with percentage-variance confidence bands.
-4. Flag named risks — e.g., "payroll on May 15 lands $4,200 below your fixed-cost floor at the median forecast."
+4. Flag named risks — e.g., "payroll on 2026-05-15 lands ¥4,200 below your fixed-cost floor at the median forecast."
 5. Deliver chat summary + downloadable XLSX.
 6. Present to the owner. Wait for explicit "okay, see what we can collect" before Step 2.
 
 If the forecast shows payroll is comfortably covered, ask the owner whether they still want to chase overdue invoices or stop here.
+
+## 发薪合规成本(须计入预测)
+
+发薪不只是净工资(到手工资)。做现金需求预测时,除净工资外,还必须把下列法定成本计入同一笔现金支出:
+
+- **五险一金** —— 养老、医疗、失业、工伤、生育五项社会保险,加住房公积金。分为**单位缴纳**与**个人代扣**两部分,两部分都要经由单位账户支付/申报,均需占用现金。
+- **个人所得税(工资薪金)** —— 按**累计预扣预缴**方法计算,**单位是扣缴义务人**,须从工资中代扣并按期申报缴纳。
+
+比例、缴费基数、公积金比例、个税起征点与专项附加扣除等**随参保城市与年度政策变动**,差异很大。**本技能不计算确切的社保/公积金/个税数额**,只提示务必把这几笔一并计入现金需求;确切口径以**参保城市社保局(12333)、电子税务局,以及你的代账会计当年口径为准**。
 
 ## Step 2 — Overdue collection (invoice-chase)
 

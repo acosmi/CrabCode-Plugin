@@ -7,39 +7,39 @@ Variables in `{{double braces}}` are placeholders — replace with computed valu
 ---
 
 ```markdown
-# Business Pulse — {{Day, Month Date, Year}}
+# Business Pulse — {{YYYY-MM-DD}}
 
 **Overall: {{🟢|🟡|🔴}} {{one-line status, e.g. "Cash healthy, one overdue invoice needs attention."}}}**
 
 ## TL;DR
 
-- {{Most important number-backed fact, e.g. "Cash balance $84k, down $6k WoW — two large vendor payments cleared."}}
-- {{Second most important, e.g. "$3,400 from Acme Corp is 47 days overdue — no response since Mar 12."}}
-- {{Third, e.g. "Pipeline $128k weighted; two deals gone cold this week."}}
+- {{Most important number-backed fact, e.g. "Cash balance ¥84k, down ¥6k WoW — two large vendor payments cleared."}}
+- {{Second most important, e.g. "¥3,400 from 明发商贸 is 47 days overdue — no response since 2026-03-12."}}
+- {{Third, e.g. "Pipeline ¥128k weighted; two deals gone cold this week."}}
 
 ---
 
 ## 💰 Cash & Finance — {{🟢|🟡|🔴}}
 
-- **Cash balance**: ${{BALANCE}} ({{▲|▼|▬}} ${{DELTA}} WoW)
-- **MTD revenue**: ${{MTD}} vs. ${{PRIOR_MTD}} last month ({{▲|▼|▬}} {{PCT}}%)
-- **Outstanding AR**: ${{AR_TOTAL}} across {{N}} open invoices
+- **Cash balance**: ¥{{BALANCE}} ({{▲|▼|▬}} ¥{{DELTA}} WoW)
+- **MTD revenue**: ¥{{MTD}} vs. ¥{{PRIOR_MTD}} last month ({{▲|▼|▬}} {{PCT}}%)
+- **Outstanding AR**: ¥{{AR_TOTAL}} across {{N}} open invoices
 
 **AR aging**
-- 0–30 days: ${{AR_0_30}}
-- 31–60 days: ${{AR_31_60}} {{🟡 if nonzero}}
-- 61+ days: ${{AR_61}} {{🔴 if nonzero}}
+- 0–30 days: ¥{{AR_0_30}}
+- 31–60 days: ¥{{AR_31_60}} {{🟡 if nonzero}}
+- 61+ days: ¥{{AR_61}} {{🔴 if nonzero}}
 
 **Overdue > 30 days**
-- {{customer}} — ${{amount}} ({{days}} days overdue)
-- {{customer}} — ${{amount}} ({{days}} days)
+- {{customer}} — ¥{{amount}} ({{days}} days overdue)
+- {{customer}} — ¥{{amount}} ({{days}} days)
 
 ---
 
 ## 📈 Revenue & Sales — {{🟢|🟡|🔴}}
 
-- **7-day settlements**: ${{SETTLEMENTS}} ({{▲|▼|▬}} {{PCT}}% vs. prior 7 days)
-- **Alipay (支付宝)**: ${{ALIPAY_TOTAL}} | **WeChat Pay (微信支付)**: ${{WECHATPAY_TOTAL}} {{omit if no bill export provided}}
+- **7-day settlements**: ¥{{SETTLEMENTS}} ({{▲|▼|▬}} {{PCT}}% vs. prior 7 days)
+- **Alipay (支付宝)**: ¥{{ALIPAY_TOTAL}} | **WeChat Pay (微信支付)**: ¥{{WECHATPAY_TOTAL}} {{omit if no bill export provided}}
 
 **Unusual transactions**
 - {{amount}} — {{counterparty}} — {{status: failed/pending/large}}
@@ -49,10 +49,10 @@ Variables in `{{double braces}}` are placeholders — replace with computed valu
 
 ## 🔮 Pipeline — {{🟢|🟡|🔴}}
 
-- **Weighted pipeline**: ${{WEIGHTED}} ({{▲|▼|▬}} ${{DELTA}} WoW)
+- **Weighted pipeline**: ¥{{WEIGHTED}} ({{▲|▼|▬}} ¥{{DELTA}} WoW)
 - **Coverage vs. target**: {{RATIO}}x monthly target {{🟢|🟡|🔴}}
-- **Closed-won this week**: ${{CW}} across {{N}} deals
-- **New deals created**: {{N}} (${{TOTAL}})
+- **Closed-won this week**: ¥{{CW}} across {{N}} deals
+- **New deals created**: {{N}} (¥{{TOTAL}})
 
 **Deals needing attention**
 - {{deal name}} — {{stage}} — {{why: gone cold / slipped / stalled}}
@@ -80,8 +80,8 @@ Variables in `{{double braces}}` are placeholders — replace with computed valu
 ## ⚠️ #1 Priority
 
 {{One specific thing to act on today. Name amounts, people, deadlines.
-Not "review cash flow" — say "The $4,200 invoice from Acme Corp is 23 days
-overdue. Call Sarah Chen at 415-555-0192 today."}}
+Not "review cash flow" — say "The ¥4,200 invoice from 明发商贸 is 23 days
+overdue. Call 李娜 at 138xxxxxxxx today."}}
 
 ---
 
@@ -100,8 +100,8 @@ overdue. Call Sarah Chen at 415-555-0192 today."}}
 
 ## Formatting rules
 
-1. **Dollar amounts**: `$43k` for thousands, `$1.2m` for millions. No unnecessary decimals.
+1. **Currency amounts**: `¥43k` for thousands, `¥1.2m` for millions. No unnecessary decimals.
 2. **Percentages**: one decimal for trends (e.g. "▲ 8.3%"), integers elsewhere.
-3. **Dates**: human-readable in prose ("Apr 14"), ISO in metadata ("2026-04-14").
-4. **Arrow spacing**: `▲ $2k` not `▲$2k`.
+3. **Dates**: ISO `YYYY-MM-DD` (e.g. "2026-04-14"), in both prose and metadata.
+4. **Arrow spacing**: `▲ ¥2k` not `▲¥2k`.
 5. **Length**: aim for one page. Two pages max. If a section balloons, tighten prose.

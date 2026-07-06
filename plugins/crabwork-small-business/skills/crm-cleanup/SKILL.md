@@ -54,6 +54,10 @@ If HubSpot is unreachable, stop — this command requires HubSpot as the data so
 - **Never auto-merge duplicate contacts.** Show side-by-side and wait for approval per pair.
 - **Side-by-side diffs for all changes.** Show current value and proposed value; wait for approval per item.
 
+## 个人信息合规(PIPL)
+
+扫描、去重、合并 HubSpot 联系人本质上是**处理个人信息**(姓名、邮箱、电话等),受《个人信息保护法》(PIPL)约束:相关个人信息须**合法取得、获得授权、遵循最小必要**。**合并重复联系人、填充缺失字段(尤其邮箱、电话)前,务必逐条向用户确认**,绝不自动合并。涉及跨境传输、批量导出或更深入的合规判断时,移交 `crablaw-cn:data-activity-triage` 处理。
+
 ## Output
 
 End with a summary: X deals updated, Y contacts merged, Z fields filled. Include links to the affected records.

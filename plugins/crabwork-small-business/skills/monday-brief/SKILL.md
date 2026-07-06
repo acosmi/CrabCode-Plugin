@@ -29,13 +29,13 @@ If a source is missing, note it in the brief ("no 支付宝 bill export this wee
 Layout (markdown, fits on one screen):
 
 ```
-# Monday Brief — {Mon DD, YYYY}
+# Monday Brief — {YYYY-MM-DD}
 
 ## Cash
-{$X balance · {+/-}$Y net last 7 days · runway note}
+{¥X balance · {+/-}¥Y net last 7 days · runway note}
 
 ## Sales (last 7d vs prior 7d)
-{$X total · {+/-}Z% · top SKU: {name} ({$})}
+{¥X total · {+/-}Z% · top SKU: {name} ({¥})}
 
 ## Pipeline
 {N deals moved · M stalled · K new leads}

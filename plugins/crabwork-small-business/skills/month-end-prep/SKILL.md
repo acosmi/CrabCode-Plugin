@@ -91,6 +91,8 @@ and how to distinguish them.
 
 ### Step 5 — Receipts check (local files)
 
+> **税前扣除凭证须为发票。** 中国企业所得税税前扣除,合规凭证应为**发票**(数电发票 / 增值税专用发票 / 增值税普通发票);**收据、白条一般不能作为税前扣除凭证**。做凭证核对时请区分"发票"与"收据/白条"——某笔支出即便有收据,通常仍需取得对应发票才能税前扣除。下文的凭证(receipt)检查,核对的是**是否有合规发票**留存,而不是只有一张收据。
+
 If local file access is available, scan the receipts folder (ask the user for the
 path; default `~/Documents/Receipts`) for the target month.
 
@@ -102,8 +104,8 @@ For each expense transaction in the register above ¥25 with no attached documen
 List missing receipts. The user can supply the file or mark as "receipt not required"
 (e.g., a recurring auto-pay with no receipt).
 
-If local file access is not available, ask the user to confirm which expenses they
-have receipts (发票) for — don't silently skip this step.
+If local file access is not available, ask the user to confirm which expenses have a
+compliant 发票 on file (收据/白条 generally won't be deductible) — don't silently skip this step.
 
 ### Step 6 — Owner sign-off gate
 

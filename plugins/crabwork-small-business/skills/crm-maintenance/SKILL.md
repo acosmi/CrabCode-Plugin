@@ -18,11 +18,11 @@ description: >
 Pull context from the pasted email thread or the DingTalk/Feishu calendar event, resolve the right HubSpot contact and deal, log the activity, and surface what changed. For a deal cleanup, audit the deal against recent email/calendar activity and propose updates — never apply them without approval.
 
 ```
-User: "log this call to the Acme deal"
+User: "log this call to the 明发商贸 deal"
 → Read the most recent completed DingTalk/Feishu calendar event
-→ Confirm attendees map to the Acme deal's contacts
-→ Write a call activity on the Acme deal
-→ Report: "Logged call to Acme Q2 Expansion. [deal link]"
+→ Confirm attendees map to the 明发商贸 deal's contacts
+→ Write a call activity on the 明发商贸 deal
+→ Report: "Logged call to 明发商贸 Q2 Expansion. [deal link]"
 ```
 
 ## Workflow
@@ -60,6 +60,10 @@ User: "log this call to the Acme deal"
 - **Never create a new deal unprompted.** Ask if the right deal can't be resolved.
 - **Announce contact creation before writing.** One line — lets the user catch typos or duplicates.
 - **Side-by-side diffs for cleanup.** Show current value and proposed value; wait for approval per item.
+
+## 个人信息合规(PIPL)
+
+从邮件、日历、邮件签名自动创建或合并客户联系人,本质上是**收集个人信息**(姓名、邮箱、电话等),受《个人信息保护法》(PIPL)约束:须**合法取得、获得授权、遵循最小必要**原则,只收集业务确需的字段。**在去重/合并个人信息(尤其邮箱、电话)之前,务必先向用户确认**,不要自动合并。涉及跨境传输、批量导出或更深入的合规判断时,移交 `crablaw-cn:data-activity-triage` 处理。
 
 ## Reference
 

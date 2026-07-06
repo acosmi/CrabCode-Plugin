@@ -51,12 +51,12 @@ Assign a 🟢/🟡/🔴 status to each section. If a source returned nothing, ma
 
 ## Step 3 — Flag risks proactively
 
-Scan for actionable items. Every risk entry must name a specific record and a next step — "some overdue invoices" is useless; "$3,400 from Acme Corp, 47 days overdue, no response since Mar 12" is actionable.
+Scan for actionable items. Every risk entry must name a specific record and a next step — "some overdue invoices" is useless; "¥3,400 from 明发商贸, 47 days overdue, no response since 2026-03-12" is actionable.
 
 - Invoices in the accounting export past due > 30 days — name customer, amount, days overdue
 - HubSpot deals with no activity in 7+ days, or close date in past but still open
 - DingTalk/Feishu messages marked urgent or containing "escalation," "complaint," "cancel," "refund" (投诉 / 退款 / 取消 equivalents)
-- Failed or pending transactions > $500 in the 支付宝/微信支付 bill exports
+- Failed or pending transactions > ¥500 in the 支付宝/微信支付 bill exports
 
 ## Step 4 — Compose the output
 
@@ -65,9 +65,9 @@ Use the exact template in `reference/output_template.md`. Include only sections 
 Cross-source synthesis is where this skill earns its keep. If a Feishu message connects to a stalled HubSpot deal, surface that link in the #1 Priority section. Synthesis is what makes the pulse more useful than checking each tool separately.
 
 Writing rules:
-- Numbers lead, words follow. Never write "revenue is healthy" — write "$43k this month, ▲ 8% MoM" and let the owner judge.
+- Numbers lead, words follow. Never write "revenue is healthy" — write "¥43k this month, ▲ 8% MoM" and let the owner judge.
 - Every number carries a delta vs. the prior period where available. Absolute snapshots (cash balance) still show WoW delta.
-- Names and dollars, not adjectives. "$4,200 from Acme, 23 days overdue" beats "some concerning receivables."
+- Names and amounts, not adjectives. "¥4,200 from 明发商贸, 23 days overdue" beats "some concerning receivables."
 - No filler. If a section has nothing worth reporting, write "No material changes" and move on.
 
 ## Step 5 — Export and share (once)

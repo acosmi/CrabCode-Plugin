@@ -23,7 +23,7 @@ Build the margin table:
 
 ```
 Product          | Revenue  | COGS     | Gross Margin | Margin %
-{product}        | ${amt}   | ${amt}   | ${amt}       | {X}%
+{product}        | ¥{amt}   | ¥{amt}   | ¥{amt}       | {X}%
 ```
 
 Flag any product with margin below 20% as a risk.

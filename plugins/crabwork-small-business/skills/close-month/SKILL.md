@@ -28,7 +28,7 @@ Trigger the `month-end-prep` skill workflow:
 Surface in the same report:
 - **Uncategorized transactions** — book entries with no category
 - **Suspicious duplicates** — same amount, same vendor, within 3 days
-- **Missing receipts** — book entries above $75 with no attachment noted in the export
+- **Missing receipts** — book entries above ¥75 with no attachment noted in the export
 
 For each, recommend an action for the owner to take in their accounting software: categorize as X, delete duplicate, attach receipt.
 
@@ -39,8 +39,8 @@ Wait for owner to triage flagged items before generating the narrative. Do not a
 After triage, generate a plain-English P&L narrative:
 
 ```
-{Month YYYY} closed at ${revenue} revenue ({+/-}{X}% vs prior month).
-Top driver: {category/customer}. Biggest swing: {category} {direction} ${amount}
+{Month YYYY} closed at ¥{revenue} revenue ({+/-}{X}% vs prior month).
+Top driver: {category/customer}. Biggest swing: {category} {direction} ¥{amount}
 because {reason inferred from transactions}.
 
 Margin: {X}% ({+/-}Y pts vs prior). {Cost-side commentary}.

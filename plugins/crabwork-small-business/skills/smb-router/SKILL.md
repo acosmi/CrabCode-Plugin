@@ -49,7 +49,7 @@ Listen to the owner's request. Match it against this routing table — pick the 
 | "What does next month look like?" / "cash forecast" / "runway" | `/month-heads-up` |
 | "Close the books" / "month-end" / "reconcile" | `/close-month` |
 | "What are my margins?" / "should I raise prices?" / "cost per unit" | `/price-check` |
-| "Tax stuff" / "estimated taxes" / "1099s" / "accountant needs..." | `/tax-prep` |
+| "Tax stuff" / "报税" / "增值税" / "季度申报" / "汇算清缴" / "代账会计" / "发票" | `/tax-prep` |
 
 **Sales & marketing:**
 | Owner says something like... | Route to |
@@ -64,7 +64,7 @@ Listen to the owner's request. Match it against this routing table — pick the 
 | "What are customers saying?" / "complaints" / "reviews" | `/customer-pulse-check` |
 | "A customer is upset" / "handle this complaint" / "angry email" | `/handle-complaint` |
 | "Clean up the CRM" / "HubSpot is a mess" / "stale deals" | `/crm-cleanup` |
-| "Review this contract" / "NDA" / "should I sign this?" | `/review-contract` |
+| "Review this contract" / "合同审查" / "保密协议" / "should I sign this?" | `/review-contract` |
 
 **Business intelligence:**
 | Owner says something like... | Route to |

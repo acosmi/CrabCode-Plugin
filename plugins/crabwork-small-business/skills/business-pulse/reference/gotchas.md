@@ -40,7 +40,7 @@ The owner sees the gap explicitly and can provide the export or proceed with a p
 ```
 CrabCode: [calls query-alipay-payment hoping for a transaction list]
         → gets a single-payment lookup error or an unrelated record
-        → reports "支付宝 revenue: $0" in the pulse
+        → reports "支付宝 revenue: ¥0" in the pulse
 ```
 
 ### ✓ Good

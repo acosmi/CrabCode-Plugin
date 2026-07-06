@@ -35,8 +35,8 @@ Any threshold marked `# TODO: confirm with owner` should produce a note at the t
 - 🔴 < -10%
 
 **Failed transactions**
-- 🟡 Any failed transaction > $200
-- 🔴 Any failed transaction > $1,000, or 3+ failures in the week
+- 🟡 Any failed transaction > ¥200
+- 🔴 Any failed transaction > ¥1,000, or 3+ failures in the week
 
 ---
 

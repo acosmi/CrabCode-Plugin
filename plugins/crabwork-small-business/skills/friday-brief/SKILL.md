@@ -41,7 +41,7 @@ WATCHES
 • {watch 1} — {recommended action}
 • {watch 2} — {recommended action}
 
-Revenue this week: ${amount} ({+/-}X% vs last week)
+Revenue this week: ¥{amount} ({+/-}X% vs last week)
 ```
 
 ## Data failures

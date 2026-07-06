@@ -22,7 +22,7 @@ Using the `cash-flow-snapshot` skill workflow:
 
 1. From the accounting export, list recurring expenses (payroll, subscriptions, rent/lease) due in the next 30 days — ask the owner to confirm or fill gaps.
 2. List any outstanding invoices past due or due within 14 days.
-3. Flag any payment that would push the balance below a comfortable buffer (default: <$2,000 or the owner's average monthly expense × 0.5, computed from the export).
+3. Flag any payment that would push the balance below a comfortable buffer (default: <¥2,000 or the owner's average monthly expense × 0.5, computed from the export).
 
 ## Step 3 — Cash-flow forecast
 
@@ -42,9 +42,9 @@ Format as:
 Month-End Heads Up — {current date}
 Horizon: next {X} days
 
-Cash today: ${amount}
-Projected end-of-period: ${amount}
-Tightest week: {date range} — projected ${amount}
+Cash today: ¥{amount}
+Projected end-of-period: ¥{amount}
+Tightest week: {date range} — projected ¥{amount}
 
 TWO THINGS TO WATCH
 1. {item} — {why it matters} — suggested action: {action}

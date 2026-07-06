@@ -8,7 +8,7 @@ Expected columns (order doesn't matter; headers are case-insensitive and may be 
 
 | Column | Required | Description |
 |---|---|---|
-| `date` (日期 / 交易时间) | Yes | Transaction date (any standard format: YYYY-MM-DD, MM/DD/YYYY, etc.) |
+| `date` (日期 / 交易时间) | Yes | Transaction date (any standard format: YYYY-MM-DD, YYYY/MM/DD, etc.) |
 | `item` or `product` or `service` or `description` (商品名称 / 备注) | Yes | What was sold |
 | `amount` or `revenue` or `total` (金额) | Yes | Transaction amount (CNY unless stated otherwise) |
 | `quantity` or `qty` (数量) | No | Units sold — if missing, assume 1 per transaction |

@@ -4,8 +4,8 @@ version: 0.3.0
 description: >
   Analyzes unit economics by product or service from the owner's payment bill
   exports (支付宝商家平台 / 微信支付商户平台 CSV) and accounting cost data
-  (用友好会计 / 金蝶精斗云 export or owner-provided figures), benchmarks against
-  inflation and cost changes, and shows pricing-scenario data (e.g. "a 5%
+  (用友好会计 / 金蝶精斗云 export or owner-provided figures), compares against
+  input-cost increases and cost changes, and shows pricing-scenario data (e.g. "a 5%
   increase historically correlates with ~3% volume drop"). Surfaces analysis
   only — does not recommend a price. Use when the user asks about raising
   prices, pricing, margin analysis, what to charge, whether costs are eating
@@ -28,7 +28,7 @@ When an SMB owner asks "should I raise my prices?" or "are my margins okay?", th
 2. **Collects cost data** from the owner's accounting software export (用友好会计 / 金蝶精斗云) — COGS, direct expenses
 3. **Collects revenue data** from Alipay (支付宝商家平台) or WeChat Pay (微信支付商户平台) bill exports
 4. **Computes unit economics** — revenue, COGS, gross margin, margin % per item
-5. **Benchmarks against context** — inflation, cost changes, industry norms if available
+5. **Benchmarks against context** — input-cost increases, cost changes, industry norms if available
 6. **Builds pricing scenarios** — shows what happens to revenue and margin at +5%, +10%, +15% price changes, using historical correlation where data allows
 7. **Presents the analysis** — no price recommendation; the owner decides
 
@@ -104,7 +104,7 @@ Flag any item where margin is below 20% — not as a recommendation, but as a da
 
 Layer in context to make the numbers meaningful:
 
-- **Inflation:** Note relevant cost trends if discussing input cost increases. Example: "Your input costs rose ~X% over this period while your prices held flat — that compressed margin by Y points."
+- **Cost increases:** Note relevant cost trends if discussing input cost increases. Example: "Your input costs rose ~X% over this period while your prices held flat — that compressed margin by Y points."
 - **Industry benchmarks:** Use the owner's stated industry to surface rough gross margin norms for their category. See `reference/industry-benchmarks.md`.
 - **Historical comparison:** If 24+ months of data is available, compare this year's margins to last year's to surface the trend direction.
 
