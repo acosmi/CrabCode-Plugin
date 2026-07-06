@@ -1,93 +1,85 @@
-# Interview Guide Structure
+# 面试指南结构
 
-This reference covers how to build the interview guide and scoring rubric.
-A good guide reduces bias, improves consistency, and makes debrief conversations
-sharper because everyone evaluated the same things the same way.
-
----
-
-## Recommended Document Structure
-
-### Section 1: Role Summary
-One paragraph. Remind interviewers what we're hiring for and why.
-Include the stage of the process this guide covers (phone screen, full loop, etc.)
-
-### Section 2: Interview Stage Map
-A simple table showing who interviews the candidate at each stage and what
-competency each stage is assessing. This avoids interviewers asking the same
-questions and lets them compare notes on different dimensions.
-
-| Stage | Interviewer(s) | Competencies Assessed |
-|---|---|---|
-| Phone screen | Recruiter | Communication, baseline fit |
-| Hiring manager interview | HM | Role-specific scope, leadership |
-| Peer interview | Team member | Collaboration, working style |
-| Skills/case interview | Senior IC | Technical depth, problem-solving |
-
-### Section 3: Competency Question Bank
-For each competency, include 4–6 behavioral questions and 2–3 follow-up probes.
-
-**Format:**
-
-#### [Competency Name]
-*What we're evaluating:* [1-sentence description of what good looks like]
-
-**Questions:**
-1. Tell me about a time you [specific situation relevant to this competency]...
-2. Describe a moment when you had to [challenge]...
-3. Walk me through how you [process or decision relevant to the role]...
-
-**Follow-up probes (use any of these to go deeper):**
-- What was the outcome?
-- What would you do differently?
-- Who else was involved and what was your specific role?
-- What was the hardest part?
-
-**Typical competency areas to cover (adapt to the role):**
-- Communication & stakeholder management
-- Problem-solving & analytical thinking
-- Ownership & accountability
-- Collaboration & influence
-- Domain/technical skills
-- Adaptability & learning
-
-### Section 4: Scoring Rubric
-For each competency, define what a 1, 3, and 5 look like.
-This gives interviewers a shared frame of reference and prevents grade inflation.
-
-| Score | Label | What it means |
-|---|---|---|
-| 5 | Exceptional | Exceeds bar; would be a top 10% hire for this competency |
-| 4 | Strong | Clearly meets bar; evidence is specific and compelling |
-| 3 | Meets bar | Adequate evidence; some gaps but nothing disqualifying |
-| 2 | Below bar | Gaps are significant; would need close management in this area |
-| 1 | Does not meet bar | Clear deficiency; would be a blocker for this role |
-
-Write out the 1/3/5 behavioral anchors for each competency so interviewers
-aren't just using their gut.
-
-**Example — Ownership & Accountability:**
-- **5:** Proactively identified a problem no one asked them to solve; drove it
-  to resolution and documented learnings for the team.
-- **3:** Followed through on assigned work reliably; flagged risks early but
-  didn't typically expand scope independently.
-- **1:** Waited for direction; examples were vague about their personal
-  contribution vs. the team's contribution.
-
-### Section 5: Debrief Guide
-A short set of instructions for running the post-interview debrief:
-- Each interviewer shares their scores before discussion begins (no anchoring)
-- Focus debrief time on competencies where scores diverged
-- Identify any disqualifying signals separately from overall score
-- Decision framework: "Would we be excited to have this person on the team?"
-  not just "Did they clear the bar?"
+本参考文件讲解如何搭建面试指南与评分表。一份好的指南能减少偏见、提升一致性,也让复盘
+讨论更犀利——因为每个人都用同样的方式评估了同样的东西。
 
 ---
 
-## Question Writing Tips
+## 推荐的文档结构
 
-- Behavioral questions ("Tell me about a time...") surface real evidence, not hypotheticals
-- Situational questions ("What would you do if...") are fine for roles where
-  the candidate has no prior experience in that specific domain
-- Avoid leading questions ("We value collaboration — how collaborative are you?")
-- One question at a time — don't bundle two questions into one
+### 第 1 节:岗位摘要
+一段话。提醒面试官我们在招什么岗位、为什么招。注明本指南覆盖流程中的哪个阶段(电话
+初筛、完整面试环节等)。
+
+### 第 2 节:面试阶段图
+一张简单的表,列出各阶段由谁面试候选人、各阶段考察什么胜任力。这能避免面试官问重复
+的问题,也让他们能就不同维度交换意见。
+
+| 阶段 | 面试官 | 考察的胜任力 |
+|---|---|---|
+| 电话初筛 | 招聘专员 | 沟通、基本匹配 |
+| 用人经理面试 | 用人经理 | 岗位相关职责范围、领导力 |
+| 同级面试 | 团队成员 | 协作、工作风格 |
+| 技能 / 案例面试 | 资深独立贡献者 | 技术深度、解决问题能力 |
+
+### 第 3 节:胜任力题库
+每项胜任力配 4–6 个行为面试问题和 2–3 个追问。
+
+**格式:**
+
+#### [胜任力名称]
+*我们在评估什么:* [一句话描述"做得好"是什么样]
+
+**问题:**
+1. 请讲一次你[与该胜任力相关的具体情境]的经历……
+2. 描述一个你不得不[某项挑战]的时刻……
+3. 带我梳理一遍你如何[与岗位相关的流程或决策]……
+
+**追问(任选其一深入挖掘):**
+- 结果如何?
+- 若重来你会怎么做?
+- 还有谁参与其中,你具体扮演什么角色?
+- 最难的部分是什么?
+
+**通常要覆盖的胜任力领域(按岗位调整):**
+- 沟通与干系人管理
+- 解决问题与分析思维
+- 主人翁意识与担当
+- 协作与影响力
+- 领域 / 技术技能
+- 适应力与学习力
+
+### 第 4 节:评分表
+每项胜任力都定义清楚 1 分、3 分、5 分各是什么样。这给面试官一个共同的参照系,防止
+分数虚高。
+
+| 分数 | 标签 | 含义 |
+|---|---|---|
+| 5 | 卓越 | 超出标准;在该胜任力上属前 10% 的人选 |
+| 4 | 优秀 | 明显达标;证据具体且有说服力 |
+| 3 | 达标 | 证据充分;有些不足但无致命问题 |
+| 2 | 低于标准 | 差距明显;在该方面需要密切管理 |
+| 1 | 未达标 | 明显欠缺;会成为该岗位的硬伤 |
+
+为每项胜任力写出 1/3/5 分的行为锚点,让面试官不只是凭直觉打分。
+
+**示例——主人翁意识与担当:**
+- **5 分:** 主动发现一个没人要求他解决的问题;推动其解决,并为团队沉淀了经验总结。
+- **3 分:** 可靠地完成分派的工作;能及早提示风险,但通常不会主动扩展职责范围。
+- **1 分:** 等着别人给指示;举例时含糊其辞,分不清哪些是个人贡献、哪些是团队贡献。
+
+### 第 5 节:复盘指引
+一组用于开展面试后复盘的简短说明:
+- 讨论开始前,每位面试官先各自亮出分数(避免相互锚定)
+- 把复盘时间集中在分数出现分歧的胜任力上
+- 把任何致命信号与总分分开识别
+- 决策框架:"我们会为这个人加入团队而兴奋吗?"而不只是"他达标了吗?"
+
+---
+
+## 出题技巧
+
+- 行为面试题("请讲一次你……的经历")能带出真实证据,而非假设
+- 情境题("如果……你会怎么做")适用于候选人在该具体领域没有过往经验的岗位
+- 避免诱导性问题("我们重视协作——你的协作性怎么样?")
+- 一次只问一个问题——不要把两个问题捆在一起

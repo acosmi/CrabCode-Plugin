@@ -1,116 +1,111 @@
-# Worked Example: Senior Product Manager
+# 实操示例:高级产品经理
 
-## Input
+## 输入
 
-User message:
-> "We need to hire a Senior Product Manager for our payments team. They'll own
-> the roadmap for our checkout experience. We want 5+ years of PM experience,
-> ideally with a fintech or payments background. Remote-friendly, NYC preferred.
-> Comp is $160–185k base. Three interview rounds: recruiter screen, hiring manager
-> deep-dive, and a panel with two senior PMs. Get the offer ready to send for
-> signature when we get there."
+用户消息:
+> "我们要为支付团队招一名**高级产品经理**,主要负责结账体验的产品规划。
+> 要求 **5 年以上**产品经理经验,有金融科技/支付背景更佳。可远程,坐标**深圳**。
+> 月薪 **¥28k–35k**。三轮面试:HR 初筛、用人经理深聊、两名资深 PM 组成的面试组。
+> 到时候把录用通知书准备好,能发出去签署。"
 
 ---
 
-## Phase 1 — What CrabCode extracts
+## 阶段 1 —— CrabCode 提取到的信息
 
-| Field | Value |
+| 字段 | 值 |
 |---|---|
-| Role title | Senior Product Manager |
-| Team / function | Payments team |
-| Key responsibilities | Own roadmap for checkout experience |
-| Must-haves | 5+ years PM experience |
-| Nice-to-haves | Fintech or payments background |
-| Location | Remote-friendly, NYC preferred |
-| Compensation | $160–185k base |
-| Interview process | 3 rounds: recruiter screen, HM deep-dive, senior PM panel (2 people) |
-| Offer delivery | Signature-ready (owner sends via 众律宝 or on paper) |
+| 岗位名称 | 高级产品经理 |
+| 团队 / 职能 | 支付团队 |
+| 核心职责 | 负责结账体验的产品规划 |
+| 硬性要求 | 5 年以上产品经理经验 |
+| 加分项 | 金融科技 / 支付背景 |
+| 工作地点 | 可远程,坐标深圳 |
+| 薪酬 | 月薪 ¥28k–35k(税前) |
+| 面试流程 | 3 轮:HR 初筛、用人经理深聊、资深 PM 面试组(2 人) |
+| 录用通知书交付 | 签署就绪(用户通过众律宝发起签署,或纸质) |
 
-CrabCode confirms and asks exactly one question:
-> "Got it — hiring packet for a Senior PM on the payments team, $160–185k,
-> remote-friendly NYC. One question before I start: do you have an existing job
-> description or offer letter template I should use as the starting point, or
-> should I build from scratch?"
+CrabCode 确认信息,并只问一个问题:
+> "收到——为支付团队招高级产品经理,月薪 ¥28k–35k,可远程、坐标深圳。开始前问一句:
+> 你们有现成的职位描述或录用通知书模板要我作为起点吗?还是我从零起草?"
 
 ---
 
-## Expected output
+## 预期产出
 
-### `Senior-PM-Job-Post.docx`
+> 每份对外/对 HR 的产物页首均标:`【AI 辅助整理，非法律/人力资源意见，请经律师/HR 复核后使用】`
 
-Structure follows `references/job-post-structure.md`:
+### `深圳-高级产品经理-招聘启事.docx`
 
-1. **Opening hook** — Why this role exists now: the payments team is scaling the
-   checkout experience and needs someone to own the roadmap end-to-end.
-2. **About the company** — 3–4 sentences (CrabCode asks or infers from context).
-3. **About the role** — What success looks like 12 months in: a faster, more
-   reliable checkout with measurably higher conversion.
-4. **What you'll do** — 5–6 bullets, action-verb led (e.g. "Own the checkout
-   roadmap from discovery through launch…").
-5. **What we're looking for** — Required: 5+ yrs PM exp, comfort with data,
-   strong written communication. Preferred: fintech or payments domain experience.
-6. **Compensation** — $160,000–$185,000 base salary.
-7. **How to apply** — One sentence.
+结构遵循 `reference/job-post-structure.md`:
 
-Length target: 500–650 words.
+1. **开场钩子** —— 说明为什么现在设这个岗位:支付团队正在打磨结账体验,需要一个人端到端
+   负责产品规划。
+2. **公司简介** —— 3–4 句(CrabCode 询问或据上下文推断,如"云溪科技有限公司")。
+3. **岗位定位** —— 12 个月后的成功画像:更快、更稳的结账流程,转化率可衡量地提升。
+4. **你将负责** —— 5–6 条,动词开头(如"端到端负责结账产品规划,从调研到上线……")。
+5. **我们期待你** —— 硬性:5 年以上 PM 经验、数据敏感、书面沟通强。加分:金融科技/支付领域经验。
+6. **薪酬与福利** —— 月薪 ¥28,000–35,000;五险一金(养老/医疗/失业/工伤/生育 + 住房公积金),
+   另列 2–3 项亮点福利。**不含**任何就业歧视性条件(民族/性别/宗教/婚育/健康携带状态等)。
+7. **如何投递** —— 一句话。
 
----
-
-### `Senior-PM-Interview-Guide.docx`
-
-Structure follows `references/interview-guide-structure.md`:
-
-- **Role summary** — one paragraph reminding interviewers what they're assessing.
-- **Stage map** — 3 stages, each interviewer, each competency.
-- **Stage 1: Recruiter screen** — Communication, baseline fit, logistics.
-  Questions focus on career narrative and logistics (comp, start date, remote setup).
-- **Stage 2: HM deep-dive** — Roadmap ownership, payments context, prioritization
-  under constraints. 5–6 behavioral questions; 2–3 follow-up probes each.
-- **Stage 3: Senior PM panel** — Split between the two panelists. Panelist A owns
-  product judgment (how they make tradeoffs); Panelist B owns cross-functional
-  collaboration (how they work with engineering and design). Questions are pre-assigned
-  so the candidate isn't asked the same thing twice.
-- **Scoring rubric** — 1/3/5 anchors written specifically for a payments PM role
-  (not generic). Example for "Ownership": 5 = proactively identified checkout
-  failure mode no one asked them to track, drove fix, documented for team.
-- **Debrief guide** — Interviewers share scores before discussion; focus debrief
-  on divergent scores.
+篇幅目标:500–650 字。
 
 ---
 
-### `Senior-PM-Offer-Letter.docx`
+### `高级产品经理-面试指南.docx`
 
-Based on `references/offer-letter-template.md`. Pre-filled where data is available:
+结构遵循 `reference/interview-guide-structure.md`:
 
-| Field | Value |
+- **岗位摘要** —— 一段话,提醒面试官在评估什么。
+- **面试阶段图** —— 3 个阶段,各自的面试官与考察维度。
+- **阶段 1:HR 初筛** —— 沟通、基本匹配、后勤(薪酬预期、到岗时间、远程条件)。
+- **阶段 2:用人经理深聊** —— 产品规划主导权、支付业务理解、约束下的优先级取舍。
+  5–6 个行为面试问题,每题 2–3 个追问。
+- **阶段 3:资深 PM 面试组** —— 两名面试官分工。A 负责产品判断力(如何做取舍);
+  B 负责跨职能协作(如何与研发、设计配合)。问题预先分配,避免重复。
+- **评分表** —— 针对支付类 PM 岗位专门撰写的 1/3/5 分档锚点(非通用)。
+  例如"主人翁意识":5 = 主动发现无人跟进的结账故障模式,推动修复并为团队沉淀文档。
+- **复盘指引** —— 面试官先各自打分再讨论,重点讨论分歧项。
+
+---
+
+### `高级产品经理-录用通知书.docx`
+
+基于 `reference/offer-letter-template.md` 的 **(A) 录用通知书** 部分。有数据的字段预填:
+
+| 字段 | 值 |
 |---|---|
-| `[JOB TITLE]` | Senior Product Manager |
-| `[ANNUAL SALARY]` | `$160,000–$185,000 — confirm exact figure with HR before sending` |
-| `[CANDIDATE FULL NAME]` | Left blank |
-| `[PROPOSED START DATE]` | Left blank |
-| `[OFFER EXPIRATION DATE]` | Left blank |
-| At-will clause | Included |
-| Legal review disclaimer | Included |
+| `[岗位名称]` | 高级产品经理 |
+| `[月薪金额]` | `¥28,000–35,000/月 —— 与 HR 核实确切数额后填写` |
+| `[候选人姓名]` | 暂空 |
+| `[报到日期]` | 暂空 |
+| `[答复截止日期]` | 暂空 |
+| "本通知非劳动合同"声明 | 已包含 |
+| 试用期(不超过第 19 条上限)+ 试用期工资 ≥ 转正 80% 且 ≥ 当地最低工资 | 已包含 |
+| 五险一金 | 已包含 |
+| 身份/证件核验(外国人需就业许可) | 已包含 |
+| "入职 1 个月内须签书面劳动合同"提示 | 已包含 |
+| 页首红线【AI 辅助整理…请经律师/HR 复核后使用】 | 已包含 |
+
+> 同时向用户展示 `reference/offer-letter-template.md` 的 **(B) 书面劳动合同要点清单**,
+> 提醒:录用通知书只是要约,报到后须在 1 个月内签书面劳动合同;正式劳动合同/竞业条款的
+> 深度审查移交 crablaw-cn 的 `employment-contract-review`、`non-compete-review` 等技能或律师。
 
 ---
 
-## Phase 6 — Expected signature handoff
+## 阶段 6 —— 预期签署交接
 
-1. CrabCode asks: "What's the candidate's full name (and email, if you want it in
-   the cover message)?"
-2. Finalizes `Senior-PM-Offer-Letter.docx`: fills the candidate name, keeps
-   `[ANNUAL SALARY — confirm with HR]` as a marked placeholder, and confirms the
-   acceptance section has clear Signature and Date lines.
-3. Drafts a cover message in chat — subject
-   `Offer of Employment — Senior Product Manager at [Company Name]` plus a short
-   warm note — for the user to paste when sending.
-4. Hands off: "The offer letter is final at [path]. Upload it to 众律宝 and send
-   it to [Candidate Name] for signature — or print it for a wet signature. I can't
-   send it for you yet (the 众律宝 connector is pending)."
-5. Does NOT send anything — no email, no signing link. If the user asks for a
-   reminder, CrabCode offers a DingTalk/Feishu message via the connected connector
-   and shows the text before sending.
+1. CrabCode 询问:"候选人全名是?(如果想写进通知消息,也告诉我联系方式)"——用户答:李娜。
+2. 定稿 `高级产品经理-录用通知书.docx`:填入候选人姓名"李娜",保留
+   `[月薪 —— 与 HR 核实]` 为标注占位符,确认"本通知非劳动合同"声明与签名/日期栏齐全。
+3. 在对话中拟一条通知消息——标题 `云溪科技有限公司 录用通知书 —— 高级产品经理`,
+   加一句温暖的话——供用户粘贴发送。
+4. 交接:"录用通知书已定稿,路径 [文件路径]。请上传到众律宝发送给李娜签署,或打印后纸质签署。
+   我暂时还不能替你发送(众律宝连接器待接入)。提醒:李娜报到后请在 1 个月内签订书面劳动合同,
+   否则第 2 个月起须付双倍工资。"
+5. **不**替用户发送任何东西——不发邮件、不发签署链接、不代签劳动合同。若用户要提醒,
+   CrabCode 通过已连接的钉钉/飞书连接器发一条消息,并先展示文本再发送。
 
-**Pass criteria:** User receives a final .docx with the signer filled in, marked
-placeholders called out, and a paste-ready cover message. Nothing has been sent
-on the user's behalf, and CrabCode said so explicitly.
+**通过标准:** 用户拿到一份填好签署人的录用通知书 .docx、标注清楚的占位符、以及一条可直接
+粘贴的通知消息;没有任何东西被擅自发送或签署,且 CrabCode 明确说明了这一点;"1 个月内签
+书面劳动合同"的红线已向用户点明。

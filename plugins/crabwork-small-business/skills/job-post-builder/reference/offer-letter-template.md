@@ -1,139 +1,204 @@
-# Offer Letter Template
+# 录用通知书与书面劳动合同要点模板
 
-Use this as the base template for the offer letter .docx file.
-Replace all `[BRACKETED FIELDS]` with actual values or leave them as placeholders
-for the user to fill in. Mark any placeholder clearly so it's obvious what
-still needs to be completed before sending.
+> 【AI 辅助整理，非法律/人力资源意见，请经律师/HR 复核后使用】
 
-> ⚠️ Legal reminder: This template requires review by qualified legal counsel
-> before use. Employment law varies by jurisdiction.
+本文件是招聘环节的两件套底稿:
+
+- **(A) 录用通知书(Offer Letter)** —— 用人单位向候选人发出的**录用要约**。它**不是劳动合同**,只是"打算录用你、请你来报到"的意思表示。用它生成 `[岗位名称]-录用通知书.docx`。
+- **(B) 书面劳动合同要点清单/提示** —— 提醒双方入职后必须签的**书面劳动合同**该包含什么。本插件**只做要点提示,不起草正式劳动合同**;劳动合同、竞业限制、员工手册的合规审查请移交 crablaw-cn 法律插件(见文末"移交深度审查")或专业律师/HR。
+
+把所有 `[方括号字段]` 替换为真实值,或保留为占位符供用户填写。每个占位符要标注清楚,让人一眼看出**发出前还需补什么**。
+
+> ⚠️ 法律提醒:中国用工的法定凭证是**书面劳动合同**,不是录用通知书。录用通知书发出后反悔,可能承担**缔约过失责任**;书面劳动合同必须自**用工之日起 1 个月内**订立。本模板需经 HR / 律师复核后使用。
 
 ---
 
-## Template
+## (A) 录用通知书模板
 
 ---
 
-[COMPANY LETTERHEAD / LOGO]
+[公司抬头 / LOGO]
 
-[DATE]
+[日期]
 
-[CANDIDATE FULL NAME]
-[CANDIDATE ADDRESS LINE 1]
-[CANDIDATE ADDRESS LINE 2]
-[CITY, STATE, ZIP]
+致 [候选人姓名] 女士/先生:
 
-Dear [CANDIDATE FIRST NAME],
+感谢您参加 [公司名称] [岗位名称] 岗位的应聘。经综合评估,我们**诚挚地向您发出本录用通知书**,并期待您的加入。就录用相关事项通知如下:
 
-We are thrilled to offer you the position of **[JOB TITLE]** at [COMPANY NAME].
-We were genuinely impressed by [a brief, specific, warm note about the candidate —
-e.g., "your approach to the product design challenge and your thoughtful questions
-about the team's roadmap"], and we believe you will be an outstanding addition to
-our team.
+**一、岗位信息**
 
-**Position Details**
-
-| | |
+| 项目 | 内容 |
 |---|---|
-| Position Title | [JOB TITLE] |
-| Department | [DEPARTMENT] |
-| Reports To | [MANAGER NAME], [MANAGER TITLE] |
-| Employment Type | [Full-Time / Part-Time] |
-| FLSA Status | [Exempt / Non-Exempt] |
-| Start Date | [PROPOSED START DATE] |
-| Work Location | [OFFICE ADDRESS / Remote / Hybrid — specify days on-site if applicable] |
+| 岗位名称 | [岗位名称] |
+| 所属部门 | [部门] |
+| 汇报对象 | [直属上级姓名]，[上级职务] |
+| 用工形式 | [全日制 / 非全日制] |
+| 工时制度 | [标准工时制 / 综合计算工时制 / 不定时工作制]（后两种属特殊工时,须经当地人力资源社会保障部门审批后方可实行） |
+| 工作地点 | [工作地点，如"深圳市南山区……"；远程/混合办公请注明到岗要求] |
+| 拟报到时间 | [报到日期] |
 
-**Compensation**
+**二、劳动报酬**
 
-Your starting base salary will be **[ANNUAL SALARY OR HOURLY RATE]**,
-paid [bi-weekly / semi-monthly / monthly] in accordance with [COMPANY NAME]'s
-standard payroll schedule.
+税前月薪 **¥[月薪金额] 元/月**，按月发放，发薪日为每月 [发薪日]（如遇节假日顺延）。具体构成(基本工资、绩效、津贴等)以双方签订的书面劳动合同约定为准。
 
-[IF APPLICABLE — EQUITY]
-You will be eligible to receive a grant of **[NUMBER] [shares/options]** of
-[COMPANY NAME] [common stock / stock options] at the fair market value on the
-date of grant, subject to approval by the Board of Directors and the terms of
-the company's equity incentive plan. Your grant will vest over [VESTING SCHEDULE,
-e.g., "four years with a one-year cliff"].
+[如适用 —— 奖金]
+您可参加 [公司名称] 的年度绩效奖金,目标金额约为 [奖金金额或月数],具体依公司与个人绩效及奖金制度确定。
 
-[IF APPLICABLE — BONUS]
-You will be eligible to participate in [COMPANY NAME]'s annual bonus program,
-with a target bonus of **[BONUS AMOUNT OR %]** of your base salary, subject to
-company and individual performance.
+[如适用 —— 股权/期权激励]
+公司可能提供股权/期权激励。**中国境内股权激励的法律路径与税务处理与境外不同**,须由公司结合具体架构单独设计并另行签署协议;本通知书不含股权承诺,一切以另行签署的书面文件为准。
 
-**Benefits**
+**三、试用期**
 
-You will be eligible to participate in [COMPANY NAME]'s benefits program,
-which includes [list 3–5 key benefits, e.g., medical/dental/vision insurance,
-401(k) with employer match, paid parental leave, etc.]. Full details will be
-provided during your onboarding.
+拟约定试用期 **[试用期时长]**。试用期长度受法律上限约束(见下),试用期工资不低于转正后工资的 80% 且不低于工作地当地最低工资标准。**同一用人单位与同一劳动者只能约定一次试用期。** 试用期包含在劳动合同期限内,具体以书面劳动合同约定为准。
 
-**Conditions of Employment**
+**四、社会保险与住房公积金("五险一金")**
 
-This offer is contingent upon:
-- [Successful completion of a background check — delete if not applicable]
-- [Satisfactory reference checks — delete if not applicable]
-- [Verification of your legal right to work in [COUNTRY/JURISDICTION]]
-- Your execution of [COMPANY NAME]'s standard Confidentiality and Intellectual
-  Property Agreement (enclosed / provided separately)
+自建立劳动关系起,公司依法为您缴纳社会保险(养老、医疗、失业、工伤、生育)并缴存住房公积金。缴费基数与比例以参保城市当年社保/公积金政策为准。
 
-**Employment At-Will**
-[Include or delete depending on jurisdiction and employment type]
-Your employment with [COMPANY NAME] is at-will, meaning either you or the
-company may terminate the employment relationship at any time, with or without
-cause or advance notice.
+**五、录用附条件**
 
-**Acceptance**
+本录用以下列条件全部满足为前提,任一条件不成就,公司有权撤销本录用通知:
+- [通过入职背景调查 —— 不需要可删除]
+- [通过入职体检 —— 不需要可删除]
+- 完成身份与任职资格核验:中国公民请携带**居民身份证**及学历/资格证书原件;**外国人**入职须依法办理**外国人就业许可与工作类居留证件**方可用工
+- 签署 [公司名称] 的《保密与知识产权协议》(随附 / 另行提供)
+- 您与原单位不存在未了结的、可能影响本岗位任职的竞业限制或其他义务
 
-To accept this offer, please sign and return this letter by **[OFFER EXPIRATION DATE]**.
-We've enclosed a copy for your records.
+**六、答复期限与报到**
 
-[SIGNING INSTRUCTIONS — e.g. "You'll receive a 众律宝 signing link separately" — the owner sends the letter via 众律宝 or on paper; delete this line if not needed]
+请您于 **[答复截止日期]** 前签署并回传本通知书确认接受。逾期未确认的,本录用通知自动失效。请于 [报到日期] 携带上述证件到 [报到地点] 办理入职手续。
 
-We are excited about the prospect of you joining [COMPANY NAME] and look forward
-to welcoming you to the team. Please don't hesitate to reach out to [HR CONTACT NAME]
-at [HR CONTACT EMAIL] if you have any questions.
+**七、重要声明(务必阅读)**
 
-Sincerely,
+1. **本录用通知书是录用要约,不是劳动合同,不构成双方最终的劳动关系约定。** 双方权利义务以入职后签订的**书面劳动合同**为准。
+2. 依据《劳动合同法》,公司将自您**用工之日起 1 个月内**与您订立书面劳动合同,请您配合完成签署。
+3. 本通知书所载岗位、薪酬、试用期等为拟定条件,最终以书面劳动合同的约定为准;如两者不一致,以书面劳动合同为准。
 
-[HIRING MANAGER NAME]
-[HIRING MANAGER TITLE]
-[COMPANY NAME]
-[DATE]
+[签署说明 —— 例如"您将另行收到众律宝签署链接"；本通知书由用人单位通过众律宝发起签署或纸质签署,不需要可删除此行]
+
+如您有任何疑问,欢迎联系 [HR 联系人姓名]（[HR 联系电话/企业微信]）。再次期待您的加入!
+
+此致
+
+[招聘负责人姓名]
+[招聘负责人职务]
+[公司名称]（盖章）
+[日期]
 
 ---
 
-**Acceptance:**
+**候选人确认:**
 
-I, [CANDIDATE FULL NAME], accept the offer of employment described in this letter
-under the terms and conditions stated above.
+本人 [候选人姓名] 已阅读并理解本录用通知书的全部内容,**知悉本通知书为录用要约而非劳动合同**,同意接受上述录用条件,并将于约定时间报到、配合签订书面劳动合同。
 
-Signature: _______________________________ Date: _______________
+签名:_______________________________  日期:_______________
 
-[CANDIDATE FULL NAME] (printed)
-
----
-
-*⚠️ This template requires legal review before use in any employment context.
-Compensation ranges, equity terms, and at-will provisions vary by jurisdiction
-and should be reviewed by qualified legal counsel.*
+[候选人姓名]（正楷）
 
 ---
 
-## Field Reference
+*⚠️ 本模板为招聘录用底稿,发出前需经 HR / 律师复核。薪酬、试用期、股权等条款须符合《劳动合同法》及工作地当年政策;录用通知书不能替代书面劳动合同。*
 
-| Field | Description |
+---
+
+## (B) 书面劳动合同要点清单/提示
+
+> **本插件只生成招聘与录用材料,不起草正式劳动合同,也不出具法律意见。** 下列为提示性清单,帮助用户和 HR 记住书面劳动合同该覆盖的要点;正式劳动合同、竞业限制、员工手册的起草与合规审查请移交 crablaw-cn 法律插件或专业律师。
+
+### 🚩 头号红线:1 个月内必须签书面劳动合同
+
+- 用人单位应自**用工之日起 1 个月内**与劳动者订立**书面劳动合同**(《劳动合同法》第 10 条)。
+- 逾期不满 1 年未签的,自**用工满 1 个月的次日起至补签前一日**,应向劳动者**每月支付二倍工资**(第 82 条)。
+- 用工满 **1 年**仍未签书面劳动合同的,**视为已订立无固定期限劳动合同**。
+- 结论:录用通知书**不能**替代书面劳动合同。报到当天即应启动书面劳动合同签署流程。
+
+### 书面劳动合同必备条款(《劳动合同法》第 17 条)
+
+至少应包含:
+1. 用人单位名称、住所和法定代表人或主要负责人;劳动者姓名、住址和身份证件号码
+2. 劳动合同期限(固定期限 / 无固定期限 / 以完成一定工作任务为期限)
+3. 工作内容和工作地点
+4. 工作时间和休息休假
+5. 劳动报酬(数额、构成、发放时间与方式)
+6. 社会保险
+7. 劳动保护、劳动条件和职业危害防护
+8. 法律法规规定应纳入的其他事项(如试用期、培训、保密、补充保险与福利等,可由双方约定)
+
+### 试用期(《劳动合同法》第 19 条)
+
+| 劳动合同期限 | 试用期上限 |
 |---|---|
-| [COMPANY LETTERHEAD / LOGO] | Replace with actual letterhead or remove |
-| [DATE] | Date the letter is signed/sent |
-| [CANDIDATE FULL NAME] | Full legal name |
-| [JOB TITLE] | Exact title as posted |
-| [DEPARTMENT] | Team or business unit |
-| [MANAGER NAME / TITLE] | Direct manager |
-| [PROPOSED START DATE] | Target start date |
-| [ANNUAL SALARY OR HOURLY RATE] | Confirmed comp — verify with HR |
-| [EQUITY FIELDS] | Delete entire section if no equity |
-| [BONUS FIELDS] | Delete entire section if no bonus |
-| [OFFER EXPIRATION DATE] | Typically 3–5 business days from send |
-| [HR CONTACT] | Who candidate should call with questions |
-| [SIGNING INSTRUCTIONS] | How the candidate signs — the owner sends a 众律宝 signing link (manually; no connector yet) or uses paper. Delete if not needed |
+| 3 个月以上不满 1 年 | ≤ 1 个月 |
+| 1 年以上不满 3 年 | ≤ 2 个月 |
+| 3 年以上固定期限 / 无固定期限 | ≤ 6 个月 |
+| 以完成一定工作任务为期限 / 期限不满 3 个月 | 不得约定试用期 |
+
+- **同一用人单位与同一劳动者只能约定一次试用期。**
+- 试用期工资**不低于**转正后本岗位工资的 **80%**,且**不低于工作地当地最低工资标准**。
+
+### 工时制度
+
+- **标准工时制**:一般每日不超过 8 小时、每周不超过 40 小时;延长工作时间依法支付加班费。
+- **综合计算工时制 / 不定时工作制**:属特殊工时,**须经当地人力资源社会保障部门审批**后方可实行,不能在合同里随意约定。
+
+### 劳动报酬与发薪
+
+- 通常**按月**以货币形式**足额**支付,约定固定发薪日;不得克扣或无故拖欠。
+- 加班费、最低工资标准依工作地当年规定执行。
+
+### 社会保险与住房公积金
+
+- 依法缴纳养老、医疗、失业、工伤、生育保险,并缴存住房公积金。
+- 缴费基数、比例逐年、按地区调整,**不在此硬编码**;以**参保城市/当地社保局(全国统一咨询电话 12333)当年口径**为准。
+
+### 竞业限制(如涉及,《劳动合同法》第 23、24 条)
+
+- 仅可与**高级管理人员、高级技术人员和其他负有保密义务的人员**约定。
+- 期限**不超过 2 年**;在职期间无补偿,离职后竞业限制期内须**按月支付经济补偿**,否则条款履行存在瑕疵。
+- 违约金、补偿标准须合理约定 —— 请交由专业审查,勿套用模板。
+
+### 劳动合同解除与经济补偿(提示,非操作指引)
+
+- 中国**没有"随意雇佣"**这一说。用人单位单方解除劳动合同**必须具备法定情形**(《劳动合同法》第 39、40、41 条)。
+- **违法解除**的,劳动者可主张继续履行或要求**二倍经济补偿(俗称 2N)**赔偿金(第 87 条)。
+- **合法解除/终止**的,依法支付经济补偿(第 47 条,俗称 **N**;未提前 30 日通知而代通知的另加一个月工资,俗称 **N+1**)。
+- 具体情形复杂,**务必移交 crablaw-cn 或律师**评估,勿在录用阶段自行承诺解除条件。
+
+### 外国人用工提示
+
+- 中国公民:核验居民身份证及资格证件即可,无需"工作许可"类手续。
+- 外国人:须依法办理**外国人就业许可、工作类居留证件**后方可用工;未办理即用工存在合规风险。
+
+---
+
+## 移交深度审查(linter-safe)
+
+本插件仅生成招聘与录用材料,**不出具法律意见、不起草正式劳动合同**。以下深度审查请以文字建议移交 crablaw-cn 法律插件的对应技能,或专业律师:
+
+- 书面劳动合同条款审查 → `crablaw-cn:employment-contract-review`
+- 竞业限制/保密条款审查 → `crablaw-cn:non-compete-review`
+- 解除/裁员风险评估 → `crablaw-cn:termination-risk-review`
+- 员工手册/规章制度审查 → `crablaw-cn:employee-handbook-review`
+
+措辞示例:"本插件仅生成招聘与录用材料,不出具法律意见;劳动合同/竞业条款的合规审查建议交由 crablaw-cn 法律插件的 `employment-contract-review` 等技能,或专业律师。"
+
+---
+
+## 字段对照表(录用通知书)
+
+| 字段 | 说明 |
+|---|---|
+| [公司抬头 / LOGO] | 替换为实际抬头或删除 |
+| [日期] | 通知书出具/签署日期 |
+| [候选人姓名] | 候选人法定全名 |
+| [岗位名称] | 与招聘启事一致的岗位名 |
+| [部门] | 所属团队或业务单元 |
+| [直属上级姓名 / 职务] | 汇报对象 |
+| [报到日期] | 拟报到日期 |
+| [月薪金额] | 税前月薪(¥/月）—— 须经 HR 核实,勿臆造 |
+| [奖金字段] | 无奖金则删除该段 |
+| [股权/期权字段] | 无则删除;有则提示单独设计 |
+| [试用期时长] | 依合同期限套用第 19 条上限 |
+| [答复截止日期] | 一般为发出后 3–5 个工作日 |
+| [HR 联系人] | 候选人咨询对象 |
+| [签署说明] | 候选人如何签署 —— 用人单位通过众律宝发起签署(需用户手动发起,尚无连接器)或纸质。不需要可删除 |

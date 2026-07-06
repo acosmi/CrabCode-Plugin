@@ -1,71 +1,118 @@
-# Gotchas
+# 易踩的坑
 
-## 1. Claiming the offer was sent for signature
+## 1. 声称录用通知书已发出去签署
 
-✗ **Bad:** CrabCode finishes Phase 6 and says "I've sent the offer to the candidate
-via 众律宝 — you'll be notified when they sign."
+✗ **反面:** CrabCode 走完阶段 6,说"我已经通过众律宝把录用通知书发给候选人了——
+他们签署后会通知你。"
 
-✓ **Good:** CrabCode finalizes the offer letter, presents the cover message, and
-says: "The letter is final at [path]. Upload it to 众律宝 and send it yourself —
-I can't send it for you yet (the 众律宝 connector is pending)."
+✓ **正面:** CrabCode 把录用通知书定稿,展示附言消息,并说:"通知书已定稿,路径
+[文件路径]。请你自己上传到众律宝并发送——我暂时还不能替你发(众律宝连接器待接入)。"
 
-**Why it matters:** There is no e-sign connector in this plugin. Claiming a send
-happened means the candidate never receives the offer and the owner finds out days
-later. The skill's job ends at a signature-ready document plus a clear handoff.
+**为什么重要:** 本插件里没有电子签署连接器。谎称已发送,意味着候选人根本收不到录用
+通知书,而企业主几天后才发现。本技能的职责止于一份签署就绪的文档加一次清晰的交接。
 
 ---
 
-## 2. Missing candidate details before finalizing
+## 2. 定稿前缺少候选人信息
 
-✗ **Bad:** CrabCode reaches Phase 6, "finalizes" the letter, and hands it off with
-`[CANDIDATE FULL NAME]` still blank — then asks afterwards: "By the way, who is
-the candidate?"
+✗ **反面:** CrabCode 走到阶段 6,"定稿"了通知书,却在 `[候选人姓名]` 仍空白的情况下
+交了出去——事后才问:"对了,候选人是谁来着?"
 
-✓ **Good:** If the user chose signature-ready delivery in Phase 1, collect the
-candidate's full name (and email, if it goes in the cover message) before Phase 6
-finalization begins — either in Phase 1 or at the end of Phase 5. Never hand off
-a letter with a blank signer.
+✓ **正面:** 若用户在阶段 1 选了签署就绪的交付方式,就在阶段 6 定稿开始前——要么在
+阶段 1、要么在阶段 5 末尾——收集候选人全名(若要写进附言,还有邮箱)。绝不交出一份
+签署人空白的通知书。
 
-**Why it matters:** A "final" document with the signer missing isn't final — the
-owner uploads it to 众律宝, notices the blank, and has to round-trip back. Collect
-the details up front so the handoff is one clean step.
+**为什么重要:** 一份签署人缺失的"定稿"文档并不算定稿——企业主上传到众律宝后发现空白,
+只能再来回一趟。提前把信息收齐,让交接一步到位。
 
 ---
 
-## 3. Re-asking for context the user already provided
+## 3. 重复询问用户已经提供的信息
 
-✗ **Bad:** The user says "we need to hire a senior PM, fully remote, $160–180k"
-and Phase 1 asks for role title, location, and compensation anyway.
+✗ **反面:** 用户说"我们要招一个高级产品经理,可远程,月薪 ¥25–30k",阶段 1 却还是
+去问岗位名称、地点和薪酬。
 
-✓ **Good:** Extract role title, location, and compensation from the message, confirm
-them in a single sentence, and ask only for the fields that are genuinely missing.
+✓ **正面:** 从消息里提取岗位名称、地点和薪酬,用一句话确认,只追问真正缺失的字段。
 
-**Why it matters:** The skill explicitly requires "one focused clarifying question
-rather than a long form." Redundant questions break trust and slow the workflow.
-
----
-
-## 4. Silently expanding the user's existing format
-
-✗ **Bad:** The user has a 3-section job post on file. CrabCode produces a 7-section
-post based on `references/job-post-structure.md` without asking.
-
-✓ **Good:** Map the user's existing format against the reference, identify missing
-sections, and ask one question: "Your existing JD has X and Y — want me to add Z,
-or keep your current format?"
-
-**Why it matters:** The user's format is the source of truth. Overriding it silently
-may conflict with internal HR or legal standards the user hasn't mentioned.
+**为什么重要:** 本技能明确要求"用一个聚焦的澄清问题,而不是一份冗长的表单"。重复发问
+会破坏信任、拖慢流程。
 
 ---
 
-## 5. Inventing compensation figures
+## 4. 不问一声就擅自扩充用户的现有格式
 
-✗ **Bad:** No salary range was provided, so CrabCode writes "$120,000–$150,000 DOE"
-in the job post or offer letter.
+✗ **反面:** 用户存档里有一份 3 节的招聘启事。CrabCode 不问一声,就基于
+`references/job-post-structure.md` 产出一份 7 节的招聘启事。
 
-✓ **Good:** If compensation isn't provided, omit the range from the job post entirely.
-In the offer letter, use `[ANNUAL SALARY — confirm with HR]` as a bracketed placeholder.
+✓ **正面:** 把用户的现有格式与参考文件对照,找出缺失的章节,只问一个问题:"你现有的
+职位描述有 X 和 Y——要不要我加上 Z,还是保持你现在的格式?"
 
-**Why it matters:** Inventing compensation figures creates legal and HR liability.
-The skill's instructions are explicit: "Don't invent a range."
+**为什么重要:** 用户的格式即准绳。不声不响地覆盖它,可能与用户没提到的内部 HR 或法务
+标准相冲突。
+
+---
+
+## 5. 臆造薪酬数字
+
+✗ **反面:** 没有提供薪酬区间,CrabCode 却在招聘启事或录用通知书里写"¥12k–15k/月 面议"。
+
+✓ **正面:** 若未提供薪酬,就在招聘启事里完全略去区间。在录用通知书里,用
+`[月薪 —— 与 HR 核实]` 作为方括号占位符。薪酬一律用**月薪(¥/月)**表述。
+
+**为什么重要:** 臆造薪酬数字会带来法律和 HR 责任。本技能的指示很明确:"不要臆造区间。"
+
+---
+
+## 6. 把录用通知书当成最终雇佣凭证 / 写"随意雇佣"式随时解除条款
+
+✗ **反面:** CrabCode 在录用通知书里写"雇佣关系为随意雇佣,双方可随时无理由解除",
+或让用户以为签了录用通知书就等于确立了雇佣关系、不必再签劳动合同。
+
+✓ **正面:** 录用通知书只是**录用要约**,须写明"本通知非劳动合同,以书面劳动合同为准";
+中国**没有"随意雇佣"**,用人单位解除须有法定情形(《劳动合同法》39/40/41 条)。始终提示
+用户:**自用工之日起 1 个月内必须签订书面劳动合同**。
+
+**为什么重要:** "随意雇佣"条款在中国法下无效且违法;逾期未签书面劳动合同,第 2 个月起
+须付**双倍工资**(第 82 条),满 1 年未签**视为已订无固定期限合同**。把 offer 当凭证会
+让用人单位漏签劳动合同、埋下双倍工资和违法解除风险。深度审查移交 crablaw-cn 的
+`employment-contract-review` / `termination-risk-review`。
+
+---
+
+## 7. 试用期约定超上限或重复约定
+
+✗ **反面:** 3 个月的短期合同还约定 2 个月试用期;或员工转固定合同后再约定一次试用期;
+或把试用期工资压到远低于转正工资。
+
+✓ **正面:** 按《劳动合同法》第 19 条套上限——合同 3 月–1 年→≤1 个月;1–3 年→≤2 个月;
+3 年以上/无固定期限→≤6 个月;**同一单位对同一人只能约定一次**试用期。试用期工资**不低于**
+转正工资的 **80%** 且**不低于当地最低工资**。
+
+**为什么重要:** 违法约定的试用期一旦履行,劳动者可要求用人单位按**已履行超期部分**
+以转正工资标准支付赔偿金。
+
+---
+
+## 8. 招聘启事含就业歧视性条件
+
+✗ **反面:** 招聘启事写"仅限男性""限本地户籍""35 岁以下""已婚已育优先",或在面试中
+把女性婚育情况当录用门槛。
+
+✓ **正面:** 只写岗位真实需要的客观条件;不得基于**民族、种族、性别、宗教信仰**歧视,
+不得以性别拒录/提高标准或询问婚育作条件,不得歧视**传染病病原携带者**(除法定不宜岗位)。
+存疑表述交 HR / 律师复核。
+
+**为什么重要:** 就业歧视可引发行政处罚与劳动争议/诉讼,并损害雇主品牌。
+
+---
+
+## 9. 用美国工时/福利框架套中国岗位
+
+✗ **反面:** 录用通知书写美式"豁免/非豁免"工时、"企业退休金匹配""带薪育儿假"作为默认福利,
+或按双周/半月发薪。
+
+✓ **正面:** 用中国**工时制**(标准工时制;综合计算工时制、不定时工作制属特殊工时,须经
+人社部门审批);福利按**五险一金**(养老/医疗/失业/工伤/生育 + 住房公积金);通常**按月**
+在固定发薪日发薪。
+
+**为什么重要:** 美国工时/福利概念在中国无对应且不适用;套用会产生误导与合规风险。

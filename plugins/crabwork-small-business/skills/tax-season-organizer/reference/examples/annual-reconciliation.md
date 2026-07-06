@@ -1,103 +1,108 @@
-# Worked Example: Year-End 1099 Prep
+# 实例:年度汇算清缴数据整理
 
-**Scenario:** Marcus owns a digital marketing agency. He asks: "I need to send out
-my 1099s — can you pull together a list of who needs one?"
+**场景:** 李梅经营明发商贸个体工商户(增值税小规模纳税人)。她说:"要做去年的经营所得汇算了,
+帮我把全年收入、成本和发票理一理,交给代账会计。"
 
----
-
-## Step 1: Gather contractor payments from all sources
-
-**Accounting software export** (用友好会计 vendor payment report, Jan 1 – Dec 31, 2024,
-uploaded as CSV):
-
-| Vendor | Total paid | 1099 eligible? | EIN/SSN on file? |
-|--------|-----------|----------------|-----------------|
-| Jenna Torres (copywriter) | $8,400 | Yes | Yes |
-| Apex Web Solutions | $15,200 | Yes | Yes |
-| Bob Nguyen | $550 | No | No |
-| FedEx | $320 | No | No |
-| Spark Digital Inc. | $6,000 | Yes | Yes |
-
-**Alipay (支付宝商家平台 bill export, payments sent, 2024)** — the alipay connector
-cannot export history, so Marcus downloaded the bill CSV from 支付宝商家平台:
-
-| Recipient | Total sent | Notes |
-|-----------|-----------|-------|
-| jenna.torres@email.com | $1,200 | Likely same as accounting-software vendor |
-| designbymike@163.com | $2,100 | Not in the accounting export |
-| Bob Nguyen | $480 | |
-
-**WeChat Pay (微信支付)** — Marcus confirmed he pays no contractors via WeChat Pay;
-no 微信支付商户平台 export needed.
+> 个体工商户缴**经营所得个人所得税**,不缴企业所得税;经营所得汇算清缴期限为**次年 3 月 31 日前**
+> (企业主体的企业所得税汇算为次年 5 月 31 日前)。以电子税务局为准。
 
 ---
 
-## Step 2: Aggregate and deduplicate
+## 第一步:汇总全年收入与成本费用
 
-Cross-referencing the accounting export and the 支付宝 bill:
+**记账软件导出**(用友好会计,2025 年 1 月 1 日 – 12 月 31 日,上传 CSV):
 
-| Payee | Accounting export | 支付宝 | Total | Notes |
-|-------|-----------|--------|-------|-------|
-| Jenna Torres | $8,400 | $1,200 | **$9,600** | Same person — email match |
-| Apex Web Solutions | $15,200 | — | **$15,200** | |
-| Spark Digital Inc. | $6,000 | — | **$6,000** | |
-| Design by Mike (Mike unknown) | — | $2,100 | **$2,100** | Not in accounting export; payee name unknown |
-| Bob Nguyen | $550 | $480 | **$1,030** | Combined > $600; flagged |
-| FedEx | $320 | — | $320 | Below threshold; goods/shipping — exempt |
-
----
-
-## Step 3: Apply $600 threshold and W-9 check
-
-- Jenna Torres: $9,600 ✅ → **1099-NEC required** · W-9 on file (EIN in accounting software)
-- Apex Web Solutions: $15,200 ✅ → **1099-NEC candidate** · W-9 on file · Note: may be a corp (confirm)
-- Spark Digital Inc.: $6,000 ✅ → **1099-NEC candidate** · W-9 on file · "Inc." — likely corp exempt (confirm)
-- Design by Mike: $2,100 ✅ → **1099-NEC required** · W-9 not on file — must collect
-- Bob Nguyen: $1,030 ✅ → **1099-NEC required** · W-9 not on file — must collect
-- FedEx: $320 → below threshold; goods/shipping — not required
+| 项目 | 金额 | 备注 |
+|------|------|------|
+| 全年营业收入 | 210 万元 | 开票收入 188 万 + 未开票收入 22 万 |
+| 采购成本 | 150 万元 | 进项发票齐全 |
+| 房租 | 12 万元 | 取得增值税普通发票 |
+| 工资薪金 | 18 万元 | 有工资表 / 申报记录 |
+| 零星采购、运费等 | 9 万元 | **其中 4 万元仅有白条 / 收据** |
 
 ---
 
-## Step 4: Output delivered to Marcus
+## 第二步:核对进销项发票与收付流水
+
+**支付宝商家平台账单(2025 年收付款)** —— 支付宝连接器无法导出历史,李梅从商家平台下载账单 CSV:
+
+| 交易对方 | 年度金额 | 方向 | 备注 |
+|---------|---------|------|------|
+| 各零售客户(合计) | 196 万元 | 收款 | 与开票 + 部分未开票收入对应 |
+| 云仓物流 | 5 万元 | 付款 | 运费,**未见对应发票** |
+
+**微信支付** —— 李梅确认另有约 16 万元零售收款走微信支付,尚未导出微信支付商户平台账单。
+
+收入口径交叉核对:
+```
+账载收入 210 万 vs 开票收入 188 万 vs(支付宝 196 万 + 微信约 16 万 = 212 万收款流水)
+→ 差异主要为 22 万未开票收入 + 收付款时间差,请会计逐笔确认收入口径
+→ 微信支付账单未提供,收入完整性待补
+```
+
+---
+
+## 第三步:标记缺票 / 不可税前扣除项
+
+- 采购成本 150 万 ✅ 进项发票齐全 → 可税前扣除
+- 房租 12 万 ✅ 普通发票 → 可税前扣除
+- 工资薪金 18 万 ✅ 有工资表与个税申报 → 可税前扣除
+- 零星采购 / 运费 9 万:其中 5 万有票 ✅;**4 万元仅白条 / 收据 ⚠️ 不得税前扣除,须补票或纳税调整**
+- 云仓物流运费 5 万(支付宝付款)⚠️ 未见发票 → 缺票待补
+
+---
+
+## 第四步:核对可享的小微优惠
 
 ```
-## 1099 prep list — 2024
-Prepared January 10, 2025 · For review by your accountant · Not tax advice
+经营所得应纳税所得额(初步)= 收入 210 万 − 有票成本费用(150+12+18+5 = 185 万)= 25 万元
+(4 万缺票 + 5 万运费缺票未计入扣除,补票后可再调减)
+减半优惠:个体工商户年应纳税所得额 ≤ 200 万元部分减半征收(截至 2026,执行至 2027-12-31)
+→ 25 万元全部在减半区间内,请会计按减半口径核算
+六税两费:小规模 + 个体户可享减半,请会计一并核对
+```
 
-### Summary
-- Contractors paying: 5 candidates identified
-- Require 1099-NEC (≥$600 for services): 5
-- Missing W-9: 2 — action required before January 31
-- Corporation exemption review needed: 2 (Apex, Spark)
+---
 
-### 1099-NEC candidates
+## 第五步:交付给李梅的整理包
 
-| Payee | Total paid | Source(s) | W-9 status | Notes |
-|-------|-----------|-----------|------------|-------|
-| Jenna Torres | $9,600 | Accounting export + 支付宝 | ✅ EIN on file | 支付宝 also paid $1,200 — combined above |
-| Apex Web Solutions | $15,200 | Accounting export | ✅ EIN on file | "Solutions" — may be corp; confirm exemption with accountant |
-| Spark Digital Inc. | $6,000 | Accounting export | ✅ EIN on file | "Inc." — likely corp-exempt; confirm with accountant |
-| Design by Mike | $2,100 | 支付宝 only | ⚠️ Missing W-9 | Full name unknown — obtain before filing |
-| Bob Nguyen | $1,030 | Accounting export + 支付宝 | ⚠️ Missing W-9 | Combined books ($550) + 支付宝 ($480) = $1,030 |
+```
+【AI 辅助整理,非税务意见,请经会计/税务师复核后使用】
 
-### Missing W-9 action list
-These contractors must provide a W-9 before you can file:
+## 年度汇算清缴数据整理包 —— 2025 年度(经营所得,个体工商户)
+整理日期 2026-03-06 · 交代账会计 / 税务师核对 · 非税务意见,不代为申报
 
-1. **Design by Mike** — paid $2,100 via 支付宝. Obtain full legal name and W-9.
-   IRS W-9 form: https://www.irs.gov/pub/irs-pdf/fw9.pdf
-2. **Bob Nguyen** — paid $1,030 (books + 支付宝). W-9 not on file for either source.
+### 收入汇总
+- 账载收入 210 万元(开票 188 万 + 未开票 22 万)
+- 收款流水:支付宝 196 万 + 微信约 16 万 = 212 万 —— 与账载差异请会计核对
+- ⚠️ 微信支付商户平台账单未提供,收入完整性待补
 
-### Data coverage note
-This list covers the 用友好会计 vendor payment export and the 支付宝商家平台 bill
-export for 2024. Marcus confirmed no contractors are paid via 微信支付, so no
-微信支付商户平台 bill was needed. If any other payment rail was used, those
-payments are not included.
+### 成本费用与税前扣除凭证核对
+| 科目 | 金额 | 有票 / 缺票 |
+|------|------|------------|
+| 采购成本 | 150 万 | ✅ 有票 |
+| 房租 | 12 万 | ✅ 有票 |
+| 工资薪金 | 18 万 | ✅ 有据 |
+| 零星采购 / 运费 | 9 万 | ⚠️ 4 万缺票 |
+| 云仓物流运费 | 5 万 | ⚠️ 缺票 |
 
-### Next steps for your accountant
-- [ ] Collect W-9 from Design by Mike (full legal name needed first)
-- [ ] Collect W-9 from Bob Nguyen
-- [ ] Confirm corporation exemption for Apex Web Solutions
-- [ ] Confirm corporation exemption for Spark Digital Inc.
-- [ ] File 1099-NECs by January 31, 2025
-- [ ] File 1096 transmittal with IRS by January 31, 2025
+### 缺票待补 / 待调整清单(补票前不得税前扣除)
+1. **零星采购白条 4 万元** —— 向供货方索取发票,或由会计做纳税调整。
+2. **云仓物流运费 5 万元** —— 支付宝付款但无发票,向对方索取运输发票。
+
+### 小微优惠核对
+- 经营所得应纳税所得额约 25 万元(缺票 9 万未计入扣除,补票后可再调减)
+- 个体工商户 ≤ 200 万元部分减半征收(截至 2026,执行至 2027-12-31,请核实当年最新口径)
+- 六税两费减半适用,请会计一并核对
+
+### 数据覆盖说明
+本次覆盖用友好会计全年导出与支付宝商家平台账单;微信支付商户平台账单**未提供**,约 16 万元
+微信收款未纳入核对。补齐后我可重新汇总。
+
+### 交给会计的下一步
+- [ ] 向供货方 / 云仓物流补开发票(合计缺票约 9 万元)
+- [ ] 核对未开票收入 22 万元的收入确认口径
+- [ ] 补充微信支付商户平台账单,核对收入完整性
+- [ ] 确认经营所得减半与六税两费减半的适用
+- [ ] 按期完成经营所得汇算(2025 年度,2026-03-31 前,以电子税务局为准)
 ```

@@ -1,93 +1,95 @@
-# Worked Example: Quarterly Estimated Tax
+# 实例:季度申报数据整理
 
-**Scenario:** Sarah runs a freelance graphic design business as a sole proprietor.
-She asks: "How much should I pay in estimated taxes for Q2?"
-
----
-
-## Step 1: Gather the YTD P&L
-
-Sarah has no accounting-software connector, so she exports a P&L from 用友好会计
-and uploads the Excel file — January 1 through March 31, 2025:
-- Gross income: $48,000
-- Operating expenses: $12,500 (software, equipment, marketing)
-- Net ordinary income: **$35,500**
+**场景:** 张伟经营云溪科技有限公司(增值税小规模纳税人,按季申报)。他问:"第二季度增值税和
+所得税大概要准备多少?帮我把申报数据理一下。"
 
 ---
 
-## Step 2: Ask about prior payments
+## 第一步:收集当季经营数据
 
-> "Have you made any estimated tax payments so far this year?"
-
-Sarah: "I paid $2,000 in April for Q1."
+云溪科技没有记账软件连接器,张伟从用友好会计导出第二季度(4 月 1 日 – 6 月 30 日)利润表与销售额,
+上传 Excel:
+- 当季营业收入(销售额):**33.5 万元**(均为适用 3% 征收率的服务收入)
+- 当季成本费用合计:**24 万元**(其中**有发票支撑 21 万元**,无票白条 3 万元)
+- 本年累计应纳税所得额(前两季测算):约 **18 万元**
 
 ---
 
-## Step 3: Calculate
+## 第二步:确认身份与已申报情况
+
+> "先确认几项:增值税是小规模纳税人吧?所得税主体是有限公司(缴企业所得税)?本年前面季度
+> 预缴过多少?"
+
+张伟:"小规模,按季报;公司是有限责任公司。第一季度企业所得税预缴过一点,增值税因为没超 30 万免征了。"
+
+---
+
+## 第三步:分税种整理
 
 ```
-YTD net profit (Q1):        $35,500
-Annualized net profit:      $35,500 × 4 = $142,000  ← rough annualization
+【增值税 —— 小规模纳税人】
+当季销售额:33.5 万元(适用 3% 征收率的服务收入)
+免征线判断:季销售额 33.5 万 > 30 万元免征线 → 本季不免征,就全额计税
+适用征收率:现行 3% 减按 1%(截至 2026,执行至 2027-12-31,请核实当年最新口径)
+增值税测算:33.5 万 ÷(1 + 1%)× 1% ≈ 0.33 万元(不含税销售额 × 1%;确切数以申报表为准)
+提示:上季度未超 30 万免征,本季超线需全额计税,注意口径差异
 
-Self-employment tax:
-  SE base:   $142,000 × 92.35%  = $131,137
-  SE tax:    $131,137 × 15.3%   = $20,064
-  (Soc. Sec. cap at $176,100 — not hit, full rate applies)
-  Deductible half:              = $10,032
+【附加税费 —— 以实缴增值税为计税依据】
+计税依据:本季实缴增值税 ≈ 0.33 万元
+城建税(按所在地,示例市区 7%)+ 教育费附加 3% + 地方教育附加 2% = 合计 12%
+小规模可享"六税两费"减半 → 实际按 6% 测算 ≈ 0.33 万 × 6% ≈ 0.02 万元
+(具体比例按属地与当年政策,请会计核对)
 
-Federal income tax:
-  Adjusted net: $142,000 − $10,032 = $131,968
-  Bracket: 22% (estimated; actual may vary with household income)
-  Federal tax:  $131,968 × 22%     = $29,033
-
-Total estimated annual liability:
-  SE tax + federal = $20,064 + $29,033 = $49,097
-
-Quarterly breakdown:
-  Annual liability:       $49,097
-  Payments made (Q1):    −$2,000
-  Remaining:              $47,097 ÷ 3 remaining quarters = $15,699 per quarter
-  Q2 payment due June 16: ~$15,700
+【企业所得税 —— 季度预缴(累计口径)】
+本年累计应纳税所得额:约 18 万元(有票成本费用已扣除,3 万元缺票未计入扣除)
+小型微利三条件核对:应纳税所得额 ≤ 300 万 ✅ / 从业人数 ≤ 300 人(待张伟确认)/ 资产 ≤ 5000 万(待确认)
+若符合小型微利:18 万 × 25% × 20% = 18 万 × 5% ≈ 0.9 万元(累计预缴额,减已预缴)
+(截至 2026,执行至 2027-12-31,请核实当年最新口径)
 ```
 
 ---
 
-## Step 4: Output delivered to Sarah
+## 第四步:交付给张伟的整理包
 
 ```
-## Estimated tax summary — Q2 2025
-Prepared April 24, 2025 · For review by your accountant · Not tax advice
+【AI 辅助整理,非税务意见,请经会计/税务师复核后使用】
 
-**YTD net profit (Jan 1 – Mar 31):** $35,500
-**Estimated annual net profit:** $142,000 (annualized from Q1 actual)
-**Business type assumed:** Sole proprietor (confirm with accountant)
+## 季度申报数据整理包 —— 2026 年第二季度
+整理日期 2026-07-05 · 交代账会计 / 税务师核对 · 非税务意见,不代为申报
 
-### Self-employment tax
-$142,000 × 92.35% × 15.3% = $20,064
-Deductible SE half: $10,032
+**纳税人身份:** 增值税小规模纳税人(按季申报)· 所得税主体:有限责任公司(企业所得税)
+**当季销售额:** 33.5 万元 · 本年累计应纳税所得额约 18 万元
 
-### Federal income tax estimate
-Adjusted net income: $131,968
-Assumed bracket: 22% (confirm with accountant — household income affects this)
-Federal income tax estimate: $29,033
+### 增值税(小规模)
+- 季销售额 33.5 万元 > 30 万元免征线 → 本季不免征,全额计税
+- 适用征收率:3% 减按 1%(截至 2026,执行至 2027-12-31,请核实当年最新口径)
+- 增值税测算:不含税销售额 × 1% ≈ **0.33 万元**(确切数以申报表为准)
 
-### Total estimated annual liability
-$20,064 + $29,033 = **$49,097**
+### 附加税费(以实缴增值税为依据)
+- 城建税(示例市区 7%)+ 教育费附加 3% + 地方教育附加 2%,小规模享六税两费减半
+- 测算 ≈ **0.02 万元**(属地比例与减半以当年政策为准,请会计核对)
 
-### Q2 payment
-Annual liability:      $49,097
-Less Q1 payment made: −$2,000
-Remaining:             $47,097 ÷ 3 quarters = **~$15,700 due by June 16, 2025**
+### 企业所得税季度预缴(累计口径)
+- 本年累计应纳税所得额约 18 万元(3 万元缺票支出未计入扣除)
+- 小型微利三条件:应纳税所得额达标 ✅;从业人数、资产总额**待确认**
+- 若符合小型微利:减按 25% 计入、按 20% 征收(实际 5%)≈ **0.9 万元**(累计,减已预缴)
 
-### Safe harbor note
-To avoid underpayment penalty: ensure total 2025 payments ≥ 100% of your 2024
-tax (or 110% if 2024 AGI > $150,000). Ask your accountant for that figure.
+### 申报期限提示
+- 第二季度增值税、附加、企业所得税预缴:季度终了后 15 日内申报(遇节假日顺延),以电子税务局为准
 
-### Assumptions — review with your accountant
-- Federal bracket: 22% (effective rate may differ)
-- Business structure: sole proprietor (assumed)
-- Annualization: Q1 × 4 — income may be seasonal
-- State taxes: not included
-- QBI deduction (up to 20%): not applied — could reduce federal tax significantly
-- Retirement contributions, home office, vehicle: not applied
+### 口径、时效与待会计确认事项
+- 征收率 / 优惠均为截至 2026 现行、执行至 2027-12-31,请核实当年最新口径、以电子税务局为准
+- **待确认:** 小型微利的从业人数与资产总额是否达标
+- **缺票提示:** 3 万元无票支出未作税前扣除,请补票或由会计做纳税调整
+- 城建税属地比例(7%/5%/1%)与六税两费减半适用,请按属地核对
+- 本整理只产出交接包,申报与报送税务机关由您 / 会计执行,不代办
 ```
+
+---
+
+## 变体提示:个体工商户 / 个人独资的季度整理
+
+若主体是个体工商户 / 个人独资 / 合伙(如"明发商贸个体工商户"),第三步的所得税部分改为**经营所得
+预缴**:不缴企业所得税,按累计应纳税所得额套用 5%–35% 五级超额累进(见
+[calculation-assumptions.md](../calculation-assumptions.md)),年应纳税所得额 ≤ 200 万元部分减半;
+增值税与附加税费的整理逻辑相同。
