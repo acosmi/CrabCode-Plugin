@@ -10,6 +10,7 @@ description: >
   packet (xlsx + one-page PDF). Use when the user says "close the month,"
   "month-end," "reconcile," "what's missing," "P&L," or asks why revenue or
   margin changed this month.
+  亦触发于:"月结""对账""缺什么票""利润表""这个月利润怎么变的"。
 ---
 
 # Month End Prep

@@ -8,7 +8,7 @@ description: >
   当店主问客户情绪怎么样、要做评价分析、大家在说什么,或问起支付纠纷与退款客诉时使用。
   触发词:how customers are feeling, review analysis, what people are saying,
   disputes and refund complaints、"客户情绪怎么样"、"分析一下评价"、"大家在说什么"、
-  "最近的支付纠纷"、"退款客诉汇总"。
+  "最近的支付纠纷"、"退款客诉汇总"、"差评"、"口碑"、"客户满意度"、"投诉多不多"。
 ---
 
 # 客户情绪脉搏

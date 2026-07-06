@@ -1,7 +1,7 @@
 ---
 name: sales-brief
 version: 0.3.0
-description: 从店主的支付宝商家平台账单导出和会计软件数据(用友好会计 / 金蝶精斗云)中,盘出卖得最好和最差的商品,识别季节性规律,产出一份 2 周内容简报——主推赢家、清掉滞销。当店主运行 /sales-brief,或问"什么在卖""该推什么""我的爆款是啥""什么不动销""该发点什么""下一步该主推什么(要有数据支撑)"时触发。Also triggers on "what's selling," "what should I promote," "what's my best seller," "what's not moving," "what to post about," or a data-backed plan for what to push next. 可选回溯窗口 30、60 或 90 天。
+description: 产出快速 2 周行动计划与畅销滞销榜(两周窗口,区别于 30 天内容策略)。从店主的支付宝商家平台账单导出和会计软件数据(用友好会计 / 金蝶精斗云)中,盘出卖得最好和最差的商品,识别季节性规律,产出一份 2 周内容简报——主推赢家、清掉滞销。当店主运行 /sales-brief,或问"什么在卖""该推什么""我的爆款是啥""什么不动销""该发点什么""下一步该主推什么(要有数据支撑)"时触发。Also triggers on "what's selling," "what should I promote," "what's my best seller," "what's not moving," "what to post about," or a data-backed plan for what to push next. 可选回溯窗口 30、60 或 90 天。
 allowed-tools: Read, WebFetch, Bash
 ---
 

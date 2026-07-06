@@ -8,7 +8,7 @@ description: >
   经店主批准后创建支付宝收款链接嵌入提醒;所有提醒文案均在对话中起草,由店主自行复制发送,绝不代客发送。
   催收话术恪守合法催收红线,并附「非法律意见、请核实」提示。
   Use when the user asks "who owes me money," mentions overdue invoices, or wants to
-  follow up on unpaid invoices —— 亦触发于:催款、催收、欠款、应收账款、账款逾期、逾期发票、催开发票、开发票。
+  follow up on unpaid invoices —— 亦触发于:催款、催收、欠款、应收账款、账款逾期、逾期发票、催开发票、开发票、要账、货款、对账、客户拖着不付。
 ---
 
 # 催收逾期账款(Invoice Chase)

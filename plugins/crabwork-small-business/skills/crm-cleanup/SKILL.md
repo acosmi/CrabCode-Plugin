@@ -1,7 +1,7 @@
 ---
 name: crm-cleanup
 version: 0.3.0
-description: Scans HubSpot for stale deals, duplicate contacts, and missing fields, then fixes what the owner approves. Trigger when the owner runs /crm-cleanup or says "clean up the CRM," "HubSpot is a mess," "dedupe my contacts," "fix stale deals," "tidy up my pipeline," or wants their CRM data cleaned. Accepts optional scope argument for deals, contacts, or all.
+description: Scans HubSpot for stale deals, duplicate contacts, and missing fields, then fixes what the owner approves. Trigger when the owner runs /crm-cleanup or says "clean up the CRM," "HubSpot is a mess," "dedupe my contacts," "fix stale deals," "tidy up my pipeline," or wants their CRM data cleaned. Accepts optional scope argument for deals, contacts, or all. 亦触发于:"清理一下 CRM""HubSpot 太乱了""合并重复客户""清理僵尸商机""整理管道"。
 allowed-tools: Read, WebFetch, Bash
 ---
 

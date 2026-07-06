@@ -8,7 +8,7 @@ description: >
   判定是否属法定应退(七天无理由退货、三包质量问题、欺诈退一赔三),再谈店主善意裁量。
   触发词:"draft a response", "answer this customer", "where's my order",
   "I want a refund","起草回复"、"回这个客户"、"我的订单到哪了"、"我要退款"、
-  "这个能退吗"、"七天无理由退货"。
+  "这个能退吗"、"七天无理由退货"、"质量问题"、"破损/坏了"、"发错货"。
 compatibility: "需要支付宝、HubSpot(CRM 连接器以实际配置为准)。可选:Intercom、钉钉/飞书。微信支付尚未接入。连接器缺失时,仅凭粘贴进来的文本亦可运行。"
 ---
 

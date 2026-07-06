@@ -1,7 +1,7 @@
 ---
 name: monday-brief
 version: 0.3.0
-description: Generates a one-page Monday morning briefing from live connectors (钉钉/飞书 schedule and messages, HubSpot pipeline) plus any uploaded accounting or 支付宝 bill exports — cash, sales, pipeline, week ahead, top three to-dos. Trigger when the owner runs /monday-brief or says "what's on my plate this week," "Monday brief," "start-of-week summary," "catch me up to start the week," "what should I focus on this week," or wants a beginning-of-week overview. Accepts optional post destination and save-to arguments.
+description: Generates a one-page Monday morning briefing from live connectors (钉钉/飞书 schedule and messages, HubSpot pipeline) plus any uploaded accounting or 支付宝 bill exports — cash, sales, pipeline, week ahead, top three to-dos. Trigger when the owner runs /monday-brief or says "what's on my plate this week," "Monday brief," "start-of-week summary," "catch me up to start the week," "what should I focus on this week," or wants a beginning-of-week overview. Accepts optional post destination and save-to arguments. 亦触发于:"这周要忙啥""周一给我个概览""本周重点""开个周会"。
 allowed-tools: Read, WebFetch, Bash
 ---
 

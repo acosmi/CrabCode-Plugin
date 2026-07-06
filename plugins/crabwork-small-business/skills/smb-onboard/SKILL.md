@@ -10,6 +10,7 @@ description: >
   says any of: "set me up," "setup," "help me get set up," "get started," "help
   me get started," "get me started," "what can you do," "I'm new to this," or is
   in their first session.
+  亦触发于:"帮我设置""怎么开始用""新手上路""带我上手""第一次用怎么弄"。
 ---
 
 <!-- capability-route: office-spreadsheets=none(excel appears only in the pending-connector workaround description — CSV/Excel exports as a stopgap; onboarding delegates any export analysis to the matched recipe skill and produces no spreadsheet files itself) -->

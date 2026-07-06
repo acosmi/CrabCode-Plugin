@@ -1,7 +1,7 @@
 ---
 name: close-month
 version: 0.3.0
-description: Closes the month — reconciles the owner's accounting-software export (用友好会计 / 金蝶精斗云) against payment-platform bill exports (支付宝商家平台, 微信支付商户平台), flags gaps and uncategorized transactions, writes a plain-English P&L narrative, and exports an xlsx + PDF close packet. Trigger when the owner runs /close-month or says "close the month," "close the books," "month-end close," "reconcile last month," "do the monthly close," or hands the books off to their accountant. Accepts optional month and save-to arguments.
+description: Closes the month — reconciles the owner's accounting-software export (用友好会计 / 金蝶精斗云) against payment-platform bill exports (支付宝商家平台, 微信支付商户平台), flags gaps and uncategorized transactions, writes a plain-English P&L narrative, and exports an xlsx + PDF close packet. Trigger when the owner runs /close-month or says "close the month," "close the books," "month-end close," "reconcile last month," "do the monthly close," or hands the books off to their accountant. Accepts optional month and save-to arguments. 亦触发于:"月结""结账""对账""月底结账""把这个月的账结了"。
 allowed-tools: Read, WebFetch, Bash
 ---
 

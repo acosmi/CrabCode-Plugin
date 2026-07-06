@@ -9,6 +9,7 @@ description: >
   this meeting," "add this contact to HubSpot," "update the deal," "note what
   we discussed," "add context to a deal," or wants their CRM kept in sync after
   a conversation. (For bulk dedupe and stale-deal sweeps, that is crm-cleanup.)
+  亦触发于:"更新一下客户""记一下这次沟通""把这个客户加进去""记个通话""把刚聊的记下来"。
 ---
 
 # CRM Maintenance

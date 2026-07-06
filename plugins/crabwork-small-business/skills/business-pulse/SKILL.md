@@ -12,6 +12,7 @@ description: >
   picture. Trigger when the user asks how the business is doing, wants a
   snapshot, a weekly summary, a Monday brief, or says anything like "what am
   I missing" or "catch me up on the business."
+  亦触发于:"生意怎么样""最近生意如何""给我个整体情况""我是不是漏了什么""帮我把生意梳理一下"。
 ---
 
 # Business Pulse

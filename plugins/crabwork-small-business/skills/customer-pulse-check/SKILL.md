@@ -1,7 +1,7 @@
 ---
 name: customer-pulse-check
 version: 0.3.0
-description: 把支付纠纷/退款记录(支付宝商家平台 / 微信支付商户平台 导出或粘贴的数据)、HubSpot 工单,以及评价导出(大众点评/淘宝)综合成一份"最该修的三件事"清单,并附上供店主复核发送的客户回复模板草稿。触发:店主运行 /customer-pulse-check,或问 "what are customers saying"、"any complaints lately"、"review my feedback"、"what are people unhappy about"、"summarize my reviews",或"客户在说什么"、"最近有没有客诉"、"看看我的评价"、"大家不满什么"、"汇总一下我的评价"、"客户情绪怎么样"、"最该修的是什么",或想让反复出现的客户问题浮出来。可接受可选的 since-date 参数。
+description: 把支付纠纷/退款记录(支付宝商家平台 / 微信支付商户平台 导出或粘贴的数据)、HubSpot 工单,以及评价导出(大众点评/淘宝)综合成一份"最该修的三件事"清单,增量在于附上供店主复核后可直接发送的客户回复模板草稿(纯只读的评价与口碑分析请走 customer-pulse)。触发:店主运行 /customer-pulse-check,或问 "what are customers saying"、"any complaints lately"、"review my feedback"、"what are people unhappy about"、"summarize my reviews",或"客户在说什么"、"最近有没有客诉"、"看看我的评价"、"大家不满什么"、"汇总一下我的评价"、"最该修的是什么",或想让反复出现的客户问题浮出来。可接受可选的 since-date 参数。
 allowed-tools: Read, WebFetch, Bash
 ---
 

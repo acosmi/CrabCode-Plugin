@@ -13,6 +13,7 @@ description: >
   if the user doesn't say "margin" explicitly — phrases like "am I making
   enough?", "should I charge more?", or "my costs are going up" all call for
   this skill.
+  中文触发:"要不要涨价""该涨价吗""帮我定个价""毛利多少""赚不赚钱""成本涨了怎么办""这个卖多少钱合适""利润太薄"。
 ---
 
 # Margin Analyzer

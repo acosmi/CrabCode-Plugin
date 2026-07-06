@@ -11,6 +11,7 @@ description: >
   owner asks "what can you do," "help me with my business," "what should I
   focus on," "I don't know where to start," or any open-ended business request
   that doesn't clearly match a single skill.
+  触发词:"你能做什么""能帮我做点什么""帮我看看生意""我该先做什么""不知道从哪儿开始""有什么功能""随便帮我理理",或任何暂时对不上具体技能的开放式经营诉求——拿不准走哪个技能时默认进本技能引导。
 ---
 
 <!-- capability-route: office-spreadsheets=none(excel appears only in the data-requirements table describing what inputs other commands need; the router never parses exports or produces files itself — it hands off to the target skill) -->
