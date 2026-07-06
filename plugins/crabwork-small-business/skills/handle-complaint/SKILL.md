@@ -1,57 +1,76 @@
 ---
 name: handle-complaint
 version: 0.3.0
-description: Handles an incoming customer complaint end-to-end — pulls order and account context (HubSpot history, Alipay payment status by order number), drafts a tone-matched response for the owner to send, and suggests an operational fix so it doesn't recur. Trigger when the owner runs /handle-complaint or says "a customer is upset," "handle this complaint," "angry customer email," "deal with this complaint," "respond to this unhappy customer," or pastes a negative message. Accepts optional ticket ID argument.
+description: 端到端处理一条客户投诉——拉取订单与账户背景(HubSpot 历史、按订单号查支付宝支付状态;CRM 连接器以实际配置为准),先依《消费者权益保护法》判定是否属法定应退(七天无理由退货、三包质量问题、欺诈退一赔三),再以店主语气起草一封语气匹配、供店主发送的回复,并给出一条运营改进建议以防复发。触发:店主运行 /handle-complaint,或说 "a customer is upset"、"handle this complaint"、"angry customer email"、"deal with this complaint"、"respond to this unhappy customer",或"有客户不满"、"处理这条投诉"、"愤怒邮件"、"回一下这个不满的客户"、"这个要退款吗",或粘贴一条负面消息。可接受可选的工单 ID 参数。
 allowed-tools: Read, WebFetch, Bash
 ---
 
-Run the complaint resolution workflow by chaining two skills. Read the complaint, gather context, draft a response, and suggest a fix so it doesn't happen again.
+通过串联两个技能跑完投诉处理流程。读取投诉、收集背景、起草回复,并给出一条防止复发的运营改进建议。
 
-Parse arguments:
-- `TICKET_ID` (optional) — HubSpot ticket ID, or "latest" to pull the most recent unresolved complaint. If omitted, ask the owner to paste the complaint text — there is no email connector, so emailed complaints arrive as pasted text.
+解析参数:
+- `TICKET_ID`(可选)—— HubSpot 工单 ID,或填 "latest" 拉取最近一条未解决的投诉。若省略,请店主把投诉文本粘贴进来——目前尚无邮件连接器,邮件投诉以粘贴文本的形式进来。
 
-## Step 1 — Load the complaint (ticket-deflector)
+## 第 1 步 —— 载入投诉(ticket-deflector)
 
-Using the `ticket-deflector` skill workflow:
+沿用 `ticket-deflector` 技能的工作流:
 
-1. If a ticket ID was given: pull the full thread from HubSpot.
-2. If "latest": pull the most recent unresolved HubSpot ticket tagged as complaint/support.
-3. If neither: ask the owner to paste the complaint text directly.
-4. Identify: customer name, order/account info (including the 支付宝 order number if present), what they're upset about, what they're asking for.
+1. 若给了工单 ID:从 HubSpot 拉取完整往来。
+2. 若填 "latest":拉取最近一条标记为投诉 / 客服且未解决的 HubSpot 工单。
+3. 两者都没有:请店主直接粘贴投诉文本。
+4. 识别:客户姓名、订单 / 账户信息(含支付宝订单号,若有)、他们因何不满、诉求是什么。
 
-## Step 2 — Pull context
+## 第 2 步 —— 拉取背景
 
-1. Search HubSpot for the customer's history: past purchases, prior complaints, deal stage, lifetime value.
-2. If an Alipay order number is available, pull payment status via `query-alipay-payment` and refund status via `query-alipay-refund`. If not, ask the owner for the order number or have them look the payment up in 支付宝商家平台 / 微信支付商户平台 and paste the result. Dispute history has no connector — it comes from merchant-platform exports or pasted records.
-3. Summarize: "This is a {new/returning} customer, ¥{lifetime_value} in purchases, {0/N} prior complaints. Their current issue is {one sentence}."
+1. 在 HubSpot 检索该客户历史:过往购买、以往投诉、商机阶段、客户终身价值(CRM 连接器以实际配置为准)。
+2. 若有支付宝订单号,用 `query-alipay-payment` 查支付状态、`query-alipay-refund` 查退款状态。若没有,请店主提供订单号,或到支付宝商家平台 / 微信支付商户平台查到后粘贴结果。纠纷 / 争议历史没有连接器——来自商家平台导出或粘贴记录。
+3. 小结:"这是一位{新 / 回头}客户,累计消费 ¥{金额},此前{0 / N}次投诉。本次诉求是{一句话}。"
 
-## Step 3 — Draft response (ticket-deflector)
+## 第 3 步 —— 消保法法定权利判断
 
-Using the `ticket-deflector` skill workflow for tone-matched response:
+起草回复前,先依《消费者权益保护法》及其《实施条例》(2024-07-01 施行)判定诉求是否属**法定应退 / 应换 / 应赔**。**判断顺序:先定法定义务,再谈店主裁量。** 逐项核对:
 
-1. Draft a reply matched to the severity and the customer's history:
-   - First-time complainers with high LTV → empathetic, generous
-   - Repeat complainers → professional, firm, solution-focused
-   - Abusive tone → professional, brief, boundary-setting
-2. Include: acknowledgment, explanation (if known), resolution offer, next step.
-3. Present the draft to the owner. Do NOT send — the owner sends approved drafts from their own mailbox.
+- **网购七天无理由退货(第 25 条):** 自收货起 7 日内可无理由退货,**商品应当完好**;因查验拆封或合理调试不影响商品原有品质、功能、外观的,经营者**应予退货**。除外:定制商品、鲜活易腐、在线交付 / 拆封的数字化商品、已交付的报纸期刊。
+- **三包 / 质量问题:** 商品有质量问题的,依法**修理 / 更换 / 退货**,**不受七天限制**。
+- **欺诈退一赔三(第 55 条):** 经营者欺诈的,增加赔偿 = 价款的 **3 倍**,不足 **500 元的按 500 元**计。
+- **预付式消费 / 大数据杀熟(《实施条例》):** 不得相同条件下对不同人不同价;预付式不得降质加价、遇重大经营风险停止收取预付款、停业迁址提前告知。
 
-## Step 4 — Suggest operational fix (customer-pulse)
+**命中任一法定情形的,回复先落实法定义务(该退退、该换换、该赔赔),店主的额外让步只能叠加其上,不能用"善意让步"话术取代或规避法定应退。** 均未命中,再回到店主裁量。
 
-1. Check if this complaint matches a known theme (from prior `/customer-pulse-check` runs or similar complaints in HubSpot).
-2. If it's a pattern: "This is the {Nth} complaint about {issue} this month. Consider: {specific operational change}."
-3. If it's isolated: "This looks like a one-off. No pattern detected."
+## 第 4 步 —— 起草回复(ticket-deflector)
 
-## Connector failures
+沿用 `ticket-deflector` 技能的工作流做语气匹配回复:
 
-If HubSpot is unreachable, ask the owner to paste the complaint text — the skill works with manual input. If Alipay is not connected or no order number is available, skip the payment lookup and note "Payment status unavailable — working from complaint text only."
+1. 依第 3 步的法定判断与客户历史,起草匹配严重程度的回复:
+   - **命中法定应退 / 应换 / 应赔** → 先把依法处理写清楚,再谈额外让步
+   - 高终身价值的首次投诉者 → 共情、慷慨
+   - 反复投诉者 → 专业、有原则、聚焦解决
+   - 言语过激者 → 专业、简短、划定边界
+2. 包含:认可、解释(若已知)、解决方案、下一步。
+3. 每条面向客户的回复末尾保留红线提示(给店主的合规提醒,发送前可移除):
 
-## Approval gates
+   > 【AI 辅助草稿，非法律意见，退换货与赔偿请依《消费者权益保护法》核实】
 
-- **Never send a response without explicit owner approval.** Drafts only; the owner does the sending.
-- **Never issue refunds or credits automatically.** Present the option; the owner decides. An Alipay refund (`refund-alipay-payment`) runs only after the owner explicitly confirms amount, customer, and order number.
-- **Never close tickets without owner confirmation.** Dispute handling lives in the merchant platforms and is the owner's action.
+4. 把草稿呈给店主。**不要发送**——获批的草稿由店主从自己的邮箱 / 微信发送。
 
-## Output
+## 第 5 步 —— 提出运营改进建议(customer-pulse)
 
-Present the customer context summary, the drafted response, and any pattern-based operational suggestion. Ask: "Want to use this draft (I'll finalize it for you to send), edit it, or handle it differently?"
+沿用 `customer-pulse` 技能的工作流:
+
+1. 查这条投诉是否命中已知主题(来自以往 `/customer-pulse-check` 运行结果,或 HubSpot 中的同类投诉)。
+2. 若成规律:"这是本月第 {N} 起关于 {问题} 的投诉。建议:{具体运营改进}。"
+3. 若为个案:"看起来是一次性个案,未发现规律。"
+
+## 连接器失效
+
+若 HubSpot 不可达,请店主粘贴投诉文本——本技能可基于手工输入运行。若支付宝未连接或没有订单号,跳过支付查询并注明"支付状态不可用——仅凭投诉文本处理"。
+
+## 审批门禁
+
+- **不得起草违法拒绝法定退货 / 退款的回复;命中法定应退情形先依法处理。** 七天无理由(商品完好)、三包质量问题、欺诈退一赔三一旦命中,回复须先落实法定义务,不得用"善意让步"话术取代或规避——店主不得违法拒退。
+- **未经店主明确批准,绝不发送回复。** 只出草稿;发送由店主完成。
+- **绝不自动退款或补偿。** 呈上选项,由店主决定。支付宝退款(`refund-alipay-payment`)只有在店主明确确认金额、客户与订单号后才执行。
+- **未经店主确认,绝不关闭工单。** 纠纷处理在商家平台进行,是店主的动作。
+
+## 输出
+
+呈上客户背景小结、起草好的回复,以及任何基于规律的运营改进建议。若命中法定应退情形,注明依据(七天无理由 / 三包 / 退一赔三)。然后询问:"要用这份草稿吗(我来帮您定稿好发送)、还要改,还是换个方式处理?"

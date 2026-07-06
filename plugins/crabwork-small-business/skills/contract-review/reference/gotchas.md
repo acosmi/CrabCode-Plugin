@@ -1,105 +1,102 @@
-# Gotchas
+# 边界情形(Gotchas)
 
-Edge cases in contract analysis. Good / Bad pairs.
-
----
-
-## Gotcha: Flagging standard boilerplate as a red flag
-
-**Why it matters:** Over-flagging trains the user to ignore the summary. If everything is a red flag, nothing is.
-
-### ✗ Bad
-
-```
-Contract has a standard mutual NDA confidentiality clause, 2-year duration.
-CrabCode: "🔴 Red flag: Confidentiality clause imposes obligations on both parties."
-```
-
-Standard mutual NDA is market-norm. Flagging it as a red flag destroys signal-to-noise ratio.
-
-### ✓ Good
-
-```
-Contract has a standard mutual NDA confidentiality clause, 2-year duration.
-CrabCode: [skips; does not flag]
-```
-
-Reserve red flags for genuinely non-standard terms. If a clause is boilerplate and fair, omit it.
+合同分析中的边界情形。好 / 坏 对照。
 
 ---
 
-## Gotcha: Missing clauses aren't missing from the analysis
+## 坑:把标准套话当成红旗
 
-**Why it matters:** For SMBs, the absence of standard protections (liability cap, change order process, consequential damages waiver) is often more dangerous than an unfavorable clause — the default legal position fills the gap, usually in the counterparty's favor.
+**为什么要紧:** 过度标红会训练用户忽略摘要。若什么都是红旗,就没有红旗。
 
-### ✗ Bad
-
-```
-Contract has no liability cap.
-CrabCode: [no mention; only analyzes clauses that are present]
-```
-
-User signs thinking liability is limited. It isn't.
-
-### ✓ Good
+### ✗ 坏
 
 ```
-Contract has no liability cap.
-CrabCode: "🔴 Missing: No liability cap. This contract contains no limitation-of-liability
-clause. Under default law, your exposure is uncapped. Standard practice is to cap at
-fees paid in the prior 12 months. Suggest adding: 'Each party's total liability shall
-not exceed the fees paid or payable in the 12 months preceding the claim.'"
+合同含一条标准的双向保密条款,保密期 2 年。
+CrabCode:"🔴 高风险:保密条款对双方都设定了义务。"
 ```
 
-Treat absent-but-standard clauses as red flags. Explicitly label them "Missing."
+标准的双向保密属市场惯例。把它标成红旗会毁掉信噪比。
+
+### ✓ 好
+
+```
+合同含一条标准的双向保密条款,保密期 2 年。
+CrabCode:[略过;不标记]
+```
+
+红旗只留给真正非标准的条款。条款若是套话且公平,略去。
 
 ---
 
-## Gotcha: Large PDFs truncated mid-analysis
+## 坑:漏掉的条款不能从分析里漏掉
 
-**Why it matters:** Contracts over 20–30 pages often have the most dangerous terms in exhibits, schedules, or "Order Forms" at the back. If the PDF is read only up to page 15, key terms are silently missed.
+**为什么要紧:** 对中小企业而言,缺少标准保护(责任上限、变更签证机制、间接损失的处理)往往比一条不利条款更危险——法律的默认规则会填补空白,通常倒向对方一侧。
 
-### ✗ Bad
-
-```
-Skill reads pages 1–10 of a 40-page MSA. Schedules A–D (starting page 28) contain
-the IP assignment and liability cap. Skill produces a "clean" summary.
-```
-
-### ✓ Good
+### ✗ 坏
 
 ```
-Read the PDF in chunks: pages 1–10, 11–20, 21–40. Analyze all chunks before
-producing the summary. If a section heading mentions "Schedule," "Exhibit," or
-"Appendix," flag it explicitly and ensure it was read.
+合同没有约定责任上限。
+CrabCode:[只字不提;只分析写出来的条款]
 ```
 
-Always read the full document. Use the `pages` parameter to chunk large PDFs.
+用户以为责任有限,签了字。其实没有。
+
+### ✓ 好
+
+```
+合同没有约定责任上限。
+CrabCode:"🔴 缺失:未约定责任上限。本合同没有任何限制赔偿责任的条款。按《民法典》
+违约责任的默认规则,损失赔偿以订立合同时可预见的损失为限,但没有金额上限,你的赔偿
+敞口不封顶。市场惯例是封顶到索赔前 12 个月已付费用。建议加入:'任何一方的累计赔偿
+责任,不超过索赔发生前 12 个月内已支付或应付的费用。'"
+```
+
+把"本该有却缺失"的标准条款当红旗对待,并明确标注"缺失"。
 
 ---
 
-## Gotcha: Counterparty template vs. negotiated draft
+## 坑:大 PDF 分析到一半被截断
 
-**Why it matters:** Recommendations should match the negotiating context. Pushing back hard on a startup's first-draft agreement is different from pushing back on a Fortune 500 procurement template — the latter is often non-negotiable on 80% of its terms.
+**为什么要紧:** 20–30 页以上的合同,最危险的条款常在末尾的附件、附表或"订单表"里。若 PDF 只读到第 15 页,关键条款会被悄悄漏掉。
 
-### ✗ Bad
-
-```
-Fortune 500 vendor agreement with standard procurement terms.
-CrabCode: "🔴 This Net-60 payment term should be renegotiated to Net-30.
-         Their legal team will likely accept the change."
-```
-
-Unrealistic recommendation wastes the user's political capital.
-
-### ✓ Good
+### ✗ 坏
 
 ```
-CrabCode: "🟡 Net-60 payment terms. This is longer than typical (Net-30 is standard),
-         but common in large enterprise procurement templates. Worth asking for
-         Net-45 as a compromise — they may accept it, especially for recurring work.
-         Note: if this is a Fortune 500 template, payment terms are often non-negotiable
-         in the first engagement."
+技能只读了 40 页服务合同的第 1–10 页。附表 A–D(从第 28 页起)含知识产权归属与
+责任上限。技能却出了一份"干净"的摘要。
 ```
 
-Match the recommendation to the power dynamic. Label it yellow, not red. Acknowledge the reality.
+### ✓ 好
+
+```
+分块读取 PDF:第 1–10 页、11–20 页、21–40 页。所有分块都分析完再出摘要。
+若某段标题出现"附表""附件""附录",明确指出并确保已读到。
+```
+
+务必通读全文。用 `pages` 参数对大 PDF 分块。
+
+---
+
+## 坑:对方格式范本 vs 双方协商稿
+
+**为什么要紧:** 建议要匹配谈判情境。对一份初创公司的首版协议猛烈还价,和对一份大型企业采购范本还价是两回事——后者往往 80% 的条款不容改动。
+
+### ✗ 坏
+
+```
+大型企业供应商采购协议,标准采购条款。
+CrabCode:"🔴 这个 60 天账期应改成 30 天。
+         对方法务多半会接受。"
+```
+
+不切实际的建议白白浪费用户的谈判筹码。
+
+### ✓ 好
+
+```
+CrabCode:"🟡 账期 60 天。比通常更长(30 天是常态),但在大型企业采购范本里常见。
+         值得争取 45 天作为折中——对方可能接受,尤其是长期回头合作。
+         注:若这是大型企业范本,首次合作时账期往往不容协商。"
+```
+
+让建议匹配力量对比。标黄,而非标红。承认现实。

@@ -1,214 +1,264 @@
-# Gotchas
+# 易踩的坑(Gotchas)
 
-Common failure modes for the design-creator skill.
-
----
-
-## Gotcha: Claiming an asset was generated
-
-**Why it matters:** No design connector ships with this plugin — the
-in-house cloud design service (自营云端设计) connector is not yet
-available. This skill produces design briefs; only the owner produces
-pixels. Presenting a "rendered design," a preview image, or a "generated
-asset" that the owner never handed back is fabrication, and it breaks the
-Stage 5 attachment step downstream (there is no file).
-
-### ✗ Bad
-
-```
-"I've generated the Jun 2 design — here's a preview: [image]"
-(No rendered file exists. The 'preview' is invented.)
-```
-
-Or any variation: "the design tool returned…", "your asset is ready in
-自营云端设计…" — all forbidden until the owner supplies the file.
-
-### ✓ Good
-
-```
-"The Jun 2 design brief is approved. Render it in your design tool and
-send back the file or a hosted URL — I'll verify it against the brief
-and stage the post."
-```
-
-An asset exists in this workflow at exactly one moment: when the owner
-hands back the rendered file.
+design-creator 技能常见的失败模式。
 
 ---
 
-## Gotcha: Producing a design brief for an email row
+## 坑:谎称素材已"生成"
 
-**Why it matters:** The owner descoped design work from the email path
-entirely. Emails from this skill are text-only — subject, preheader,
-body. Writing a design brief for an email row — even "just as a visual
-reference" — is a regression of an explicit descope.
+**为什么要紧:** 本插件不带任何设计连接器——自营云端设计的连接器尚未上线。本技能
+产出设计简报;只有店主产出像素。把店主从未交回的"渲染稿""预览图""生成的素材"呈现
+出来,就是编造,还会在下游打断阶段 5 的附件步骤(根本没有文件)。
 
-### ✗ Bad
-
-```
-Calendar has 6 social rows + 2 email rows.
-→ Stage 3 writes 6 social briefs + 2 email header briefs.
-```
-
-### ✓ Good
+### ✗ 坏
 
 ```
-Stage 1: Calendar built with Path column.
-  - 6 rows tagged Design brief (social)
-  - 2 rows tagged Text-only (no design work)
-Stage 3: Writes exactly 6 briefs. Email rows never enter this stage.
-Stage 4: Drafts 6 social captions + 2 full emails (subject + preheader +
-         body) as plain text.
-Stage 5: Stages/packages 6 social posts. Surfaces 2 emails inline for
-         the owner to copy into their email tool.
+"我已经生成了 6月2日 的设计——预览在这:[图片]"
+(不存在任何渲染文件。这张"预览"是编的。)
 ```
 
-If the owner explicitly asks for a designed email ("can you spec a
-header image for the Jun 5 email?"), redirect: "This skill keeps emails
-as text-only. If you want a designed email, build the visual in your
-design tool and I can help you write the copy here."
+或任何变体:"设计工具返回了……""你的素材已在自营云端设计里就绪……"——在店主
+交回文件之前一律禁止。
+
+### ✓ 好
+
+```
+"6月2日 的设计简报已批准。请在你的设计工具中渲染,把文件或托管 URL 发回给我——
+我会对照简报核验,再暂存这条帖。"
+```
+
+在本工作流里,素材只在一个时刻存在:店主交回渲染文件的那一刻。
 
 ---
 
-## Gotcha: Skipping Checkpoint 1 (calendar approval) before writing briefs
+## 坑:给邮件行做设计简报
 
-**Why it matters:** Writing 10+ design briefs takes time and owner
-attention — and the owner then renders them by hand. If the calendar has
-the wrong dates, wrong channels, or the owner changes their mind about a
-theme, all that work (and any rendering already done) is discarded. The
-calendar checkpoint is the cheapest place to catch misalignment.
+**为什么要紧:** 店主已把设计工作彻底移出邮件路径。本技能产出的邮件是纯文本——
+主题行、预览文字、正文。给邮件行写设计简报——哪怕"只是当个视觉参考"——也是对一条
+明确移除项的倒退。
 
-### ✗ Bad
+### ✗ 坏
 
-Receive the brief → immediately write all 12 design briefs → present
-them before the owner has agreed on the schedule.
+```
+日历有 6 个社交行 + 2 个邮件行。
+→ 阶段 3 写了 6 份社交简报 + 2 份邮件头图简报。
+```
 
-Owner: "Oh wait, I didn't want any posts the week of the 15th, I'm traveling."
+### ✓ 好
 
-### ✓ Good
+```
+阶段 1:日历带 路径 列搭好。
+  - 6 行标记 设计简报(社交)
+  - 2 行标记 纯文本(无设计工作)
+阶段 3:恰好写 6 份简报。邮件行绝不进入本阶段。
+阶段 4:起草 6 段社交文案 + 2 封完整邮件(主题行 + 预览文字 + 正文),纯文本。
+阶段 5:暂存/打包 6 条社交帖。把 2 封邮件内联呈现,供店主复制进邮件工具。
+```
 
-Present the calendar table first. Wait for explicit "looks good" before
-writing a single design brief.
+若店主明确要求做设计版邮件("能给 6月5日 的邮件设计个头图吗?"),改道:"本技能
+把邮件保持为纯文本。若你想要设计版邮件,请在你的设计工具里做视觉,文案我可以在这
+帮你写。"
 
 ---
 
-## Gotcha: Layout needs more photos than the brief provides
+## 坑:日历批准(检查点 1)前就写简报
 
-**Why it matters:** Multi-image layouts (小红书 carousels, product grids)
-can need 3+ photos. When the content brief gives you 1 photo and the
-layout demands 3, a design brief with unresolved slots ("Product2: TBD")
-sends the owner into their design tool with nothing to place — they
-either stall or ship a stock placeholder.
+**为什么要紧:** 写 10+ 份设计简报既费时又占店主注意力——而且要店主亲手渲染。若
+日历的日期错了、渠道错了,或店主改了主意换主题,这些工作(以及已经渲染的部分)全部
+作废。日历检查点是最便宜的纠偏点。
 
-### ✗ Bad
+### ✗ 坏
 
-Build the manifest with one row per asset ("Carousel — needs product
-photos"). Write the brief with 1 named file and 2 vague slots. Owner
-renders slide 1 properly and fills slides 2–3 with stock images.
+拿到简报 → 立刻写完全部 12 份设计简报 → 在店主还没就排期达成一致时就呈现。
 
-### ✓ Good
+店主:"哦等等,15 号那周我不想发帖,我要出差。"
 
-Build the manifest slot-by-slot. Surface the gap explicitly:
+### ✓ 好
 
-```
-The Jun 9 carousel layout has 3 image slots. The brief gave me 1 photo
-(linen_midi_01.jpg). How should I fill the other 2?
-
-1. Reuse the same photo across all 3 slots
-2. You point me at 2 more photos (file paths)
-3. Switch to a single-image layout
-```
-
-Wait for the owner's choice before writing the brief. Every slot in a
-presented brief names a real file.
+先呈现日历表。等到明确的"可以"之后,再写第一份设计简报。
 
 ---
 
-## Gotcha: Staging a post before verifying the rendered asset against its brief
+## 坑:版式需要的照片比简报提供的多
 
-**Why it matters:** Brief approval is not asset approval. The owner
-renders by hand — typos in the overlay text, the wrong photo, or the
-wrong aspect ratio slip in easily. A staged post with a near-miss asset
-goes out wrong, and the error is public.
+**为什么要紧:** 多图版式(小红书轮播、产品格)可能需要 3+ 张照片。当内容简报只给
+你 1 张、版式却要 3 张时,一份留着未解决图片位("产品2:待定")的简报会把店主送进
+设计工具却无图可放——他要么卡住,要么塞一张图库占位图。
 
-### ✗ Bad
+### ✗ 坏
+
+按"一素材一行"建清单("轮播——需要产品图")。简报里 1 个命名文件 + 2 个含糊的位。
+店主把第 1 张做好,第 2、3 张用图库图凑。
+
+### ✓ 好
+
+逐位建清单。把缺口显式抛出:
 
 ```
-Owner sends back 8 rendered files → attach and stage all 8 immediately.
+6月9日的轮播版式有 3 个图片位。简报只给了我 1 张照片(linen_midi_01.jpg)。
+另外 2 个怎么填?
+
+1. 三个位复用同一张照片
+2. 你再给我 2 张照片(文件路径)
+3. 改成单图图文
 ```
 
-Result: the Jun 9 post publishes with "Sumer linen" in the headline.
-
-### ✓ Good
-
-Run every returned file through the verification checklist in
-`design-brief-spec.md`: right photo per slot, overlay text verbatim,
-correct dimensions, on-brand colors, no leftover template text. Name any
-deviation exactly ("Jun 9 cover uses the denim photo; brief calls for
-linen_midi_01.jpg") and ask for a re-render of just that asset. Only
-verified assets reach Stage 5.
+等到店主选完再写简报。已呈现简报里的每个位都指向一个真实文件。
 
 ---
 
-## Gotcha: Routing domestic-platform rows through the HubSpot Social API
+## 坑:暂存前未对照简报核验渲染素材
 
-**Why it matters:** HubSpot Social can only auto-publish to accounts
-connected in HubSpot; 公众号, 小红书, 抖音, and 视频号 cannot be connected.
-Calling the Social API for those rows either errors or, worse, stages a
-post to the wrong (overseas) channel the owner happens to have connected.
+**为什么要紧:** 简报批准不等于素材批准。店主亲手渲染——叠加文字打错字、放错照片、
+比例弄错,都很容易溜进来。带着"差一点"素材的暂存帖会发错,而错误是公开的。
 
-### ✗ Bad
+### ✗ 坏
 
 ```
-POST /marketing/v3/social/posts for the Jun 2 Xiaohongshu row,
-channelId guessed from the connected-accounts list.
+店主发回 8 个渲染文件 → 立刻全部附件并暂存 8 条。
 ```
 
-### ✓ Good
+结果:6月9日 那条帖以标题"夏日亚麻"发出,却拼成了"夏日亚蔴"。
 
-Split Stage 5 by channel: rows for HubSpot-connectable accounts are
-staged as `SCHEDULED`; 公众号/小红书/抖音/视频号 rows get a publish-ready
-package (date/time + final caption + verified asset) plus the scheduling
-CSV, logged against the HubSpot campaign for tracking. The owner
-publishes natively — 公众号 supports scheduled publishing in its own
-editor.
+### ✓ 好
+
+把每个发回的文件过一遍 `design-brief-spec.md` 里的核验清单:每个位照片正确、叠加
+文字逐字一致、尺寸正确、颜色合品牌、没有残留模板文字。精确点名任何偏差("6月9日
+封面用了牛仔照;简报要的是 linen_midi_01.jpg"),请店主只重渲这一个素材。只有已核验
+的素材能进阶段 5。
 
 ---
 
-## Gotcha: Caption voice drift across a long calendar
+## 坑:把国内平台行走 HubSpot Social API
 
-**Why it matters:** When drafting 12–20 captions in one pass, the tone tends
-to drift — early captions follow the brief's voice markers, later ones slip
-into generic marketing copy. Owners notice immediately.
+**为什么要紧:** HubSpot Social 只能自动发布到在 HubSpot 内已连接的账号;公众号、
+小红书、抖音、视频号无法接入。对这些行调用 Social API,要么报错,更糟的是把帖暂存
+到店主恰好连着的另一个(海外)错误渠道。
 
-### ✗ Bad
+### ✗ 坏
 
-Post 1: "Our handmade candles are the perfect summer gift 🌿" (matches brief: "warm, conversational")
-Post 10: "Elevate your ambiance with our artisanal fragrance collection." (corporate drift)
+```
+为 6月2日 的小红书行调用 POST /marketing/v3/social/posts,
+channelId 从已连接账号列表里猜一个。
+```
 
-### ✓ Good
+### ✓ 好
 
-Before drafting, anchor on 2–3 voice markers from the brief (e.g., "casual,
-friendly, uses light humor"). Re-read the first draft caption before writing
-each new one. If the owner flags a voice mismatch on any caption, re-read that
-caption and flag it as the recalibration point for the remaining drafts.
+按渠道拆分阶段 5:HubSpot 可连接账号的行暂存为 `SCHEDULED`;公众号/小红书/抖音/
+视频号 行拿到可直接发布的打包件(日期/时间 + 最终文案 + 已核验素材)外加排期 CSV,
+登记到 HubSpot 战役下以便追踪。店主原生发布——公众号在自己的编辑器里支持定时发布。
 
 ---
 
-## Gotcha: Staging HubSpot posts without verifying `scheduledAt` is in the future
+## 坑:长日历里文案语气漂移
 
-**Why it matters:** HubSpot rejects posts with `scheduledAt` in the past with
-a validation error. If the calendar was built on an earlier date and the
-owner is only now staging, some dates may have passed.
+**为什么要紧:** 一口气起草 12–20 段文案时,语气容易漂——前几段还跟着简报的语气
+标记,后面的滑向通用营销腔。店主一眼就看出来。
 
-### ✗ Bad
+### ✗ 坏
 
-Build calendar on April 1st for June posts → owner approves May 15th → try to
-stage without checking → post for "April 30th 10:00 AM" returns 400.
+第 1 帖:"我们的手工蜡烛是完美的夏日礼物 🌿"(贴合简报:"温暖、口语化")
+第 10 帖:"以我们的匠心香氛系列提升您的居家氛围。"(官腔漂移)
 
-### ✓ Good
+### ✓ 好
 
-Before calling `POST /social/posts`, compare each `scheduledAt` against the
-current UTC time. If any post date has passed, surface it: "The post scheduled
-for April 30th has already passed. Should I skip it, or reschedule it to next
-week?"
+起草前,先锚定简报里的 2–3 个语气标记(如"轻松、友好、带点幽默")。写每一段新文案
+前,重读第一段草稿。若店主对某段指出语气不符,重读那一段,并把它作为其余草稿的
+重新校准点。
+
+---
+
+## 坑:暂存 HubSpot 帖前未核验 `scheduledAt` 在未来
+
+**为什么要紧:** HubSpot 会以校验错误拒绝 `scheduledAt` 在过去的帖。若日历是在更早
+的日期搭的、店主现在才来暂存,有些日期可能已经过去。
+
+### ✗ 坏
+
+4月1日 为 6 月的帖搭日历 → 店主 5月15日 批准 → 不检查就暂存 → "4月30日 10:00" 的帖
+返回 400。
+
+### ✓ 好
+
+调用 `POST /social/posts` 前,把每个 `scheduledAt` 与当前 UTC 时间比对。若有日期已
+过去,抛出来:"排在 4月30日 的帖已经过去了。跳过它,还是改到下周?"
+
+---
+
+## 坑:文案 / 图上文字用了极限词(绝对化用语)
+
+**为什么要紧:** 这是小微商家最容易踩、罚得最狠的雷。"最佳""第一""顶级""国家级"这类
+绝对化用语,一旦落到公众号/小红书/抖音/视频号的文案或图上文字里,就是可被立案的
+违法广告。**罚则:《广告法》第 57 条——责令停止发布、处 20 万至 100 万元罚款,情节
+严重者吊销营业执照。** 图上文字与正文文案同属对外广告,都要过阶段 4 自检。
+
+### ✗ 坏
+
+```
+小红书标题:"全网最好的亚麻裙,杭州第一,断货王!"
+图上文字:  "顶级面料 · 绝对透气"
+```
+
+### ✓ 好
+
+```
+小红书标题:"夏天最想穿的那条亚麻裙(私心推荐)"
+图上文字:  "亲肤透气的水洗亚麻 · 上新到店"
+```
+
+默认避免极限词。确需强调优势,用可证的具体表述("含棉量 55%""3 天售出 200 条"需有
+后台数据支撑),或限定范围且有客观依据(如指向本店自身、限定"本次上新")。**存疑
+一律移交 `crablaw-cn:marketing-claims-review`,不带雷投放。**
+
+---
+
+## 坑:促销文案虚构原价 / 虚假折扣 / 买赠条件含糊(价格法)
+
+**为什么要紧:** "原价 ¥999,今日 ¥299""买 2 送 1""满 300 减 100"这类促销,若原价从
+未实际成交、折扣算错、或赠品与门槛写不清,触碰《价格法》与《消费者权益保护法》(虚构
+原价、价格欺诈)。小微做促销尤其高频踩这条。
+
+### ✗ 坏
+
+```
+"原价 ¥888,今日直降到 ¥199!买 2 条连衣裙送豪礼,手慢无!"
+(原价从未按 ¥888 卖过;"豪礼"是什么、送多少、送到几号,全不明。)
+```
+
+### ✓ 好
+
+```
+"夏季款连衣裙 ¥299/条(日常价 ¥299,明码标价)。6月1日–7月31日:同一订单买 2 条
+连衣裙,赠 1 件指定配饰(帆布包或发带二选一,限量 200 份,送完即止)。"
+```
+
+凡出现原价/折扣/满减/买赠/免费,逐项核对:原价真实存在且曾实际成交、折扣算得对、
+赠品与门槛(数量、有效期、是否限量)写清楚。含糊的促销改写清楚或删。
+
+---
+
+## 坑:特殊行业(保健食品/医疗/教育/金融)套用通用促销文案
+
+**为什么要紧:** 医疗、药品、保健食品、医疗器械、教育培训、金融理财、房地产、化妆品
+有特别广告限制;部分属需广告审查行业,不得擅自发布。把通用促销腔("最有效""包过""稳
+赚")套上去,是这些行业里最典型的违法宣传。
+
+### ✗ 坏
+
+```
+保健食品文案:"吃了它,三高全没,替代降压药,一个月见效!"
+教育培训文案:"保过班,不过全额退,提分最快!"
+```
+
+### ✓ 好
+
+```
+保健食品文案:"XX 蛋白粉,每份含蛋白 12g。本品不能代替药物。"
+        (不宣称疗效;标注法定提示语;不与药品比较。)
+教育培训文案:"暑期口语小班,8 人满班,外教带练。"
+        (不承诺效果、不承诺升学/通过率。)
+```
+
+命中任一特殊行业:不套用通用促销模板,提示店主该行业文案须送审;正式对外宣称以
+文字建议移交 `crablaw-cn:marketing-claims-review`。若装了 `crabcode-media-ops`,其
+内容合规审查作为更深一层;未装时本技能自检即兜底,不得跳过。

@@ -1,97 +1,101 @@
-# Example: SaaS vendor agreement flagged summary
+# 实例:SaaS 服务合同分级摘要
 
-A worked example of contract-review output. Contract: a SaaS subscription agreement from a mid-size software vendor.
-
----
-
-## Input
-
-> "Review this SaaS agreement before I sign. We're a 12-person consulting firm."
-
-Contract: 18-page SaaS Subscription Agreement, vendor template, governing law: California.
+一个 contract-review 输出的完整实例。合同:一家中型软件供应商的 SaaS 订阅服务合同。
 
 ---
 
-## Output
+## 输入
 
-### 📋 Contract summary
+> "帮我看看这份 SaaS 服务合同再签。我们是一家 12 人的咨询公司。"
 
-12-month SaaS subscription, auto-renewing annually. Vendor provides project management software. You pay $2,400/year billed monthly. Vendor hosts data; you own your data but grant vendor a broad license to use it for "product improvement." You can terminate with 30 days notice but owe fees through end of the contract term.
-
----
-
-### 🔴 Red flags (push back before signing)
-
-**1. Uncapped liability**
-
-> *"IN NO EVENT SHALL VENDOR'S LIABILITY EXCEED THE AMOUNTS ACTUALLY PAID BY CUSTOMER IN THE THREE (3) MONTHS PRECEDING THE CLAIM."*
-
-**Problem:** Three months of fees = $600. If a vendor data breach exposes your client data, your recovery is capped at $600 — regardless of actual damages. For a consulting firm handling client information, this is inadequate.
-
-**Ask for:** Cap at 12 months of fees paid ($2,400), or at a fixed floor of $50,000 for data security incidents. Suggested language:
-
-> *"Vendor's total liability shall not exceed the greater of (a) fees paid in the twelve (12) months preceding the claim or (b) $50,000 for claims arising from data security incidents."*
+合同:18 页《SaaS 订阅服务合同》,供应商(云溪科技有限公司)格式范本,约定由供应商所在地人民法院管辖。
 
 ---
 
-**2. Auto-renewal with 60-day opt-out window**
+## 输出
 
-> *"This Agreement shall automatically renew for successive one-year terms unless either party provides written notice of non-renewal no less than sixty (60) days prior to the end of the then-current term."*
+**【AI 辅助整理,非法律意见,请经律师复核后使用】**
 
-**Problem:** You have a 60-day window to opt out. Miss it and you're committed to another year. With a $2,400/year contract, that's easy to overlook.
+> 本插件仅做大白话初筛,不出具法律意见;高风险条款建议移交 crablaw-cn 法律插件的 `crablaw-cn:review`(律师级审查)/ `crablaw-cn:clause-redraft`(条款改写)等技能或专业律师复核。
 
-**Ask for:** Reduce to 30-day opt-out, or add a reminder obligation from vendor. Alternatively, calendar the opt-out deadline now (2027-04-01 if signing May 1, 2026).
+### 📋 合同摘要
 
----
-
-### 🟡 Yellow flags (negotiate if possible)
-
-**3. Broad data license**
-
-> *"Customer grants Vendor a non-exclusive, worldwide license to use, process, and analyze Customer Data to improve Vendor's products and services."*
-
-**Concern:** Vendor can use your data — including client project data — to train their product. This may conflict with your client confidentiality obligations.
-
-**Ask for:** Restrict to aggregated, anonymized usage only. Suggested language:
-
-> *"...limited to aggregated, de-identified data and expressly excluding any Customer Data that identifies Customer's clients or projects."*
+12 个月 SaaS 订阅,按年自动续约。云溪科技有限公司提供项目管理软件。你按年支付 ¥24,000、按月计费。云溪托管数据;你拥有自己的数据,但授予云溪一项较宽的许可用于"产品改进"。你可提前 30 天通知解除,但需支付至合同期满的费用。
 
 ---
 
-**4. No termination for cause cure period**
+### 🔴 高风险(签字前必须争取)
 
-> *"Vendor may terminate this Agreement immediately upon Customer's material breach."*
+**1. 责任上限过低,近乎不设有效救济**
 
-**Concern:** Vendor can cut off access immediately for any "material breach" with no chance to fix it. No definition of "material." You could lose access to your data mid-project.
+> *"在任何情况下,云溪科技的赔偿责任均不超过客户在索赔发生前三(3)个月内实际支付的费用。"*
 
-**Ask for:** 15-day cure period. Suggested: *"...upon written notice and Customer's failure to cure such breach within fifteen (15) days."*
+**问题:** 三个月费用 = ¥6,000。若云溪发生数据泄露、导致你的客户数据外泄,你能获赔的上限只有 ¥6,000,与实际损失无关。对一家处理客户信息的咨询公司,这远远不够。且按《民法典》584 条,违约损失赔偿以订立合同时可预见的损失为限,过低的约定上限会把可预见损失也一并压没。
 
----
+**争取:** 上限提高到 12 个月已付费用(¥24,000),或就数据安全事件另设 ¥300,000 的固定下限。建议表述:
 
-### 🟢 Key terms to note
-
-- **Payment:** Monthly, auto-charged. Keep credit card current or service suspends immediately.
-- **Data portability:** You can export your data at any time and for 30 days post-termination. Plan export before cancellation.
-- **Governing law:** California. Any disputes go to Santa Clara County courts.
-- **Uptime SLA:** 99.5% monthly. Credits issued as account credits, not cash.
+> *"云溪科技的累计赔偿责任不超过下列较高者:(a) 索赔发生前十二(12)个月内已支付的费用;或 (b) 因数据安全事件引起的索赔,¥300,000。"*
 
 ---
 
-### 💡 Negotiation playbook
+**2. 自动续约,退出窗口仅 60 天**
 
-| Flag | Ask | Framing |
-|------|-----|---------|
-| Liability cap | Raise to 12 months ($2,400) or $50K for security incidents | "We handle client data — we need the liability cap to reflect actual risk" |
-| Auto-renewal window | Reduce to 30 days | "60 days is tight for a small team — 30 is more typical" |
-| Data license | Restrict to anonymized/aggregated | "Our client agreements restrict how we share their project data" |
-| Termination cure | Add 15-day cure period | "We need a chance to fix issues before access is cut off" |
+> *"本合同于每一年度期满后自动续约一年,除非任何一方在当期期满前不少于六十(60)日书面通知不再续约。"*
 
----
+**问题:** 你只有 60 天窗口退出,错过就再锁一年。¥24,000/年 的合同很容易被忽略。
 
-*This is not legal advice. For binding decisions, consult an attorney.*
+**争取:** 缩短到 30 天,或要求云溪负有到期提醒义务。或现在就把退出截止日记入日历(若 2026 年 5 月 1 日签,则 2027 年 4 月 1 日前)。
 
 ---
 
-## Redline DOCX
+### 🟡 中风险(尽量争取)
 
-A redlined DOCX with these suggested changes marked in tracked-changes format was exported to: `contract-review-redline-2026-05-01.docx`
+**3. 宽泛的数据许可**
+
+> *"客户授予云溪科技一项非独占、全球范围的许可,使用、处理并分析客户数据,以改进云溪科技的产品与服务。"*
+
+**顾虑:** 云溪可用你的数据——包括客户项目数据——训练其产品。这可能与你对自己客户的保密义务冲突;且处理个人信息还须符合《个人信息保护法》的告知同意与最小必要,"产品改进"这类宽泛目的通常需要单独、明确的同意基础。
+
+**争取:** 限于聚合、匿名化用途。建议表述:
+
+> *"……仅限于经聚合、去标识化处理的数据,且明确排除任何可识别客户之客户或项目的客户数据。"*
+
+---
+
+**4. 因违约解除无补救期**
+
+> *"客户存在重大违约的,云溪科技有权立即解除本合同。"*
+
+**顾虑:** 云溪可对任何"重大违约"立即切断访问、不给改正机会,且未定义"重大"。你可能在项目中途失去数据访问。按《民法典》,一般应经催告、在合理期限内仍未履行方可解除。
+
+**争取:** 15 天补救期。建议:*"……经书面通知且客户在十五(15)日内未予改正的。"*
+
+---
+
+### 🟢 关注要点
+
+- **付款:** 按月自动扣款。保持账户余额/代扣有效,否则服务立即暂停。取得的发票为增值税发票,留存备查。
+- **数据可携:** 你可随时导出数据,终止后 30 天内仍可导出。取消前先做导出。
+- **管辖与争议解决:** 约定发生争议由供应商(云溪科技)所在地有管辖权的人民法院管辖。注意:合同不能既约定诉讼又约定仲裁;若改走仲裁,须明确选定具体仲裁委员会,否则可能无效。向法院请求保护权利的诉讼时效为 3 年(《民法典》188 条)。
+- **服务可用性(SLA):** 每月 99.5%。以账户服务时长补偿,不折现金。
+
+---
+
+### 💡 谈判要点
+
+| 风险点 | 争取 | 话术 |
+|------|-----|------|
+| 责任上限 | 提高到 12 个月(¥24,000),或数据安全事件 ¥300,000 | "我们处理客户数据,责任上限要匹配真实风险" |
+| 自动续约窗口 | 缩短到 30 天 | "60 天对小团队太紧,30 天更常见" |
+| 数据许可 | 限于匿名化/聚合 | "我们对客户负有保密义务,得限制其项目数据的使用范围" |
+| 违约解除 | 增加 15 天补救期 | "切断访问前得给我们改正的机会" |
+
+---
+
+*【AI 辅助整理,非法律意见,请经律师复核后使用】。涉及具约束力的决定,请交律师复核。高风险条款可移交 crablaw-cn 法律插件的 `crablaw-cn:review` / `crablaw-cn:clause-redraft` 等技能。*
+
+---
+
+## 修改标记 DOCX
+
+一份以修订/批注标记上述改动的 DOCX 已导出至:`contract-review-redline-2026-05-01.docx`

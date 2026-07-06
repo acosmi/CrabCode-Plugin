@@ -2,87 +2,101 @@
 name: invoice-chase
 version: 0.3.0
 description: >
-  Drafts overdue-invoice reminders from the owner's accounting software AR
-  aging (用友好会计 / 金蝶精斗云 export) cross-checked against Alipay
-  (支付宝商家平台) bill exports, matched to each customer's payment history and
-  tone (gentle for good customers, firm for repeat late payers). With owner
-  approval, creates Alipay payment links to include in reminders; all reminder
-  text is drafted in chat for the owner to copy and send. Use when the user
-  asks "who owes me money," mentions overdue invoices, or wants to follow up
-  on unpaid invoices.
+  从店主记账软件的应收账龄(用友好会计 / 金蝶精斗云 导出)出发,起草逾期账款催收提醒,
+  并与支付宝商家平台(支付宝)账单导出交叉核对;按每位客户的付款历史与语气分级
+  (老客户温和、屡拖客户正式)匹配话术,同时兼顾「催付款(应收账款)」与「催 / 补开发票」两条线。
+  经店主批准后创建支付宝收款链接嵌入提醒;所有提醒文案均在对话中起草,由店主自行复制发送,绝不代客发送。
+  催收话术恪守合法催收红线,并附「非法律意见、请核实」提示。
+  Use when the user asks "who owes me money," mentions overdue invoices, or wants to
+  follow up on unpaid invoices —— 亦触发于:催款、催收、欠款、应收账款、账款逾期、逾期发票、催开发票、开发票。
 ---
 
-# Invoice Chase
+# 催收逾期账款(Invoice Chase)
 
-## Quick start
+## 快速开始
 
-Read the AR aging report, score each customer by payment history, draft a tone-matched reminder for each overdue invoice, and present them to the owner. Nothing goes out until the owner says so.
+读取应收账龄报表,按付款历史为每位客户评分,为每笔逾期账款起草语气匹配的催收提醒,再呈交店主。**未经店主同意,任何文案都不外发。**
 
 ```
-User: "who owes me money"
-→ Ask for the AR aging export from the accounting software (用友好会计 / 金蝶精斗云)
-→ Cross-reference a recent 支付宝商家平台 bill export (last 14 days)
-→ Score each customer: good-payer / occasionally-late / repeat-late
-→ Draft tone-matched reminders
-→ Show summary table + drafts. Wait for "send these."
+用户:"谁还欠我钱"
+→ 索要记账软件的应收账龄导出(用友好会计 / 金蝶精斗云)
+→ 交叉核对近 14 天的支付宝商家平台账单导出
+→ 为每位客户评分:good-payer / occasionally-late / repeat-late(守信 / 偶尔逾期 / 屡次逾期)
+→ 起草语气匹配的催收提醒(同时点到「催付款」与「催 / 补开发票」)
+→ 先出汇总表 + 草稿,等店主说"发这些"再动
 ```
 
-## Setup (first run only)
+## 中国口径:催款前必须把握的四件事
 
-Ask the owner two questions before running for the first time:
+催收既是要钱,也牵涉税务与法律合规。起草时始终把握以下四条,并在每条催收产物末尾附上提示:**【AI 辅助整理,非法律意见;催收话术与利息主张请核对合同并咨询专业人士】**。
 
-1. **Reminder channel**: "How do you usually send payment reminders — email, WeChat, or something else?" There is no email connector yet (腾讯企业邮 wrapper pending), so reminders are drafted in chat for the owner to copy into their channel. If the owner just wants an internal nudge to themselves or their bookkeeper, that can go out as a DingTalk/Feishu message via the connected connector instead. Store the answer.
-2. **WeChat Pay**: "Do you also collect payments via WeChat Pay (微信支付)? It's not connected yet, but if you upload a 微信支付商户平台 bill export I'll include it in the overdue sweep." — if yes, ask for that export alongside the accounting data.
+1. **发票是税控凭证,不是随手开的收据。** 中国的「发票」指增值税专用发票 / 增值税普通发票、数电发票(全面数字化的电子发票),属国家税控凭证。**收款方依法负有开具发票的义务,客户索取发票是法定权利。** 因此催收要区分并同时点到两条线:
+   - **催付款**(追讨应收账款):对方欠的是钱。
+   - **催 / 补开发票**:很多小微被卡在「款到才开票 vs 票到才付款」的死结上——对方以「没收到发票」拖延付款,或己方以「没收到款」不肯开票。起草前先厘清是哪一种,票、款两条线分别写清、分别推进,别混为一谈也别漏掉。
 
-Do not ask again on subsequent runs.
+2. **诉讼时效 3 年,要及时主张。** 依《民法典》第一百八十八条,向人民法院请求保护民事权利的诉讼时效期间为三年,自权利人**知道或应当知道权利受到损害以及义务人之日**起算。话术要体现「及时主张、尽快结清」。依第一百九十五条,**权利人向义务人提出履行请求可中断诉讼时效**——因此每一次催收都应留存**书面凭证**(短信、微信、催款函、邮件等),既是催告,也是时效中断的证据。
 
-## Workflow
+3. **逾期利息 / 违约金:有约定从约定,无约定参照 LPR。** 合同约定了逾期利息或违约金的,按约定主张;没有约定的,可另行主张资金占用损失,司法实践通常**参照全国银行间同业拆借中心公布的当期贷款市场报价利率(LPR)**计算。文案中**不要硬编码具体利率或金额**,写「按合同约定或参照当期 LPR 主张逾期利息」。注意:约定违约金过分高于实际损失的,可能被法院酌情调减,不宜在话术里漫天要价。
 
-1. **Pull overdue receivables.** Ask the owner for an AR aging export (CSV/Excel, or a pasted report) from their accounting software (用友好会计 / 金蝶精斗云) covering all invoices more than 1 day past due. If WeChat Pay is in scope (owner confirmed at setup), also take the 微信支付商户平台 bill export.
+4. **合法催收红线:全程合法,只留证据,不施压恐吓。** 催收话术**不得包含威胁、恐吓、骚扰,不得公开欠款人隐私或向无关第三方施压**。语气分级(温和 / 正式)只是措辞轻重不同,**任何一级都必须合法**。正式催告(firm)的落点是「正式主张 + 保留书面证据 + 必要时通过法律途径解决」,而非制造恐惧或人身压力。
 
-2. **Cross-reference payment history.** Ask the owner for a recent 支付宝商家平台 bill export (CSV) covering at least the last 14 days. The Alipay MCP connector cannot export transaction history — the bill file is the only bulk source.
-   - If the export's end date is more than 2 days old, ask for a fresh download before proceeding — stale data risks dunning someone who already paid.
-   - For a single invoice with a known merchant order number, `query-alipay-payment` (if the Alipay connector is configured) can spot-check that one payment's status. Do not use it to sweep the whole customer list.
-   - If no bill export is available, flag every customer in the batch as "Alipay not verified — confirm manually" in the summary table and score from accounting history only. Do not silently drop the caveat.
+## 初始设置(仅首次运行)
 
-   If a customer shows a settled payment within the last 14 days, flag as "possibly paid — verify" and exclude from the draft queue.
+首次运行前,先问店主两个问题:
 
-3. **Score each customer.** Read [reference/tone-matching.md](reference/tone-matching.md) for scoring logic. Result: `good-payer`, `occasionally-late`, or `repeat-late`.
+1. **催收渠道**:"你平时通过什么方式发催款提醒——邮件、微信,还是其他?"目前尚无邮件连接器(腾讯企业邮封装待接入),因此提醒统一在对话中起草,由店主复制到自己的渠道发送。若店主只是想给自己或记账会计一个内部提醒,可通过已连接的钉钉 / 飞书连接器发出。记录答案。
+2. **微信支付**:"你也用微信支付(微信支付)收款吗?目前尚未接入,但你若上传微信支付商户平台的账单导出,我会把它并入逾期排查。"——若是,索要该导出,与记账数据一并处理。
 
-4. **Draft reminder messages.** One message per customer — consolidate multiple overdue invoices into one message. Match tone to score. See [reference/examples/gentle-reminder.md](reference/examples/gentle-reminder.md) and [reference/examples/firm-reminder.md](reference/examples/firm-reminder.md).
+后续运行不再重复询问。
 
-5. **Present drafts to owner.** Show a summary table first:
+## 工作流
 
-   | Customer | Amount Due | Days Late | Tone | Delivery |
-   |---|---|---|---|---|
-   | Acme Corp | ¥1,200 | 18 days | Gentle | Alipay link + chat draft (owner sends) |
-   | Smith LLC | ¥450 | 47 days | Firm | Chat draft (owner sends) |
+1. **拉取逾期应收。** 向店主索要记账软件的应收账龄导出(CSV / Excel,或粘贴的报表),来自其记账软件(用友好会计 / 金蝶精斗云),覆盖所有逾期 1 天以上的账款。若微信支付在范围内(店主在初始设置中已确认),同时取微信支付商户平台的账单导出。逐笔记下**发票状态**(已开 / 未开 / 部分开),以便区分「催款」与「催 / 补开发票」。
 
-   Then show each draft in full. Wait for owner to say "send these" or approve individually.
+2. **交叉核对付款历史。** 向店主索要近期的支付宝商家平台账单导出(CSV),至少覆盖最近 14 天。支付宝 MCP 连接器无法导出交易历史——账单文件是唯一的批量来源。
+   - 若导出截止日期距今超过 2 天,先索要一份最新下载再继续——数据过期有向已付款客户重复催收的风险。
+   - 对于已知商户订单号的单笔账款,可用 `query-alipay-payment`(若支付宝连接器已配置)抽查这一笔的付款状态。不要用它扫描整份客户清单。
+   - 若拿不到账单导出,在汇总表中把整批客户标为"支付宝未核验——请手动确认",仅凭记账历史评分。不要悄悄吞掉这条提示。
 
-6. **Prepare delivery — only after approval.**
-   - For invoices to be collected via Alipay: create a payment link with the Alipay connector (`create-web-page-alipay-payment` or `create-mobile-alipay-payment`) and insert it into the reminder text. If the Alipay connector is not configured, it will be absent — fall back to the owner's own收款 link or bank details in the draft, and say so.
-   - Hand the finished reminder text to the owner in chat to copy and send through their channel — there is no email connector yet.
-   - Where a plain notification suffices (e.g. alerting the bookkeeper), send a DingTalk/Feishu message via the connected connector.
-   - Never create a payment link or send any message without explicit approval.
+   若某客户显示最近 14 天内有一笔已结算付款,标为"疑似已付——待核实"并移出草稿队列。
 
-7. **Report what happened.** List which payment links were created, which drafts were handed off for the owner to send, which notifications went out, and what was flagged (possibly paid, excluded).
+3. **为每位客户评分。** 评分逻辑见 [reference/tone-matching.md](reference/tone-matching.md)。结果:`good-payer`、`occasionally-late` 或 `repeat-late`。
 
-## Approval gates
+4. **起草催收提醒。** 每位客户一条消息——把同一客户的多笔逾期账款合并进一条。语气匹配评分。同时厘清票、款两条线:该催款催款,该催 / 补开发票也一并点到。参见 [reference/examples/gentle-reminder.md](reference/examples/gentle-reminder.md) 与 [reference/examples/firm-reminder.md](reference/examples/firm-reminder.md)。
 
-- **Never create a payment link, send a message, or finalize a draft batch without explicit owner approval.** Present all drafts first; wait for the go-ahead.
-- **Never include a customer who paid in the last 14 days.** Flag as "possibly paid — verify" instead.
-- **Never draft a reminder for a customer not in the accounting software AR export** (or the WeChat Pay export, if provided). No reminders from memory alone.
-- **One approval covers one batch.** Adding a customer or changing a draft after approval starts a new round.
+5. **呈交草稿给店主。** 先出汇总表:
 
-## Reference
+   | 客户 | 应收金额 | 逾期天数 | 语气 | 发票状态 | 交付方式 |
+   |---|---|---|---|---|---|
+   | 明发商贸 | ¥1,200 | 18 天 | 温和 | 已开票 | 支付宝链接 + 对话草稿(店主发送) |
+   | 云溪科技 | ¥450 | 47 天 | 正式 | 未开票 | 对话草稿(店主发送) |
 
-- [reference/tone-matching.md](reference/tone-matching.md) — scoring logic, tone guidelines, subject line formulas
-- [reference/gotchas.md](reference/gotchas.md) — known failure modes
-- [reference/examples/gentle-reminder.md](reference/examples/gentle-reminder.md) — good-payer reminder example
-- [reference/examples/firm-reminder.md](reference/examples/firm-reminder.md) — repeat-late-payer reminder example
+   然后逐条展示完整草稿,每条草稿末尾附上"【AI 辅助整理,非法律意见,请核对合同】"提示。等店主说"发这些"或逐条批准。
 
-## Spreadsheet input routing
+6. **准备交付——仅在批准之后。**
+   - 对于通过支付宝收款的账款:用支付宝连接器创建收款链接(`create-web-page-alipay-payment` 或 `create-mobile-alipay-payment`)并插入提醒文案。若支付宝连接器未配置,则该工具不存在——回退到店主自己的收款链接或银行账户信息,并在草稿中说明。
+   - 把定稿的提醒文案在对话中交给店主,由其复制并通过自己的渠道发送——目前尚无邮件连接器。
+   - 只需普通通知的场景(如提醒记账会计),通过已连接的钉钉 / 飞书连接器发送。
+   - 未经明确批准,绝不创建收款链接或发送任何消息。
 
-- When the AR aging or bill export arrives as an Excel file (.xlsx/.xls), parse it via `crabcode-office-suite:crabcode-spreadsheets`; CSV files and pasted reports need no extra tooling. Reminders themselves are chat drafts — no spreadsheet output.
-- If that skill reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin` and retry — or ask for a CSV export instead.
+7. **回报结果。** 列出创建了哪些收款链接、哪些草稿已交店主发送、发出了哪些通知,以及标记了什么(疑似已付、已排除)。
+
+## 审批门禁
+
+- **未经店主明确批准,绝不创建收款链接、发送消息或定稿草稿批次。** 先呈交所有草稿,等放行。
+- **绝不催收最近 14 天内已付款的客户。** 改标为"疑似已付——待核实"。
+- **绝不为不在记账软件应收导出(或微信支付导出,若提供)中的客户起草提醒。** 不凭记忆催收。
+- **一次批准只覆盖一个批次。** 批准后增加客户或改动草稿,即开启新一轮。
+- **合法催收红线不可逾越。** 任何草稿都不得含威胁、恐吓、骚扰或公开欠款人隐私;逾期利息只写"按合同约定或参照当期 LPR",不硬编码数值;每条催收产物附"【AI 辅助整理,非法律意见,请核对合同】"提示。
+
+## 参考文件
+
+- [reference/tone-matching.md](reference/tone-matching.md) —— 评分逻辑、语气准则、主题行公式
+- [reference/gotchas.md](reference/gotchas.md) —— 已知失败模式
+- [reference/examples/gentle-reminder.md](reference/examples/gentle-reminder.md) —— 守信客户提醒示例
+- [reference/examples/firm-reminder.md](reference/examples/firm-reminder.md) —— 屡次逾期客户提醒示例
+
+## 表格输入路由
+
+- 当应收账龄或账单导出是 Excel 文件(.xlsx/.xls)时,通过 `crabcode-office-suite:crabcode-spreadsheets` 解析;CSV 文件和粘贴的报表无需额外工具。提醒本身是对话草稿——不产出表格。
+- 若该技能报 Unknown skill,说明未安装 office 套件:引导店主通过 `/plugin` 安装 `crabcode-office-suite` 后重试——或改为索要 CSV 导出。

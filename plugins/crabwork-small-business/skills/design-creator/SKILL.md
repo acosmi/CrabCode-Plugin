@@ -2,357 +2,362 @@
 name: design-creator
 version: 0.3.0
 description: >
+  接收一份已审批的内容简报(content brief),端到端执行一场营销战役:排布发布
+  日历、逐渠道撰写文案、为每个视觉素材写出精确的设计简报(尺寸、版式、文字叠加、
+  品牌色),并在 HubSpot 中暂存(stage)整场战役。所有对外文案在交付前必过
+  《广告法》/《价格法》合规自检。素材渲染由店主在自己的设计工具中完成——自营云端
+  设计(自营云端设计)连接器上线后由其承接,在此之前用店主当前的工具。本技能不生成
+  图片。邮件正文以纯文本起草,由店主用自己的工具发送。每一步都需要店主显式批准。
   Takes an approved content brief and executes a campaign end-to-end: builds
-  the posting calendar, drafts per-channel copy, writes a precise design
-  brief (dimensions, layout, text overlay, brand colors) for every visual
-  asset, and stages the campaign in HubSpot. Asset rendering is done by the
-  owner in their own design tool — the in-house cloud design service
-  (自营云端设计) once its connector ships, or whatever tool they use today.
-  This skill does not generate images. Email content is drafted as plain
-  text for the owner to send from their own tool. Every step requires
-  explicit owner approval. Use when the user says "make the content,"
-  "generate the posts," "create the assets," "turn this into a campaign,"
-  or hands off an approved brief for execution.
+  the posting calendar, drafts per-channel copy, runs an Advertising-Law /
+  Price-Law compliance self-check on every outbound line, writes a precise
+  design brief (dimensions, layout, text overlay, brand colors) for every
+  visual asset, and stages the campaign in HubSpot. This skill does not
+  generate images. Email content is drafted as plain text for the owner to
+  send from their own tool. Every step requires explicit owner approval. Use
+  when the user says "撰写文案""生成推文""做素材""把这个变成一场战役""过一遍
+  广告法合规""make the content," "generate the posts," "create the assets,"
+  "turn this into a campaign," or hands off an approved brief for execution.
 ---
 
-# Design Creator
+# 设计创作者(Design Creator)
 
-## Scope
+## 适用范围
 
-This skill handles a campaign in five sequential stages, each gated by owner
-approval:
+本技能把一场战役拆成五个顺序阶段,每个阶段都以店主批准为闸口:
 
 ```
-brief → calendar → asset inventory → design briefs → copy → HubSpot staging
+简报 → 日历 → 素材清单 → 设计简报 → 文案 → HubSpot 暂存
 ```
 
-| Path | Channels | What this skill produces |
-|------|----------|--------------------------|
-| Design brief (social) | WeChat Official Account (公众号), WeChat Channels (视频号), Xiaohongshu (小红书), Douyin (抖音) | Design brief + final caption + staged campaign entry in HubSpot |
-| Text-only | Email (newsletter, marketing, drip) | Subject + preheader + body, surfaced inline for the owner to send |
+| 路径 | 渠道 | 本技能产出 |
+|------|------|-----------|
+| 设计简报(社交) | 公众号、视频号、小红书、抖音 | 设计简报 + 最终文案 + HubSpot 中暂存的战役条目 |
+| 纯文本 | 邮件(newsletter、营销、drip) | 主题行 + 预览文字(preheader)+ 正文,内联呈现供店主发送 |
 
-**This skill does not render images.** The connector for the in-house cloud
-design service (自营云端设计) is not yet available. For every visual asset,
-the skill produces a complete, unambiguous design brief — dimensions,
-layout, exact text overlay, image placement, brand colors — and the owner
-renders it in 自营云端设计 once connected, or in whatever design tool they
-use today. Never present an image as "generated" unless the owner supplied
-the rendered file.
+**本技能不渲染图片。** 自营云端设计的连接器尚未上线。对每个视觉素材,本技能产出
+一份完整、无歧义的设计简报——尺寸、版式、精确的文字叠加、图片位置、品牌色——由店主
+在自营云端设计(连接后)或当前使用的任何设计工具中渲染。除非店主提供了已渲染的文件,
+否则绝不把图片说成"已生成"。
 
-**No design assets for email rows under any circumstance.** The owner
-explicitly descoped design work from the email path: emails from this skill
-are text-only — subject, preheader, body. If the owner asks for a designed
-email, see `reference/gotchas.md` for the redirect language.
+**任何情况下都不为邮件行产出设计素材。** 店主已明确把设计工作移出邮件路径:本技能
+产出的邮件是纯文本——主题行、预览文字、正文。若店主要求做设计版邮件,见
+`reference/gotchas.md` 的改道话术。
 
 ---
 
-## Pre-flight
+## 起飞前检查(Pre-flight)
 
-Before Stage 1, confirm:
+进入阶段 1 前,确认:
 
-1. **Brief.** The user has referenced or pasted an approved brief. If not:
-   "I'll need the content brief before I can build the campaign. Do you
-   have one from the content-strategy skill, or would you like to write
-   one now?"
+1. **简报。** 用户已引用或粘贴一份已审批的简报。若没有:"我需要先拿到内容简报
+   才能搭建战役。你有 content-strategy 技能产出的简报吗,还是现在写一份?"
 
-2. **Rendering tool.** Ask which tool the owner will render assets in
-   (自营云端设计 once its connector is live, or their current design tool).
-   This only affects the handoff wording — the briefs are tool-agnostic.
+2. **渲染工具。** 询问店主将用哪个工具渲染素材(自营云端设计连接器上线后用它,
+   否则用当前设计工具)。这只影响交接措辞——简报本身与工具无关。
 
-3. **HubSpot tier.** Social staging requires Marketing Hub Professional,
-   and HubSpot Social can only auto-publish to accounts connected in
-   HubSpot. Domestic platforms (公众号, 小红书, 抖音, 视频号) cannot be
-   connected to HubSpot Social — those rows get a publish-ready package
-   and a scheduling CSV instead
-   (see [reference/hubspot-staging.md](reference/hubspot-staging.md)).
+3. **HubSpot 版本(tier)。** 社交暂存需要 Marketing Hub Professional,且 HubSpot
+   Social 只能自动发布到在 HubSpot 内已连接的账号。国内平台(公众号、小红书、抖音、
+   视频号)无法接入 HubSpot Social——这些行改为拿到一份可直接发布的打包件和一份
+   排期 CSV(见 [reference/hubspot-staging.md](reference/hubspot-staging.md))。
 
-4. **Brand assets.** Confirm the path to product photos on disk, and the
-   brand colors/fonts (hex codes if the owner has them — ask once, reuse
-   for every brief).
+4. **品牌素材。** 确认磁盘上产品照片的路径,以及品牌色/字体(若店主有十六进制
+   色值——问一次,每份简报复用)。
 
-5. **Workload summary.** Count the design-brief rows and surface the total
-   before Stage 1 begins:
+5. **工作量小结。** 数清设计简报行数,在阶段 1 开始前给出总量:
 
    ```
-   This campaign needs:
-     Design briefs (social rows): 8  — you render each in your design tool
-     Text-only rows (email):      2  — drafted inline, no design work
+   本场战役需要:
+     设计简报(社交行):8  — 每份由你在设计工具中渲染
+     纯文本行(邮件):  2  — 内联起草,无设计工作
 
-   Proceed?
+   继续?
    ```
 
 ---
 
-## Workflow
+## 工作流
 
-### Stage 1 — Posting calendar
+### 阶段 1 — 发布日历
 
-Pull from the brief: content themes, channels, cadence, hard dates
-(launches, sales, holidays).
+从简报中提取:内容主题、渠道、发布节奏、硬性日期(上新、促销、节日)。
 
-Build a calendar table with a `Path` column that routes every row to either
-a design brief or text-only drafting:
+搭建一张日历表,用 `路径(Path)` 列把每一行路由到设计简报或纯文本起草:
 
-| Date | Channel | Path | Theme | Asset type | Caption/Subject angle |
-|------|---------|------|-------|------------|-----------------------|
-| Jun 2 | Xiaohongshu | Design brief (social) | Linen launch | 3:4 image note | "finally, a dress…" |
-| Jun 5 | Email | Text-only | Linen launch | Email body | "Linen that actually breathes" |
+| 日期 | 渠道 | 路径 | 主题 | 素材类型 | 文案/主题行角度 |
+|------|------|------|------|----------|----------------|
+| 6月2日 | 小红书 | 设计简报(社交) | 亚麻上新 | 3:4 图文 | "终于有一条裙子……" |
+| 6月5日 | 邮件 | 纯文本 | 亚麻上新 | 邮件正文 | "真正透气的亚麻" |
 
-Tag every email-channel row as `Text-only` before presenting. Cap at 30
-days unless the brief specifies otherwise. Flag scheduling conflicts (two
-posts same day for the same product) up front.
+呈现前,把每个邮件渠道行标记为 `纯文本`。除非简报另有说明,上限 30 天。提前标出
+排期冲突(同一天、同一产品发两条)。
 
-**Checkpoint 1.** Present the calendar. Ask: "Does this match the plan?
-Any dates to shift, channels to add, or themes to swap?" Iterate until
-approved, then restate the split out loud — "N rows get design briefs, M
-rows go through text-only drafting" — before moving on. Catching a
-miscategorization here is free; catching it after the owner has rendered
-designs isn't.
+**检查点 1。** 呈现日历。问:"这符合计划吗?有要挪的日期、要加的渠道、要换的主题
+吗?"迭代到批准为止,然后把拆分口头复述一遍——"N 行走设计简报,M 行走纯文本
+起草"——再往下走。在这里抓出归类错误是免费的;等店主渲染完设计再抓就不是了。
 
 ---
 
-### Stage 2 — Asset inventory (design-brief rows only)
+### 阶段 2 — 素材清单(仅设计简报行)
 
-Email rows skip this stage entirely. For each `Design brief (social)` row,
-build a manifest of what the layout needs and what's already available.
+邮件行完全跳过本阶段。对每个 `设计简报(社交)` 行,建立一份清单:版式需要什么、
+已有什么。
 
-1. **Enumerate every image slot the layout needs.** A single-image post
-   needs 1 photo; a 小红书 carousel or product grid can need 3+. List slots
-   individually (`Cover`, `Product1`, `Product2`, …) — never roll them up
-   as "product images."
+1. **列出版式需要的每一个图片位。** 单图推文需要 1 张照片;小红书轮播或产品格
+   可能需要 3+。逐个列出图片位(`封面`、`产品1`、`产品2`……)——绝不笼统汇成
+   "产品图"。
 
-2. **Inventory available assets.** Text content from the brief (product
-   names, offer copy, taglines, pricing), product photos on the owner's
-   disk (exact file paths), brand colors and fonts.
+2. **盘点可用素材。** 简报里的文字内容(产品名、促销文案、标语、价格)、店主磁盘
+   上的产品照片(精确文件路径)、品牌色与字体。
 
-3. **Build the slot-by-slot gap table.** One row per slot per asset — not
-   per asset.
+3. **搭建逐位缺口表。** 一行对应一个位对应一个素材——不是一行一个素材。
 
-   | Date | Slot | Kind | Available asset | Status |
-   |------|------|------|-----------------|--------|
-   | Jun 2 | Cover | image | ~/photos/linen_midi_01.jpg | ready |
-   | Jun 2 | Headline | text | "Summer linen, finally" | ready |
-   | Jun 9 | Product1 | image | — | **MISSING** |
+   | 日期 | 图片位 | 类型 | 可用素材 | 状态 |
+   |------|--------|------|----------|------|
+   | 6月2日 | 封面 | 图片 | ~/photos/linen_midi_01.jpg | 就绪 |
+   | 6月2日 | 标题 | 文字 | "夏日亚麻,终于来了" | 就绪 |
+   | 6月9日 | 产品1 | 图片 | — | **缺失** |
 
-4. **Resolve slot/asset mismatches with the owner.** If the layout calls
-   for more photos than the brief provides, pause and ask:
+4. **与店主解决位/素材不匹配。** 若版式需要的照片比简报提供的多,暂停并询问:
 
    ```
-   The Jun 9 carousel layout has 3 image slots. The brief gave me 1
-   photo (linen_midi_01.jpg). How should I fill the other 2?
+   6月9日的轮播版式有 3 个图片位。简报只给了我 1 张照片
+   (linen_midi_01.jpg)。另外 2 个怎么填?
 
-     1. Reuse the same photo across all 3 slots
-     2. You point me at 2 more photos (file paths)
-     3. Switch to a single-image layout
+     1. 三个位复用同一张照片
+     2. 你再给我 2 张照片(文件路径)
+     3. 改成单图版式
    ```
 
-   No briefs go out with unresolved slots — a brief that says "product
-   photo TBD" ships a placeholder into the owner's design tool.
+   没有任何简报能带着未解决的图片位就发出去——一份写着"产品图待定"的简报会把
+   占位图送进店主的设计工具。
 
-5. **Confirm the manifest.** Show the owner the completed slot-by-slot
-   table with every slot resolved to a real file or final text. This is
-   the last stop before brief writing.
-
----
-
-### Stage 3 — Design briefs + rendering handoff
-
-Before writing any brief, re-read the calendar and drop any row whose
-`Path` is not `Design brief (social)`. Email rows do not pass through this
-stage.
-
-For each design-brief row, write one complete brief using the template in
-[reference/design-brief-spec.md](reference/design-brief-spec.md). Every
-brief must be renderable without a follow-up question, and specifies:
-
-- **Asset type and exact dimensions** (px) for the target channel
-- **Layout** — where each element sits, in plain words
-- **Text overlay** — the exact strings, verbatim; mark hierarchy
-  (headline / subhead / CTA)
-- **Image placement** — which file goes in which slot, by file path
-- **Brand colors and fonts** — hex codes and font names from pre-flight
-- **Style notes** — mood, whitespace, what to avoid
-
-Present briefs in calendar order, one row at a time or batched — owner's
-choice.
-
-**Checkpoint 2 (briefs).** "Any briefs to adjust — layout, copy on the
-image, photo choice?" Iterate until every brief is approved.
-
-**Rendering handoff.** Hand the approved briefs to the owner:
-
-```
-All 8 design briefs are approved. Render them in your design tool
-(自营云端设计 once the connector is live — until then, whichever tool you
-use). Send back the finished files or hosted image URLs and I'll verify
-them against the briefs and stage the campaign.
-```
-
-**Verification (when rendered files come back).** Check each rendered
-asset against its brief before it goes anywhere near staging:
-
-- Right photo in each slot (no stock placeholders, no gray boxes)
-- Text overlay matches the approved strings verbatim
-- Dimensions match the channel spec
-- Nothing off-brief (wrong product, wrong colorway, lorem-ipsum)
-
-If an asset misses, name the exact deviation ("the Jun 9 cover uses the
-denim photo, brief calls for linen_midi_01.jpg") and ask the owner to
-re-render just that one. The campaign can proceed row-by-row — verified
-rows don't wait for stragglers unless the owner wants a single batch.
+5. **确认清单。** 把每个位都落实到真实文件或最终文字的完整逐位表给店主看。这是
+   写简报前的最后一站。
 
 ---
 
-### Stage 4 — Copy drafting
+### 阶段 3 — 设计简报 + 渲染交接
 
-For each calendar row, draft the copy. Social rows get a caption; email
-rows get a full email.
+写任何简报前,重读日历,丢掉所有 `路径` 不是 `设计简报(社交)` 的行。邮件行不经过
+本阶段。
 
-**Social captions** — 公众号, 视频号, 小红书, 抖音:
+对每个设计简报行,用 [reference/design-brief-spec.md](reference/design-brief-spec.md)
+的模板写一份完整简报。每份简报都必须无需追问即可渲染,并指明:
 
-- Length: channel-appropriate. Xiaohongshu: title ≤ 20 chars, body ≤
-  1,000 chars. Douyin / WeChat Channels: short caption, hook in the first
-  line. WeChat Official Account: article-style, 300–800 words for a promo
-  post.
-- Structure: hook → one product benefit → CTA → 3–6 hashtags/topics
-  (not 30).
-- Voice: match the brief's tone markers. If the brief says "casual and
-  friendly," don't write corporate copy.
-- No filler. No "Exciting news!" or "We're thrilled to announce." Open
-  with the value.
+- **素材类型与精确尺寸**(px),对应目标渠道
+- **版式** —— 每个元素坐落何处,用大白话说清
+- **文字叠加** —— 逐字精确的字符串;标出层级(标题 / 副标题 / CTA)。图上文字即
+  对外广告,须先过阶段 4 的《广告法》自检(极限词等)
+- **图片位置** —— 哪个文件放进哪个位,用文件路径
+- **品牌色与字体** —— 起飞前检查得到的十六进制色值与字体名
+- **风格备注** —— 调性、留白、要避免什么
 
-**Email content** — this skill writes the entire email; no design work:
+按日历顺序呈现简报,一次一行或成批——店主定。
 
-- Subject: ≤ 50 chars, specific, no clickbait. "Spring projects are
-  booking up" beats "Don't miss out!"
-- Preheader: ≤ 90 chars, complements the subject without repeating it.
-- Body: plain prose, 100–250 words. Opening line that earns the read →
-  1–2 paragraphs of substance → single clear CTA → sign-off.
-- Voice: same tone markers as social. Owners want their emails to sound
-  like them, not like a templated newsletter.
-- No image references. Don't write "see image above." If the owner wants
-  visuals, they add them in their email tool.
-- One CTA per email. Pick the most important action and lead with it.
+**检查点 2(简报)。** "有要调整的简报吗——版式、图上的文字、选图?"迭代到每份
+简报都获批。
 
-Present captions inline below each social row. Present full emails
-inline below each email row:
+**渲染交接。** 把已批准的简报交给店主:
 
 ```
-Subject: <subject line>
-Preheader: <preheader text>
-
-<body text>
+8 份设计简报已全部批准。请在你的设计工具中渲染(自营云端设计连接器上线后用它——
+在此之前用你顺手的工具)。把成品文件或托管图片 URL 发回给我,我会对照简报核验,
+再暂存战役。
 ```
 
-For worked examples, see
-[reference/examples/boutique-brief-campaign.md](reference/examples/boutique-brief-campaign.md).
+**核验(渲染文件发回时)。** 每个渲染素材在靠近暂存前都对照其简报核验:
 
-**Checkpoint 3.** "Any captions or emails to rewrite? Flag the date and
-what to change." Iterate until approved.
+- 每个位放的照片正确(没有图库占位图、没有灰框)
+- 文字叠加与批准的字符串逐字一致
+- 尺寸符合渠道规格
+- 没有跑偏简报的东西(错的产品、错的配色、lorem-ipsum)
+
+若某素材没对上,精确点名偏差("6月9日封面用了牛仔照,简报要的是
+linen_midi_01.jpg"),请店主只重渲这一个。战役可逐行推进——已核验的行不必等掉队
+的,除非店主想要一整批一起。
 
 ---
 
-### Stage 5 — HubSpot staging + handoff
+### 阶段 4 — 文案撰写
 
-HubSpot remains the campaign system of record. Email content is not
-staged — it's surfaced inline for the owner to copy into their email tool.
-For API field reference, see
-[reference/hubspot-staging.md](reference/hubspot-staging.md).
+对每个日历行起草文案。社交行给一段文案;邮件行给一封完整邮件。
 
-1. **Create the campaign.** `POST /marketing/v3/campaigns` with the
-   campaign name and start/end dates from the calendar.
+**在把任何对外文案交付给店主之前,先跑一遍下面的《广告法》/《价格法》合规自检。**
+这是小微商家最容易踩、罚得最狠的雷区;本技能自带的这道自检是兜底防线,即便未安装
+其他合规插件也必须执行。
 
-2. **Stage HubSpot-connectable rows (if any).** HubSpot Social can only
-   auto-publish to accounts connected in HubSpot. If the owner has such a
-   channel connected, `POST` to the HubSpot Social API per row:
-   - `channel`: map calendar channel to HubSpot account ID
-   - `scheduledAt`: ISO 8601 datetime — confirm it's in the future before
-     calling
-   - `content.body`: approved caption
-   - `attachments`: publicly hosted URL of the verified rendered asset —
-     if the asset is only a local file, stage the post without the
-     attachment and tell the owner to add the image in HubSpot
-   - `status`: `SCHEDULED` (never `PUBLISHED`)
+#### 《广告法》/《价格法》合规自检(每条对外文案交付前必过)
 
-3. **Package domestic-platform rows.** 公众号, 小红书, 抖音, and 视频号
-   cannot be published through HubSpot Social. For each of these rows,
-   produce a publish-ready package — date/time, channel, final caption,
-   verified asset file — plus one scheduling CSV covering all of them
-   (format in [reference/hubspot-staging.md](reference/hubspot-staging.md)).
-   The owner publishes natively in each platform (公众号 supports scheduled
-   publishing in its own editor). Log the package against the HubSpot
-   campaign so tracking stays in one place.
+按顺序逐项扫描每一段文案与每一处图上文字(文字叠加同属对外广告)。命中即按"处置"
+处理,绝不带雷投放。
 
-4. **Confirm the queue.** For staged HubSpot posts, call
-   `GET /marketing/v3/social/posts?status=SCHEDULED` and surface the list
-   with a direct link to the HubSpot campaign view. For packaged rows,
-   surface the publish schedule table.
+1. **极限词扫描(绝对化用语)。** 默认剔除极限词:"国家级""最高级""最佳",以及
+   "第一""唯一""首个""最好""顶级""绝对""独家""首家""最先进""最××"等。
+   - **罚则**:《广告法》第 57 条——责令停止发布、**处 20 万至 100 万元罚款**,
+     情节严重者吊销营业执照。
+   - **nuance(2023《广告绝对化用语执法指南》)**:并非一刀切。指向经营者自身、
+     限定特定时空条件、有客观依据可自我表述的,存在免罚空间。
+   - **处置**:默认避免极限词;确需使用须有客观依据且限定范围,存疑送审(见下第 6 条)。
 
-5. **Surface email content for handoff.** For each email row, present the
-   approved subject + preheader + body inline, grouped by send date. The
-   owner copies these into their email tool.
+2. **虚假 / 引人误解宣传。** 不得对商品性能、功能、质量、销售状况、用户评价、曾获
+   荣誉等作虚假或引人误解的表示(《广告法》第 4 条、第 28 条;《反不正当竞争法》)。
+   - **处置**:每一处事实性宣称都要有可核实依据。"销量第一""好评如潮""复购率最高"
+     这类没有客观数据支撑的,删掉或改为可证的具体表述。
 
-6. **Optional notification.** If DingTalk (钉钉) or Feishu (飞书) is
-   connected, offer to send the owner a message with the publish schedule
-   via the connected connector so it's on their phone.
+3. **特殊行业限制。** 医疗、药品、**保健食品**、医疗器械、教育培训、金融理财、
+   房地产、化妆品等有特别限制。
+   - 保健食品不得宣称疗效,须标注"本品不能代替药物"。
+   - 属于需广告审查的行业,不得擅自发布。
+   - **处置**:命中任一特殊行业即提示送审、勿套用通用促销模板;正式宣称移交
+     `crablaw-cn:marketing-claims-review`。
 
-**Final checkpoint.**
+4. **价格法(促销文案)。** 不得虚构原价、虚假折扣;须明码标价;"买赠""满减""免费"
+   等促销须真实,明确赠品与条件(《价格法》;《消费者权益保护法》)。
+   - **处置**:凡出现原价/折扣/满减/买赠/免费,核对:原价真实存在且曾实际成交、
+     折扣算得对、赠品与门槛写清楚(数量、有效期、是否限量)。含糊的促销改写清楚或删。
+
+5. **明示广告。** 软文、直播带货须可被识别为广告并显著标明;不得损害未成年人身心
+   健康;代言须基于真实使用。
+   - **处置**:带货/软文加显著广告标识;面向未成年人的内容格外谨慎;不写店主未真实
+     使用的代言口吻。
+
+6. **高风险送审。** 命中"极限词但无客观依据""特殊行业""重大事实性宣称",或任何拿不
+   准的,以文字建议移交 `crablaw-cn:marketing-claims-review`(中国营销宣传合规
+   审查)。若已安装 `crabcode-media-ops`,其内容合规审查(content compliance
+   review)路由作为更深一层复核;但 media-ops 未装时,本技能的自检即为兜底,不得
+   因缺 media-ops 而跳过。
+
+自检通过后,**每条对外文案的交付都附上红线提示**:
 
 ```
-Campaign "Summer Linen" is set up in HubSpot: [link]
+【AI 辅助草稿,非广告合规意见,投放前请自检《广告法》并按需送审】
+```
 
-Publish schedule (you publish these natively):
-  Jun 2, 10:00 — Xiaohongshu — linen launch note (asset: verified)
-  Jun 4, 10:00 — 公众号 — social-proof article (asset: verified)
+**社交文案** —— 公众号、视频号、小红书、抖音:
+
+- 长度:随渠道而定。小红书:标题 ≤ 20 字,正文 ≤ 1,000 字。抖音 / 视频号:短文案,
+  第一行就抛钩子。公众号:文章式,促销推文 300–800 字。
+- 结构:钩子 → 一个产品卖点 → CTA → 3–6 个话题标签(不是 30 个)。
+- 语气:贴合简报的调性标记。若简报说"轻松友好",别写成官腔。
+- 不灌水。不写"激动人心的消息!"或"我们非常荣幸地宣布"。开门见山讲价值。
+
+**邮件正文** —— 本技能写整封邮件;无设计工作:
+
+- 主题行:≤ 50 字,具体,不做标题党。"春季档期正在被订满"胜过"错过悔一年!"
+- 预览文字(preheader):≤ 90 字,与主题行互补而不重复。
+- 正文:纯散文,100–250 字。一句能换来继续读的开头 → 1–2 段有料内容 → 单一
+  明确 CTA → 落款。
+- 语气:与社交同一套调性标记。店主希望邮件听起来像自己,而非模板 newsletter。
+- 不引用图片。别写"见上图"。若店主想要视觉,他们在邮件工具里自己加。
+- 每封一个 CTA。挑最重要的动作,放在最前。
+
+在每个社交行下方内联呈现文案。在每个邮件行下方内联呈现整封邮件:
+
+```
+主题行:<主题行>
+预览文字:<preheader 文字>
+
+<正文>
+```
+
+需要范例,见
+[reference/examples/boutique-brief-campaign.md](reference/examples/boutique-brief-campaign.md)。
+
+**检查点 3。** "有要重写的文案或邮件吗?点出日期和要改什么。"迭代到批准为止。
+
+---
+
+### 阶段 5 — HubSpot 暂存 + 交接
+
+HubSpot 仍是战役的系统记录(system of record)。邮件正文不进暂存——它内联呈现,
+供店主复制进自己的邮件工具。API 字段参考见
+[reference/hubspot-staging.md](reference/hubspot-staging.md)。
+
+1. **创建战役(campaign)。** `POST /marketing/v3/campaigns`,带上日历里的战役名与
+   起止日期。
+
+2. **暂存 HubSpot 可连接的行(若有)。** HubSpot Social 只能自动发布到在 HubSpot 内
+   已连接的账号。若店主连了这类渠道,逐行 `POST` 到 HubSpot Social API:
+   - `channel`:把日历渠道映射到 HubSpot 账号 ID
+   - `scheduledAt`:ISO 8601 时间——调用前确认在未来
+   - `content.body`:已批准的文案
+   - `attachments`:已核验渲染素材的公开托管 URL——若素材只是本地文件,不带附件
+     暂存该帖,并告知店主在 HubSpot 里补图
+   - `status`:`SCHEDULED`(绝不 `PUBLISHED`)
+
+3. **打包国内平台行。** 公众号、小红书、抖音、视频号无法经 HubSpot Social 发布。对
+   这些行中的每一行,产出一份可直接发布的打包件——日期/时间、渠道、最终文案、已核验
+   素材文件——外加一份覆盖全部的排期 CSV(格式见
+   [reference/hubspot-staging.md](reference/hubspot-staging.md))。店主在各平台原生
+   发布(公众号在自己的编辑器里支持定时发布)。把打包件登记到 HubSpot 战役下,让
+   追踪集中一处。
+
+4. **确认队列。** 对已暂存的 HubSpot 帖,调用
+   `GET /marketing/v3/social/posts?status=SCHEDULED`,并给出通往 HubSpot 战役
+   视图的直达链接。对打包行,给出发布排期表。
+
+5. **交接邮件正文。** 对每个邮件行,把已批准的主题行 + 预览文字 + 正文按发送日期
+   分组内联呈现。店主复制进自己的邮件工具。
+
+6. **可选通知。** 若已连接钉钉(钉钉)或飞书(飞书),提出通过已连接的连接器把发布
+   排期发给店主,方便他在手机上看。
+
+**最终检查点。**
+
+```
+战役"夏日亚麻"已在 HubSpot 建好:[链接]
+
+发布排期(由你原生发布):
+  6月2日 10:00 — 小红书 — 亚麻上新图文(素材:已核验)
+  6月4日 10:00 — 公众号 — 社会证明文章(素材:已核验)
   …
 
-Email content is drafted below — copy each into your email tool when
-you're ready to send:
+邮件正文已在下方起草——想发时把每封复制进你的邮件工具:
 
-  Jun 5 — "Linen that actually breathes"
+  6月5日 — "真正透气的亚麻"
 
-Want me to message this schedule to you on DingTalk/Feishu?
-Anything to change before we're done?
+要我把这份排期通过钉钉/飞书发给你吗?收尾前还有要改的吗?
 ```
 
 ---
 
-## Approval gates
+## 审批闸口(Approval gates)
 
-- **Never claim an image was generated.** No design connector is
-  available; this skill produces briefs, and only the owner produces
-  pixels. An asset exists when the owner hands back the file.
-- **No design briefs for email rows.** Re-check the `Path` column before
-  writing every brief.
-- **No publishing.** HubSpot posts are staged as `SCHEDULED` only;
-  domestic-platform rows are handed off as packages; the owner controls
-  go-live everywhere.
-- **Never stage a post whose rendered asset hasn't been verified against
-  its brief.** Brief approval is not asset approval.
-- **Never route a 公众号/小红书/抖音/视频号 row through the HubSpot Social
-  API.** Those rows get the publish package + CSV.
-- **Never leave an image slot unresolved in a brief.** Slot-by-slot
-  inventory first; "TBD" ships placeholders.
-- **Never skip Checkpoint 1.** Writing briefs before the calendar is
-  approved is the largest source of wasted work in this skill.
-- **Check `scheduledAt` is in the future** before every HubSpot staging
-  call.
+- **绝不宣称图片是生成的。** 没有设计连接器可用;本技能产出简报,只有店主产出
+  像素。素材在店主交回文件的那一刻才存在。
+- **凡对外文案先过《广告法》/《价格法》自检。** 命中极限词/特殊行业须改写或送审,
+  绝不直接投放;每条交付附红线提示
+  `【AI 辅助草稿,非广告合规意见,投放前请自检《广告法》并按需送审】`。
+- **邮件行不出设计简报。** 写每份简报前复查 `路径` 列。
+- **不发布。** HubSpot 帖只暂存为 `SCHEDULED`;国内平台行以打包件交接;上线由店主
+  全程掌控。
+- **绝不暂存渲染素材未对照简报核验的帖。** 简报批准 ≠ 素材批准。
+- **绝不把公众号/小红书/抖音/视频号行走 HubSpot Social API。** 这些行走发布打包件
+  + CSV。
+- **绝不在简报里留未解决的图片位。** 先逐位盘点;"待定"会送出占位图。
+- **绝不跳过检查点 1。** 日历批准前就写简报,是本技能最大的返工来源。
+- **每次 HubSpot 暂存调用前检查 `scheduledAt` 在未来。**
 
 ---
 
-## Reference
+## 参考
 
-- [reference/design-brief-spec.md](reference/design-brief-spec.md) — the
-  design brief template, per-channel dimensions, rendering handoff and
-  verification checklist
-- [reference/hubspot-staging.md](reference/hubspot-staging.md) — HubSpot
-  campaign/Social API and the scheduling CSV for domestic platforms
-- [reference/gotchas.md](reference/gotchas.md) — Good / Bad patterns for
-  every failure mode this skill has hit in production
+- [reference/design-brief-spec.md](reference/design-brief-spec.md) —— 设计简报模板、
+  逐渠道尺寸、渲染交接与核验清单
+- [reference/hubspot-staging.md](reference/hubspot-staging.md) —— HubSpot 战役/Social
+  API 与国内平台排期 CSV
+- [reference/gotchas.md](reference/gotchas.md) —— 本技能在实战中踩过的每个失败模式的
+  好 / 坏 对照(含《广告法》/《价格法》)
 - [reference/examples/boutique-brief-campaign.md](reference/examples/boutique-brief-campaign.md)
-  — full worked example (single-image note, multi-slot carousel)
+  —— 完整范例(单图图文、多位轮播,附合规视角)
 
-## Media publishing routing
+## 媒体发布路由(Media publishing routing)
 
-- For domestic-platform publishing workflows (公众号/小红书/抖音/视频号 platform adaptation, content compliance review, and publish logging), route to `crabcode-media-ops:media-platform-adapter` and `crabcode-media-ops:media-ops` instead of hand-rolling platform rules here.
-- If triggering them returns Unknown skill, the media-ops plugin is not installed: guide the owner to install `crabcode-media-ops` via `/plugin`, then retry. Until then, deliver the publish-ready package for native manual publishing as described above.
+- 国内平台发布工作流(公众号/小红书/抖音/视频号 平台适配、内容合规审查、发布留痕),
+  路由到 `crabcode-media-ops:media-platform-adapter` 与 `crabcode-media-ops:media-ops`,
+  不要在这里手搓平台规则。其内容合规审查是本技能阶段 4 自检之上更深的一层;两者不
+  互斥,自检始终先跑。
+- 若触发它们返回 Unknown skill,说明 media-ops 插件未安装:引导店主经 `/plugin`
+  安装 `crabcode-media-ops`,再重试。在那之前,按上文交付可直接发布的打包件供原生
+  手动发布;阶段 4 的《广告法》自检不因 media-ops 缺席而跳过。

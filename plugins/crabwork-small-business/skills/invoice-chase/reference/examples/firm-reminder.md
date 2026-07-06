@@ -1,28 +1,36 @@
-# Firm Reminder — Repeat Late Payer Example
+# 正式催告——屡次逾期客户示例
 
-**Scenario:** Smith LLC, ¥450 invoice, 47 days past due. Paid late in 3 of last 4 invoices.
+**场景:** 云溪科技,¥450 账款,逾期 47 天。最近 4 笔里有 3 笔逾期。双方一直卡在「款到才开票 vs 票到才付款」的死结上。
 
-**Score:** `repeat-late` · **Tone:** Firm
-
----
-
-**Subject:** Past due notice: Invoice #1038 — ¥450 (47 days overdue)
-
-Hi Tom,
-
-Invoice #1038 for ¥450 is now 47 days past due. The original due date was March 11.
-
-Please remit payment by May 2. You can pay via Alipay here: [Alipay payment link — Invoice #1038 — ¥450]
-
-If there's a question about this invoice, reply to this message and I'll sort it out quickly.
-
-[Owner name]
+**评分:** `repeat-late`(屡次逾期) · **语气:** 正式
 
 ---
 
-**Why this works:**
-- States the facts directly: amount, invoice number, days overdue, original due date
-- One clear deadline in the body
-- Leaves a professional out ("if there's a question") without being apologetic
-- Single call to action — one payment link
-- Firm but professional — no threats, no caps
+**主题:** 逾期催告:第 1038 号账款 ¥450(逾期 47 天)
+
+云溪科技 财务部 刘经理:
+
+第 1038 号账款 ¥450 现已逾期 47 天,原到期日为 3 月 11 日,至今未见付款。
+
+关于发票:我方依法负有开具发票的义务,已就本笔款项开具数电发票(增值税普通发票),可随时向贵司交付 / 重发。发票与付款并不互为前提,请勿再以「未收到发票」为由延后付款——开票需求我方即刻满足,款项也请一并结清。
+
+请于 5 月 2 日前付清上述款项。逾期利息按合同约定计算;合同未约定的,参照当期 LPR 主张资金占用损失。为维护双方权益、也为避免拖过法律规定的主张期限,请及时结清。逾期仍未付,我方将保留通过法律途径主张欠款及相应利息的权利。
+
+支付宝收款链接:[支付宝收款链接 —— 第 1038 号账款 —— ¥450]
+
+如对本笔账款有疑问,回复本消息,我会尽快核对处理。
+
+[店主署名]
+
+【AI 辅助整理,非法律意见;催收话术与利息主张请核对合同并咨询专业人士】
+
+---
+
+**为什么这样写有效:**
+- 直陈事实:金额、账款编号、逾期天数、原到期日,不含情绪与指控
+- **正面履行开票义务**(数电发票已开、可随时交付),当场拆掉「等票才付」的死结——票、款两条线都点到
+- 正文给出一个明确期限
+- **逾期利息只写「按合同约定或参照当期 LPR」,不硬编码具体利率或金额**;违约金不漫天要价
+- 点到「及时结清、避免拖过主张期限」,呼应 3 年诉讼时效;催收本身即书面凭证,可中断时效
+- 依法主张的落点是「保留通过法律途径主张的权利」——**正式而合法,无威胁、无恐吓、不公开隐私**
+- 只设一个行动号召——一条付款链接。末尾附「非法律意见、请核实」提示。

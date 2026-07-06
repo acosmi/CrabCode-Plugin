@@ -1,77 +1,94 @@
-# Example: Refund request — Alipay payment found
+# 示例:退款请求 —— 查到支付宝支付记录
 
-**Scenario:** A customer emails saying their product arrived damaged and they want a full refund. The owner pastes the email and says "answer this customer."
+**场景:** 一位客户来消息说收到的商品损坏了,要求全额退款。店主把消息粘贴进来,说"回一下这个客户"。**要点:商品存在质量问题属"三包"法定义务,依法应退——不是店主的善意让步。**
 
 ---
 
-## Customer email (pasted by the owner)
+## 客户消息(店主粘贴)
 
-> **Subject:** Damaged product — need refund
+> **主题:** 商品损坏,需要退款
 >
-> Hi, I ordered a cutting board set last month and it arrived cracked. I'd like a full refund please. My order number is 20260328001847.
+> 你好,我上个月买的一套竹制砧板,收到时就裂了一道大口子,想申请全额退款。我的订单号是 20260328001847。
 >
-> — Sarah M.
+> —— 林晓梅
 
 ---
 
-## Step 2 — Alipay lookup result
+## 第 2 步 —— 支付宝查询结果
 
-`query-alipay-payment` with order number 20260328001847 returns:
+用订单号 20260328001847 调用 `query-alipay-payment`,返回:
 
-- **Order number (out_trade_no):** 20260328001847
-- **Amount:** ¥64.00
-- **Date:** 2026-03-28
-- **Trade status:** paid
-- **Refund check (`query-alipay-refund`):** no refund on record
-
----
-
-## Step 3 — HubSpot lookup result
-
-Contact found: Sarah M. (sarah.m@email.com)
-- Lifecycle stage: Customer
-- Prior orders: 2
-- Notes: "Returning customer — sent holiday promo Dec 2025."
+- **订单号(out_trade_no):** 20260328001847
+- **金额:** ¥64.00
+- **日期:** 2026-03-28
+- **交易状态:** 已付款(paid)
+- **退款核查(`query-alipay-refund`):** 无退款记录
 
 ---
 
-## Step 4 — Draft reply (presented to owner for review)
+## 第 3 步 —— HubSpot 查询结果(CRM 连接器以实际配置为准)
 
-> **Subject:** Re: Damaged product — need refund
+查到联系人:林晓梅(linxiaomei@example.com)
+
+- 生命周期阶段:客户
+- 历史订单:2 笔
+- 备注:"回头客——2025 年 12 月发过节日促销。"
+
+---
+
+## 第 4 步 —— 消保法法定权利判断
+
+逐项核对(判断顺序:先定法定义务,再谈裁量):
+
+- **网购七天无理由退货(第 25 条)?** 客户诉求是"商品损坏",走质量问题路径即可,不必依赖七天无理由(且无理由退货以商品完好为前提,本例商品已有瑕疵)。
+- **三包 / 质量问题?** **命中。** 砧板到货即开裂,属商品存在质量问题,依法**应予退货 / 更换**,**不受七天限制**,也不以商品完好为前提。
+- **欺诈退一赔三(第 55 条)?** 无证据表明经营者存在欺诈,暂不适用(如后续查明以次充好、虚假宣传,再评估退一赔三)。
+- **预付式消费 / 大数据杀熟?** 与本例无关。
+
+**结论:** 本例属**三包法定义务**下的应退情形——全额退款是**依法处理**,不是店主的"善意破例"。草稿据此定基调:先讲依法退款,店主若愿意再叠加额外补偿(如补运费)。
+
+---
+
+## 第 5 步 —— 起草回复(呈交店主审阅)
+
+> **主题:** 回复:商品损坏,需要退款
 >
-> Hi Sarah,
+> 林晓梅您好,
 >
-> So sorry to hear your cutting board set arrived cracked — that's definitely not okay. I've pulled up your order and I'm issuing a full refund of ¥64.00. You should see it back on your original payment method within 3–5 business days.
+> 非常抱歉,您收到的竹制砧板到货就裂了——这确实是我们的质量问题,不该发生。商品存在质量问题,依《消费者权益保护法》本就应当为您退货,我已为您办理这笔 ¥64.00 的全额退款,款项将按原路退回,预计 3–5 个工作日到账。
 >
-> Thanks for letting me know, and I appreciate your patience. Really sorry about this.
+> 给您添麻烦了,非常感谢您的理解。这套砧板的破损情况我们也已记录,会向供货方反馈。
 >
-> [Owner name]
+> [店主署名]
+>
+> 【AI 辅助草稿，非法律意见，退换货与赔偿请依《消费者权益保护法》核实】
 
 ---
 
-## Step 5 — Owner approves draft (no edits)
+## 第 6 步 —— 店主批准草稿(无修改)
 
 ---
 
-## Step 6 — Refund approval prompt
+## 第 7 步 —— 退款审批提示
 
-> *"Issue refund of ¥64.00 to Sarah M. (sarah.m@email.com) for order 20260328001847? Reply Y to proceed."*
+> *"就订单 20260328001847,向 林晓梅(linxiaomei@example.com)退款 ¥64.00?回复 Y 继续。"*
 
-Owner replies: **Y**
+店主回复:**Y**
 
-→ Refund issued via `refund-alipay-payment`.
-
----
-
-## Step 7 — Hand-off + HubSpot note
-
-Final reply handed to the owner, who sends it from their own mailbox (no email connector).
-
-HubSpot note logged on Sarah M.'s contact:
-> "Ticket Deflector — 2026-04-23: Customer reported damaged product. Full refund of ¥64.00 issued via Alipay (order 20260328001847). Reply drafted and handed to owner to send."
+→ 经 `refund-alipay-payment` 发起退款。(即便这是三包法定义务、依法本就该退,发起退款这一动作仍走店主确认门禁。)
 
 ---
 
-## Step 8 — Report
+## 第 8 步 —— 交接 + HubSpot 备注
 
-> Reply finalized for Sarah M. (owner to send) · Refund of ¥64.00 issued via Alipay (20260328001847) · HubSpot note logged.
+终稿交给店主,由店主从自己的邮箱 / 微信发送(无邮件连接器)。
+
+在林晓梅的联系人下记一条 HubSpot 备注(CRM 连接器以实际配置为准):
+
+> "客诉退款助手 —— 2026-04-23:客户反馈商品(竹制砧板)到货开裂,属三包质量问题。已依法通过支付宝办理 ¥64.00 全额退款(订单 20260328001847)。回复已起草并交店主发送。"
+
+---
+
+## 第 9 步 —— 汇报
+
+> 已为林晓梅定稿回复(店主发送)· 属三包质量问题、依法应退 · 已通过支付宝发起 ¥64.00 退款(20260328001847)· HubSpot 备注已记录。

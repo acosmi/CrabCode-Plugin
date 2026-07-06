@@ -1,30 +1,30 @@
-# Contract intake: getting the document into the review
+# 合同接入:怎么把文档送进审查
 
-There is no email or e-sign connector in this plugin yet — the 腾讯企业邮 (email) and 众律宝 (e-sign) connectors are pending. Contracts arrive by upload or paste.
+本插件尚无邮箱或电子签连接器——腾讯企业邮(邮箱)与众律宝(电子签)待接入。合同通过上传或粘贴进入审查。
 
-## Supported sources
+## 支持的来源
 
-1. **Local file** — PDF or DOCX from Desktop or a folder the owner points to. Read PDFs chunked via the `pages` parameter for 10+ page files. Read the whole document, including exhibits and schedules at the back.
-2. **Pasted text** — If the owner pastes the contract into chat, work with what's provided. If it looks truncated (cuts off mid-clause, missing signature block), say so and ask for the rest.
+1. **本地文件** — 桌面或业主指定文件夹里的 PDF 或 DOCX。10 页以上的 PDF 用 `pages` 参数分块读取。通读全文,包括末尾的附件、附表。
+2. **粘贴文本** — 业主把合同粘进对话时,就用所给内容。若看起来被截断(在条款中途断掉、缺签署栏),如实指出并请其补齐。
 
-## Asking for the contract
+## 索取合同
 
-If no file or text was provided:
+若既无文件也无文本:
 
 ```
-"Attach the contract as a PDF or DOCX, or paste the text directly — I'll take it from there."
+"把合同以 PDF 或 DOCX 上传,或直接粘贴正文——剩下的交给我。"
 ```
 
-If the contract is sitting in the owner's inbox or in an e-sign service, ask them to download it and attach the file. Do not claim to be able to fetch it.
+若合同还在业主邮箱或电子签平台里,请其下载后上传文件。不要声称能自行拉取。
 
-## After the review
+## 审查之后
 
-- The redlined DOCX is produced locally. The owner sends it back to the counterparty themselves — there is no email connector. If they want a cover note, draft it in chat for them to copy.
-- Once terms are settled, the owner sends the final document for signature via 众律宝, or signs on paper. The skill prepares the document; it never sends or signs.
-- Where a notification suffices (e.g., "review done, summary saved"), offer to send a DingTalk/Feishu message via the connected connector — show the message and get approval first.
+- 带修改标记的 DOCX 在本地生成。业主自行把它回传给对方——尚无邮箱连接器。若需附一段说明,在对话里替其起草,供其复制。
+- 条款谈定后,由业主经众律宝送签,或纸质签署。本技能只负责准备文档,绝不发送、绝不签署。
+- 若只需一条通知(如"审查完成,摘要已存"),可提议经已连接的连接器发一条钉钉/飞书消息——先展示消息内容并取得确认。
 
-## What NOT to do
+## 不要做的事
 
-- Do not claim to search email or fetch envelopes from an e-sign service — those connectors don't exist yet.
-- Do not send anything on the owner's behalf. Drafts are produced in chat for the owner to send.
-- Do not read or modify the original file beyond what the review needs.
+- 不要声称能搜邮箱或从电子签平台拉取签署文件——这些连接器还不存在。
+- 不要代业主发送任何东西。草稿在对话里产出,由业主自行发送。
+- 除审查所需外,不读取、不修改原始文件。

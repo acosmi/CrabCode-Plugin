@@ -1,27 +1,30 @@
-# Gentle Reminder — Good Customer Example
+# 温和提醒——守信客户示例
 
-**Scenario:** Acme Corp, ¥1,200 invoice, 18 days past due. Paid on time in 5 of 5 prior invoices.
+**场景:** 明发商贸,¥1,200 账款,逾期 18 天。此前 5 笔账款全部按时付清。发票已开具。
 
-**Score:** `good-payer` · **Tone:** Gentle
-
----
-
-**Subject:** Quick reminder: Invoice #1042 for ¥1,200
-
-Hi Sarah,
-
-Just a quick note — Invoice #1042 for ¥1,200 was due on April 9 and I haven't seen payment come through yet.
-
-I know things get busy — if it's already on its way, please disregard! If not, here's the link to pay via Alipay: [Alipay payment link — Invoice #1042 — ¥1,200]
-
-Thanks so much, and let me know if anything looks off on the invoice.
-
-[Owner name]
+**评分:** `good-payer`(守信) · **语气:** 温和
 
 ---
 
-**Why this works:**
-- Opens with assumption of oversight, not accusation
-- Gives an easy out ("if it's already on its way")
-- Single call to action — one payment link (created via the Alipay connector after owner approval; use the owner's own payment details if the connector is unavailable)
-- Short. No lecture, no policy statement.
+**主题:** 温馨提醒:第 1042 号账款 ¥1,200 待付
+
+张姐,您好:
+
+小小提醒一下——第 1042 号账款 ¥1,200 于 4 月 9 日到期,目前还没看到款项到账。
+
+发票已随货开好(数电发票已发到贵司预留邮箱),您留存报销即可。知道最近事情多,若款项已在路上,请忽略本条!若还没顾上,这是支付宝付款链接:[支付宝收款链接 —— 第 1042 号账款 —— ¥1,200]
+
+多谢啦,发票或对账上有任何不对的地方,随时招呼我。
+
+[店主署名]
+
+【AI 辅助整理,非法律意见,请核对合同】
+
+---
+
+**为什么这样写有效:**
+- 以「一时疏忽」开场,不作指控
+- 给一个体面的台阶(「若款项已在路上」)
+- **发票已开、随信说明**,免去对方「等票才付」的借口——票、款不互为前提
+- 只设一个行动号召——一条付款链接(经店主批准后由支付宝连接器创建;连接器不可用时用店主自己的收款信息)
+- 简短。不说教,不搬政策。末尾附「非法律意见、请核对」提示。

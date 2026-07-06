@@ -1,73 +1,77 @@
 ---
 name: review-contract
 version: 0.3.0
-description: Reviews a contract in plain English, surfaces red flags with severity ratings, and produces a marked-up docx/PDF with suggested redlines. Trigger when the owner runs /review-contract or says "review this contract," "what am I signing," "should I sign this," "check this NDA/MSA/agreement," "any red flags in this," "look at these terms," or uploads/pastes a contract or legal document. Accepts an optional file path; works fully offline with a local file or pasted text (no email or e-sign connector yet).
+description: 以《民法典》合同编口径用大白话审查合同,按严重程度标出红旗,并生成带修改标记的 docx/PDF 供业主谈判使用。Reviews a contract in plain language, surfaces red flags with severity ratings, and produces a marked-up docx/PDF with suggested redlines. 触发:业主运行 /review-contract,或说"审合同""帮我看看这份合同""这个该不该签""看看这份保密协议/服务合同""有没有坑""看看这些条款",或说 "review this contract," "what am I signing," "should I sign this," "check this NDA/MSA/agreement," "any red flags in this," "look at these terms," 或上传/粘贴合同、法律文件。可选接收文件路径;有本地文件或粘贴文本即可离线运行(尚无邮箱或电子签连接器)。
 allowed-tools: Read, WebFetch, Bash
 ---
 
-Run the contract review. Read the document, explain what it says, flag anything risky, and produce marked-up redlines for the owner to use in negotiations.
+运行合同审查。读文档、讲清它写了什么、标出有风险的地方,并生成带修改标记的修改稿供业主谈判使用。
 
-Parse arguments:
-- `FILE_PATH` — path to a local PDF/docx file; if omitted, ask the owner to attach the contract or paste the text. There is no email or e-sign connector yet (腾讯企业邮 and 众律宝 are pending), so the contract always comes from the owner directly.
+**页首红线(每次输出必标):** `【AI 辅助整理,非法律意见,请经律师复核后使用】`。本命令仅做大白话初筛,不出具法律意见;高风险条款建议移交 crablaw-cn 法律插件的 `crablaw-cn:review`(律师级审查)/ `crablaw-cn:clause-redraft`(条款改写)等技能,或专业律师复核。
 
-## Step 1 — Load the contract
+解析参数:
+- `FILE_PATH` — 本地 PDF/docx 文件路径;若省略,请业主上传合同或粘贴正文。尚无邮箱或电子签连接器(腾讯企业邮、众律宝待接入),合同始终由业主直接提供。
 
-Using the `contract-review` skill workflow:
+## 第 1 步 — 载入合同
 
-1. If a file path is given: read the document from Files or Desktop.
-2. If the owner pasted the contract text: work with what's provided.
-3. If neither: ask the owner to attach the contract as a PDF or docx, or paste the text. If it lives in their inbox or an e-sign service, they download it and attach it — the skill cannot fetch it.
+沿用 `contract-review` 技能的工作流:
 
-## Step 2 — Plain-English summary
+1. 若给了文件路径:从文件或桌面读取文档。
+2. 若业主粘贴了合同正文:就用所给内容。
+3. 两者都无:请业主以 PDF 或 docx 上传合同,或粘贴正文。若合同在其邮箱或电子签平台里,由其下载后上传——本技能无法自行拉取。
 
-Produce a 3-paragraph summary:
-1. **What this contract does** — the deal in plain terms (who, what, how much, how long)
-2. **Key obligations** — what the owner must do and when
-3. **Key rights** — what the owner gets and any termination or exit paths
+## 第 2 步 — 大白话摘要
 
-## Step 3 — Red-flag list
+出一份三段式摘要:
+1. **这份合同干什么** — 用大白话讲清这笔交易(谁、做什么、多少钱、多长期限)
+2. **主要义务** — 业主必须做什么、何时做
+3. **主要权利** — 业主能得到什么,以及任何解除或退出路径
 
-For each risk, rate severity: 🔴 High / 🟡 Medium / 🟢 Low
+## 第 3 步 — 红旗清单
 
-Flag at minimum:
-- Auto-renewal clauses with short cancellation windows
-- Unilateral price change rights
-- Broad IP ownership transfers
-- Unlimited liability or missing liability cap
-- Exclusivity clauses
-- Non-compete or non-solicit provisions
-- Ambiguous payment or deliverable terms
+对每项风险评级:🔴 高 / 🟡 中 / 🟢 低
 
-Format each flag as:
+至少标出:
+- 自动续约且退出窗口过短(错过不续约通知窗口会被再锁一年)
+- 单方调价权
+- 宽泛的知识产权归属转让(成果著作权/专利权是否被一并转走、有无既有成果与背景工具的除外)
+- 不设责任上限或缺失责任上限(赔偿敞口按《民法典》违约责任填补,以订立时可预见损失为限但无金额上限)
+- 排他性条款
+- 竞业限制条款(注意:中国法下仅限高管/高级技术/负保密义务人员,期限≤2 年,且离职后须按月支付经济补偿,否则难以约束员工;不可照搬照套全体员工)
+- 付款或交付条款含糊(账期、"定金"与"订金/预付款"用字、逾期利息/违约金——违约金过分高于实际损失可请求调减,定金不得超过标的额 20%)
+- 管辖与争议解决(须明确、单一:约定法院管辖或明确选定的仲裁委员会;不能又约定诉讼又约定仲裁,仲裁未选定机构可能无效;诉讼时效 3 年)
+- 数据处理条款(涉及个人信息的须符合《个人信息保护法》/《数据安全法》:告知同意、最小必要、委托处理)
+
+每条红旗按此格式:
 ```
-{Severity} {Clause name} — {what it says in plain English} — Suggested redline: {fix}
-```
-
-## Step 4 — Marked-up redlines
-
-Generate a list of specific redline suggestions in legal markup format:
-```
-§{section}: DELETE "[original language]" / INSERT "[suggested replacement]"
-Reason: {one sentence}
+{严重程度} {条款名} — {大白话讲它写了什么} — 建议修改:{改法}
 ```
 
-Offer to export this as a marked-up docx or PDF to Files or Desktop.
+## 第 4 步 — 修改标记
 
-## Connector failures
+生成一份具体的修改建议清单,用条款修改标记格式:
+```
+第{条/款}条:删除"[原文]" / 加入"[建议替换文字]"
+理由:{一句话}
+```
 
-This command works fully offline — it needs no connectors. If no file path was given and nothing was pasted, ask the owner to upload the contract as a PDF or docx. Sending the redline to the counterparty and routing the final document for signature are the owner's manual steps: 众律宝 (connector pending) or paper.
+提议把它导出为带修改标记的 docx 或 PDF 到文件或桌面。
 
-## Approval gates
+## 连接器缺失
 
-- **Never claim to send, sign, or route anything for signature.** Prepare the final document; the owner sends it for signature via 众律宝 (or on paper) manually.
-- **Always caveat:** "This is not legal advice. Review with your attorney before signing."
-- **Never delete or overwrite the original document.**
+本命令完全离线运行——不需要任何连接器。若既没给文件路径也没粘贴内容,请业主以 PDF 或 docx 上传合同。把修改稿发给对方、以及把最终文档送签,都是业主的手动步骤:众律宝(连接器待接入)或纸质。
 
-## Deliverable routing
+## 审批门禁
 
-- Reading a PDF contract is handled by `crabcode-office-suite:crabcode-pdf`; the marked-up export is generated with `crabcode-office-suite:crabcode-documents` for docx, or `crabcode-office-suite:crabcode-pdf` for PDF.
-- If either skill reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin`, then retry. Until then, work from pasted text and present the redlines as markdown in chat.
+- **绝不**声称已发送、已签署或已送签。只准备最终文档;由业主经众律宝(或纸质)手动送签。
+- **红线**:每次输出页首标注 `【AI 辅助整理,非法律意见,请经律师复核后使用】`。仅做大白话初筛,不出具法律意见;高风险条款移交 crablaw-cn 法律插件(`crablaw-cn:review` / `crablaw-cn:clause-redraft` / `crablaw-cn:nda-review` / `crablaw-cn:risk-summary`)或专业律师复核。
+- **绝不**删除或覆盖原始文档。
 
-## Output
+## 交付路由
 
-Present the plain-English summary, red-flag list, and redline suggestions. Ask the owner whether to export a marked-up copy and where to save it.
+- 读取 PDF 合同由 `crabcode-office-suite:crabcode-pdf` 处理;带修改标记的导出物,docx 由 `crabcode-office-suite:crabcode-documents` 生成、PDF 由 `crabcode-office-suite:crabcode-pdf` 生成。
+- 若任一技能报 Unknown skill,说明 office 套件未安装:引导业主经 `/plugin` 安装 `crabcode-office-suite` 后重试。在此之前,从粘贴文本工作,并在对话里用 markdown 呈现修改建议。
+
+## 输出
+
+呈现大白话摘要、红旗清单与修改建议。询问业主是否导出带修改标记的副本、存到哪里。

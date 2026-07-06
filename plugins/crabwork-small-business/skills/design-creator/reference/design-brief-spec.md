@@ -1,134 +1,126 @@
-# Design Brief Spec
+# 设计简报规格(Design Brief Spec)
 
-The design-creator skill does not render images. There is no design
-connector in this plugin yet — the in-house cloud design service
-(自营云端设计) connector is planned but not available. Until it ships, the
-skill's visual deliverable is a **design brief**: a spec complete enough
-that the owner (or anyone they hand it to) can render the asset in one
-pass, in any tool, without a follow-up question.
+design-creator 技能不渲染图片。本插件里还没有设计连接器——自营云端设计的连接器在
+规划中但尚未上线。在它上线前,本技能的视觉交付物是一份**设计简报**:一份完整到店主
+(或他交办的任何人)能在任何工具里一次渲染成型、无需追问的规格。
 
 ---
 
-## Table of contents
+## 目录
 
-1. [Brief template](#brief-template)
-2. [Dimensions by channel](#dimensions-by-channel)
-3. [Text overlay rules](#text-overlay-rules)
-4. [Rendering handoff](#rendering-handoff)
-5. [Verification checklist](#verification-checklist)
-6. [自营云端设计 status](#自营云端设计-status)
+1. [简报模板](#简报模板)
+2. [逐渠道尺寸](#逐渠道尺寸)
+3. [文字叠加规则](#文字叠加规则)
+4. [渲染交接](#渲染交接)
+5. [核验清单](#核验清单)
+6. [自营云端设计状态](#自营云端设计状态)
 
 ---
 
-## Brief template
+## 简报模板
 
-One brief per calendar row. Every field filled — no "TBD."
+一个日历行一份简报。每个字段都填满——不留"待定"。
 
 ```
-DESIGN BRIEF — {date} · {channel}
-Asset type:   {e.g., Xiaohongshu 3:4 note image, 公众号 article header}
-Dimensions:   {W×H px}
-Layout:       {plain-language placement of every element, top to bottom}
-Text overlay:
-  Headline:   "{exact string}"
-  Subhead:    "{exact string, or —}"
-  CTA:        "{exact string, or —}"
-Images:
-  {Slot name}: {absolute file path or file name confirmed in Stage 2}
-Brand:
-  Colors:     {hex codes from pre-flight}
-  Fonts:      {font names, or "owner's brand font"}
-Style notes:  {mood, whitespace, what to avoid}
-Export:       PNG or JPG at the stated dimensions
+设计简报 —— {日期} · {渠道}
+素材类型:   {如:小红书 3:4 图文,公众号 文章头图}
+尺寸:       {宽×高 px}
+版式:       {自上而下,每个元素的大白话位置}
+文字叠加:
+  标题:     "{精确字符串}"
+  副标题:   "{精确字符串,或 —}"
+  CTA:      "{精确字符串,或 —}"
+图片:
+  {图片位名}: {阶段 2 确认的绝对文件路径或文件名}
+品牌:
+  颜色:     {起飞前检查得到的十六进制色值}
+  字体:     {字体名,或 "店主的品牌字体"}
+风格备注:    {调性、留白、要避免什么}
+导出:       PNG 或 JPG,按上述尺寸
 ```
 
-Rules:
+规则:
 
-- **Text overlay strings are final copy.** The owner types them verbatim
-  into the design tool — never paraphrase or leave "something like…".
-- **Every image slot names a real file** confirmed in the Stage 2
-  manifest. A brief with an unresolved slot is not presentable.
-- **Dimensions come from the table below**, not from memory of whatever
-  template the owner used last time.
-
----
-
-## Dimensions by channel
-
-Commonly used sizes for domestic channels. Platforms crop and re-compress
-on upload — treat these as the working canvas and confirm in the
-platform's uploader if a layout is tight.
-
-| Channel | Asset | Dimensions |
-|---------|-------|-----------|
-| Xiaohongshu (小红书) | Note image / carousel page | 1242×1660 (3:4 vertical) |
-| Xiaohongshu (小红书) | Square note image | 1080×1080 |
-| WeChat Official Account (公众号) | Article cover (头图) | 900×383 (2.35:1) |
-| WeChat Official Account (公众号) | Secondary cover (次条) | 200×200 |
-| WeChat Channels (视频号) / Douyin (抖音) | Vertical cover | 1080×1920 (9:16) |
-| Email | Header image (if the owner adds one in their email tool) | 600×200 |
-
-Multi-page carousels (小红书): every page uses the same dimensions; the
-brief lists one image slot per page.
+- **文字叠加字符串就是最终文案。** 店主会把它逐字敲进设计工具——绝不改写、绝不
+  留"大概像……"。
+- **图上文字即对外广告,须先过阶段 4 的《广告法》/《价格法》自检。** 标题、副标题、
+  CTA 里不得出现极限词(绝对化用语)或无依据的宣称;含促销价/折扣/买赠的叠加文字,
+  按价格法核对真实、明确。存疑移交 `crablaw-cn:marketing-claims-review`。
+- **每个图片位都指向一个真实文件**(阶段 2 清单里确认过)。带未解决图片位的简报不
+  可呈现。
+- **尺寸取自下表**,不是凭记忆用店主上次的模板。
 
 ---
 
-## Text overlay rules
+## 逐渠道尺寸
 
-- Headline is the largest element; one idea per asset.
-- Keep overlay text short — an image that needs three sentences should
-  move the copy into the caption instead.
-- Contrast: dark text on light photo areas or a brand-color panel behind
-  the text; the brief's style notes say which.
-- 小红书 covers carry the hook (the cover competes in the feed); the note
-  body carries the detail.
-- No platform UI mimicry (fake buttons, fake follow prompts).
+国内渠道常用尺寸。平台在上传时会裁剪并重新压缩——把这些当作工作画布,版式吃紧时
+在平台上传器里再确认。
 
----
+| 渠道 | 素材 | 尺寸 |
+|------|------|------|
+| 小红书 | 图文 / 轮播页 | 1242×1660(3:4 竖版) |
+| 小红书 | 方形图文 | 1080×1080 |
+| 公众号 | 文章头图 | 900×383(2.35:1) |
+| 公众号 | 次条封面 | 200×200 |
+| 视频号 / 抖音 | 竖版封面 | 1080×1920(9:16) |
+| 邮件 | 头图(若店主在邮件工具里自行添加) | 600×200 |
 
-## Rendering handoff
-
-After Checkpoint 2 (all briefs approved):
-
-1. Hand the full brief set to the owner in one block, calendar order.
-2. The owner renders each asset in their design tool — 自营云端设计 once
-   its connector is live, or whatever they use today.
-3. The owner returns finished files (file paths) or hosted image URLs.
-4. Verify each asset against its brief (checklist below) before Stage 5
-   staging. Verified rows can proceed while stragglers are re-rendered.
-
-Only a **publicly hosted URL** can be attached to a HubSpot social post.
-A local file is fine for domestic-platform publish packages (the owner
-uploads natively); for HubSpot-staged rows without a hosted URL, stage
-the post without the attachment and note that the owner adds the image
-in HubSpot.
+多页轮播(小红书):每页用同一尺寸;简报里一页列一个图片位。
 
 ---
 
-## Verification checklist
+## 文字叠加规则
 
-Look at each rendered asset and reject it if any of these holds:
-
-- Wrong photo in a slot, or a stock/placeholder image where a product
-  photo should be
-- Text overlay differs from the approved strings (typos count)
-- Wrong dimensions or aspect ratio for the channel
-- Off-brand colors or fonts when the brief specified them
-- Leftover template text (lorem-ipsum, sample prices)
-- Subject doesn't match the brief (wrong product, wrong colorway)
-
-On rejection, name the exact deviation and the brief line it violates,
-and ask the owner to re-render just that asset — never silently stage a
-near-miss.
+- 标题是最大的元素;一个素材一个想法。
+- 叠加文字保持简短——需要三句话的图,应把文案移进正文文案里。
+- 对比度:深色文字放在照片的浅色区域,或文字后垫一块品牌色面板;由简报的风格备注
+  指定用哪种。
+- 小红书封面承载钩子(封面要在信息流里竞争);图文正文承载细节。
+- 不模仿平台 UI(假按钮、假关注提示)。
+- **合规红线:图上文字与正文文案同属对外广告。** 落进简报前先过阶段 4 自检——无
+  极限词、无虚假/引人误解宣称;涉特殊行业(保健食品须标"本品不能代替药物"等)或
+  促销价格,按规改写或送审。
 
 ---
 
-## 自营云端设计 status
+## 渲染交接
 
-- **Now:** no connector. All rendering is manual, by the owner, from the
-  briefs above. Never present an image as generated by this skill.
-- **When the 自营云端设计 connector ships:** the same briefs become the
-  input to in-tool rendering, and the verification checklist stays —
-  automated rendering does not skip visual verification. Until the
-  connector appears in the plugin's connector list, assume it does not
-  exist.
+在检查点 2(所有简报获批)之后:
+
+1. 把整套简报按日历顺序一整块交给店主。
+2. 店主在设计工具里渲染每个素材——自营云端设计连接器上线后用它,否则用当前工具。
+3. 店主交回成品文件(文件路径)或托管图片 URL。
+4. 在阶段 5 暂存前,对照简报核验每个素材(见下方清单)。已核验的行可先行推进,掉队
+   的重渲。
+
+只有**公开托管的 URL** 才能附到 HubSpot 社交帖上。本地文件对国内平台发布打包件没
+问题(店主原生上传);对没有托管 URL 的 HubSpot 暂存行,不带附件暂存该帖,并注明
+店主在 HubSpot 里补图。
+
+---
+
+## 核验清单
+
+逐个查看渲染素材,命中任一条即退回:
+
+- 某个位放错照片,或该放产品图的地方放了图库/占位图
+- 文字叠加与批准的字符串不符(错别字也算)
+- 渠道尺寸或比例不对
+- 简报指定了品牌色/字体却跑偏
+- 残留模板文字(lorem-ipsum、样例价格)
+- 主题跑偏(错的产品、错的配色)
+- **叠加文字触碰《广告法》/《价格法》**(极限词、无依据宣称、虚构原价/含糊买赠、
+  特殊行业缺法定提示)——退回改写或送审,绝不带雷暂存
+
+退回时,精确点名偏差及其违反的简报行,请店主只重渲那一个素材——绝不悄悄把"差一点"
+的素材暂存出去。
+
+---
+
+## 自营云端设计状态
+
+- **现在:** 无连接器。所有渲染都由店主手动、依据上述简报完成。绝不把图片说成由本
+  技能生成。
+- **自营云端设计连接器上线后:** 同一批简报成为在工具内渲染的输入,核验清单照旧——
+  自动渲染不跳过视觉核验。在连接器出现在插件的连接器列表之前,一律假设它不存在。

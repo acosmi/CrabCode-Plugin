@@ -1,57 +1,57 @@
-# Gotchas — ticket-deflector
+# 易踩的坑 —— 客诉退款助手
 
-Edge cases that caused problems in testing or review.
+在测试或复核中暴露过问题的边界情况。
 
 ---
 
-## Gotcha: Matching the owner's voice, not a generic "professional" tone
+## 1. 把法定应退当成店主的"善意让步"
 
-**Why it matters:** The value of this skill is that responses sound like the owner wrote them. A bland corporate draft gets rewritten from scratch — wasted effort.
+✗ **反面:** 客户收到的商品有质量问题要求退货,CrabCode 起草"这次我们特殊照顾、给您破个例退款"的口吻——把**三包法定义务**说成店主的恩惠;或客户签收 5 天内要无理由退货(商品完好),草稿却写"按规定本不支持退货,但我们通融一下"。
 
-### ✗ Bad
+✓ **正面:** 起草前先做**消保法法定权利判断**:七天无理由(商品完好)、三包质量问题、欺诈退一赔三一旦命中,就是**法定应退 / 应赔**。回复先把依法处理写清楚("您的情况符合《消费者权益保护法》,我们依法为您办理退货 / 退款"),店主的额外让步(补运费、送券)再叠加其上。
 
-> Dear Customer,
+**为什么重要:** 把法定义务包装成善意让步,既误导消费者放弃法定权利,也让店主暴露在**违法拒退**的行政处罚与诉讼风险下。判断顺序必须是**先法定、后裁量**。
+
+---
+
+## 2. 匹配店主的语气,而不是泛泛的"专业"腔
+
+✗ **反面:**
+
+> 尊敬的客户:
 >
-> Thank you for reaching out. We apologize for any inconvenience and are committed to resolving your issue in a timely manner. Please allow 3–5 business days for processing.
+> 感谢您的联系。给您带来不便,我们深表歉意,并将尽快为您解决问题。请给予 3–5 个工作日处理。
 >
-> Sincerely, Customer Support
+> 此致 客服团队
 
-### ✓ Good
+✓ **正面:** 用店主真实的语气来写。若没有店主既往的消息可参照,就问一句:*"您平时的语气偏正式、随意,还是介于两者之间?"* 说话简短直接的店主,草稿也简短直接;热情爱聊的店主,就保留那份热情和他惯用的标点习惯。
 
-Draft in the owner's actual register. If no prior emails from the owner are available to reference, ask: *"What's your usual tone — formal, casual, or somewhere in between?"* A short, direct owner gets a short direct draft. A warm, chatty owner gets warmth and their punctuation quirks preserved.
-
----
-
-## Gotcha: Flagging data gaps inline, not at the end
-
-**Why it matters:** If the order number is missing — or `query-alipay-payment` returns no match for it — and the draft says "your refund of ¥X is being processed," the owner will send a false claim. Data gaps must be visible at the point they affect the message.
-
-### ✗ Bad
-
-Draft the reply as if all data is available, then add a footnote: "Note: I couldn't find the Alipay payment."
-
-### ✓ Good
-
-Insert the gap notice inside the draft at the exact sentence where it matters:
-
-> Hi Sarah, thanks for reaching out. I've looked into your order *[Note: No Alipay payment found for this order number — verify it before sending]* and want to get this sorted.
-
-The owner sees the problem before hitting send.
+**为什么重要:** 本技能的价值在于回复读起来像店主本人写的。千篇一律的客服腔会被推翻重写——白费功夫。
 
 ---
 
-## Gotcha: The customer has multiple orders and no order number in the message
+## 3. 数据缺口就地标注,而不是堆到末尾
 
-**Why it matters:** Alipay lookups are single-order by number — there is no search-by-email. When the owner checks 支付宝商家平台 and finds two orders — one refunded, one not — a "just use the most recent" assumption produces the wrong draft.
+✗ **反面:** 当作数据齐全那样把回复写完,再在末尾补一句脚注:"注:我没查到这笔支付宝支付。"
 
-### ✗ Bad
+✓ **正面:** 把缺口提示插到它真正影响那句话的位置:
 
-Assume the complaint is about the most recent order and proceed without telling the owner.
+> 李静您好,感谢联系。我查了下您的订单 *[注:该订单号在支付宝查无支付记录——发送前请核实]*,想尽快帮您处理妥当。
 
-### ✓ Good
+店主在点"发送"之前就看到了问题。
 
-Surface all candidate orders and pause:
+**为什么重要:** 若订单号缺失——或 `query-alipay-payment` 查不到匹配——而草稿却写"您 ¥X 的退款正在处理中",店主就会发出一条不实承诺。数据缺口必须在它影响到内容的那一处就可见。
 
-> *"Your 商家平台 lookup shows 2 orders for this customer: (1) ¥49.00 · 2026-03-14 · paid · (2) ¥129.00 · 2026-04-01 · paid. Which one is this about?"*
+---
 
-Wait for the owner to confirm the order number before writing the draft.
+## 4. 客户有多笔订单,消息里却没有订单号
+
+✗ **反面:** 假定投诉针对最近一笔订单,不告诉店主就径直推进。
+
+✓ **正面:** 把所有候选订单列出并暂停:
+
+> *"您在支付宝商家平台的查询显示该客户有 2 笔订单:(1)¥49.00 · 2026-03-14 · 已付款 ·(2)¥129.00 · 2026-04-01 · 已付款。这次是关于哪一笔?"*
+
+等店主确认订单号后再写草稿。
+
+**为什么重要:** 支付宝查询是按单号单笔进行的——没有按邮箱检索。店主在支付宝商家平台查到两笔订单(一笔已退、一笔未退)时,"就用最近那笔"的假设会产出错误的草稿。
