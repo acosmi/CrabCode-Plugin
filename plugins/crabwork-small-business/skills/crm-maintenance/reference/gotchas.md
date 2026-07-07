@@ -4,27 +4,27 @@ Edge cases where the `crm-maintenance` skill is most likely to produce bad CRM d
 
 ---
 
-## Gotcha: Creating a duplicate contact when the email is already in HubSpot under a different case
+## Gotcha: Creating a duplicate contact when the identifier is already in the CRM under a different case
 
-**Why it matters:** HubSpot dedupes on exact email match. `Lina@mingfa.com` and `lina@mingfa.com` are treated as distinct, but an owner who already created one will see a silent duplicate appear. That destroys the owner's trust in the skill.
+**Why it matters:** Many CRMs dedupe on an exact identifier match (email, phone, or 微信). `Lina@mingfa.com` and `lina@mingfa.com` are treated as distinct, but an owner who already created one will see a silent duplicate appear. That destroys the owner's trust in the skill.
 
 ### ✗ Bad
 
-> Searched HubSpot for `Lina@mingfa.com` — no match. Creating new contact: 李娜 (Lina@mingfa.com).
+> Searched the CRM for `Lina@mingfa.com` — no match. Creating new contact: 李娜 (Lina@mingfa.com).
 
 New contact is created; owner's existing `lina@mingfa.com` contact now has a duplicate.
 
 ### ✓ Good
 
-> Searched HubSpot for `lina@mingfa.com` (case-insensitive) — no match. Creating new contact: 李娜 (lina@mingfa.com). Announcing before write.
+> Searched the CRM for `lina@mingfa.com` (case-insensitive) — no match. Creating new contact: 李娜 (lina@mingfa.com). Announcing before write.
 
-Always normalize email to lowercase before lookup. Announce the creation so the owner can catch misses.
+Always normalize the identifier (lowercase email, canonical phone) before lookup. Announce the creation so the owner can catch misses.
 
 ---
 
 ## Gotcha: Writing the full email thread as the activity body
 
-**Why it matters:** HubSpot activities are signal surfaces for fast scanning, not a transcript archive. A 12-message thread pasted into the activity body is useless; a three-sentence summary of what was agreed is actionable.
+**Why it matters:** CRM activities are signal surfaces for fast scanning, not a transcript archive. A 12-message thread pasted into the activity body is useless; a three-sentence summary of what was agreed is actionable.
 
 ### ✗ Bad
 
@@ -45,7 +45,7 @@ Summary names the decisions, the numbers, and the next step.
 
 ## Gotcha: Auto-creating a deal when the right one can't be resolved
 
-**Why it matters:** Duplicate deals are very hard to untangle in HubSpot — they split activity history, confuse reporting, and the owner usually notices weeks later when a forecast looks wrong.
+**Why it matters:** Duplicate deals are very hard to untangle in any CRM — they split activity history, confuse reporting, and the owner usually notices weeks later when a forecast looks wrong.
 
 ### ✗ Bad
 

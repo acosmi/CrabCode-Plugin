@@ -1,13 +1,13 @@
 # Example: log a call with a missing contact
 
-Worked scenario for the call path — a DingTalk calendar event has three attendees, one of them isn't in HubSpot yet.
+Worked scenario for the call path — a DingTalk calendar event has three attendees, one of them isn't in the CRM yet. Field names (`hs_call_*`) are the HubSpot illustration; map to your platform per [../crm-fields.md](../crm-fields.md).
 
 ## Setup
 
 - User just finished a 30-minute video call titled "明发商贸 — technical deep dive" at 10:00am, scheduled via DingTalk calendar
 - Attendees on the calendar invite: the user, `lina@mingfa.com`, `wangqiang@mingfa.com`
-- 李娜 is an existing HubSpot contact on the "明发商贸 Q2 Expansion" deal
-- 王强 is NOT in HubSpot
+- 李娜 is an existing CRM contact on the "明发商贸 Q2 Expansion" deal
+- 王强 is NOT in the CRM
 - The 明发商贸 Q2 Expansion deal is the only open deal for 李娜
 
 ## User says
@@ -33,7 +33,7 @@ Reads event details: 30 minutes, external attendees `lina@mingfa.com` and `wangq
 - Looks up `wangqiang@mingfa.com` → does not exist.
 - Announces contact creation:
 
-> *"王强 (wangqiang@mingfa.com) isn't in HubSpot. Creating the contact and associating to the 明发商贸 Q2 Expansion deal."*
+> *"王强 (wangqiang@mingfa.com) isn't in the CRM. Creating the contact and associating to the 明发商贸 Q2 Expansion deal."*
 
 Creates the contact with `email`, `firstname: 强`, `lastname: 王`, `company: 明发商贸` (inferred from email domain). Associates to the deal.
 
@@ -57,7 +57,7 @@ Announced the contact creation before writing. Activity write is inline per the 
 > *"明发商贸 — technical deep dive" (30 min, 10:00am)*
 > Created new contact: 王强 (wangqiang@mingfa.com) — associated to the deal.
 > Call body is a placeholder — add your notes if you want them on the deal timeline.
-> [HubSpot: 明发商贸 Q2 Expansion]
+> [CRM: 明发商贸 Q2 Expansion]
 
 ## What this example demonstrates
 

@@ -1,12 +1,12 @@
 # Example: log email to an existing deal (happy path)
 
-A worked scenario for the email path — contact exists, deal resolves unambiguously, activity logs cleanly.
+A worked scenario for the email path — contact exists, deal resolves unambiguously, activity logs cleanly. Field names (`hs_email_*`) are the HubSpot illustration; for 企业微信/钉钉/飞书/有赞 use that platform's equivalent per [../crm-fields.md](../crm-fields.md). (企业微信 has no deals — it would log the activity against the customer / 客户 record.)
 
 ## Setup
 
 - User pastes an email thread with subject "明发商贸 Q2 pricing follow-up" (no email connector — threads arrive as pasted text)
 - Thread has three messages between the user and `lina@mingfa.com` over the last two days
-- `lina@mingfa.com` is an existing contact in HubSpot
+- `lina@mingfa.com` is an existing contact in the CRM
 - She is associated to exactly one open deal: "明发商贸 Q2 Expansion" (proposal sent, ¥18K, close date 2026-05-15)
 
 ## User says
@@ -40,7 +40,7 @@ Contact already existed, no creation announcement needed. Activity write happens
 > Logged email activity to 明发商贸 Q2 Expansion:
 > *"李娜 confirmed 50 seats at ¥360/seat (¥18K). Signed SOW coming Friday."*
 > Timestamped yesterday 4:12pm. No contact created — 李娜 was already on the deal.
-> [HubSpot: 明发商贸 Q2 Expansion]
+> [CRM: 明发商贸 Q2 Expansion]
 
 ## What makes this the happy path
 
