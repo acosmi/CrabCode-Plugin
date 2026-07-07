@@ -6,7 +6,7 @@ description: >
   right now — vague or specific — and routes them to the best skill or slash
   command for the moment. Also serves as a guide: explains what's available,
   which connectors and data sources each command needs (支付宝, 钉钉/飞书,
-  腾讯文档, HubSpot, or an uploaded export), suggests what to try next, and
+  腾讯文档, your CRM, or an uploaded export), suggests what to try next, and
   adapts recommendations based on stored business context. Trigger whenever the
   owner asks "what can you do," "help me with my business," "what should I
   focus on," "I don't know where to start," or any open-ended business request
@@ -64,7 +64,7 @@ Listen to the owner's request. Match it against this routing table — pick the 
 |---|---|
 | "What are customers saying?" / "complaints" / "reviews" | `/customer-pulse-check` |
 | "A customer is upset" / "handle this complaint" / "angry email" | `/handle-complaint` |
-| "Clean up the CRM" / "HubSpot is a mess" / "stale deals" | `/crm-cleanup` |
+| "Clean up the CRM" / "客户资料一团乱" / "stale deals" | `/crm-cleanup` |
 | "Review this contract" / "合同审查" / "保密协议" / "should I sign this?" | `/review-contract` |
 
 **Business intelligence:**
@@ -108,17 +108,17 @@ Keep it to 2-3 sentences per bucket. End with: "What's on your mind? I'll get yo
 
 If no connectors are connected at all (or the owner just installed the plugin):
 1. Trigger `smb-onboard` immediately: "Looks like you haven't connected any tools yet. Let me walk you through setup — it takes about 5 minutes and unlocks everything else."
-2. If the owner has a specific ask but no connectors, explain what's needed. Some commands need a connector (HubSpot, 钉钉/飞书, 腾讯文档, 支付宝), others need an uploaded export: "To run `/plan-payroll`, I need your latest accounting export from 用友好会计 or 金蝶精斗云 — there's no accounting connector yet. Upload it and I can start now, or we can do onboarding first to get everything wired up."
+2. If the owner has a specific ask but no connectors, explain what's needed. Some commands need a connector (a CRM — 企业微信/钉钉/飞书/有赞, HubSpot for cross-border — or 钉钉/飞书, 腾讯文档, 支付宝), others need an uploaded export: "To run `/plan-payroll`, I need your latest accounting export from 用友好会计 or 金蝶精斗云 — there's no accounting connector yet. Upload it and I can start now, or we can do onboarding first to get everything wired up."
 3. Never route to a data-dependent command when the required connector or export is missing — always tell the owner what's needed first.
 
 ### Step 6 — Connector-aware routing
 
-**Connector reality.** Shipped: **alipay (支付宝)** — creates payment links, looks up a single payment by order number, processes refunds; it cannot bulk-export transaction history, so revenue data always comes from a 支付宝商家平台 bill export (CSV) the owner uploads. **dingtalk (钉钉)** / **feishu (飞书)** — messages and schedule. **tencent-docs (腾讯文档)** — online docs/sheets. **hubspot** — CRM. Pending (treat as absent; the workaround is exports, paste, or manual handoff): accounting software (用友好会计 / 金蝶精斗云), 微信支付, 众律宝 (e-sign), 自营云端设计 (design), 腾讯企业邮 (email), 阿里云盘.
+**Connector reality.** Shipped: **alipay (支付宝)** — creates payment links, looks up a single payment by order number, processes refunds; it cannot bulk-export transaction history, so revenue data always comes from a 支付宝商家平台 bill export (CSV) the owner uploads. **dingtalk (钉钉)** / **feishu (飞书)** — messages and schedule, plus 套件内 customer-management / CRM by scope. **tencent-docs (腾讯文档)** — online docs/sheets. **hubspot** — CRM, kept as a **cross-border/外贸 optional**, not the default. **CRM (国内默认):** route to **企业微信** (私域 SCRM, default recommendation) or the already-connected 钉钉/飞书 suite CRM; retail businesses to **有赞**. 企微 and 有赞 have no official MCP yet (self-built wrapper pending) — until then, customer/order data comes from exports or paste, and the skills degrade gracefully. Pending (treat as absent; the workaround is exports, paste, or manual handoff): 企业微信 / 有赞 CRM wrappers, accounting software (用友好会计 / 金蝶精斗云), 微信支付, 众律宝 (e-sign), 自营云端设计 (design), 腾讯企业邮 (email), 阿里云盘.
 
 Before recommending a command, check which connectors are active and what data it needs. If the best-match command requires something missing:
 
 1. Tell the owner what you'd recommend and why it's blocked: "The best fit for that is `/close-month`, but it runs on your accounting export — there's no 用友/金蝶 connector yet. Can you upload last month's export?"
-2. If a fallback command can serve the same intent with what *is* available, offer it: "Without the accounting export, I can still run `/friday-brief` from your 支付宝商家平台 bill export or HubSpot — it won't be as complete, but you'll get a revenue snapshot."
+2. If a fallback command can serve the same intent with what *is* available, offer it: "Without the accounting export, I can still run `/friday-brief` from your 支付宝商家平台 bill export or your CRM — it won't be as complete, but you'll get a revenue snapshot."
 3. Always be explicit about what's skipped: "Note: no 微信支付 export this time, so that revenue won't be in the picture."
 4. Never silently route to a command that will partially fail — the owner should know upfront what they'll get and what they won't.
 
@@ -130,16 +130,16 @@ Before recommending a command, check which connectors are active and what data i
 | `/month-heads-up` | accounting export | 支付宝商家平台 bill export |
 | `/price-check` | accounting export | 支付宝商家平台 bill export |
 | `/tax-prep` | accounting export | 支付宝商家平台 bill export |
-| `/call-list` | HubSpot | dingtalk/feishu (schedule) |
-| `/run-campaign` | HubSpot | accounting or 支付宝 bill export; visuals via `design-creator` (自营云端设计 connector pending — assets are produced for the owner to finish manually) |
-| `/sales-brief` | 支付宝 bill export or accounting export | HubSpot |
-| `/customer-pulse-check` | HubSpot or pasted payment/feedback data | — |
-| `/crm-cleanup` | HubSpot | — |
+| `/call-list` | CRM (企业微信/钉钉/飞书/有赞; HubSpot for cross-border) | dingtalk/feishu (schedule) |
+| `/run-campaign` | CRM (企业微信/钉钉/飞书/有赞; HubSpot for cross-border) | accounting or 支付宝 bill export; visuals via `design-creator` (自营云端设计 connector pending — assets are produced for the owner to finish manually) |
+| `/sales-brief` | 支付宝 bill export or accounting export | CRM |
+| `/customer-pulse-check` | CRM / support tickets or pasted payment/feedback data | — |
+| `/crm-cleanup` | CRM (企业微信/钉钉/飞书/有赞; HubSpot for cross-border) | — |
 | `/review-contract` | — (works with file upload or paste) | — (signing is manual via 众律宝 — connector pending) |
-| `/monday-brief` | — (degrades gracefully) | dingtalk/feishu, HubSpot, tencent-docs, uploaded exports |
-| `/friday-brief` | 支付宝 bill export or HubSpot | — |
-| `/quarterly-review` | accounting export | 支付宝 bill export, HubSpot |
-| `/handle-complaint` | — (works with pasted text) | HubSpot, dingtalk/feishu (reply drafts are produced in chat; refunds via alipay only with owner approval) |
+| `/monday-brief` | — (degrades gracefully) | dingtalk/feishu, CRM, tencent-docs, uploaded exports |
+| `/friday-brief` | 支付宝 bill export or CRM | — |
+| `/quarterly-review` | accounting export | 支付宝 bill export, CRM |
+| `/handle-complaint` | — (works with pasted text) | CRM / support tickets, dingtalk/feishu (reply drafts are produced in chat; refunds via alipay only with owner approval) |
 | `smb-onboard` | — | all |
 
 ### Step 7 — Handle tiebreakers

@@ -90,14 +90,14 @@ Look right?
 
 ---
 
-# Branch B: Owner uses an unsupported tool
+# Branch B: Owner has no CRM connector yet
 
 ## Setup
 
 - **Owner:** 阿伟, freelance design studio (2 people)
 - **Session type:** First session
 - **Primary headache:** Customer follow-up
-- **Current CRM:** Pipedrive (no CrabCode connector)
+- **Current customer tracking:** personal WeChat + a spreadsheet (no CRM connector; 企业微信 wrapper still pending)
 
 ## Transcript
 
@@ -105,13 +105,13 @@ Look right?
 
 **阿伟:** Customer follow-up. Leads slip through.
 
-**CrabCode:** For customer follow-up, the two pieces I'd want are a CRM and your team chat (钉钉 or 飞书). Are you on HubSpot today, or something else?
+**CrabCode:** For customer follow-up, the two pieces I'd want are a CRM and your team chat (钉钉 or 飞书). What do you track customers in today?
 
-**阿伟:** Pipedrive.
+**阿伟:** Personal WeChat and a spreadsheet, mostly.
 
-**CrabCode:** Got it — we don't have a Pipedrive connector yet. If you stayed on Pipedrive, you'd still get cash-flow work and schedule work from CrabCode, but I wouldn't be able to score leads or draft follow-ups from inside the CRM. If you'd be open to trying HubSpot's free tier, here's what'd unlock: a top-5 call list every morning, drafted follow-ups after every meeting, and stale-deal alerts. Up to you — want to try it, or skip the CRM for now?
+**CrabCode:** Got it. On a spreadsheet you'd still get cash-flow and schedule work, but I couldn't score leads or draft follow-ups from inside CrabCode. Since your customers live in WeChat, the natural fit is **企业微信** — 私域 SCRM, free — which would unlock a top-5 follow-up list every morning, drafted messages after each touch, and going-cold alerts. Honest caveat: its connector isn't live yet, so for now that would run on a customer-list export or paste, not a direct pull. (If you did overseas/外贸 work, HubSpot would be the other option — not your case.) Want to head toward 企业微信, or skip CRM for now?
 
-**阿伟:** Skip for now. I'll stick with Pipedrive.
+**阿伟:** Skip for now. I'll keep the spreadsheet.
 
 **CrabCode:** No problem. Then let's connect 飞书 — that's where I can send you a follow-up nudge and pull your schedule when we plan the week. Sound good?
 
@@ -125,6 +125,7 @@ Look right?
 
 - [ ] Named the function ("a CRM and your team chat"), not the platform
 - [ ] Asked what the owner uses before pitching anything
-- [ ] On unsupported tool, listed gain/loss concretely without pushing
-- [ ] Accepted the owner's decision and pivoted to the next supported tool
-- [ ] No paragraph-long descriptions of HubSpot, 飞书, or Pipedrive
+- [ ] Recommended 企业微信 as the default CRM fit (customers in WeChat) and was honest the connector is pending (export/paste for now)
+- [ ] Did not push HubSpot as the default — mentioned it only as the cross-border/外贸 option
+- [ ] Accepted the owner's decision and pivoted to the next supported tool (飞书)
+- [ ] No paragraph-long product descriptions of 企业微信, 飞书, or a spreadsheet
