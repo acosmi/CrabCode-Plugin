@@ -1,62 +1,54 @@
-# Job Post Structure Guide
+# 招聘启事结构指南
 
-Use this structure for every job post. The goal is a posting that attracts strong,
-self-aware candidates — not one that checks an HR box.
-
----
-
-## Recommended Structure
-
-### 1. Opening Hook (2–3 sentences)
-Lead with the *why* — why this role exists, what problem it solves, or what
-moment the company is in. This is what makes a candidate stop scrolling.
-
-> Bad: "We are looking for an experienced marketing manager."
-> Good: "We're doubling our go-to-market team this year and need someone to own
-> how we show up in enterprise accounts — from first touch through renewal."
-
-### 2. About the Company (3–4 sentences)
-Brief, honest, specific. What does the company do, who do they serve, and why
-does it matter? Avoid buzzwords. If the company has a notable milestone (funding,
-growth rate, customer names), one sentence here earns trust.
-
-### 3. About the Role (1 paragraph)
-Describe what success in this role looks like 12 months in. What will this person
-have built, shipped, or changed? This grounds the responsibilities that follow.
-
-### 4. What You'll Do (bulleted list, 4–7 items)
-Use action verbs. Start each bullet with what the person will *own*, not what
-they'll *help with*. Avoid exhaustive laundry lists — prioritize the 4–7 things
-that matter most.
-
-### 5. What We're Looking For (2 sections)
-**Required:**
-- Keep this tight. Each line is a filter. Ask: "Would we reject a strong candidate
-  who didn't have this?" If no, move it to preferred.
-- Use "experience with" not "expertise in" where possible — it's less intimidating
-  and still accurate.
-
-**Preferred (nice to have):**
-- Things that would make a candidate exceptional but aren't dealbreakers.
-
-### 6. Compensation + Benefits (if provided)
-List the salary range, equity if applicable, and 3–5 standout benefits. If comp
-isn't provided by the user, omit this section entirely — don't invent a range.
-
-### 7. How to Apply
-One clear sentence. Link or email. No hoops.
+每一篇招聘启事都按本结构撰写。目标是吸引到实力强、对自己有清晰认知的候选人——而不是走个 HR 流程、打个勾。
 
 ---
 
-## Writing Principles
+## 推荐结构
 
-**Inclusive language checklist:**
-- Avoid "rockstar", "ninja", "guru", "hustle culture" signals
-- Avoid unnecessary degree requirements if experience is a valid substitute
-- Avoid gendered language
-- Aim for a Flesch-Kincaid grade level of 10–12
+### 1. 开场钩子(2–3 句)
+先讲**为什么**——为什么设这个岗位、它解决什么问题、公司正处在什么节点。这是让候选人停下来往下看的理由。
 
-**Length:** 400–700 words is the sweet spot. Under 300 feels thin; over 900 loses candidates.
+> 差:"我们正在招聘一名有经验的市场经理。"
+> 好:"今年我们要把增长团队扩一倍,需要一个人来主导我们在大客户场景中的打法——从首次触达一直到续约。"
 
-**Tone:** Match the company's voice. A startup sounds different from a regulated enterprise.
-Ask the user if unsure, or infer from any existing materials you've found.
+### 2. 公司简介(3–4 句)
+简短、诚实、具体。公司做什么、服务谁、为什么重要?避免空话套话。若有值得一提的里程碑(融资、增长、标杆客户),用一句话带出即可,能建立信任。
+
+### 3. 岗位概述(1 段)
+描述这个岗位**做满 12 个月时的成功样子**:这个人会建成、交付或改变什么?这为后面的职责清单提供了锚点。
+
+### 4. 你将做什么(项目符号列表,4–7 条)
+用动词开头。每条从这个人将**主导**什么写起,而不是**协助**什么。避免事无巨细的流水账——挑最重要的 4–7 件事。
+
+### 5. 我们期待你具备(两小节)
+**必备:**
+- 保持精简。每一行都是一道筛子。自问:"一个优秀但不具备这条的候选人,我们会拒掉吗?"若不会,就挪到"加分项"。
+- 尽量用"有……经验"而非"精通……"——门槛感更低,同样准确。
+
+**加分项(锦上添花):**
+- 能让候选人特别出彩、但并非硬性门槛的条件。
+
+### 6. 薪酬与福利(若提供)
+用**月薪(¥/月)**表述薪酬区间;福利以**五险一金**(养老、医疗、失业、工伤、生育保险 + 住房公积金)为默认框架,再列 3–5 项亮点福利(如带薪年假、补充医疗、餐补、弹性办公等)。股权/期权激励在中国的法律路径与税务处理不同,如涉及请列为**可选**并提示"另行专业设计"。若用户未提供薪酬,整节直接省略——不要臆造区间。最低工资、社保比例/基数逐年、按地区调整,不硬编码,以参保城市当年口径为准。
+
+### 7. 如何应聘
+一句话讲清。链接或邮箱/企业微信。别设门槛套路。
+
+---
+
+## 撰写原则
+
+**就业反歧视合规清单(《就业促进法》《劳动法》《妇女权益保障法》等):**
+- **不得**基于**民族、种族、性别、宗教信仰**设置歧视性条件或区别对待
+- **不得**以性别为由拒录或提高对女性的录用标准;**不得**将**婚育情况**(是否结婚、生育、孕检等)作为录用条件或面试询问的门槛
+- **不得**歧视**传染病病原携带者**(经医学鉴定,除法律、行政法规规定不宜从事的岗位外);一般岗位不得强制入职乙肝等病原检测
+- **慎用**"仅限本地户籍""35 岁以下""限男性""形象气质佳""限某院校"等易引发就业歧视争议的表述;确有**岗位真实需要**(如法定不宜女性的特定劳动)时,须有客观依据并如实说明
+- 避免"rockstar/大牛/工作狂"等隐性筛人黑话;能力可替代时不设不必要的学历门槛
+- 语言平实、面向大众可读
+
+> 招聘启事只描述岗位真实需要的客观条件;把"人"的固有身份特征(民族/性别/宗教/婚育/健康携带状态)排除在筛选标准之外。存疑条款请交 HR / 律师复核,或移交 crablaw-cn 的 `employee-handbook-review` 等技能评估。
+
+**篇幅:** 400–700 字是甜区。低于 300 字显得单薄,超过 900 字会流失候选人。
+
+**语气:** 贴合公司自身的调性。初创公司和受监管的大企业听起来就该不一样。拿不准时问用户,或从已找到的既有材料中推断。

@@ -1,106 +1,111 @@
-# Good / Bad Patterns
+# 正确 / 错误对照
 
-Common failure modes and how to avoid them.
+常见失误及规避方法。
 
 ---
 
-## Calculations
+## 增值税:先判身份与免征线,再谈计税
 
-**BAD:** Apply 22% to gross revenue.
+**错误:** 拿销售额直接乘税率当增值税,不看身份、不看免征线。
 ```
-Gross revenue: $120,000
-Tax estimate: $120,000 × 22% = $26,400  ← wildly wrong
+当季销售额:28 万元
+"增值税 = 28 万 × 3% = 8400 元"  ← 全错:小规模季销售额未超 30 万免征线,本季免征增值税
 ```
 
-**GOOD:** Apply bracket rate to net profit AFTER SE tax deduction.
+**正确:** 先确认小规模 / 一般纳税人,小规模再比对季度免征线,超线才按适用征收率(现行 3% 减按 1%)。
 ```
-Gross revenue: $120,000
-Expenses:      $45,000
-Net profit:    $75,000
-SE tax:        $75,000 × 92.35% × 15.3% = $10,628
-Deductible ½: $5,314
-Adjusted net:  $75,000 − $5,314 = $69,686
-Fed. tax est.: $69,686 × 22% = $15,331
-Total:         $10,628 + $15,331 = $25,959
+当季销售额:28 万元(小规模纳税人,按季申报)
+判断:未超 30 万元季度免征线 → 本季免征增值税,附加税费随之为零
+(超过 30 万则就全额按 1% 计税,而非仅超出部分)
 ```
 
 ---
 
-## Assumptions
+## 把毛利 / 收入错当应纳税所得额
 
-**BAD:** State a dollar figure without any context.
-> "Your Q2 estimated payment is $6,500."
+**错误:** 把收入或毛利直接乘所得税率。
+> "收入 120 万,企业所得税 = 120 万 × 25% = 30 万元。"
 
-**GOOD:** State the figure with the assumptions table.
-> "Based on 22% federal bracket, sole proprietor structure, and no prior-year
-> safe harbor data: **Q2 payment ≈ $6,500**. State taxes not included.
-> QBI deduction not applied. Review with your accountant."
-
----
-
-## 1099 threshold
-
-**BAD:** Only flag vendors carrying a "1099 eligible" tag in the owner's accounting
-software export. Many owners never set this flag. Silently missing contractors is
-worse than over-flagging.
-
-**GOOD:** Work from ALL vendors with ≥ $600 in payments, then note which ones are
-tagged 1099-eligible in the export and which are flagged by category heuristics.
-Let the accountant make the final call.
+**正确:** 应纳税所得额 = 收入 − 可税前扣除的成本费用税金等 − 允许弥补的亏损;小型微利再套优惠。
+> "收入 120 万 − 有票成本费用 95 万 = 应纳税所得额约 25 万元;若符合小型微利三条件,
+> 减按 25% 计入按 20% 征收(实际 5%)≈ 1.25 万元。缺票支出未计入扣除,请会计核对。"
 
 ---
 
-## Payee deduplication
+## 缺票支出擅自税前扣除
 
-**BAD:** Auto-merge "Bob Smith" and "Robert Smith Design LLC" because they sound similar.
-These could be different people or the same person's sole-prop vs. LLC.
+**错误:** 把只有白条 / 收据的支出也计入税前扣除。
+> "现金采购 6 万(无发票),已计入成本抵税。"
 
-**GOOD:** Flag likely duplicates for human review.
-> "These look like they may be the same person — confirm before filing:
-> Bob Smith ($1,200) | Robert Smith Design ($800) — combined would be $2,000"
+**正确:** 税前扣除凭证须为发票;缺票项只标记为"须补票或做纳税调整",不擅自扣除。
+> "现金采购 6 万仅有收据、无发票 → 列入缺票待补清单,补票前不得税前扣除,请会计判定调整。"
 
----
-
-## Incomplete payment-rail coverage
-
-**BAD:** Build the 1099 list from the accounting-software export alone and present it
-as complete when the owner also pays contractors through 支付宝 or 微信支付.
-
-**GOOD:** Ask which payment rails the owner used, and state coverage explicitly.
-> "This list covers your accounting-software export and the 支付宝商家平台 bill you
-> uploaded. You mentioned some contractors are paid via 微信支付 — that export wasn't
-> provided, so those payments are not included. Upload the 微信支付商户平台 bill and
-> I'll re-run the aggregation."
+区分"发票"与"收据":收据 / 白条一般不能作税前扣除凭证。
 
 ---
 
-## Corporation exemption
+## 把易变税率写成永久事实
 
-**BAD:** Automatically exclude "Smith Consulting Inc." from the 1099 list because it
-has "Inc." in the name.
+**错误:** "小规模增值税征收率就是 1%,记住这个数就行。"
 
-**GOOD:** Flag it for the accountant with a note.
-> "Smith Consulting Inc. — $4,500. Corporations are generally exempt from 1099-NEC
-> requirements, but confirm with your accountant (S-corps and some professional corps
-> are exceptions)."
+**正确:** 标注时效与出处,提示核实。
+> "现行 3% 征收率减按 1%(截至 2026,执行至 2027-12-31)。政策按年调整,申报前请核实当年
+> 最新口径、以电子税务局为准。"
 
 ---
 
-## Tax advice boundary
+## 混淆所得税主体:个体户当成企业
 
-**BAD:** "You should use a SEP-IRA to reduce your tax bill."
+**错误:** 给个体工商户按企业所得税 25% 计算。
 
-**GOOD:** "Your accountant may recommend a SEP-IRA or Solo 401(k) contribution to
-reduce taxable income — these can significantly change the estimate above."
-
-The skill surfaces options; the accountant advises.
+**正确:** 个体工商户 / 个人独资 / 合伙**不缴企业所得税**,缴经营所得个人所得税(5%–35% 五级超额
+累进);年应纳税所得额 ≤ 200 万元部分可减半。先确认主体类型再套口径。
 
 ---
 
-## S-corp owners
+## 小型微利优惠:漏看三条件同时满足
 
-**BAD:** Apply SE tax to an S-corp owner's full income.
+**错误:** 只看应纳税所得额 ≤ 300 万就直接按 5% 算,忽略人数与资产。
 
-**GOOD:** Note that SE tax applies only to W-2 wages for S-corp shareholders, not to
-K-1 distributions — and ask the user to confirm their business structure before
-running calculations. If unsure, default to sole prop math and note the assumption.
+**正确:** 三条件**同时满足**才享优惠——年应纳税所得额 ≤ 300 万元、从业人数 ≤ 300 人、资产总额
+≤ 5000 万元,且属非限制和禁止行业。任一不满足即按法定 25%,交会计确认。
+
+---
+
+## 收入口径不一致:开票收入 vs 收款流水 vs 账载
+
+**错误:** 只按开票金额报收入,忽略未开票收入与收款流水的差异。
+
+**正确:** 三者交叉核对,差异逐项标注,交会计判定。
+> "账载收入 88 万、开票收入 80 万、支付宝 + 微信收款流水 92 万——差异 12 万疑为未开票收入 /
+> 往来款,请会计逐笔确认收入口径。"
+
+---
+
+## 交易对方 / 发票疑似重复,擅自合并
+
+**错误:** 因名称相近就自动把"明发商贸"与"明发商贸行"合并为一户。
+
+**正确:** 疑似重复只标记,交人工核对。
+> "疑似同一供应商,合并前请确认:明发商贸(税号 A,1.2 万)| 明发商贸行(税号 B,0.8 万)——
+> 税号不同,可能是两户。"
+
+---
+
+## 收付款渠道覆盖不全
+
+**错误:** 只用记账软件导出就当全部收入 / 成本,而业主还通过支付宝、微信支付收付款。
+
+**正确:** 问清用了哪些收付款渠道,并在产出中写明覆盖范围。
+> "本次核对覆盖了记账软件导出与您上传的支付宝商家平台账单。您提到部分货款走微信支付——该导出
+> 尚未提供,相关收付款未纳入。请上传微信支付商户平台账单,我再重新汇总核对。"
+
+---
+
+## 越界给出税务意见 / 代客申报
+
+**错误:** "你应该注册成小规模来少交税。" / "我帮你在电子税务局报了。"
+
+**正确:** 只呈现口径与选项,申报与筹划交会计 / 税务师;本技能绝不代客申报或报送。
+> "身份选择(小规模 / 一般纳税人)、优惠适用与申报,请与您的会计 / 税务师确认;本整理只产出交接包,
+> 不代为申报或向税务机关报送。"

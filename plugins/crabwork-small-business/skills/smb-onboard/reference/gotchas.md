@@ -65,24 +65,24 @@ Show the block, wait for approval, then write.
 
 ## Gotcha: Pitching the platform instead of the capability
 
-**Why it matters:** Owners already know what HubSpot, 支付宝, 钉钉, and 飞书 do. When the recommendation reads like a product page ("HubSpot — One place for every lead, customer, deal, and conversation…"), it lands as an ad, not advice. The owner tunes out exactly when we need their attention.
+**Why it matters:** Owners already know what 企业微信, 支付宝, 钉钉, and 飞书 do. When the recommendation reads like a product page ("企业微信 — 私域客户一站式管理，客户群、朋友圈、复购全打通…"), it lands as an ad, not advice. The owner tunes out exactly when we need their attention.
 
 ### ✗ Bad
 
-> "1. HubSpot (CRM) — One place for every lead, customer, deal, and conversation. Once it's in, I can prioritize who to call today, draft follow-ups, log notes, and spot deals going stale.
+> "1. 企业微信 (SCRM) — 私域客户一站式:客户群、朋友圈、复购全打通。Once it's in, I can prioritize who to follow up today, draft messages, log notes, and spot customers going cold.
 >
 > 2. 钉钉 — Where your team already talks and where your schedule lives: commitments buried in group chats, customer questions waiting on a reply, meetings you forgot were today. Connecting it lets me surface what actually needs an answer…"
 
-Reads like marketing for HubSpot and 钉钉. The owner is being sold to.
+Reads like marketing for 企业微信 and 钉钉. The owner is being sold to.
 
 ### ✓ Good
 
 > "For customer follow-up, the two pieces I'd want are a CRM and your team chat (钉钉 or 飞书).
 >
-> Are you on HubSpot today, or something else?"
+> What do you track customers in today?"
 >
-> *(Owner: "Pipedrive.")*
+> *(Owner: "Honestly just a spreadsheet and my personal WeChat.")*
 >
-> "Got it — we don't have a Pipedrive connector yet. If you stayed on Pipedrive, you'd still get cash-flow and schedule work, but I wouldn't be able to score leads or draft follow-ups from inside CrabCode. If you'd be open to trying HubSpot's free tier, here's what'd unlock: top-5 call list every morning, drafted follow-ups after every meeting, stale-deal alerts. Up to you — want to try it, or skip CRM for now?"
+> "Got it. On a spreadsheet you'd still get cash-flow and schedule work, but I couldn't score leads or draft follow-ups from inside CrabCode. Most shops whose customers live in WeChat run follow-up through **企业微信** — 私域 SCRM, free — and that would unlock a top-5 follow-up list every morning, drafted messages after every touch, and going-cold alerts. (Its connector is still pending, so for now that runs on a customer-list export or paste — no pretending it's live.) For cross-border/外贸 with overseas buyers, HubSpot is the other option. Up to you — want to head toward 企业微信, or skip CRM for now?"
 
-States the function, checks what the owner uses, gives a clear gain/loss in plain English, leaves the decision with the owner. If the owner asks "what does HubSpot actually do?" — that's an explicit invitation; answer it directly.
+States the function, checks what the owner uses, gives a clear gain/loss in plain English, is honest that the 企微 connector is pending, and leaves the decision with the owner. If the owner asks "what does 企业微信 actually do?" — that's an explicit invitation; answer it directly.

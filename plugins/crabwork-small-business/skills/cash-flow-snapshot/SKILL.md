@@ -9,6 +9,7 @@ description: >
   Delivers a chat summary and a downloadable XLSX. Use when the user asks
   "forecast my cash flow," "will I make payroll," mentions "runway," or says
   "cash crunch."
+  亦触发于:"现金流""还有多少现金""撑得住吗""资金紧张""未来三个月钱够吗"。
 compatibility: "Runs entirely from CSV/Excel exports or pasted data — no live accounting connector required. Output uses xlsx skill."
 ---
 

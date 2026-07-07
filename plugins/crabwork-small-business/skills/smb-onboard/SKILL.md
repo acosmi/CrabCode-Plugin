@@ -3,13 +3,14 @@ name: smb-onboard
 version: 0.3.0
 description: >
   CrabCode as the trainer. Walks an SMB owner through connecting their first two
-  tools (支付宝, 钉钉/飞书, 腾讯文档, HubSpot), runs one recipe to prove immediate
+  tools (支付宝, 钉钉/飞书, 腾讯文档, a CRM — 企业微信/钉钉/飞书/有赞), runs one recipe to prove immediate
   value, interviews them about their business (industry, size, top three
   headaches), stores that context persistently so every other skill benefits,
   and sets a weekly check-in cadence. Use when the owner is getting started or
   says any of: "set me up," "setup," "help me get set up," "get started," "help
   me get started," "get me started," "what can you do," "I'm new to this," or is
   in their first session.
+  亦触发于:"帮我设置""怎么开始用""新手上路""带我上手""第一次用怎么弄"。
 ---
 
 <!-- capability-route: office-spreadsheets=none(excel appears only in the pending-connector workaround description — CSV/Excel exports as a stopgap; onboarding delegates any export analysis to the matched recipe skill and produces no spreadsheet files itself) -->
@@ -31,16 +32,18 @@ User: "get me started"
 
 ## Connector reality
 
-Shipped connectors: **alipay (支付宝)** — payment links, single-payment lookup, refunds (it cannot export transaction history); **dingtalk (钉钉)** and **feishu (飞书)** — messages, schedule; **tencent-docs (腾讯文档)** — online docs and sheets; **hubspot** — CRM. Each needs credentials, configured via /plugin → Manage plugins → Configure; an unconfigured connector simply doesn't show up.
+Shipped connectors: **alipay (支付宝)** — payment links, single-payment lookup, refunds (it cannot export transaction history); **dingtalk (钉钉)** and **feishu (飞书)** — messages, schedule, plus 套件内 customer-management / CRM by scope; **tencent-docs (腾讯文档)** — online docs and sheets; **hubspot** — CRM, kept as a cross-border/外贸 optional (not the default). Each needs credentials, configured via /plugin → Manage plugins → Configure; an unconfigured connector simply doesn't show up.
 
-Pending (be upfront, never fake them): accounting software (用友好会计 / 金蝶精斗云), 微信支付 (WeChat Pay), 众律宝 (e-sign), 自营云端设计 (design), 腾讯企业邮 (email), 阿里云盘. Until those land, the covered areas run on CSV/Excel exports, pasted data, or manual handoff — say so honestly when the owner's headache lands there.
+**CRM (国内默认):** the default CRM recommendation is **企业微信** (私域 SCRM) for owners whose customers live in WeChat, or the already-connected 钉钉/飞书 suite CRM; retail/e-commerce owners route to **有赞**; HubSpot stays available for cross-border/外贸 only. 企业微信 and 有赞 have no official MCP yet (self-built wrapper pending) — until then, customer/order data comes from exports or paste and the skills degrade gracefully.
+
+Pending (be upfront, never fake them): 企业微信 / 有赞 CRM wrappers, accounting software (用友好会计 / 金蝶精斗云), 微信支付 (WeChat Pay), 众律宝 (e-sign), 自营云端设计 (design), 腾讯企业邮 (email), 阿里云盘. Until those land, the covered areas run on CSV/Excel exports, pasted data, or manual handoff — say so honestly when the owner's headache lands there.
 
 ## Tone for connectors
 
-Whenever a connector comes up — recommending one, naming what to try next, or clarifying mid-flow — describe **what CrabCode will be able to do once it's connected**, not what the platform itself is or sells. Owners already know what HubSpot, 支付宝, 钉钉, and 飞书 do; they don't need a product pitch from us.
+Whenever a connector comes up — recommending one, naming what to try next, or clarifying mid-flow — describe **what CrabCode will be able to do once it's connected**, not what the platform itself is or sells. Owners already know what 企业微信, 支付宝, 钉钉, and 飞书 do; they don't need a product pitch from us.
 
 - Speak about capabilities we unlock ("draft follow-ups after every meeting", "create a payment link the moment you need one", "pull today's schedule before you ask"), never feature lists.
-- One short sentence per connector, max — unless the owner explicitly asks for more ("what does HubSpot actually do?"), in which case answer that directly.
+- One short sentence per connector, max — unless the owner explicitly asks for more ("what does 企业微信 actually do?"), in which case answer that directly.
 - This rule applies to every step below.
 
 ## Workflow
@@ -52,7 +55,7 @@ Whenever a connector comes up — recommending one, naming what to try next, or 
    Name the two **functions** we want (e.g. "a place to track customers and deals" and "your team chat and schedule") — not the platform features. One short sentence each, max. Then ask whether the owner uses a supported tool for each.
 
    For each function, branch:
-   - **Owner uses a supported connector** (e.g. they say "HubSpot" or "钉钉"): say one sentence about what CrabCode will be able to do together with it, then guide the connection (via /plugin → Manage plugins → Configure).
+   - **Owner uses a supported connector** (e.g. they say "企业微信", "钉钉", or — for cross-border — "HubSpot"): say one sentence about what CrabCode will be able to do together with it, then guide the connection (via /plugin → Manage plugins → Configure).
    - **Owner uses an unsupported tool or nothing yet**: list 2–3 concrete things CrabCode will be able to do *with* the supported alternative, and 1–2 things that won't work without it. If the area's connector is still pending (accounting, email, WeChat Pay), say so and explain the export/paste workaround instead of pretending. Then let the owner decide. Do not push.
 
    Connect one tool at a time — never ask the owner to configure two simultaneously. See [reference/gotchas.md](reference/gotchas.md) for the failure pattern this replaces.

@@ -1,103 +1,138 @@
-# Tax Calculation Assumptions
+# 计税口径与分类假设
 
-This file documents the math and assumptions used in quarterly estimated tax calculations.
-Always surface these assumptions in the output so the accountant can adjust.
+本文件说明整理季度申报 / 年度汇算数据时所依据的**中国税种口径与计税基础**。目的是把经营数据归入
+正确的税种分类,供代账会计 / 税务师核对——**不是冒充税务机关算出确切应纳税额**。
 
----
-
-## Self-employment (SE) tax
-
-SE tax applies to sole proprietors, single-member LLCs, and partners. It does **not** apply
-to S-corp owners on their W-2 wages (only on distributions — and even that varies).
-
-**Formula:**
-```
-SE tax base     = net profit × 92.35%
-                  (the 7.65% reduction accounts for the employer-equivalent deduction)
-SE tax          = SE tax base × 15.3%
-                  (12.4% Social Security + 2.9% Medicare)
-                  Note: Social Security only applies up to the wage base ($176,100 for 2025)
-Deductible half = SE tax ÷ 2   ← reduces taxable income
-```
-
-**Example:**
-```
-Net profit:      $80,000
-SE tax base:     $80,000 × 92.35% = $73,880
-SE tax:          $73,880 × 15.3%  = $11,304
-Deductible half: $11,304 ÷ 2      = $5,652
-```
+> **时效红线(每处引用都要随附):** 以下征收率、免征线、优惠均为**截至 2026 年现行政策**,多数
+> 优惠**执行至 2027-12-31**。税率与政策随年度调整,产出中一律标注"请核实当年最新口径、以电子税务局
+> 为准",**不得把易变税率写成永久事实**。
+>
+> **法律框架:**《中华人民共和国增值税法》**自 2026-01-01 施行**,叠加《企业所得税法》《个人所得税法》
+> 及财政部、国家税务总局公告。征管全程走**电子税务局 + 数电发票(全电发票)+ 金税四期**。
 
 ---
 
-## Federal income tax estimate
+## 一、增值税
 
-### Business types and how they're taxed
+### 纳税人身份
 
-| Business type | How income is taxed | SE tax applies? |
-|--------------|---------------------|-----------------|
-| Sole proprietor / single-member LLC | Schedule C → personal 1040 | Yes |
-| Partnership / multi-member LLC | Schedule K-1 → personal 1040 | Yes (on earned income) |
-| S-corporation | W-2 wages + K-1 distributions → 1040 | On wages only |
-| C-corporation | Separate corporate return | No (payroll taxes instead) |
+| 身份 | 界限 | 计税方式 |
+|------|------|----------|
+| 小规模纳税人 | 年应税销售额 ≤ 500 万元(或符合条件自愿保留) | 按销售额 × 征收率(简易计税) |
+| 一般纳税人 | 年应税销售额 > 500 万元,或自愿登记 | 销项税额 − 进项税额 |
 
-Default assumption: **sole proprietor** unless the user specifies otherwise. Always state this.
+身份决定计税方式,先确认再整理。不确定时按现有资料标注,交会计确认。
 
-### Federal income tax brackets (2025, single filer)
+### 小规模纳税人
 
-| Taxable income | Rate |
-|---------------|------|
-| $0 – $11,925 | 10% |
-| $11,926 – $48,475 | 12% |
-| $48,476 – $103,350 | 22% |
-| $103,351 – $197,300 | 24% |
-| $197,301 – $250,525 | 32% |
-| $250,526 – $626,350 | 35% |
-| Over $626,350 | 37% |
+- **免征线**:月销售额 ≤ 10 万元(**按季申报的,季销售额 ≤ 30 万元**)的,**免征增值税**。超过则就
+  全额(而非仅超出部分)按适用征收率计税。
+- **征收率**:现行 **3% 征收率减按 1%** 征收。对**销售 / 出租不动产、转让土地使用权**等适用其他征收率
+  (如 5%)的项目,不适用减按 1% 的政策,按其适用征收率执行。
+- 执行至 **2027-12-31**;请核实当年最新口径。
 
-**For a rough estimate**, apply a single effective rate. Use 22% as the default for most SMB
-owners unless the user gives you more info. Note this assumption explicitly.
+### 一般纳税人
 
-**Adjusted net income** (for tax calculation):
-```
-Adjusted net = net profit − (SE tax ÷ 2) − QBI deduction (if applicable)
-```
-The QBI deduction (up to 20% of qualified business income) is significant for many SMBs —
-note that it's not included in the base estimate and the accountant should apply it.
+- **应纳增值税 = 当期销项税额 − 当期进项税额**;进项大于销项的部分形成留抵,结转下期继续抵扣。
+- 销项税额 = 不含税销售额 × 适用税率(现行主要为 13% / 9% / 6%,按应税项目区分);进项税额需取得
+  合规的增值税专用发票 / 数电发票方可抵扣。
+- 具体税率与可抵扣范围以当年政策及电子税务局为准。
 
 ---
 
-## Quarterly due dates (2025)
+## 二、附加税费
 
-| Quarter | Period covered | Payment due |
-|---------|---------------|-------------|
-| Q1 | Jan 1 – Mar 31 | April 15, 2025 |
-| Q2 | Apr 1 – May 31 | June 16, 2025 |
-| Q3 | Jun 1 – Aug 31 | September 15, 2025 |
-| Q4 | Sep 1 – Dec 31 | January 15, 2026 |
+以**实际缴纳的增值税(及消费税)**为**计税依据**——增值税免征时,附加税费也随之为零。
 
----
+| 税(费)种 | 计征比例 | 计税依据 |
+|-----------|---------|----------|
+| 城市维护建设税 | 市区 7% / 县城镇 5% / 其他 1% | 实缴增值税 |
+| 教育费附加 | 3% | 实缴增值税 |
+| 地方教育附加 | 2% | 实缴增值税 |
 
-## Safe harbor rule
-
-To avoid underpayment penalties, total estimated payments must be at least the lesser of:
-- **100%** of prior year tax liability (or **110%** if prior year AGI exceeded $150,000)
-- **90%** of current year tax liability
-
-Always note this in output. The user's accountant should confirm prior-year tax figures.
+**六税两费减半:** 小规模纳税人、小型微利企业、个体工商户,可对城建税、教育费附加、地方教育附加、
+印花税(不含证券交易印花税)、资源税、房产税、城镇土地使用税、耕地占用税**减半征收**。执行至
+**2027-12-31**;请核实当年最新口径、以电子税务局为准。
 
 ---
 
-## What the estimate does NOT include
+## 三、企业所得税(有限公司等企业主体)
 
-Always list these exclusions in every output:
-- State and local income taxes
-- QBI deduction (Section 199A — can reduce federal tax by up to 20%)
-- Home office deduction
-- Vehicle deductions
-- Depreciation / Section 179
-- Retirement contributions (SEP-IRA, Solo 401k) — can significantly reduce SE tax base
-- Health insurance deduction for self-employed
-- Prior-year net operating loss carryforward
+### 主体与计税方式
 
-These can meaningfully reduce the final number. Flag them so the accountant applies them.
+| 主体类型 | 所得税种 | 计税基础 |
+|---------|---------|----------|
+| 有限责任公司 / 股份公司等企业 | 企业所得税 | 应纳税所得额 = 收入总额 − 不征税收入 − 免税收入 − 各项扣除 − 允许弥补的以前年度亏损 |
+| 个体工商户 / 个人独资 / 合伙 | 不缴企业所得税,缴经营所得个人所得税 | 见第四节 |
+
+- **法定税率 25%**;符合条件的小型微利企业享受下述优惠。
+
+### 小型微利企业优惠(核心)
+
+**三项条件须同时满足**(从事国家非限制和禁止行业):
+
+1. 年应纳税所得额 ≤ **300 万元**
+2. 从业人数 ≤ **300 人**
+3. 资产总额 ≤ **5000 万元**
+
+**优惠计算:** 应纳税所得额**减按 25% 计入**应纳税所得额,再按 **20%** 税率征收 —— **实际税负 5%**。
+执行至 **2027-12-31**;请核实当年最新口径。
+
+> 概念示例(仅示范口径,不作确切税额):某公司年应纳税所得额 200 万元,符合小型微利 →
+> 计入基数 200 万 × 25% = 50 万元 → 应纳企业所得税 50 万 × 20% = 10 万元(即 200 万 × 5%)。
+> 具体以会计核算与电子税务局申报为准。
+
+---
+
+## 四、经营所得个人所得税(个体工商户 / 个人独资 / 合伙)
+
+个体工商户、个人独资企业、合伙企业**不缴企业所得税**,其生产经营所得缴纳**经营所得个人所得税**。
+
+### 五级超额累进税率表(年度)
+
+| 全年应纳税所得额 | 税率 | 速算扣除数 |
+|-----------------|------|-----------|
+| ≤ 30,000 元 | 5% | 0 |
+| 30,000 – 90,000 元 | 10% | 1,500 |
+| 90,000 – 300,000 元 | 20% | 10,500 |
+| 300,000 – 500,000 元 | 30% | 40,500 |
+| > 500,000 元 | 35% | 65,500 |
+
+- **应纳税额 = 应纳税所得额 × 适用税率 − 速算扣除数。**
+- 应纳税所得额 = 收入总额 − 成本、费用、税金、损失及其他支出 −(依法可扣的投资者本人费用等)。
+- **减半优惠:** 对个体工商户年应纳税所得额**不超过 200 万元的部分,减半征收**经营所得个人所得税
+  (可与其他优惠叠加)。执行至 **2027-12-31**;请核实当年最新口径。
+- 上表为现行法定税率表,仍应以最新税法及电子税务局为准。
+
+---
+
+## 五、申报期限(以电子税务局公告为准)
+
+| 事项 | 申报 / 汇算期限 |
+|------|----------------|
+| 增值税及附加(小规模) | 多**按季**申报,季度终了后 15 日内 |
+| 增值税及附加(一般纳税人) | **按月**申报,次月 15 日内 |
+| 企业所得税季度预缴 | 季度终了后 15 日内 |
+| 企业所得税年度汇算清缴 | 次年 1 月 1 日 – **5 月 31 日** |
+| 经营所得年度汇算(个体户 / 个独 / 合伙) | 次年 **3 月 31 日** 前 |
+
+申报期遇法定节假日顺延;具体期限**以电子税务局为准**。
+
+---
+
+## 六、税前扣除凭证:发票 ≠ 收据
+
+- 企业所得税、经营所得计税时,**成本费用须取得合规发票方可税前扣除**。
+- **发票**:增值税专用发票、普通发票、数电发票(全电发票)等,可作扣除凭证。
+- **收据 / 白条**:一般**不能**作为税前扣除凭证(特定财政票据、非应税项目等除外)。缺票支出应标记为
+  "须补票或做纳税调整",不擅自税前扣除。
+
+---
+
+## 七、本整理**不做**的事(务必在每份产出中声明)
+
+- **不代客申报纳税、不向税务机关报送**——只产出交接包,由用户 / 会计执行。
+- **不出具确切应纳税额**——最终数额以会计核算、纳税调整与电子税务局申报为准。
+- **不硬编码易变税率为永久事实**——征收率、免征线、优惠均标注时效与"请核实当年最新口径"。
+- **不代做纳税调整**——缺票、跨期、视同销售、税会差异等只标记,由会计判定。
+- **不含地方性、行业性特殊政策**——如有,提示会计按属地口径补充。

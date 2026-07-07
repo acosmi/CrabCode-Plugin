@@ -2,72 +2,89 @@
 name: ticket-deflector
 version: 0.3.0
 description: >
-  Reads a pasted customer email or ticket, pulls payment/refund status from
-  Alipay (支付宝, by order number) and account history from HubSpot, drafts a
-  tone-matched reply in the owner's writing voice for the owner to send, and
-  can issue an Alipay refund with explicit owner approval. Use when the user
-  says "draft a response," "answer this customer," "where's my order," or
-  "I want a refund."
-compatibility: "Requires Alipay (支付宝), HubSpot. Optional: Intercom, DingTalk/Feishu. WeChat Pay (微信支付) not yet connected. Works from pasted text alone if connectors are missing."
+  读取粘贴进来的客户邮件或工单,按订单号从支付宝查支付/退款状态、从你的 CRM 拉账户
+  历史(CRM 连接器以实际配置为准),以店主的书面语气起草一封语气匹配、供店主发送的
+  回复;经店主明确批准后可发起支付宝退款。起草退款/客诉回复时,先依《消费者权益保护法》
+  判定是否属法定应退(七天无理由退货、三包质量问题、欺诈退一赔三),再谈店主善意裁量。
+  触发词:"draft a response", "answer this customer", "where's my order",
+  "I want a refund","起草回复"、"回这个客户"、"我的订单到哪了"、"我要退款"、
+  "这个能退吗"、"七天无理由退货"、"质量问题"、"破损/坏了"、"发错货"。
+compatibility: "需要支付宝、你的 CRM(企业微信/钉钉/飞书/有赞;外贸可选 HubSpot;CRM 连接器以实际配置为准)。可选:客服工单/在线客服、钉钉/飞书。微信支付尚未接入。连接器缺失时,仅凭粘贴进来的文本亦可运行。"
 ---
 
-# Ticket Deflector
+# 客诉退款助手
 
-## Quick start
+## 快速上手
 
-Paste a customer email or message — CrabCode pulls payment status from Alipay (when the order number is known), looks up the customer in HubSpot, and drafts a reply in the owner's voice. If a refund is needed, it stages the details and waits for explicit approval before issuing anything.
+把一封客户邮件或消息粘贴进来——CrabCode 会(在已知订单号时)从支付宝查支付状态、在你的 CRM 中查到该客户,并以店主的语气起草回复。起草前先依《消费者权益保护法》判定是否属法定应退,命中的先依法处理;若需退款,就把明细备好,等店主明确批准后再发起任何操作。
 
 ```
-User: "answer this customer" [pastes email]
-→ Extract customer email + issue + order number from text
-→ Pull Alipay payment status (query-alipay-payment, by order number)
-→ Pull HubSpot contact history
-→ Draft reply in owner's voice
-→ Owner approves draft → owner sends it
-→ If refund needed: approval prompt → owner confirms → issue via refund-alipay-payment
+用户:"回这个客户"[粘贴邮件]
+→ 从文本提取客户联系方式 + 诉求 + 订单号
+→ 按订单号查支付宝支付状态(query-alipay-payment)
+→ 拉取你的 CRM 联系人历史(CRM 连接器以实际配置为准)
+→ 消保法法定权利判断:七天无理由?三包质量问题?欺诈?预付/杀熟?→ 先定法定义务
+→ 以店主语气起草回复(命中法定应退先依法处理,再谈善意让步;附 AI 草稿红线提示)
+→ 店主批准草稿 → 店主自行发送
+→ 如需退款:审批提示 → 店主确认 → 经 refund-alipay-payment 发起
 ```
 
-## Workflow
+## 工作流
 
-1. **Read the customer message.** Accept pasted email or message text — there is no email connector yet, so the owner pastes the thread. Extract: customer email address, name, order number (支付宝 out_trade_no, if present), and the core issue — refund request, order status question, or general complaint. If multiple issues are present, address them in the order they appear.
+1. **读取客户消息。** 接受粘贴进来的邮件或消息文本——目前尚无邮件连接器,由店主把整段往来粘贴进来(邮件、微信或短信里的文字均可)。提取:客户联系方式(邮箱,以及微信昵称 / 手机号等可用信息)、姓名、订单号(支付宝 out_trade_no,若有),以及核心诉求——退款请求、订单状态询问,或一般投诉。若一条消息包含多个诉求,按其出现顺序逐一处理。
 
-2. **Pull payment status from Alipay.** The Alipay connector looks up a single payment by order number (`query-alipay-payment`) — it cannot search by customer email or list transactions.
-   - If the message contains an order number, call `query-alipay-payment` with it. Capture: amount, date, and trade status. Use `query-alipay-refund` to check whether a refund has already been processed.
-   - If no order number is present, ask the owner to get it from the customer, or to look the payment up in 支付宝商家平台 and paste the result. Do not guess at a match.
-   - If the payment was made via WeChat Pay, there is no connector yet — ask the owner to check 微信支付商户平台 and paste the details.
-   - If Alipay is not connected (unconfigured connectors are simply absent), note it in the draft and continue from pasted data.
-   - If Intercom is connected, check for open support tickets from this customer.
-   - If the customer references multiple orders, surface all of them and ask the owner which one applies before drafting.
+2. **从支付宝查支付状态。** 支付宝连接器按订单号查询单笔支付(`query-alipay-payment`)——它无法按客户邮箱检索,也无法列出交易流水。
+   - 若消息中含订单号,用它调用 `query-alipay-payment`。记录:金额、日期、交易状态。用 `query-alipay-refund` 查是否已退过款。
+   - 若无订单号,请店主向客户索取,或到支付宝商家平台查到后把结果粘贴进来。不要臆测匹配。
+   - 若该笔支付走的是微信支付,目前尚无连接器——请店主到微信支付商户平台查询并粘贴明细。
+   - 若支付宝未连接(未配置的连接器直接缺席),在草稿中注明,并基于已粘贴的数据继续。
+   - 若已连接在线客服 / 客服工单系统,查一下该客户是否有未结的客服工单。
+   - 若客户提到多笔订单,把它们全部列出,请店主确认是哪一笔后再起草。
 
-3. **Pull customer history from HubSpot.** Search contacts by email address. Pull: lifecycle stage, notes, open deals, and recent activity. If no contact exists, note it and offer to create one after the reply is sent — do not create during the response workflow.
+3. **从你的 CRM 拉客户历史(CRM 连接器以实际配置为准)。** 按邮箱检索联系人。拉取:生命周期阶段、备注、进行中的商机,以及近期活动。(企业微信等 SCRM 无销售商机管道,可改看会员 / 消费记录;有赞的"商机"≈订单。)若无此联系人,注明,并在回复发出后再提议创建——不要在回复流程中途创建。
 
-4. **Draft the reply.** Write in the owner's writing voice. Adjust tone to fit the issue type:
-   - Refund request → empathetic, clear, action-oriented
-   - Order status question → factual, reassuring
-   - General complaint → acknowledge, explain, offer resolution
-   Flag any data gaps inline in the draft with a bracketed note (e.g., *[Note: No Alipay payment found for this order number — verify it before sending]*) so the owner sees the gap before sending. For a worked example, see [reference/examples/respond-refund-request.md](reference/examples/respond-refund-request.md). For common pitfalls, see [reference/gotchas.md](reference/gotchas.md).
+4. **消保法法定权利判断(起草前必做)。** 起草回复前,先依《中华人民共和国消费者权益保护法》及其《实施条例》(2024-07-01 施行)判定本诉求是否属**法定应退 / 应换 / 应赔**。**判断顺序:先定法定义务,再谈店主裁量。** 逐项过一遍:
 
-5. **Approval gate — owner reviews the draft.** Present the full draft. Do not finalize it until the owner approves. The owner may edit freely before approving.
+   - **网购七天无理由退货(消保法第 25 条)。** 网络等远程购物,自收到商品起 **7 日内**可无理由退货,**商品应当完好**;因**查验拆封或合理调试**而不影响商品原有品质、功能、外观的,经营者**应予退货**(《实施条例》细化)。**法定除外**(不适用七天无理由):消费者定制的商品、鲜活易腐商品、在线交付或拆封后的数字化商品(音像制品、软件等)、已交付的报纸期刊。命中 → 属**法定应退**。
+   - **三包 / 质量问题。** 商品存在质量问题的,依法**修理、更换、退货("三包")**,**不受七天限制**,也不以商品完好为前提。命中 → 属**法定应退 / 应换 / 应修**。
+   - **欺诈退一赔三(消保法第 55 条)。** 经营者提供商品或服务**有欺诈行为**的,除退款外还须按消费者要求**增加赔偿 = 价款的 3 倍**;增加赔偿**不足 500 元的,按 500 元**计。命中 → 属**法定应赔**。
+   - **预付式消费 / 大数据杀熟(《实施条例》新增)。** 不得对同一商品 / 服务在**相同条件下**因人设不同价("大数据杀熟");预付式消费不得**降低质量、加价**,出现重大经营风险应**停止收取预付款**,停业或迁址须**提前告知**并按约定退还余额;直播带货、明码标价亦须合规。命中 → 按对应法定口径处理。
 
-6. **Approval gate — refund issuance.** If a refund is warranted, surface a dedicated confirmation prompt after the owner approves the draft:
+   **结论先行:** 只要命中上述任一法定情形,就先按**法定义务**定回复基调(该退退、该换换、该赔赔),店主的额外让步(如运费补偿、优惠券)只能叠加在法定义务**之上**,**不能用"善意让步"话术取代或规避法定应退**。若均未命中,才回到店主的自由裁量。把这条判断结论作为一句话背景带进草稿,供店主复核。
 
-   > *"Issue refund of ¥[amount] to [customer name] ([email]) for order [out_trade_no]? Reply Y to proceed."*
+5. **起草回复。** 以店主的书面语气撰写。依据第 4 步的法定权利判断确定基调——**命中法定应退 / 应换 / 应赔的,先把依法处理写清楚,再谈额外善意让步**;均未命中的,才按店主裁量措辞。按诉求类型微调语气:
+   - 退款请求 → 共情、清楚、给出明确动作
+   - 订单状态询问 → 客观、让人安心
+   - 一般投诉 → 先认可、再解释、给出解决方案
 
-   Wait for explicit confirmation. If the owner's reply is anything other than a clear yes, stop and ask what they'd like to do instead. Only then call `refund-alipay-payment`.
+   把任何数据缺口就地用方括号注明(例如 *[注:该订单号在支付宝查无支付记录——发送前请核实]*),让店主在发送前就看到缺口。**每条面向客户的退款 / 客诉回复末尾都要保留红线提示**(给店主的合规提醒,发送前可移除):
 
-7. **Hand off the reply.** There is no email connector — after draft approval, hand the final text to the owner to send from their own mailbox. If DingTalk or Feishu is connected and the owner wants it, send them the final draft as a DingTalk/Feishu message via the connected connector. Then log the interaction as a note on the HubSpot contact timeline.
+   > 【AI 辅助草稿，非法律意见，退换货与赔偿请依《消费者权益保护法》核实】
 
-8. **Report.** One short paragraph: reply finalized and handed off, refund issued or not, HubSpot note logged.
+   完整示例见 [reference/examples/respond-refund-request.md](reference/examples/respond-refund-request.md);常见陷阱见 [reference/gotchas.md](reference/gotchas.md)。
 
-## Approval gates
+6. **审批门禁 —— 店主审阅草稿。** 呈上完整草稿。在店主批准前不要定稿。店主可在批准前自由修改。
 
-- **Never issue an Alipay refund without explicit owner confirmation** — always show amount, customer name, email, and order number before calling `refund-alipay-payment`.
-- **Never send or finalize the reply without owner review.** Always present the full draft first; the owner does the sending.
-- **Never create a HubSpot contact during the response flow.** Offer it afterward.
-- **Never guess which order a message is about.** If the order number is missing or multiple orders are in play, ask the owner before drafting around payment details.
-- **Never fabricate order details.** If Alipay has no record for the order number (or no order number is available), say so inline in the draft — do not invent a status.
+7. **审批门禁 —— 退款发起。** 若确需退款(即便命中法定应退、依法本就该退,**发起退款这一动作仍须店主确认**),在店主批准草稿后,单独弹出一个确认提示:
 
-## Reference
+   > *"就订单 [out_trade_no],向 [客户姓名]([联系方式])退款 ¥[金额]?回复 Y 继续。"*
 
-- [reference/gotchas.md](reference/gotchas.md) — Good / Bad patterns for tone, order-number lookup, and ambiguous refund scenarios
-- [reference/examples/respond-refund-request.md](reference/examples/respond-refund-request.md) — worked example: refund request with Alipay payment found
+   等待明确确认。若店主的回复不是清楚的"是",就停下并询问他想怎么处理。确认后才调用 `refund-alipay-payment`。
+
+8. **交接回复。** 没有邮件连接器——草稿获批后,把终稿交给店主从自己的邮箱 / 微信发送。若已连接钉钉或飞书且店主需要,通过已连接的连接器把终稿作为钉钉 / 飞书消息发给店主本人。随后把这次互动作为一条备注记到你的 CRM 联系人时间线(CRM 连接器以实际配置为准)。
+
+9. **汇报。** 一小段话:回复已定稿并交接、退款是否已发起、CRM 备注是否已记录;若命中法定应退情形,一并说明依据(七天无理由 / 三包 / 退一赔三)。
+
+## 审批门禁
+
+- **绝不在未经店主明确确认的情况下发起支付宝退款**——调用 `refund-alipay-payment` 前,始终先展示金额、客户姓名、联系方式与订单号。
+- **不得起草违法拒绝法定退货 / 退款的回复;命中法定应退情形先依法处理。** 七天无理由(商品完好)、三包质量问题、欺诈退一赔三等法定情形一旦命中,回复须先落实法定义务,店主的额外让步只能叠加于其上,不能用"善意让步"话术取代或规避——店主不得违法拒退。
+- **绝不在未经店主审阅的情况下发送或定稿回复。** 始终先呈上完整草稿;发送由店主完成。
+- **绝不在回复流程中途创建 CRM 联系人。** 事后再提议。
+- **绝不臆测消息指向哪一笔订单。** 订单号缺失或有多笔订单在场时,先问店主,再围绕支付明细起草。
+- **绝不编造订单信息。** 若支付宝对该订单号无记录(或没有订单号),就在草稿里就地说明——不要杜撰状态。
+
+## 参考文件
+
+- [reference/gotchas.md](reference/gotchas.md) —— 语气、订单号查询、模糊退款场景,以及"法定应退 vs 店主善意让步"的 好 / 坏 对照
+- [reference/examples/respond-refund-request.md](reference/examples/respond-refund-request.md) —— 完整示例:查到支付宝支付记录的退款请求(损坏退全款 = 三包法定义务)

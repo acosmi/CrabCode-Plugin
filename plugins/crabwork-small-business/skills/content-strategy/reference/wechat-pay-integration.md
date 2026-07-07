@@ -1,51 +1,32 @@
-# WeChat Pay integration (future enhancement)
+# 微信支付接入(未来增强)
 
-WeChat Pay (微信支付) is a planned revenue source for content-strategy, but
-no connector exists yet. This document records the current export-based
-path and what a future connector would change.
+微信支付是 content-strategy 规划中的收入来源,但目前还没有连接器。本文记录当前基于导出的路径,以及未来连接器会改变什么。
 
-## Current state
+## 当前状态
 
-- **No WeChat Pay connector.** All WeChat Pay revenue enters the analysis
-  the same way as Alipay revenue: the owner exports a bill CSV — from
-  微信支付商户平台 (merchant platform) — and hands over the file or pastes
-  the data.
-- The plugin's **alipay** connector does not help here either: it only
-  creates payment links, queries a single payment by order number, and
-  processes refunds. It cannot export transaction history for Alipay, let
-  alone WeChat Pay.
-- Primary tested paths today: 支付宝商家平台 bill export (CSV) and
-  accounting-software exports (用友好会计 / 金蝶精斗云).
+- **没有微信支付连接器。** 所有微信支付收入进入分析的方式和支付宝收入一样:店主从微信支付商户平台导出一份账单 CSV,把文件交上来或粘贴数据。
+- 插件的**支付宝**连接器在这里也帮不上忙:它只能创建收款链接、按订单号查单笔支付、处理退款。它连支付宝的交易历史都导不出,更别说微信支付。
+- 今天已跑通并测试过的路径:支付宝商家平台账单导出(CSV)和会计软件导出(用友好会计 / 金蝶精斗云)。
 
-## Export-based path (works today)
+## 基于导出的路径(现在就能用)
 
-1. Owner logs into 微信支付商户平台 and downloads the transaction bill
-   (交易账单) for the lookback window as CSV.
-2. Skill parses per-transaction rows: date, amount, order title.
-3. Same caveats as the Alipay export apply:
-   - Order titles may not map cleanly to catalog product names —
-     normalize and confirm groupings with the owner.
-   - The export covers WeChat Pay only; combine with the Alipay export
-     and/or accounting data for full coverage, and de-duplicate if the
-     accounting software already books this revenue.
+1. 店主登录微信支付商户平台,把回溯窗口内的交易账单下载为 CSV。
+2. 技能解析逐笔交易的行:日期、金额、订单标题。
+3. 与支付宝导出相同的注意事项同样适用:
+   - 订单标题未必能干净对上目录商品名——归一并和店主确认归并。
+   - 该导出只覆盖微信支付;与支付宝导出和/或会计数据合并才算全口径,且若会计软件已入账这笔收入要去重。
 
-## What a future connector would change
+## 未来连接器会改变什么
 
-If a WeChat Pay connector ships with bill/transaction access:
+如果某天微信支付连接器带着账单/交易访问能力上线:
 
-1. The manual export step disappears for the lookback pull.
-2. SKILL.md Step 1 gains WeChat Pay as a live source alongside the
-   file-based ones.
-3. A worked example (`reference/examples/`) should be added and validated
-   against a real merchant account before the path is documented as
-   tested.
+1. 回溯拉数时,手动导出这一步消失。
+2. SKILL.md 步骤 1 会把微信支付作为一个实时来源,与基于文件的来源并列。
+3. 应新增一个已跑通的示例(`reference/examples/`),并在真实商户账号上验证后,再把该路径记为"已测试"。
 
-Do not assume any of this exists until the connector appears in the
-plugin's connector list — until then, refer only to the export path.
+在连接器出现在插件连接器清单里之前,别假设上述任何一项存在——在此之前,只提基于导出的路径。
 
-## Why it's not wired up
+## 为什么还没接通
 
-1. **No connector available** — there is nothing to call.
-2. **No test merchant account** — even when a connector appears, the path
-   needs end-to-end validation with real bill data before it's documented
-   as a co-equal source.
+1. **没有可用连接器**——没有东西可调。
+2. **没有测试商户账号**——即便连接器出现,该路径也需要用真实账单数据做端到端验证,才能记为与其他来源并列的来源。

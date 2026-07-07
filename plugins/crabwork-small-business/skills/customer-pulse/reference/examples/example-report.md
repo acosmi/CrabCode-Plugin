@@ -1,52 +1,56 @@
-# Example: Customer Pulse Report
+# 范例:客户情绪脉搏报告
 
-**Trigger used:** "How are customers feeling this month?"
-**Date range:** April 1–30, 2026
-
----
-
-## Customer Pulse — April 1–30, 2026
-
-### Sources pulled
-- Payment disputes/refunds (支付宝商家平台 export): 4
-- HubSpot tickets: 9
-- Pasted emails: 14
-- Intercom conversations: 6
-- Pasted reviews: 0
-
-### Themes
-
-**1. Shipping delays causing repeat complaints** (11 signals)
-> "Ordered 2 weeks ago and still nothing — this is unacceptable." — [Email]
-> "Package was 10 days late and support never responded." — [Intercom]
-> "Where is my order? The tracking hasn't updated in 5 days." — [HubSpot]
-
-**2. Refund process too slow** (8 signals)
-> "I opened a refund complaint because I never got a response to my refund request." — [Payments]
-> "It's been two weeks since I asked for a refund. Still waiting." — [Email]
-> "Your return policy says 5 days but it's been 12." — [HubSpot]
-
-**3. Product quality below expectations** (5 signals)
-> "The stitching came apart after one wash." — [Intercom]
-> "Looks nothing like the photo." — [Email]
-> "Would not buy again — quality is not what I expected for the price." — [HubSpot]
-
-### Do these 3 things this week
-1. **Fix shipping comms** — Email every open order older than 7 days with a status update and a new ETA. This alone will cut Intercom volume before the root cause is resolved.
-2. **Speed up refunds** — Set a 48-hour SLA for refund approvals and assign one person to clear the current backlog this week.
-3. **Audit product listing photos** — Pull the top 3 products by complaint volume and update photos to match what's actually shipped.
+**使用的触发语:** "这个月客户情绪怎么样?"
+**日期区间:** 2026 年 4 月 1 日–30 日
 
 ---
 
-## Example: run without a payment export
+## 客户情绪脉搏 —— 2026 年 4 月 1 日–30 日
 
-**Trigger used:** "Customer pulse for last 30 days"
+### 来源盘点
+- 支付纠纷/退款(支付宝商家平台导出):4
+- 客服工单:9
+- 粘贴邮件:14
+- 在线客服会话:6
+- 粘贴评价(大众点评/淘宝):0
 
-### Sources pulled
-- Payment disputes/refunds: not provided — not included
-- HubSpot tickets: 7
-- Pasted emails: 11
-- Intercom conversations: 4
-- Pasted reviews: 3
+### 主题
 
-*(Report continues normally with available sources. The payments note appears only in Sources — no error message in the body.)*
+**1. 配送延误引发反复投诉**(11 个信号)
+> "下单两周了还没动静,太离谱了。" —— [邮件]
+> "包裹晚了十天,客服一直没回。" —— [客服]
+> "我的订单到哪了?物流五天没更新了。" —— [CRM]
+
+**2. 退款处理太慢**(8 个信号)
+> "退款申请一直没人理,我只好发起了投诉。" —— [支付纠纷]
+> "从我申请退款到现在两周了,还在等。" —— [邮件]
+> "你们退货政策写 5 天,结果拖了 12 天。" —— [CRM]
+
+**3. 商品质量低于预期**(5 个信号)
+> "洗一次线就开了。" —— [客服]
+> "和图片完全不是一回事。" —— [评价]
+> "这个价位不该是这种质量,不会再买了。" —— [CRM]
+
+### 本周就做这三件事
+1. **修复配送沟通** —— 给每一笔超过 7 天未送达的在途订单发一条状态更新和新的预计到货时间。光这一步就能在根因解决前先压下在线客服咨询量。
+2. **加快退款** —— 给退款审批定一个 48 小时时限(SLA),派一个人本周清完当前积压。
+3. **核对商品详情页图片** —— 拉出投诉量前 3 的商品,把详情图更新成实际发出的样子。
+
+*【AI 辅助整理,客户信息请脱敏,回复依《消费者权益保护法》核实】*
+
+---
+
+## 范例:没有支付导出时的运行
+
+**使用的触发语:** "近 30 天的客户情绪"
+
+### 来源盘点
+- 支付纠纷/退款:未提供——未纳入
+- 客服工单:7
+- 粘贴邮件:11
+- 在线客服会话:4
+- 粘贴评价(大众点评/淘宝):3
+
+*(报告用可得的来源照常生成。支付那条提示只出现在"来源盘点"里——正文不出现任何报错。)*
+
+*【AI 辅助整理,客户信息请脱敏,回复依《消费者权益保护法》核实】*

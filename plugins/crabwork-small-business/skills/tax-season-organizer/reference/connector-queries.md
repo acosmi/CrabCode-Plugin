@@ -1,88 +1,80 @@
-# Data Source Guide
+# 数据来源指引
 
-How to gather the right data for each mode. **None of these sources have a live MCP
-connector** — everything comes from owner-provided exports (CSV/Excel) or pasted
-reports. The alipay MCP connector cannot export transaction history (it only creates
-payment links, queries a single payment by order number, and processes refunds), so
-do not attempt to pull bulk payment data through it.
+各模式如何采集正确的数据。**以下来源均无实时 MCP 连接器**——全部来自业主提供的导出(CSV/Excel)
+或粘贴报表。支付宝 MCP 连接器无法导出交易历史(它只能创建收款链接、按订单号查询单笔交易、以及处理
+退款),因此不要尝试用它拉取批量收付款数据。
 
 ---
 
-## Accounting software (用友好会计 / 金蝶精斗云) — Quarterly mode (P&L)
+## 记账软件(用友好会计 / 金蝶精斗云)—— 季度模式(利润表 / 销售额)
 
-Ask the owner to export a **Profit & Loss** report for the period January 1 through
-the last day of the most recently completed quarter, as CSV or Excel — or to paste
-the key numbers directly.
+请业主导出本季度(季初到季末)的**利润表**以及**增值税相关的销售额 / 销项、进项明细**,CSV 或
+Excel——或直接粘贴关键数字。
 
-Key fields to capture:
-- `Total Income` / 收入合计 (gross revenue)
-- `Total Expenses` / 费用合计 (all operating expenses)
-- `Net Ordinary Income` / 净利润 (= income − expenses; this is the basis for tax calculation)
+需采集的关键字段:
+- `营业收入` / 收入合计(当季销售额;判断增值税免征线与身份的关键)
+- `销项税额` 与 `进项税额`(一般纳税人计算应纳增值税 = 销项 − 进项)
+- `成本费用合计` / 主营业务成本 + 期间费用(所得税计税基础的重要构成)
+- `利润总额` / 净利润(经收入减去可扣除成本费用后的初步结果)
 
-If the report shows multiple income/expense categories, sum them. You want the single
-bottom-line net profit figure.
+若报表分多个收入 / 费用科目,分别汇总。季度整理既要拿到销售额(增值税用),也要拿到收入减成本后的
+初步应纳税所得额测算(所得税用)。
 
-**If the owner's books are on cash basis**, use that. If accrual, note it in output —
-the accountant should confirm which basis to use for estimated taxes.
-
----
-
-## Accounting software — Year-end mode (contractor payments)
-
-Ask the owner to export all **vendor payments** (bill payments, checks, transfers to
-vendors) for the full tax year (Jan 1 – Dec 31) — a transaction list grouped by vendor.
-
-Filter for:
-- Any vendor flagged as a contractor/1099-eligible (if the owner tags vendors)
-- OR any vendor whose category is: consulting, contract labor, subcontractor, freelance, design, legal, accounting, marketing, staffing
-
-For each vendor record, capture:
-- Vendor name (legal name if available)
-- EIN / SSN (from vendor profile / tax ID column — indicates W-9 on file)
-- Total payments for the year
-- Payment dates and amounts (for cross-reference)
-- Vendor type / 1099 eligibility flag
-
-**Common issue:** Many owners never tag vendors as 1099-eligible in their accounting
-software. If the eligibility flag yields few or no results, work from ALL vendors with
-significant payment totals and let the user / accountant classify them. Note this in output.
+**若账套为收付实现制**,照此使用;**若为权责发生制**,在产出中注明——由会计确认申报应采用的口径。
 
 ---
 
-## Alipay (支付宝) — Year-end mode
+## 记账软件 —— 年度模式(全年收入、成本费用、进销项发票)
 
-Ask the owner to export a **bill/transaction report (CSV)** from 支付宝商家平台 covering
-payments **sent** (not received) for the tax year.
+请业主导出**全年(1 月 1 日 – 12 月 31 日)**的:
+- 收入明细(区分开票收入 / 未开票收入)
+- 成本费用明细(按科目)
+- **进项发票清单**与**销项发票清单**(汇算清缴核对的核心)
 
-Key fields:
-- Counterparty name / account (email or phone)
-- Total amount per recipient (aggregate for the year)
-- Transaction type (keep payments for services; see exclusions)
-- Date
+对每一笔成本费用 / 每一张发票,采集:
+- 交易对方名称(开票方 / 受票方,尽量取全称)
+- **纳税人识别号**(统一社会信用代码 / 税号;缺失即发票信息不全)
+- 金额与税额
+- 发票号码 / 数电发票号、开票日期
+- **发票类型**:增值税专用发票 / 普通发票 / 数电发票(全电发票);或标注"无发票(白条 / 收据)"
 
-**Exclude:** refunds, disputes, transfers between the owner's own accounts, and
-payments for goods.
-
----
-
-## WeChat Pay (微信支付) — Year-end mode — not yet connected
-
-If the owner also pays contractors via WeChat Pay, ask for a bill export (CSV) from
-微信支付商户平台 for the same period. Same fields and exclusions as the Alipay export.
+**常见问题:** 不少业主的记账软件里成本费用未逐笔关联发票。若发票关联字段基本为空,就从**所有金额较大
+的成本费用**入手,逐笔核对有无对应发票,让业主 / 会计判定,并在产出中注明这一情况。
 
 ---
 
-## CSV handling
+## 支付宝(支付宝)—— 年度模式
 
-Typical export paths to suggest:
-1. Accounting software: 用友好会计 / 金蝶精斗云 → reports → Profit & Loss (or vendor
-   transaction list) → export CSV/Excel
-2. 支付宝商家平台 → 账单/对账中心 → download bill CSV for the date range
-3. 微信支付商户平台 → 交易账单 → download CSV for the date range
+请业主从**支付宝商家平台**导出**账单 / 交易报表(CSV)**,覆盖本年度的**收款与付款流水**,用于与开票
+收入、成本付款交叉核对。
 
-When reading uploaded CSVs, look for these columns (names vary by export):
-- P&L: `Description`/摘要, `Amount`/金额, `Type`/类型 (Income / Expense)
-- Alipay bill: counterparty name/account, transaction type, amount, date, transaction ID
-- WeChat Pay bill: counterparty, amount, transaction time, transaction ID
+关键字段:
+- 交易对方名称 / 账号(邮箱或手机号)
+- 每个对方的年度累计金额(收 / 付分别汇总)
+- 交易类型(区分经营性收付款;见排除项)
+- 日期、交易订单号
 
-If columns don't match, ask the user to identify the payee name and amount columns.
+**排除:** 退款、争议款、业主本人账户间的转账、以及与经营无关的往来。
+
+---
+
+## 微信支付(微信支付)—— 年度模式 —— 暂未接入
+
+若业主也通过微信支付收付款,请其从**微信支付商户平台**导出同期账单(CSV)。字段与排除项同支付宝导出。
+
+---
+
+## CSV 处理
+
+建议的导出路径:
+1. 记账软件:用友好会计 / 金蝶精斗云 → 报表 → 利润表(或发票 / 往来明细)→ 导出 CSV/Excel
+2. 支付宝商家平台 → 账单 / 对账中心 → 按日期区间下载账单 CSV
+3. 微信支付商户平台 → 交易账单 → 按日期区间下载 CSV
+
+读取上传的 CSV 时,留意这些列(不同导出命名不一):
+- 利润表:`摘要` / 科目、`金额`、`类型`(收入 / 成本 / 费用)、`销项税额` / `进项税额`
+- 发票清单:发票号码 / 数电号、对方名称、纳税人识别号、金额、税额、发票类型、开票日期
+- 支付宝账单:交易对方名称 / 账号、交易类型、金额、日期、交易订单号
+- 微信支付账单:交易对方、金额、交易时间、交易单号
+
+若列名对不上,请用户指认"交易对方 / 科目名称"列与"金额"列,并说明哪些是含税、哪些是不含税金额。

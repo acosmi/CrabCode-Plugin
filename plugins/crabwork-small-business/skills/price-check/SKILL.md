@@ -1,7 +1,7 @@
 ---
 name: price-check
 version: 0.3.0
-description: Produces a margin-by-product table and three pricing-scenario data views so the owner can see the full financial picture before making a pricing decision. Works from the owner's accounting-software export (用友好会计 / 金蝶精斗云), optionally cross-validated against a 支付宝商家平台 bill export. Trigger when the owner runs /price-check or asks "should I raise prices," "what are my margins," "what should I charge," "am I making enough on this," "is this priced right," or "my costs are going up." Accepts optional product name argument.
+description: Produces a margin-by-product table and three pricing-scenario data views so the owner can see the full financial picture before making a pricing decision. Works from the owner's accounting-software export (用友好会计 / 金蝶精斗云), optionally cross-validated against a 支付宝商家平台 bill export. Trigger when the owner runs /price-check or asks "should I raise prices," "what are my margins," "what should I charge," "am I making enough on this," "is this priced right," or "my costs are going up." Accepts optional product name argument. 亦触发于:"要不要涨价""该涨多少""毛利多少""这个定价合理吗""赚得够不够""成本涨了""该卖多少钱"。
 allowed-tools: Read, WebFetch, Bash
 ---
 
@@ -23,7 +23,7 @@ Build the margin table:
 
 ```
 Product          | Revenue  | COGS     | Gross Margin | Margin %
-{product}        | ${amt}   | ${amt}   | ${amt}       | {X}%
+{product}        | ¥{amt}   | ¥{amt}   | ¥{amt}       | {X}%
 ```
 
 Flag any product with margin below 20% as a risk.

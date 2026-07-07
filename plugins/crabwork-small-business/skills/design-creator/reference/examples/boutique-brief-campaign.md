@@ -1,224 +1,246 @@
-# Worked Example: Retail Boutique Brief → Campaign
+# 完整范例:精品女装店 简报 → 战役
 
-**Business:** Bloom & Thread (蓝缕) — women's clothing boutique, Hangzhou
-**Rendering tool:** Owner renders from design briefs (自营云端设计 connector not yet available)
-**HubSpot tier:** Marketing Hub Professional (campaign record; no domestic channels connectable in HubSpot Social)
-**Brief source:** content-strategy skill output (approved by owner)
-
----
-
-## Input: Approved brief (summary)
-
-```
-Push hard: Linen summer dresses (top seller, trending +22% MoM)
-Hold steady: Accessories
-Seasonal opportunity: Back-to-school transition (Aug 15 pivot)
-Offer: Buy 2 dresses, get 1 accessory free (runs June 1–July 31)
-Channels: Xiaohongshu (小红书), WeChat Official Account (公众号), WeChat Channels (视频号)
-Cadence: 3× per week, Mon/Wed/Fri, 10 AM
-Voice: Warm, conversational, light humor. No corporate copy.
-```
+**商家:** 蓝缕(Bloom & Thread)—— 女装精品店,杭州
+**渲染工具:** 店主依据设计简报渲染(自营云端设计连接器尚未上线)
+**CRM / 营销系统:** 企业微信 私域 SCRM(仅作战役记录;企微 SCRM 无销售管道,战役靠互动 / 标签追踪;国内渠道原生发布,不接入外部社媒)
+**简报来源:** content-strategy 技能产出(店主已批准)
 
 ---
 
-## Stage 1: Posting calendar (presented for approval)
+## 输入:已批准简报(摘要)
 
-| Date | Channel | Path | Theme | Asset type | Caption angle |
-|------|---------|------|-------|------------|---------------|
-| Jun 2 | Xiaohongshu | Design brief (social) | Linen dresses launch | 3:4 note image | Product intro — "finally, a dress you can wear to both places" |
-| Jun 4 | 公众号 | Design brief (social) | Linen dresses | Article cover (900×383) | Social proof — "our most-reached-for item this spring" |
-| Jun 6 | 视频号 | Design brief (social) | Buy 2 get 1 offer | Vertical cover (1080×1920) | Offer urgency |
-| Jun 9 | Xiaohongshu | Design brief (social) | Linen styling tip | 3-page carousel (3:4) | Education — "3 ways to style the linen midi" |
-| Jun 11 | 公众号 | Design brief (social) | Behind the scenes | Article cover (900×383) | Brand story — how they're made |
-| Jun 13 | 视频号 | Design brief (social) | Weekend outfit inspo | Vertical cover (1080×1920) | Lifestyle — "your Saturday, sorted" |
+```
+主推:亚麻夏裙(销量靠前,环比 +22%)
+稳住:配饰
+季节机会:开学换季(8月15日 转向)
+促销:买 2 条连衣裙,赠 1 件配饰(2026年6月1日–7月31日)
+渠道:小红书、公众号、视频号
+节奏:每周 3 次,周一/三/五,10:00
+语气:温暖、口语化、带点幽默。不要官腔。
+```
+
+> 合规提示(阶段 4 会展开):简报里的促销"买 2 赠 1"措辞含糊——赠什么、送多少、
+> 到几号,都要在文案里写清,否则触碰《价格法》/《消费者权益保护法》。文案阶段收紧。
+
+---
+
+## 阶段 1:发布日历(呈现待批)
+
+| 日期 | 渠道 | 路径 | 主题 | 素材类型 | 文案角度 |
+|------|------|------|------|----------|----------|
+| 6月2日 | 小红书 | 设计简报(社交) | 亚麻裙上新 | 3:4 图文 | 产品介绍——"终于有一条,两个场合都能穿" |
+| 6月4日 | 公众号 | 设计简报(社交) | 亚麻裙 | 文章头图(900×383) | 社会证明——"今春回头率很高的一件" |
+| 6月6日 | 视频号 | 设计简报(社交) | 买 2 赠 1 促销 | 竖版封面(1080×1920) | 促销时限 |
+| 6月9日 | 小红书 | 设计简报(社交) | 亚麻穿搭技巧 | 3 页轮播(3:4) | 科普——"亚麻中长裙的 3 种穿法" |
+| 6月11日 | 公众号 | 设计简报(社交) | 幕后 | 文章头图(900×383) | 品牌故事——怎么做出来的 |
+| 6月13日 | 视频号 | 设计简报(社交) | 周末穿搭灵感 | 竖版封面(1080×1920) | 生活方式——"你的周六,安排好了" |
 | … | … | … | … | … | … |
 
-*Owner approved — "move Jun 11 to Jun 12, I'm posting about the sale that day. Otherwise great."*
-*(Calendar updated; proceeding to Stage 2.)*
+*店主批准——"把 6月11日 挪到 6月12日,那天我要发促销。其余都好。"*
+*(日历已更新;进入阶段 2。)*
 
 ---
 
-## Stage 2: Asset inventory (slot-by-slot)
+## 阶段 2:素材清单(逐位)
 
-**Gap resolution exchange (multi-slot carousel):**
+**缺口解决对话(多位轮播):**
 
 ```
-CrabCode: The Jun 9 styling carousel has 3 image slots (one per page).
-        The brief gave me 1 photo (~/photos/linen_midi_01.jpg). How
-        should I fill the other 2?
-          1. Reuse the same photo across all 3 pages
-          2. You point me at 2 more photos (file paths)
-          3. Switch to a single-image note
+CrabCode:6月9日的穿搭轮播有 3 个图片位(一页一个)。简报只给了我 1 张照片
+        (~/photos/linen_midi_01.jpg)。另外 2 个怎么填?
+          1. 三页复用同一张照片
+          2. 你再给我 2 张照片(文件路径)
+          3. 改成单图图文
 
-Owner: Use linen_midi_02.jpg and linen_midi_belt.jpg from the same folder.
+店主:用同文件夹里的 linen_midi_02.jpg 和 linen_midi_belt.jpg。
 
-CrabCode: Got it — manifest updated, all slots resolved.
+CrabCode:收到——清单已更新,所有位都已落实。
 ```
 
 ---
 
-## Stage 3: Design briefs + rendering handoff
+## 阶段 3:设计简报 + 渲染交接
 
-**Sample brief (Jun 2, presented for approval):**
-
-```
-DESIGN BRIEF — Jun 2 · Xiaohongshu
-Asset type:   Note cover image
-Dimensions:   1242×1660 (3:4)
-Layout:       Full-bleed product photo; headline in the top third on a
-              cream panel; CTA line bottom-left.
-Text overlay:
-  Headline:   "Finally, a dress for both places"
-  Subhead:    —
-  CTA:        "New linen midi · in store & online"
-Images:
-  Cover:      ~/photos/linen_midi_01.jpg
-Brand:
-  Colors:     Cream #F5EFE6, deep green #2E4B3F
-  Fonts:      Owner's brand font (思源宋体 fallback)
-Style notes:  Warm, airy, lots of whitespace. No starbursts, no discount
-              badges on this one — launch post, not offer post.
-Export:       PNG, 1242×1660
-```
-
-*Owner approved all 6 briefs. Handoff:*
+**样例简报(6月2日,呈现待批):**
 
 ```
-All 6 design briefs are approved. Render them in your design tool and
-send back the files or hosted URLs — I'll verify each against its brief
-and stage the campaign.
+设计简报 —— 6月2日 · 小红书
+素材类型:   图文封面
+尺寸:       1242×1660(3:4)
+版式:       满版产品照;标题置于顶部三分之一的米色面板上;CTA 一行在左下。
+文字叠加:
+  标题:     "两个场合,都能穿的那条裙"
+  副标题:   —
+  CTA:      "亚麻中长裙新品 · 门店与线上同步"
+图片:
+  封面:     ~/photos/linen_midi_01.jpg
+品牌:
+  颜色:     米色 #F5EFE6,墨绿 #2E4B3F
+  字体:     店主品牌字体(思源宋体作兜底)
+风格备注:    温暖、通透、大量留白。这一条不要爆炸贴、不要折扣角标——上新帖,不是
+             促销帖。图上文字已过《广告法》自检:无极限词、无未证宣称。
+导出:       PNG,1242×1660
 ```
 
-**Verification (files returned):**
+*店主批准全部 6 份简报。交接:*
 
 ```
-✓ Jun 2  xhs_launch.png      — matches brief
-✓ Jun 4  gzh_cover_proof.png — matches brief
-✗ Jun 9  carousel_p2.png     — page 2 uses linen_midi_01.jpg again;
-                               brief calls for linen_midi_02.jpg.
-                               Re-render just this page?
+6 份设计简报已全部批准。请在你的设计工具中渲染,把文件或托管 URL 发回给我——我会
+对照简报核验每一个,再暂存战役。
 ```
 
-*Owner re-rendered page 2; all assets verified.*
+**核验(文件已返回):**
+
+```
+✓ 6月2日  xhs_launch.png      — 与简报相符
+✓ 6月4日  gzh_cover_proof.png — 与简报相符
+✗ 6月9日  carousel_p2.png     — 第 2 页又用了 linen_midi_01.jpg;
+                               简报要的是 linen_midi_02.jpg。
+                               只重渲这一页?
+```
+
+*店主重渲了第 2 页;所有素材已核验。*
 
 ---
 
-## Stage 4: Caption drafts
+## 阶段 4:文案起草
 
-**Jun 2 — Xiaohongshu (linen dresses launch)**
+### 合规自检(交付前必过)——本战役实况
+
+- **极限词扫描:** 6月4日 初稿里出现"全网最好的亚麻裙"——命中绝对化用语
+  (《广告法》第 57 条,20 万–100 万元罚款),改写为可自我表述的具体说法。
+- **虚假/引人误解:** 6月4日 用了顾客好评,确认为真实顾客的真实评价方可引用;不编造
+  数据。
+- **特殊行业:** 女装,不涉医疗/保健食品/教育/金融等特殊行业——无需送审模板。
+- **价格法:** 简报的"买 2 赠 1"含糊——在 6月6日 与邮件里写清赠品、数量、时限、
+  是否限量;日常价明码标价,不虚构原价。
+- **明示广告 & 移交:** 均为店主自有渠道自营内容;无高风险正式宣称需移交
+  `crablaw-cn:marketing-claims-review`。若存疑或将来接入代言/直播带货,再移交。
+
+每条文案交付都附红线提示:
+
 ```
-Title: 一条裙子，市集和晚餐都能穿
+【AI 辅助草稿,非广告合规意见,投放前请自检《广告法》并按需送审】
+```
 
-Finally, a dress you can wear to the farmer's market *and* to dinner. 🌿
+---
 
-Our linen midi just landed and it's already our most-requested piece this
-summer. Breathable, effortless, and yes — it has pockets.
+**6月2日 —— 小红书(亚麻裙上新)**
+```
+标题:一条裙子,市集和晚餐都能穿
 
-Sizes go fast — come try it on at the Wulin Road store, or order in the
-mini program.
+终于有一条,逛市集能穿、赴晚餐也能穿。🌿
+
+我们的亚麻中长裙刚到店,是这个夏天门店里被问得很多的一件。亲肤透气、好搭,而且——
+真的有口袋。
+
+尺码走得快,来武林路门店试穿,或在小程序下单。
 
 #亚麻连衣裙 #杭州穿搭 #夏日通勤 #蓝缕
 ```
+*(自检:"被问得很多"限定为"门店里",属店主自身经营范围内的可自我表述,未用
+"最/第一"等极限词。)*
 
-**Jun 4 — 公众号 (social proof)**
+**6月4日 —— 公众号(社会证明)**
 ```
-"I've worn it four times this week and I'm not even sorry."
+"这周我已经穿了四次,一点也不后悔。"
 
-That's a real review from a real customer about our linen midi. Between
-you and us, we're not surprised. Shop the collection at the link below.
+这是一位真实顾客对我们亚麻中长裙的真实评价。悄悄说,我们一点也不意外。¥488,
+点击下方链接选购。
 ```
+*(自检:初稿"全网最好的亚麻裙"已删除;评价须真实、可追溯到真实顾客;价格明码
+标价 ¥488。)*
 
-**Jun 6 — 视频号 (offer)**
+**6月6日 —— 视频号(促销)**
 ```
-👗 Buy 2 dresses → get 1 accessory FREE
+👗 买 2 条连衣裙 → 赠 1 件配饰
 
-Offer runs June 1–July 31. Don't sleep on it.
+活动时间:2026年6月1日–7月31日。同一订单买 2 条连衣裙,即赠 1 件指定配饰(帆布包
+或发带二选一,限量 200 份,送完即止)。日常价明码标价,无虚构原价。
 
-Tap through to shop →
+点击下方选购 →
 ```
+*(自检:价格法——赠品、数量、门槛、时限、限量全部写明;"免费/赠"真实,不含糊。)*
 
-*Owner approved with one change: "Jun 4 caption — add the price at the end. '¥488, link below.'"*
-*Caption updated.*
+*店主批准,附一处改动:"6月4日 文案——已按你加的价格 '¥488,链接在下' 保留。"*
+*文案已更新。*
 
 ---
 
-## Stage 5: HubSpot staging + publish packages
+## 阶段 5:CRM 战役登记 + 发布打包
 
-**Campaign created:**
+**战役已创建:**
 ```
-Campaign: "Bloom & Thread — Summer Linen 2026"
-Start: Jun 2, 2026 | End: Jul 31, 2026
-Campaign ID: 8a72c1f4...
+战役:"蓝缕 —— 夏日亚麻 2026"
+起:2026年6月2日 | 止:2026年7月31日
+Campaign ID:8a72c1f4...
 ```
 
-All channels in this campaign are domestic platforms, which HubSpot Social
-cannot publish to — so no posts are staged via the Social API. Instead,
-each row gets a publish-ready package logged against the campaign, plus
-one scheduling CSV.
+本战役所有渠道都是国内平台,原生发布——因此不经任何外部 Social API 暂存
+帖。每行拿到一份登记在你的 CRM(企业微信)战役下的可直接发布打包件,外加一份排期 CSV。
 
-**Publish schedule (first 3):**
+**发布排期(前 3 条):**
 
-| Publish at | Channel | Caption preview | Asset | Status |
-|-----------|---------|-----------------|-------|--------|
-| Jun 2, 10:00 | Xiaohongshu | "Finally, a dress you can wear…" | xhs_launch.png ✓ | Ready to publish |
-| Jun 4, 10:00 | 公众号 | '"I've worn it four times…"' | gzh_cover_proof.png ✓ | Ready to publish |
-| Jun 6, 10:00 | 视频号 | "Buy 2 dresses → get 1 accessory FREE…" | sph_offer_cover.png ✓ | Ready to publish |
+| 发布时间 | 渠道 | 文案预览 | 素材 | 状态 |
+|----------|------|----------|------|------|
+| 6月2日 10:00 | 小红书 | "终于有一条,逛市集能穿……" | xhs_launch.png ✓ | 待发布 |
+| 6月4日 10:00 | 公众号 | "'这周我已经穿了四次……'" | gzh_cover_proof.png ✓ | 待发布 |
+| 6月6日 10:00 | 视频号 | "买 2 条连衣裙 → 赠 1 件配饰……" | sph_offer_cover.png ✓ | 待发布 |
 
-**Final message to owner:**
+**给店主的最终消息:**
 ```
-Campaign is set up in HubSpot for tracking:
-https://app.hubspot.com/marketing/12345/campaigns/8a72c1f4
+战役记录已登记在你的企业微信 / 营销系统用于追踪:
+企微 SCRM 无独立管道,战役进展靠互动与标签盯;连接器就位前以离线清单登记。
 
-The scheduling CSV and publish packages are ready — you publish each
-post natively (公众号 posts can be scheduled inside the 公众号 editor).
-Want me to message this schedule to you on Feishu? Anything to change
-before we're done?
+排期 CSV 和发布打包件已就绪——你原生逐条发布(公众号可在其编辑器里定时)。
+要我把这份排期通过飞书发给你吗?收尾前还有要改的吗?
 ```
 
 ---
 
-## Email content example (text-only — no design work)
+## 邮件正文范例(纯文本——无设计工作)
 
-Email rows skip the design-brief stage entirely. CrabCode writes the email
-subject, preheader, and body as plain prose in Stage 4, and the owner
-copies the content into their email tool when they're ready to send —
-there is no email connector, so nothing is sent from this skill.
+邮件行完全跳过设计简报阶段。CrabCode 在阶段 4 把邮件主题行、预览文字、正文写成纯
+散文,店主想发时把内容复制进自己的邮件工具——本技能没有邮件连接器,不从这里发送。
 
-**Calendar row:**
+**日历行:**
 
-| Date | Channel | Path | Theme | Asset type | Angle |
-|------|---------|------|-------|------------|-------|
-| Jun 5 | Email | Text-only | Summer linen launch | Email (text) | Hero customer benefit + offer |
+| 日期 | 渠道 | 路径 | 主题 | 素材类型 | 角度 |
+|------|------|------|------|----------|------|
+| 6月5日 | 邮件 | 纯文本 | 夏日亚麻上新 | 邮件(文本) | 核心顾客利益 + 促销 |
 
-**Stage 4 output (inline, no design work involved):**
+**阶段 4 产出(内联,不涉设计):**
 
 ```
-Subject: Linen that actually breathes
-Preheader: New summer styles in — plus a small gift if you grab two.
+主题行:真正会呼吸的亚麻
+预览文字:夏季新款到店——买两件还有一份小礼物。
 
-The first batch of linen midis just hit the floor. They're the kind of
-dress you can wear to brunch, to a wedding, or to the school pickup line
-without feeling like you've made a wardrobe decision.
+第一批亚麻中长裙刚上架。这种裙子,穿去早午餐、婚礼,或者接孩子放学都行,不用纠结
+今天穿什么。
 
-A few things worth knowing:
-  • Sizes XS–XL, four colorways
-  • Pockets (real ones)
-  • Buy 2 dresses through July 31 and we'll throw in a free accessory
+几点值得知道:
+  • 尺码 XS–XL,四种配色
+  • 口袋(真的能装东西那种)
+  • 6月1日–7月31日,同一订单买 2 条连衣裙,赠 1 件指定配饰(限量 200 份,送完即止)
 
-Stop by the Wulin Road store this weekend, or order in the mini program.
+这周末来武林路门店逛逛,或在小程序下单。
 
-Shop the linen collection →
+选购亚麻系列 →
 
-— Maya
-Bloom & Thread 蓝缕
+—— Maya
+蓝缕 Bloom & Thread
 ```
-
-**Stage 5 handoff:**
+*(自检:无极限词;买赠条件写明数量、时限、限量;价格法与《广告法》均已过。)*
 
 ```
-Publish packages for the social posts are ready above.
+【AI 辅助草稿,非广告合规意见,投放前请自检《广告法》并按需送审】
+```
 
-Email content for June 5 is drafted above — copy it into your email tool
-when you're ready to send. We don't stage emails directly; that lets you
-preview the formatting in your sending platform first.
+**阶段 5 交接:**
+
+```
+社交帖的发布打包件已在上方就绪。
+
+6月5日 的邮件正文已在上方起草——想发时复制进你的邮件工具。我们不直接暂存邮件,
+好让你先在发送平台里预览排版。
 ```

@@ -10,34 +10,34 @@ monthly payroll, office rent.
 
 **AR aging (用友好会计 export):**
 
-| Customer       | Invoice | Amount   | Due Date   | Days Outstanding |
-|----------------|---------|----------|------------|------------------|
-| Acme Corp      | INV-112 | ¥8,400   | Apr 10     | 12               |
-| BlueSky LLC    | INV-108 | ¥14,200  | Apr 22     | 0                |
-| Crestwood Inc  | INV-115 | ¥6,000   | May 5      | —                |
+| Customer   | Invoice | Amount   | Due Date   | Days Outstanding |
+|------------|---------|----------|------------|------------------|
+| 明发商贸   | INV-112 | ¥8,400   | 2026-04-10 | 12               |
+| 云溪科技   | INV-108 | ¥14,200  | 2026-04-22 | 0                |
+| 恒盛实业   | INV-115 | ¥6,000   | 2026-05-05 | —                |
 
 **Historical payment lag (from the 支付宝商家平台 bill export):**
 
-| Customer       | Mean Lag | Std Dev | Payments on Record |
-|----------------|----------|---------|--------------------|
-| Acme Corp      | 18 days  | 4 days  | 11                 |
-| BlueSky LLC    | 7 days   | 2 days  | 8                  |
-| Crestwood Inc  | 12 days  | 5 days  | 6                  |
+| Customer   | Mean Lag | Std Dev | Payments on Record |
+|------------|----------|---------|--------------------|
+| 明发商贸   | 18 days  | 4 days  | 11                 |
+| 云溪科技   | 7 days   | 2 days  | 8                  |
+| 恒盛实业   | 12 days  | 5 days  | 6                  |
 
 **Fixed costs (recurring AP in the accounting export):**
-- Payroll: ¥22,000 — hits April 15
-- Rent: ¥3,200 — hits May 1
-- Software subscriptions: ¥480 — hits May 1
+- Payroll: ¥22,000 — hits 2026-04-15
+- Rent: ¥3,200 — hits 2026-05-01
+- Software subscriptions: ¥480 — hits 2026-05-01
 
 ---
 
 ## Step 3 output — adjusted inflow dates
 
-| Customer       | Invoice Amount | Adj. Receipt Date | Notes                             |
-|----------------|---------------|-------------------|-----------------------------------|
-| Acme Corp      | ¥8,400        | Apr 28            | Due Apr 10 + 18-day mean lag      |
-| BlueSky LLC    | ¥14,200       | Apr 29            | Due Apr 22 + 7-day mean lag       |
-| Crestwood Inc  | ¥6,000        | May 17            | Due May 5 + 12-day mean lag       |
+| Customer   | Invoice Amount | Adj. Receipt Date | Notes                            |
+|------------|----------------|-------------------|----------------------------------|
+| 明发商贸   | ¥8,400         | 2026-04-28        | Due 2026-04-10 + 18-day mean lag |
+| 云溪科技   | ¥14,200        | 2026-04-29        | Due 2026-04-22 + 7-day mean lag  |
+| 恒盛实业   | ¥6,000         | 2026-05-17        | Due 2026-05-05 + 12-day mean lag |
 
 ---
 
@@ -58,19 +58,19 @@ Confidence band calculation:
 
 ## Step 5 output — risks flagged
 
-1. **Payroll crunch:** Payroll (¥22,000) hits April 15. Low-band inflows through
-   April 14: ¥0 (both AR receipts fall April 28–29). Shortfall risk: up to ¥22,000.
-   *Recommend: confirm receivables timing with Acme and BlueSky before April 14.*
+1. **Payroll crunch:** Payroll (¥22,000) hits 2026-04-15. Low-band inflows through
+   2026-04-14: ¥0 (both AR receipts fall 2026-04-28 and 04-29). Shortfall risk: up to ¥22,000.
+   *Recommend: confirm receivables timing with 明发商贸 and 云溪科技 before 2026-04-14.*
 
-2. **Late-payer risk:** Acme Corp historically pays 18 days late. Their ¥8,400
-   invoice (due Apr 10) shifts to April 28 — after payroll.
+2. **Late-payer risk:** 明发商贸 historically pays 18 days late. Their ¥8,400
+   invoice (due 2026-04-10) shifts to 2026-04-28 — after payroll.
 
 ---
 
 ## Step 6 output — chat summary
 
 ```
-Cash Flow Snapshot — Apr 23 → Jul 21, 2026
+Cash Flow Snapshot — 2026-04-23 → 2026-07-21
 Sources: 用友好会计 export, 支付宝商家平台 bill export
 
               Expected    Low        High
@@ -79,9 +79,9 @@ Sources: 用友好会计 export, 支付宝商家平台 bill export
 90-day net:   ¥0         —          —
 
 ⚠ 2 risks flagged:
-  • Payroll crunch: ¥22K payroll hits Apr 15; AR receipts don't clear until
-    Apr 28–29. Low-band shortfall risk: up to ¥22,000.
-  • Late-payer: Acme Corp (mean 18-day lag) shifts ¥8,400 past payroll date.
+  • Payroll crunch: ¥22K payroll hits 2026-04-15; AR receipts don't clear until
+    2026-04-28/29. Low-band shortfall risk: up to ¥22,000.
+  • Late-payer: 明发商贸 (mean 18-day lag) shifts ¥8,400 past payroll date.
 
 Confidence band: ±28% (based on historical payment variance across 3 customers).
 

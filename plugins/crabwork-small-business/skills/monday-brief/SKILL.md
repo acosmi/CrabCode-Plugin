@@ -1,7 +1,7 @@
 ---
 name: monday-brief
 version: 0.3.0
-description: Generates a one-page Monday morning briefing from live connectors (钉钉/飞书 schedule and messages, HubSpot pipeline) plus any uploaded accounting or 支付宝 bill exports — cash, sales, pipeline, week ahead, top three to-dos. Trigger when the owner runs /monday-brief or says "what's on my plate this week," "Monday brief," "start-of-week summary," "catch me up to start the week," "what should I focus on this week," or wants a beginning-of-week overview. Accepts optional post destination and save-to arguments.
+description: Generates a one-page Monday morning briefing from live connectors (钉钉/飞书 schedule and messages, your CRM pipeline/customers) plus any uploaded accounting or 支付宝 bill exports — cash, sales, pipeline, week ahead, top three to-dos. Trigger when the owner runs /monday-brief or says "what's on my plate this week," "Monday brief," "start-of-week summary," "catch me up to start the week," "what should I focus on this week," or wants a beginning-of-week overview. Accepts optional post destination and save-to arguments. 亦触发于:"这周要忙啥""周一给我个概览""本周重点""开个周会"。
 allowed-tools: Read, WebFetch, Bash
 ---
 
@@ -17,7 +17,7 @@ Trigger the `business-pulse` skill workflow. It pulls in this order, scoping to 
 
 1. **Cash** — from the owner's latest accounting export or pasted report (用友好会计 / 金蝶精斗云 — no accounting connector yet): balance + last 7 days of net flow
 2. **Sales trend** — 支付宝商家平台 bill export (CSV) last 7 days vs. prior 7 days, % change, top SKU. The alipay connector cannot export transaction history, so this comes from an owner-provided export; note 微信支付 data the same way once the owner exports it (WeChat Pay connector pending)
-3. **Pipeline** — HubSpot deals moved, deals stalled (>14 days no activity), new inbound leads
+3. **Pipeline** — your CRM: deals/customers moved, stalled (>14 days no activity), new inbound leads (企业微信 SCRM has no pipeline — read movement as customer activity; 有赞 deal ≈ 订单)
 4. **This week's commitments** — 钉钉日程 / 飞书日历 via the dingtalk/feishu connector: events with external attendees, deliverable deadlines
 5. **Watch-list** — DingTalk/Feishu messages awaiting a response, via the connected connector
 6. **The 3 things** — the three highest-leverage actions for today, ranked
@@ -29,13 +29,13 @@ If a source is missing, note it in the brief ("no 支付宝 bill export this wee
 Layout (markdown, fits on one screen):
 
 ```
-# Monday Brief — {Mon DD, YYYY}
+# Monday Brief — {YYYY-MM-DD}
 
 ## Cash
-{$X balance · {+/-}$Y net last 7 days · runway note}
+{¥X balance · {+/-}¥Y net last 7 days · runway note}
 
 ## Sales (last 7d vs prior 7d)
-{$X total · {+/-}Z% · top SKU: {name} ({$})}
+{¥X total · {+/-}Z% · top SKU: {name} ({¥})}
 
 ## Pipeline
 {N deals moved · M stalled · K new leads}

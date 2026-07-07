@@ -1,7 +1,7 @@
 ---
 name: quarterly-review
 version: 0.3.0
-description: Generates a full QBR narrative — revenue trend, margin trend, customer health, top opportunities and risks — as a presentation-ready PDF or online doc, working from the owner's accounting exports (用友好会计 / 金蝶精斗云) plus HubSpot. Trigger when the owner runs /quarterly-review or says "quarterly review," "QBR," "build a board deck," "how did the quarter go," "end-of-quarter summary," or wants a quarter-over-quarter business recap. Accepts optional quarter and save-to arguments.
+description: Generates a full QBR narrative — revenue trend, margin trend, customer health, top opportunities and risks — as a presentation-ready PDF or online doc, working from the owner's accounting exports (用友好会计 / 金蝶精斗云) plus your CRM. Trigger when the owner runs /quarterly-review or says "quarterly review," "QBR," "build a board deck," "how did the quarter go," "end-of-quarter summary," or wants a quarter-over-quarter business recap. Accepts optional quarter and save-to arguments. 亦触发于:"季度回顾""季度总结""季度经营分析""这季度怎么样""季度复盘"。
 allowed-tools: Read, WebFetch, Bash
 ---
 
@@ -22,7 +22,7 @@ Using the `business-pulse` skill in deep mode:
 
 ## Step 2 — Customer health
 
-1. Pull HubSpot deal data: new customers won, churned, average deal size, pipeline entering next quarter.
+1. Pull deal/customer data from your CRM: new customers won, churned, average deal size, pipeline entering next quarter (企业微信 SCRM has no pipeline — read as customer activity / 客户活跃度; 有赞 deal ≈ 订单).
 2. Calculate customer acquisition cost (if data available) and revenue per customer.
 3. Flag any customers representing >20% of revenue (concentration risk).
 
@@ -59,7 +59,7 @@ Generate:
 
 ## Connector failures
 
-If no accounting export or pasted P&L is provided, stop — the QBR requires the accounting data as its foundation. Ask the owner for a 用友好会计 / 金蝶精斗云 export for the quarter. If no payment settlement export is provided, skip cross-validation and note "Settlement data not provided — revenue validated from the accounting report only." If HubSpot is missing, skip customer health (Step 2) and note "HubSpot not connected — customer health section skipped." If tencent-docs is not connected and `--save-to` is `files`, save locally and tell the owner.
+If no accounting export or pasted P&L is provided, stop — the QBR requires the accounting data as its foundation. Ask the owner for a 用友好会计 / 金蝶精斗云 export for the quarter. If no payment settlement export is provided, skip cross-validation and note "Settlement data not provided — revenue validated from the accounting report only." If your CRM is not connected, skip customer health (Step 2) and note "CRM not connected — customer health section skipped." If tencent-docs is not connected and `--save-to` is `files`, save locally and tell the owner.
 
 ## Approval gates
 

@@ -2,131 +2,144 @@
 name: contract-review
 version: 0.3.0
 description: >
-  Lightweight NDA, MSA, and vendor contract review for SMBs without legal on
-  staff. Reads contracts from local files or pasted text (no email connector
-  yet — 腾讯企业邮 is pending, so contracts arrive by upload or paste); flags
-  non-standard terms; explains risks in plain English; and outputs a marked-up
-  redline as a separate DOCX the owner sends back themselves. Use when the user
-  says "review this contract," "what am I signing," "red flags," "flag any
-  concerns," "check the payment terms," or uploads/pastes a contract or legal
+  为没有专职法务的中小企业做保密协议、服务合同(MSA)、供应商合同的轻量审查,
+  以《民法典》合同编口径识别非标准条款、用大白话讲清风险(定金/违约金/账期/竞业限制/
+  管辖与争议解决/个人信息合规),并另存一份带修改标记的 DOCX 由业主自行回传对方。
+  仅做初筛,不出具法律意见。Lightweight NDA, MSA, and vendor contract review for
+  SMBs without legal on staff. Reads contracts from local files or pasted text
+  (no email connector yet — 腾讯企业邮 is pending, so contracts arrive by upload
+  or paste); flags non-standard terms; explains risks in plain language; outputs
+  a marked-up redline DOCX the owner sends back themselves. Use when the user
+  says "审合同","合同审查","帮我看看这份合同","有没有坑","定金/违约金/竞业限制/账期
+  条款","民法典","review this contract," "what am I signing," "red flags," "flag
+  any concerns," "check the payment terms," or uploads/pastes a contract or legal
   agreement.
 ---
 
-# Contract Review
+# 合同审查(Contract Review)
 
-## Quick start
+> **【AI 辅助整理,非法律意见,请经律师复核后使用】**
+> 本插件仅做大白话初筛,不出具法律意见;高风险条款建议移交 crablaw-cn 法律插件的 `crablaw-cn:review`(律师级审查)/ `crablaw-cn:clause-redraft`(条款改写)等技能或专业律师复核。
 
-Attach a contract file or paste the text directly.
+## 快速上手
+
+上传合同文件,或直接粘贴合同正文。
 
 ```
-User: "Review this MSA and flag anything I should push back on."
-→ Skill reads the document, identifies parties and contract type,
-  analyzes 8 risk categories, returns a severity-tiered summary
-  with a negotiation playbook, and exports a redlined DOCX.
+用户:"帮我看看这份服务合同,有哪些该在签字前争取的地方。"
+→ 技能读取文档,识别当事人与合同类型,
+  按 8 大风险类目分析,输出按严重程度分级的摘要
+  与谈判要点,并导出带修改标记的 DOCX。
 ```
 
-## Workflow
+## 工作流
 
-1. **Get the contract** — Contracts arrive by upload or paste (see `reference/contract-intake.md`):
-   - **Local file**: Read the PDF (chunked via `pages` parameter for 10+ page files) or DOCX via Read tool.
-   - **Pasted text**: If the user pastes text directly, work with what's provided.
-   - There is no email or e-sign connector yet (腾讯企业邮 and 众律宝 connectors are pending). If the contract lives in the owner's inbox or an e-sign service, ask them to download and attach it, or paste the text.
+1. **拿到合同** — 合同通过上传或粘贴进入审查(详见 `reference/contract-intake.md`):
+   - **本地文件**:用 Read 工具读取 PDF(10 页以上用 `pages` 参数分块读)或 DOCX。
+   - **粘贴文本**:用户直接粘贴时,就用所给内容。
+   - 目前尚无邮箱或电子签连接器(腾讯企业邮、众律宝待接入)。若合同在业主邮箱或电子签平台里,请其下载并上传,或粘贴正文。
 
-   Read the full document before analyzing. Dangerous clauses are frequently in exhibits and schedules at the back.
+   分析前先通读全文。危险条款常藏在末尾的附件、附表、订单表里。
 
-2. **Identify contract type and parties** — Determine agreement type (NDA, MSA, SOW, SaaS subscription, consulting, subcontractor, vendor) and which party is the user's company vs. the counterparty. Note if it looks like a counterparty template — these are typically one-sided and the counterparty expects pushback.
+2. **识别合同类型与当事人** — 判断协议类型(保密协议、服务合同/MSA、工作说明书/SOW、SaaS 订阅、咨询、分包、供应商采购),分清哪一方是用户公司、哪一方是对方。若像是对方提供的格式合同/范本,通常偏向对方一侧,对方也预期你会提出修改。
 
-3. **Analyze across 8 risk categories** — Work through the contract from the ops/finance perspective of a small business owner without in-house legal. Categories are ordered by typical risk severity; use judgment for context.
+3. **按 8 大风险类目分析** — 站在没有内部法务的中小企业主的经营/财务视角逐条过合同。类目大致按风险严重程度排序,具体结合情境判断。
 
-   **Category 1: Payment terms and cash flow**
-   - Payment timing: Net-30 is standard; Net-60+ is flaggable; Net-90/120 is a hard negotiation point
-   - Payment triggers: acceptance periods that let the client slow-walk approvals indefinitely
-   - Late payment penalties: absence is a gap worth noting
-   - Invoicing requirements: rigid formats or PO numbers that can delay payment on technicalities
-   - Expense reimbursement: pre-approval requirements and caps
-   - Rate adjustments: annual increase mechanism for multi-year engagements
+   **类目 1:付款条款与现金流**
+   - 账期:30 天账期为常见;60 天以上值得关注;90/120 天账期是硬谈判点(账期概念可用,但用中文"账期 XX 天"表达)
+   - 付款触发条件:"验收合格后付款"却不约定验收期限,会让对方无限期拖延审批、拖住回款
+   - 逾期利息/违约金:逾期付款利息有约定从约定;无约定时可参照全国银行间同业拆借中心公布的贷款市场报价利率(LPR)主张资金占用损失(不写死具体数值,提示按主张时点最新 LPR 核算)。约定的违约金若过分高于实际损失(一般以超过实际损失 30% 为参考),对方可请求人民法院或仲裁机构予以适当调减(《民法典》585 条)
+   - 定金:若约定"定金",受定金罚则约束——数额不得超过主合同标的额的 20%,超过部分不产生定金效力(《民法典》586–587 条);交定金一方违约无权要求返还,收定金一方违约应双倍返还。注意"定金"(有罚则)与"订金/预付款"(无罚则)一字之差、后果迥异,核对用字
+   - 开票要求:僵化的开票格式或必须提供采购编号,可能在技术性细节上拖延回款;应约定对方及时提供开票信息、及时付款。发票是税控凭证,须依法开具
+   - 费用报销:预先审批要求与上限
+   - 费率调整:多年合作应约定年度调价机制
 
-   **Category 2: Liability and indemnification**
-   - Liability caps: uncapped liability is always a red flag
-   - Mutual vs. one-sided indemnification
-   - Indemnification scope: "any and all claims arising from the services" is not standard
-   - Insurance requirements: E&O, cyber, general liability — achievability at the required limits
-   - Consequential damages waiver: missing = flag prominently
+   **类目 2:违约责任与赔偿**
+   - 责任上限:不设责任上限(赔偿敞口不封顶)始终是红旗
+   - 双向 vs 单向的赔偿/补偿义务:只约束你一方而对方免责 = 不对等
+   - 赔偿范围:"因服务引起的任何及一切索赔"这类无边界表述不合理
+   - 损失赔偿范围:按《民法典》584 条,违约损失赔偿以违约方在订立合同时预见或应当预见的损失为限(可预见性规则);合同若要排除或限定间接损失/可得利益损失的赔偿,须写明。用"间接损失/可得利益损失是否赔偿、以订立时可预见为限"的中国法口径表达,不照搬美式免责术语
+   - 保险要求:如约定投保(职业责任保险、网络安全险、一般责任险等),核对所要求保额是否可实现;用"职业责任保险"等中文表达,不照搬美式险种缩写
 
-   **Category 3: Termination and exit**
-   - Termination for convenience: is it mutual? 30-day notice is typical
-   - Termination for cause: cure period; vague "material breach" without definition
-   - Wind-down: payment for in-progress work at termination
-   - Transition assistance: paid vs. unpaid, time-limited vs. open-ended
-   - Survival clauses: indefinite indemnification survival = flag
+   **类目 3:合同解除与退出**
+   - 任意解除权:是否双向?约定的通知期(如提前 30 天书面通知)是否对等。区分《民法典》563 条法定解除情形与约定解除情形
+   - 因违约解除:是否给出补救期(经催告、合理期限内未履行方可解除);模糊的"重大违约"未定义 = 争议隐患
+   - 收尾:解除时对已完成/在途工作的付款结算
+   - 过渡协助:有偿 vs 无偿、有期限 vs 无期限
+   - 存续条款:哪些条款(保密、已发生的付款义务、争议解决)在解除后继续有效;无限期的赔偿存续 = 需关注。合同解除后,尚未履行的终止履行,已经履行的可依履行情况和合同性质请求恢复原状或采取补救措施(《民法典》566 条)
 
-   **Category 4: Intellectual property**
-   - IP assignment vs. license
-   - Pre-existing IP and background tools carve-out — absence means inadvertent assignment
-   - Work product definition breadth: drafts, notes, internal tools
+   **类目 4:知识产权**
+   - 知识产权归属 vs 许可使用:成果的著作权/专利权归谁,还是仅授予对方使用许可
+   - 既有知识产权与背景工具的除外约定:缺失可能导致你把自有工具/既有成果一并转让
+   - 工作成果的定义范围:是否把草稿、笔记、内部工具都算进"工作成果"
+   - 委托作品:如无特别约定,委托作品著作权通常归受托人,须明确约定归属以免落空
 
-   **Category 5: Scope and change management**
-   - Scope definition clarity
-   - Change order process: absence = scope creep without compensation
-   - Acceptance criteria: subjective ("to client's satisfaction") vs. defined
-   - Timeline asymmetry: user penalized for delays but client is not for slow feedback
+   **类目 5:范围与变更管理**
+   - 范围定义是否清晰
+   - 变更流程:缺少变更单/签证机制 = 范围蔓延却拿不到追加款
+   - 验收标准:主观("以客户满意为准")vs 有明确、可量化的验收标准
+   - 时间线不对称:你迟延要担责,对方迟延反馈/迟延配合却不担责
 
-   **Category 6: Non-compete and exclusivity**
-   - Non-compete scope, definition of "competitor," duration
-   - Exclusivity requirements on the user's company
-   - Non-solicitation: employee poaching is normal; industry-broad restrictions are not
+   **类目 6:竞业限制与排他性**
+   - 竞业限制(针对员工/合伙人):中国法下竞业限制**仅适用于**用人单位的高级管理人员、高级技术人员和其他负有保密义务的人员;对普通员工约定竞业限制难以获得支持。期限**不得超过 2 年**;且用人单位须在离职后竞业限制期内**按月支付经济补偿**,否则该约束通常难以对员工生效。切勿照搬美式做法把竞业限制、不挖角条款直接套用于全体员工或作宽泛行业限制。合同若含此类条款,按上述边界核查并提示移交专业审查
+   - 排他性:对你一方施加的独家/排他合作要求是否合理、有无对价
+   - 客户/员工不挖角约定:商业合同中对等约定尚属常见;扩大到全行业、无期限、无补偿的,重点关注
 
-   **Category 7: Confidentiality and data**
-   - Confidentiality scope: "all information shared" with no exceptions is overly broad
-   - Duration: 2–3 years is typical; perpetual is aggressive
-   - Data handling security requirements vs. company size and data sensitivity
-   - Return/destruction requirements post-termination
+   **类目 7:保密与数据**
+   - 保密协议(NDA → 保密协议):保密范围是否过宽("共享的全部信息"且无例外通常过宽,应排除已公开、独立开发、依法须披露等)。保密义务结合《反不正当竞争法》商业秘密保护——明确商业秘密范围、保密措施、违约与侵权责任
+   - 保密期限:2–3 年较常见;无限期偏激进(但商业秘密在其保密性存续期间可持续受保护)
+   - 数据处理条款:凡涉及处理个人信息/数据的,须提示《个人信息保护法》(PIPL)与《数据安全法》合规——**告知同意**(处理个人信息须取得同意,敏感个人信息需单独同意)、**最小必要**(只收集实现目的所必需的信息)、**委托处理**(委托方与受托方须约定处理目的、方式、期限及安全保护义务,受托方不得超范围处理),而非仅从市场惯例角度看待。跨境提供个人信息还需满足安全评估/标准合同等条件
+   - 返还/销毁要求:合同终止后对保密信息、数据的返还或销毁义务
 
-   **Category 8: Operational concerns**
-   - Governing law and dispute resolution; mandatory arbitration
-   - Auto-renewal: opt-out window and notice period (missing a 60-day window is a common SMB mistake)
-   - Assignment rights, especially if the client gets acquired
-   - Most favored nation: constrains pricing across the entire client book
-   - Audit rights: scope and frequency
+   **类目 8:操作性关注(管辖、争议解决与其他)**
+   - **管辖与争议解决**:争议解决方式须明确、单一——要么约定由**有管辖权的人民法院**管辖(可约定与争议有实际联系地点的法院),要么约定提交**明确选定的仲裁委员会**仲裁。仲裁协议必须**明确选定具体的仲裁委员会**,否则可能因约定不明而无效;且**不能既约定诉讼又约定仲裁**(或裁或审的混合约定通常无效)
+   - **诉讼时效**:向人民法院请求保护民事权利的时效期间为 **3 年**,自权利人知道或应当知道权利受损害及义务人之日起算(《民法典》188 条);书面催告等可引起时效中断。签约、履约中注意留痕、及时主张权利
+   - 自动续约:退出窗口与通知期(错过 60 天不续约通知窗口是中小企业常见失误)
+   - 转让权利:对方能否将合同权利义务转让给第三方(尤其对方被并购时)
+   - 最惠价格/价格联动:约定"给对方的价格不高于给任何其他客户"之类条款会牵制你对全部客户的定价,需谨慎(用中文"最惠价格/价格联动"表达)
+   - 审计权:对方查账/审计的范围与频次是否合理
 
-4. **Present flagged summary** — Organize by severity:
+4. **输出分级摘要** — 每次输出的页首先标注红线,再按严重程度组织:
 
-   **🔴 Red flags (push back before signing)** — For each: quote the exact clause, explain the problem in plain language, suggest specific alternative language.
+   页首固定标注:`【AI 辅助整理,非法律意见,请经律师复核后使用】`
 
-   **🟡 Yellow flags (negotiate, not deal-breakers)** — For each: quote the clause, explain the concern, describe what "better" looks like.
+   **🔴 高风险(签字前必须争取)** — 每条:引用条款原文、用大白话讲清问题、给出可替换的具体表述建议。凡列为高风险的条款,一并提示:"本插件仅做大白话初筛,不出具法律意见;高风险条款建议移交 crablaw-cn 法律插件的 `crablaw-cn:review`(律师级审查)/ `crablaw-cn:clause-redraft`(条款改写)等技能,保密协议可用 `crablaw-cn:nda-review`,需要整体风险清单用 `crablaw-cn:risk-summary`,或交专业律师复核。"
 
-   **🟢 Key terms to note (awareness only)** — Payment schedules, notice periods, renewal dates, insurance requirements, key contacts.
+   **🟡 中风险(建议谈,但非硬门槛)** — 每条:引用条款、说明顾虑、描述"更好"的样子。
 
-   **📋 Contract summary** — Plain-language summary: who does what, for how much, over what timeframe, under what conditions.
+   **🟢 关注要点(仅需知悉)** — 付款节点、通知期限、续约日期、保险/发票要求、关键联系人。
 
-   **💡 Negotiation playbook** — For each red and yellow flag: what to ask for, how to frame the ask, and what a reasonable compromise looks like.
+   **📋 合同摘要** — 大白话概述:谁为谁做什么、多少钱、多长期限、什么条件下。
 
-5. **Export redline DOCX** — After presenting the summary, offer to export a redlined DOCX with the suggested changes marked up. Use `crabcode-office-suite:crabcode-documents` to generate a Word document that:
-   - Preserves the original contract structure
-   - Marks suggested deletions in strikethrough and additions in underline
-   - Adds a cover page summarizing the changes
+   **💡 谈判要点** — 针对每条高/中风险:该争取什么、怎么开口、合理的折中方案长什么样。
 
-   Ask: "Want me to export a redlined DOCX you can send back to the counterparty?"
+5. **导出修改标记 DOCX** — 呈现摘要后,提议导出一份带修改标记的 DOCX。使用 `crabcode-office-suite:crabcode-documents` 生成 Word 文档:
+   - 保留原合同结构
+   - 建议删除的用删除线、建议新增的用下划线标出
+   - 加一页封面小结所有改动
 
-   The skill cannot send the redline anywhere — there is no email connector yet. The owner sends the DOCX to the counterparty themselves. Once terms are settled, the owner routes the final document for signature via 众律宝 (or on paper) manually; the 众律宝 connector is pending.
+   询问:"要不要导出一份带修改标记的 DOCX,方便你回传给对方?"
 
-## Approval gates
+   本技能无法把修改稿发往任何地方——尚无邮箱连接器。修改稿由业主自行发给对方。条款谈定后,由业主经众律宝(或纸质)手动送签;众律宝连接器待接入。
 
-- Never characterize the output as legal advice. Always recommend attorney review for red flags or binding decisions.
-- Quote actual clause language, not paraphrases. The user needs the exact text for negotiation calls.
-- Flag what's missing, not just what's there. A contract silent on liability caps or change orders is often more dangerous than one with unfavorable terms.
-- Do not flag standard boilerplate. If a clause is fair and market-standard, skip it. The user wants signal, not a clause-by-clause restatement.
-- Compare to market norms when flagging: "Net-90 is uncommon in professional services — Net-30 is standard."
-- Adjust recommendations to the power dynamic. A Fortune 500 procurement MSA is a different negotiation than a small startup agreement.
-- Never claim the redlined DOCX was sent, or that anything was signed or routed for signature. Sending and signing are the owner's manual steps (via 众律宝 or on paper).
+## 审批门禁
 
-## Reference
+- **红线**:每次输出页首必须标注 `【AI 辅助整理,非法律意见,请经律师复核后使用】`。本技能仅做大白话初筛,绝不将输出表述为法律意见;凡高风险条款或具约束力的决定,一律建议移交 crablaw-cn 法律插件(`crablaw-cn:review` / `crablaw-cn:clause-redraft` / `crablaw-cn:nda-review` / `crablaw-cn:risk-summary`)或专业律师复核。
+- 引用条款原文,不要复述大意。谈判时需要精确的原文。
+- 不仅看写了什么,更要看漏了什么。合同对责任上限、变更签证只字未提,往往比写了不利条款更危险——法律的默认规则会填补空白,通常不利于你。
+- 不要把标准套话当红旗。条款公平且属市场惯例的,略过。用户要的是信号,不是逐条复述。
+- 对标市场惯例再下判断:"账期 90 天在专业服务里不常见——30 天才是常态。"
+- 易变项不写死:逾期利息参照的 LPR、违约金调减幅度、诉讼时效起算等,提示按主张时点/个案最新口径核实,不硬编码具体数值。
+- 顺应力量对比调整建议。大型企业采购范本与初创小公司协议,是两种不同的谈判。
+- **绝不**声称已把修改稿发给对方,或已签署、已送签。发送与签署是业主的手动步骤(经众律宝或纸质),众律宝连接器尚未接入。
 
-- `reference/gotchas.md` — edge cases in contract analysis
-- `reference/contract-intake.md` — how contracts get into the review (upload/paste; no email or e-sign connector yet)
-- `reference/examples/flagged-summary-saas.md` — worked example: SaaS agreement review output
+## 参考资料
 
-## Deliverable routing
+- `reference/gotchas.md` — 合同分析中的边界情形
+- `reference/contract-intake.md` — 合同如何进入审查(上传/粘贴;尚无邮箱或电子签连接器)
+- `reference/examples/flagged-summary-saas.md` — 实例:SaaS 服务合同审查输出
 
-- Reading and extracting text from PDF contracts is handled by `crabcode-office-suite:crabcode-pdf`; the redlined Word deliverable is generated with `crabcode-office-suite:crabcode-documents`.
-- If either skill reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin`, then retry. Until it is installed, ask for the contract as pasted text and present the redline suggestions as markdown instead of a DOCX.
+## 交付路由
+
+- 读取并抽取 PDF 合同文本由 `crabcode-office-suite:crabcode-pdf` 处理;带修改标记的 Word 交付物由 `crabcode-office-suite:crabcode-documents` 生成。
+- 若任一技能报 Unknown skill,说明 office 套件未安装:引导业主经 `/plugin` 安装 `crabcode-office-suite` 后重试。在安装前,请业主以粘贴文本提供合同,并用 markdown 呈现修改建议,暂不出 DOCX。

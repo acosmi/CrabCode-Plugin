@@ -2,215 +2,241 @@
 name: tax-season-organizer
 version: 0.3.0
 description: >
-  Prepares tax-season materials for small business owners — framed as deliverables
-  for their accountant, not tax advice. Two modes: (1) quarterly estimated tax
-  calculation — works from a YTD P&L the owner exports (CSV/Excel) or pastes from
-  their accounting software (用友好会计 / 金蝶精斗云) and calculates the federal
-  income tax + self-employment tax liability and quarterly payment due; (2)
-  year-end 1099 prep — works from the owner's accounting-software export plus
-  bill exports from 支付宝商家平台 / 微信支付商户平台 to find contractors paid
-  over $600, builds a 1099-NEC candidate list with missing W-9 flags, and
-  produces a plain-English summary a CPA can work from directly.
+  两种模式——季度申报数据整理 / 年度汇算清缴数据整理——依据业主导出的记账软件(用友好会计 / 金蝶精斗云)与支付宝商家平台 / 微信支付商户平台数据,产出交给代账会计 / 税务师核对的交接包;不是税务意见,绝不代客申报或向税务机关报送。
 
-  Trigger this skill whenever the user mentions: quarterly taxes, estimated tax
-  payment, how much to set aside for taxes, 1099s, 1099-NEC, year-end tax prep,
-  contractor payments, W-9s, or any phrase suggesting they are preparing for a
-  tax deadline or handing materials to an accountant. Also trigger proactively
-  when a user asks about net profit or YTD income in a context that suggests
-  they are worried about their tax bill.
+  当用户提到:季度申报、季度税款、这季度要交多少税、增值税、小规模纳税人、一般纳税人、
+  附加税费、企业所得税预缴、汇算清缴、经营所得、个体工商户、进销项发票、缺票、六税两费、
+  小型微利、代账会计、要交给会计的材料等,或在担心税负的语境下询问净利润 / 本年收入时,
+  触发本技能。
 ---
 
-# Tax Season Organizer
+# 报税季整理助手
 
-> **Framing:** This skill produces prep material for a CPA, not tax advice. Say so early
-> and state every assumption explicitly so the accountant can adjust.
+> **定位说明:** 本技能产出的是交给「代账会计 / 税务师」的交接材料,不是税务意见,也绝不
+> 代客申报纳税或向税务机关报送。请在开头就讲清这一点,并把每一项口径和假设都写明,便于
+> 会计 / 税务师据实核对调整。税率、征收率、优惠政策均随年度变化,一律标注时效并提示"请核实
+> 当年最新口径、以电子税务局为准",不得把易变税率写成永久事实。
 
-## Quick start
+## 快速开始
 
-Determine which mode the user needs, pull the relevant data, calculate or compile,
-and deliver a structured document the accountant can work from directly.
+判断用户需要哪种模式,拉取相应数据,分税种整理归类,交付一份会计能直接据以核对的结构化文档。
 
 ```
-User: "what do I owe for estimated taxes this quarter?"
-→ Ask for a YTD P&L export (CSV/Excel) or pasted report from the owner's accounting software (用友好会计 / 金蝶精斗云)
-→ Calculate estimated federal income tax + SE tax
-→ Subtract payments already made this year
-→ Show Q-specific amount due with due date and assumptions stated
-→ Output: "Estimated Q2 payment due June 16: $X — see full breakdown below"
+用户:"这季度增值税和所得税大概要准备多少?"
+→ 请业主导出当季经营数据(利润表 / 销售额 / 进销项,CSV/Excel)或从用友好会计 / 金蝶精斗云粘贴关键数字
+→ 先判断小规模纳税人 / 一般纳税人身份,再整理增值税、附加税费、企业所得税季度预缴(或经营所得预缴)的计税数据
+→ 标注季度免征线判断、征收率、小型微利优惠是否适用等口径,并注明时效
+→ 产出:"季度申报数据整理包(截至第 X 季度)—— 请代账会计核对后申报"
 
-User: "I need to send out 1099s"
-→ Gather all contractor/vendor payments from the accounting-software export + 支付宝商家平台 / 微信支付商户平台 bill exports
-→ Identify contractors paid ≥ $600 YTD
-→ Flag records missing W-9 / EIN
-→ Output: 1099-NEC candidate list + missing W-9 action list
+用户:"要做汇算清缴了,帮我把一年的材料理一下"
+→ 汇总全年收入、成本费用,核对进销项发票与收付流水
+→ 标记缺票 / 白条等不可税前扣除的项目,核对可享的小微优惠
+→ 产出:年度汇算清缴数据整理包 + 缺票待补清单
 ```
 
-## Determine mode
+## 判断模式
 
-Read the user's message and context to decide which path applies:
+阅读用户的消息与上下文,判断适用哪种模式:
 
-- **Quarterly estimate** — keywords: estimated payment, quarterly taxes, how much to set aside, safe harbor, Q1/Q2/Q3/Q4
-- **Year-end 1099 prep** — keywords: 1099, 1099-NEC, year-end, contractors, W-9, send 1099s, file 1099s
-- **Combined** — some users will ask "year-end summary" and need both. Run quarterly last; run 1099 prep first since it drives the most action items.
+- **季度申报数据整理** —— 关键词:季度申报、季度预缴、这季度交多少、增值税、小规模、一般纳税人、附加税费、企业所得税预缴、第一/二/三/四季度。
+- **年度汇算清缴数据整理** —— 关键词:汇算清缴、年度汇算、企业所得税汇算、经营所得汇算、全年收入、成本费用、进销项核对、缺票、次年 5 月 31 日 / 3 月 31 日前。
+- **两者都要** —— 汇算清缴季(次年 1–5 月)常与上年第四季度 / 当年第一季度申报重叠。此时先做汇算清缴整理(行动项最多),再做季度整理。
 
-If the intent is ambiguous, ask: "Are you looking at your estimated tax payment for this quarter, or are you preparing 1099s for your contractors — or both?"
-
----
-
-## Path 1: Quarterly estimated tax
-
-### 1. Gather YTD financials
-
-There is no MCP connector for the owner's accounting software (用友好会计 / 金蝶精斗云) yet. Ask the owner to export a Profit & Loss report — CSV or Excel — from January 1 of the current year through the last day of the most recently completed quarter, or to paste the key numbers directly in chat. Capture:
-- **Gross revenue** (total income)
-- **Total expenses** (operating expenses, COGS, etc.)
-- **Net ordinary income** = revenue − expenses
-
-For field names and export tips, see [reference/connector-queries.md](reference/connector-queries.md).
-
-### 2. Ask about prior estimated payments
-
-Before calculating, ask: "How much have you already paid in estimated taxes so far this year?" If the user doesn't know, note that you'll calculate total liability — they can subtract payments themselves or check with their accountant.
-
-### 3. Calculate estimated liability
-
-See [reference/calculation-assumptions.md](reference/calculation-assumptions.md) for the full math and the assumptions table you must include in output.
-
-Short version:
-1. **SE tax** = net profit × 0.9235 × 0.153 (then halve it — the deductible half offsets income)
-2. **Adjusted net** = net profit − (SE tax / 2)
-3. **Federal income tax** = apply the bracket rate appropriate to the user's business type and estimated annual income (default to 22% unless the user tells you their bracket; note this assumption explicitly)
-4. **Total annual liability** = federal income tax + SE tax
-5. **Quarterly payment** = (total annual liability − payments made) ÷ quarters remaining
-6. **Safe harbor check** — note whether the user should verify against prior-year tax (100% of prior year, or 110% if AGI > $150k)
-
-### 4. State assumptions and deliver output
-
-Use this output structure:
-
-Structure the output as a document with these sections in order:
-
-1. **Header** — H2 with "Estimated tax summary" followed by the quarter and year.
-   Subline: prepared date and "For review by your accountant."
-
-2. **YTD snapshot** — Bold lines showing YTD net profit with date range,
-   estimated annual net profit (annualized from YTD), and assumed business type
-   (sole proprietor, S-corp, etc. — flag as assumed, not confirmed).
-
-3. **Self-employment tax** — Show the SE tax calculation: net profit times
-   92.35% times 15.3%, and the deductible SE half.
-
-4. **Federal income tax estimate** — Adjusted net income, assumed bracket
-   (default 22%, note to confirm with accountant), and the federal estimate.
-
-5. **Total estimated annual liability** — SE tax plus federal income tax.
-
-6. **Quarterly payment** — Total liability minus payments already made, divided
-   by quarters remaining, with the specific dollar amount due and the due date.
-
-7. **Safe harbor note** — Remind the owner to ensure total payments meet 100%
-   of prior-year tax (or 110% if AGI exceeded $150k).
-
-8. **Assumptions** — Bullet list of every assumption: bracket rate, business
-   structure, state taxes excluded, deductible SE half included, and deductions
-   not applied (home office, QBI, depreciation).
+若意图不明确,反问:"您是想整理这个季度的申报数据,还是做年度汇算清缴的材料整理 —— 还是两者都要?"
 
 ---
 
-## Path 2: Year-end 1099 prep
+## 模式 1:季度申报数据整理
 
-### 1. Gather contractor payments from all sources
+> 目标:把当季经营数据整理成正确的税种分类和计税基础,交给代账会计核对申报。**不冒充税务机关
+> 算出确切应纳税额,不硬编码易变征收率。**
 
-Collect **all payments made to individuals or businesses for services** in the tax year. Do not include payments for goods, refunds, or internal transfers. All sources below are owner-provided exports — none of them come from a live connector.
+### 1. 收集当季经营数据
 
-**Accounting software (用友好会计 / 金蝶精斗云) — CSV/Excel export:**
+目前尚无用友好会计 / 金蝶精斗云的 MCP 连接器。请业主从记账软件导出**当季经营数据**——利润表以及
+增值税相关的销售额 / 销项、进项明细(CSV 或 Excel),覆盖本季度(季初到季末),或直接粘贴关键数字。
+需要采集:
 
-1. **Request the export.** Prompt the owner:
+- **当季销售额 / 营业收入**(判断增值税免征线与身份的关键)
+- **销项税额与进项税额**(一般纳税人计算增值税应纳税额需要)
+- **成本费用合计**(有发票支撑的部分,是所得税计税基础的重要构成)
+- **本季 / 本年累计应纳税所得额的初步测算数据**(收入减去可税前扣除的成本费用)
 
-   > "I need payee-level detail to build your 1099 list. Please export a vendor payment report (a transaction list grouped by vendor, filtered to this tax year) from your accounting software as CSV or Excel and upload it here. I'll process it automatically."
+字段名称与导出技巧见 [reference/connector-queries.md](reference/connector-queries.md)。
 
-2. **Process the export.** Map columns: payee name, amount, date, payment method, EIN/SSN status. Follow the same aggregation and threshold logic below.
+### 2. 确认纳税人身份与已申报情况
 
-> **Note for future connector versions:** If an accounting-software MCP connector ships later and exposes vendor payment records directly, the export step can be skipped — the aggregation logic below is unchanged either way.
+计算前先问清:
+- **增值税身份**:小规模纳税人还是一般纳税人?(年应税销售额 500 万元为登记界限;不确定时按现有
+  资料标注,交会计确认。)
+- **所得税主体**:有限公司(缴企业所得税)还是个体工商户 / 个人独资 / 合伙(缴经营所得个人所得税)?
+- **本年已申报 / 已预缴情况**:"本年前几个季度已经申报预缴了多少?"若业主不清楚,说明本技能只整理
+  本季计税数据,累计抵减由会计核对。
 
-For field names and export tips, see [reference/connector-queries.md](reference/connector-queries.md).
+### 3. 分税种整理计税数据
 
-**Alipay (支付宝):** Ask the owner for a bill export (CSV) from 支付宝商家平台 covering payments **sent** to contractors in the tax year. The alipay MCP connector cannot export transaction history — it only creates payment links, queries a single payment by order number, and processes refunds — so this data must come from the 商家平台 export or pasted records.
+详见 [reference/calculation-assumptions.md](reference/calculation-assumptions.md) 的口径说明与必须随附的时效声明。要点:
 
-**WeChat Pay (微信支付) — not yet connected:** If the owner also pays contractors via WeChat Pay, ask for a bill export (CSV) from 微信支付商户平台 for the same period.
+1. **增值税**
+   - *小规模纳税人*:核对当季销售额是否超过季度免征线(季销售额未超 30 万元的,免征增值税);
+     超过则就全额按适用征收率计税(现行 3% 征收率减按 1%,销售 / 出租不动产、转让土地使用权等
+     适用其他征收率的项目除外)。
+   - *一般纳税人*:应纳增值税 = 当期销项税额 − 当期进项税额(留抵结转下期),整理销项、进项与
+     可抵扣凭证。
+2. **附加税费**:以**实际缴纳的增值税**为计税依据,整理城建税(按纳税人所在地 7% / 5% / 1%)、
+   教育费附加(3%)、地方教育附加(2%);小规模、小型微利、个体工商户可享"六税两费"减半。
+3. **所得税季度预缴**
+   - *企业所得税*:整理累计应纳税所得额,核对是否符合**小型微利企业**三项条件(见口径文件);符合的,
+     应纳税所得额减按 25% 计入、按 20% 税率预缴(实际税负 5%)。
+   - *经营所得(个体户 / 个独 / 合伙)*:不缴企业所得税,按经营所得整理累计应纳税所得额,套用
+     5%–35% 五级超额累进(年应纳税所得额不超过 200 万元的部分可减半征收)。
 
-**Direct CSV:** If the user uploads any other payment CSV directly, map columns the same way: payee name, amount, date, payment method, EIN/SSN status.
+**所有征收率、优惠均须随附时效声明**:截至 2026 年现行,执行至 2027-12-31,请核实当年最新口径、
+以电子税务局为准。
 
-### 2. Aggregate by payee
+### 4. 标注口径,交付交接包
 
-Combine across sources and sum payments by individual or business entity. Deduplicate by name (watch for "John Smith" vs "John A. Smith" — flag likely duplicates for human review rather than auto-merging).
+把输出组织成如下结构的文档(按顺序):
 
-### 3. Apply the $600 threshold
+1. **页首红线** —— 单独一行:`【AI 辅助整理,非税务意见,请经会计/税务师复核后使用】`。
 
-- **Flag for 1099-NEC:** any payee paid ≥ $600 for services (contractors, freelancers, consultants)
-- **Flag for 1099-MISC:** any payee paid ≥ $600 for rent, attorney fees, prizes/awards
-- **Near-threshold alert:** flag payees paid $400–$599 — close to the threshold, accountant may want to verify
+2. **标题** —— H2 写"季度申报数据整理包",后接季度与年度。副行:整理日期 · 交代账会计 / 税务师核对 ·
+   非税务意见,不代为申报。
 
-Corporations (Inc., Corp., LLC taxed as C or S corp) generally do not need a 1099-NEC — note this but flag for accountant confirmation.
+3. **纳税人身份快照** —— 加粗列出:增值税身份(小规模 / 一般纳税人)、所得税主体(公司 / 个体户等)、
+   当季销售额与本年累计。凡按现有资料推断的身份,标为"待会计确认"。
 
-### 4. Check W-9 status
+4. **增值税整理** —— 小规模:当季销售额与 30 万元免征线的对比、是否免征、适用征收率;一般纳税人:
+   销项税额 − 进项税额的整理结果与留抵情况。
 
-For each flagged payee, note whether a W-9 / EIN appears in the accounting-software export (vendor profile / tax ID column). Mark as:
-- ✅ W-9 on file (EIN/SSN recorded in the accounting software)
-- ⚠️ Missing — W-9 not on file; must collect before filing
-- ❓ Unknown — cannot determine from available data
+5. **附加税费整理** —— 以实缴增值税为计税依据,列城建税、教育费附加、地方教育附加;注明是否适用
+   六税两费减半。
 
-### 5. Deliver the 1099 prep package
+6. **所得税季度预缴整理** —— 企业所得税:累计应纳税所得额、小型微利三条件核对、减按 25% 计入按
+   20% 预缴的测算;或经营所得:五级超额累进的累计测算、≤200 万元部分减半。
 
-Use this structure:
+7. **申报期限提示** —— 季度终了后 15 日内申报(遇法定节假日顺延);具体以电子税务局为准。
 
-Structure the 1099 prep output as a document with these sections:
-
-1. **Header** — H2 with "1099 prep list" and the tax year. Subline: prepared
-   date, "For review by your accountant," and "Not tax advice."
-
-2. **Summary** — Bullet counts: total contractors paid, number requiring
-   1099-NEC (at or above $600 for services), number missing W-9 (with filing
-   deadline note for Jan 31), and number near-threshold flagged for review.
-
-3. **1099-NEC candidates table** — Columns: payee name, total paid, data
-   sources (accounting export / 支付宝 bill / 微信支付 bill), W-9 status
-   (on file / missing / unknown), and notes.
-
-4. **Missing W-9 action list** — Numbered list of contractors who need to
-   provide a W-9 before filing, with amounts paid and a reminder to request
-   the form.
-
-5. **Near-threshold table** — Payees paid $400-$599 flagged for accountant
-   review, with a note to verify no additional payments were missed.
-
-6. **Data coverage note** — State which bill exports were provided (支付宝商家平台,
-   微信支付商户平台, accounting software) and which were not, so the accountant
-   knows whether any payment rail is missing from the list.
-
-7. **Next steps checklist** — Action items for the accountant: collect missing
-   W-9s, confirm unknowns, review near-threshold payees, verify corporation
-   exemptions, file by January 31.
+8. **口径与时效声明 + 待会计确认事项** —— 逐条列出:所用征收率 / 优惠的时效(截至 2026、执行至
+   2027-12-31、请核实当年最新口径)、身份与优惠适用是否需确认、缺票项、是否含地方性政策等。
 
 ---
 
-## Guardrails
+## 模式 2:年度汇算清缴数据整理
 
-- **Not tax advice.** Open every deliverable with this: "Prepared for review by your accountant — not tax advice." Include it in the document header, not just in chat.
-- **State every assumption.** If you assumed a 22% bracket, say so. If you excluded state taxes, say so. The accountant will adjust; give them the levers.
-- **Don't merge payees automatically.** Flag likely duplicates for human review.
-- **Don't file anything.** The output is prep material. Filing is out of scope.
-- **Corporation exemption is a judgment call.** Note it; don't auto-exclude.
+> 目标:把全年经营数据整理成汇算清缴所需的分类,核对收入、成本费用与发票,产出交给会计的交接包。
+> 在中国,没有"按付款金额签发凭证给收款方"的机制,取而代之的是**取得合规发票 + 年度汇算**——
+> 成本费用必须有发票才能税前扣除。
 
-## Reference files
+### 1. 汇总全年收入与成本费用
 
-- [reference/calculation-assumptions.md](reference/calculation-assumptions.md) — full tax math, bracket table, and SE tax walkthrough
-- [reference/connector-queries.md](reference/connector-queries.md) — what to request from the accounting software (用友好会计 / 金蝶精斗云) and the 支付宝 / 微信支付 bill exports
-- [reference/gotchas.md](reference/gotchas.md) — Good / Bad patterns for common failure modes
-- [reference/examples/quarterly-estimate.md](reference/examples/quarterly-estimate.md) — worked quarterly estimate example
-- [reference/examples/year-end-1099.md](reference/examples/year-end-1099.md) — worked year-end 1099 prep example
+收集**全年(1 月 1 日 – 12 月 31 日)**的经营数据:
+- **全年收入**:开票收入、未开票收入分别汇总。
+- **成本费用**:按科目汇总(采购成本、房租、工资、水电、服务费等),并区分**有发票支撑**与**无发票
+  (白条 / 收据)**的部分。
 
-## Spreadsheet input routing
+字段名称与导出技巧见 [reference/connector-queries.md](reference/connector-queries.md)。
 
-- When the P&L or vendor-payment export arrives as an Excel file (.xlsx/.xls), parse it via `crabcode-office-suite:crabcode-spreadsheets`; CSV files and pasted numbers need no extra tooling. Use the same skill if the owner wants the 1099-NEC candidate list delivered as a spreadsheet file for their accountant.
-- If that skill reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin` and retry — or ask for a CSV export instead and deliver the prep material as markdown.
+### 2. 核对进销项发票与收付流水
+
+跨来源交叉核对,均为业主提供的导出,无实时连接器:
+
+**记账软件(用友好会计 / 金蝶精斗云)—— CSV/Excel 导出:**
+
+1. **请求导出。** 提示业主:
+
+   > "汇算清缴需要发票级明细。请从记账软件导出本年度的进项发票、销项发票清单以及收入 / 成本费用明细
+   > (CSV 或 Excel)上传给我,我来自动整理核对。"
+
+2. **处理导出。** 映射列:发票号码 / 数电发票号、开票方 / 受票方名称、纳税人识别号、金额、税额、
+   开票日期、发票类型(增值税专用发票 / 普通发票 / 数电发票)、有无发票标志。
+
+> **未来连接器版本备注:** 若日后上线记账软件 MCP 连接器并直接暴露发票与账簿记录,可跳过导出步骤——
+> 下面的核对逻辑不变。
+
+**支付宝(支付宝):** 请业主从**支付宝商家平台**导出账单(CSV),覆盖本年度的收款与付款流水,用于与
+开票收入、成本付款交叉核对。支付宝 MCP 连接器无法导出交易历史——它只能创建收款链接、按订单号查询
+单笔交易、以及处理退款——所以这类数据必须来自商家平台导出或粘贴记录。
+
+**微信支付(微信支付)—— 暂未接入:** 若业主也通过微信支付收付款,请其从**微信支付商户平台**导出
+同期账单(CSV),字段与排除项同支付宝。
+
+**直接上传 CSV:** 若用户直接上传其他收付款 CSV,按同样方式映射:交易对方名称、金额、日期、
+收 / 付方向、有无对应发票。
+
+### 3. 标记缺票 / 不可税前扣除项
+
+对每一笔成本费用,核对是否取得合规发票:
+- ✅ 有发票 —— 增值税专用发票 / 普通发票 / 数电发票齐全,可作税前扣除凭证
+- ⚠️ 缺票 —— 仅有白条 / 收据 / 付款记录,**不得税前扣除**,须补票或由会计做纳税调整
+- ❓ 存疑 —— 发票信息不全 / 抬头或税号有误 / 与合同不符,交会计判定
+
+**只标记,不擅自调整或删除。** 区分"发票"与"收据":收据(如非税收入收据除外的普通收据)、白条一般
+不能作为税前扣除凭证。
+
+### 4. 核对可享的小微优惠
+
+- **企业所得税(有限公司)**:核对**小型微利企业**三项条件是否同时满足——年应纳税所得额 ≤ 300 万元、
+  从业人数 ≤ 300 人、资产总额 ≤ 5000 万元,且属非限制和禁止行业。满足的,应纳税所得额减按 25% 计入、
+  按 20% 征收(实际税负 5%)。
+- **经营所得(个体户 / 个独 / 合伙)**:核对年应纳税所得额,不超过 200 万元的部分可减半征收经营所得
+  个人所得税;可与六税两费减半等政策叠加。
+
+上述优惠均标注:截至 2026 现行,执行至 2027-12-31,请核实当年最新口径、以电子税务局为准。
+
+### 5. 交付汇算清缴交接包
+
+按如下结构组织输出:
+
+1. **页首红线** —— 单独一行:`【AI 辅助整理,非税务意见,请经会计/税务师复核后使用】`。
+
+2. **标题** —— H2 写"年度汇算清缴数据整理包"与年度,并注明主体类型(企业所得税汇算 / 经营所得汇算)。
+   副行:整理日期 · 交代账会计 / 税务师核对 · 非税务意见,不代为申报。
+
+3. **收入汇总** —— 全年开票收入、未开票收入、合计;开票收入 vs 收款流水 vs 账载收入的一致性核对,
+   差异逐项标注。
+
+4. **成本费用汇总与税前扣除凭证核对** —— 按科目列示合计,并标注每类中"有发票 / 缺票"的金额占比。
+
+5. **进销项发票核对表** —— 列:交易对方、纳税人识别号、金额、发票类型、有无发票(有 / 缺 / 存疑)、
+   备注(抬头或税号异常等)。
+
+6. **缺票待补 / 待调整清单** —— 编号列出无合规发票、不能税前扣除的支出,注明金额与"须补票或做纳税
+   调整",提示尽早向对方索取发票。
+
+7. **小微优惠核对** —— 小型微利三条件核对结论 / 经营所得 ≤200 万元减半的适用情况,均附时效声明。
+
+8. **数据覆盖说明 + 交给会计的下一步清单** —— 说明已提供哪些来源(记账软件导出、支付宝商家平台、
+   微信支付商户平台)、哪些缺失;并列会计下一步:补票、确认优惠适用、核对申报口径、按期完成汇算
+   (企业所得税次年 5 月 31 日前、经营所得次年 3 月 31 日前,以电子税务局为准)。
+
+---
+
+## 红线与护栏
+
+- **非税务意见。** 每份交付物页首都要单独标注:`【AI 辅助整理,非税务意见,请经会计/税务师复核后
+  使用】`——写在文档页首,而不仅是聊天里说一句。
+- **绝不代客申报。** 本技能只产出交接包,申报纳税 / 向税务机关报送一律由用户或其会计执行,不代办。
+- **写明每一项口径与假设。** 用了哪个征收率、按小规模还是一般纳税人、是否套用小型微利优惠、是否含
+  地方性附加——都要写清,让会计有据可调。
+- **不硬编码易变税率为永久事实。** 征收率、免征线、优惠一律随附时效声明:截至 2026 现行,执行至
+  2027-12-31,请核实当年最新口径、以电子税务局为准。
+- **税前扣除凭证须为发票。** 区分发票与收据 / 白条,缺票项只标记、不擅自税前扣除或调整。
+- **不自动合并、不擅自判定。** 纳税人身份、优惠适用、发票匹配、疑似重复的交易对方等,一律标记后交
+  会计定夺,不自动合并处理。
+
+## 参考文件
+
+- [reference/calculation-assumptions.md](reference/calculation-assumptions.md) —— 增值税 / 附加税费 / 企业所得税 / 经营所得的计税口径与时效声明
+- [reference/connector-queries.md](reference/connector-queries.md) —— 向记账软件(用友好会计 / 金蝶精斗云)与支付宝 / 微信支付商户平台请求哪些导出
+- [reference/gotchas.md](reference/gotchas.md) —— 常见失误的"正确 / 错误"对照
+- [reference/examples/quarterly-estimate.md](reference/examples/quarterly-estimate.md) —— 季度申报数据整理实例
+- [reference/examples/annual-reconciliation.md](reference/examples/annual-reconciliation.md) —— 年度汇算清缴数据整理实例
+
+## 表格文件路由
+
+- 当利润表、进销项发票或成本费用明细以 Excel 文件(.xlsx/.xls)上传时,用 `crabcode-office-suite:crabcode-spreadsheets`
+  解析;CSV 文件与粘贴的数字无需额外工具。若业主希望把整理好的交接包以表格文件形式交给会计,同样用
+  该技能生成。
+- 若该技能报 Unknown skill,说明未安装办公套件:引导业主通过 `/plugin` 安装 `crabcode-office-suite`
+  后重试——或改为请其导出 CSV,并以 markdown 形式交付整理材料。

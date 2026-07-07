@@ -1,70 +1,70 @@
-# Example: Happy-path triage — 7-lead list
+# 示例:顺利路径分诊 —— 7 条线索清单
 
-7 leads → show all (≤10 rule). Owner ICP: SaaS, 10–50 employees.
+7 条线索 → 全显(≤10 规则)。业主 ICP:SaaS,10–50 人。
+
+> 每份排序清单产物顶部固定标注:`【AI 辅助排序,基于合法取得的客户信息,仅供内部跟进优先级】`。对联系人打分排序属《个人信息保护法》第 24 条的自动化决策——分数仅用于内部跟进优先级,不作价格歧视等差别待遇;业主保留人工干预。
 
 ---
 
-## Ranked output
+## 排序输出
 
 ```
-Here are your 7 leads, ranked by priority:
+【AI 辅助排序,基于合法取得的客户信息,仅供内部跟进优先级】
+
+这是你的 7 条线索,按优先级排序:
 
 ─────────────────────────────────────
-1. Sarah Chen · Acme SaaS · Score: 78
-   Last activity: 2 days ago (email reply)
-   Sarah replied asking about API limits — evaluating for a 22-person team.
-   Strong ICP fit. Lead is 12 days old (prime window). Open with her API
-   question; offer a 20-min demo to walk through limits live.
+1. 陈晓雅 · 云启软件 · 分数:78
+   最后活动:2 天前(邮件回复)
+   晓雅回复咨询 API 调用上限——在为一个 22 人团队做选型。
+   ICP 高度匹配。线索存续 12 天(黄金窗口)。开场就接她的 API
+   问题;提议一个 20 分钟演示,现场演示上限逻辑。
 
-2. Marcus Webb · Loop Analytics · Score: 64
-   Last activity: 5 days ago (site visit)
-   Visited pricing page twice this week, no reply to outreach. 31 employees,
-   SaaS — good fit. Try a softer touch: share a case study instead of another
-   demo ask.
+2. 王磊 · 环普数据 · 分数:64
+   最后活动:5 天前(网站访问)
+   本周两次访问定价页,未回复触达。31 人,SaaS——匹配不错。
+   换个更软的触达:发一份客户案例,而不是又一次演示邀约。
 
-3. Priya Nair · BuildFast · Score: 51
-   Last activity: 9 days ago (email open)
-   Opened the intro email, no reply. 18 days old — approaching stale. One
-   more value-add touch (ROI one-pager) before deprioritizing.
+3. 周敏 · 筑速科技 · 分数:51
+   最后活动:9 天前(邮件打开)
+   打开了开场邮件,未回复。存续 18 天——接近过时。
+   再做一次增值触达(一页纸的投资回报测算)后再降优先级。
 
-[4–7 follow same format, scores 30–45]
+[第 4–7 条同格式,分数 30–45]
 ─────────────────────────────────────
 
-Draft follow-ups for any of these? (e.g., "draft for 1 and 2")
-Propose call slots? (e.g., "find times for Sarah and Marcus")
+要给其中哪些起草跟进?(例:"给 1 和 2 起草")
+要提议通话时段吗?(例:"给晓雅和王磊找时间")
 ```
 
 ---
 
-## Follow-up draft — Sarah Chen
+## 跟进草稿 —— 陈晓雅
 
 ```
-Subject: Re: API limits question
+主题:回复:API 调用上限的问题
 
-Hi Sarah,
+晓雅你好,
 
-Happy to answer the API limits question properly on a short call rather
-than over email.
+API 调用上限的问题,我们约个简短通话当面说清楚,比邮件来回更快。
 
-[Owner adds availability after booking]
+[业主预订后补上可选时间]
 
-Would that work?
+这样方便吗?
 
-[Owner name]
+[业主署名]
 ```
-Draft shown in chat. Not sent — the owner copies it into their own email
-tool (or WeChat) and sends it.
+草稿仅在对话中展示。未发送——由业主自行复制到自己的邮箱工具(或微信)发送。
 
 ---
 
-## Calendar proposal — Sarah Chen
+## 日历提议 —— 陈晓雅
 
 ```
-Open 30-min slots (next 2 business days, checked via your Feishu
-calendar connector):
-  • Thu Apr 25 · 10:00–10:30 AM
-  • Thu Apr 25 · 2:00–2:30 PM
-  • Fri Apr 26 · 9:00–9:30 AM
+空闲 30 分钟时段(未来 2 个工作日,已通过你的飞书日历连接器核对):
+  • 周四 · 4 月 25 日 · 10:00–10:30
+  • 周四 · 4 月 25 日 · 14:00–14:30
+  • 周五 · 4 月 26 日 · 09:00–09:30
 
-No events created — pick one and book it directly.
+未创建任何日程——选一个自行预订。
 ```

@@ -2,342 +2,328 @@
 name: job-post-builder
 version: 0.3.0
 description: >
-  Builds end-to-end hiring packets — job post, structured interview guide with
-  scoring rubric, and offer letter template — from a hiring brief. Triggers on:
-  "help me hire", "we're hiring for", "write a job post", "job description",
-  "JD", "open role", "create a job ad", "interview questions", "scoring rubric",
-  "draft an offer letter", "send an offer", "make a hiring packet", or any
-  request to recruit for a position. When in doubt, trigger — covers the full
-  hiring workflow from job post through a signature-ready offer letter the
-  owner sends via 众律宝 (or on paper). Does NOT screen or rank applicants.
+  从一次简短的招聘沟通出发,生成端到端的招聘材料包——招聘启事、含评分表的结构化
+  面试指南,以及一份录用通知书外加一份书面劳动合同要点清单,全部以中国《劳动合同法》
+  口径撰写。触发词:"help me hire", "we're hiring for", "write a job post",
+  "job description", "JD", "open role", "create a job ad", "interview questions",
+  "scoring rubric", "draft an offer letter", "send an offer", "make a hiring packet",
+  "招聘"、"招人"、"我们在招"、"写招聘启事/职位描述"、"JD"、"面试题"、"面试评分表"、
+  "录用通知书"、"发 offer"、"劳动合同要点"、"试用期"、"五险一金",或任何为某岗位招人的
+  请求。拿不准时就触发——覆盖从招聘启事到一份签署就绪、由企业主通过众律宝(或纸质)
+  发出的录用通知书的完整招聘流程。本插件不筛选或排序应聘者,也不出具法律意见——劳动
+  合同的深度审查移交 crablaw-cn。
 ---
 
-# Job Post Builder
+# 招聘材料生成器
 
-Produces a complete hiring packet — job post, interview guide, and offer letter
-— from a brief conversation about the role. Optionally finalizes the offer
-letter as a signature-ready document for the owner to send via 众律宝 (the
-in-house e-sign service — its connector is pending) or sign on paper.
+从一次关于岗位的简短沟通出发,生成一套完整的招聘材料包——招聘启事、面试指南,以及
+一份录用通知书外加一份书面劳动合同要点清单,全部以中国《劳动合同法》口径撰写。可选择
+把录用通知书定稿为签署就绪的文档,供企业主通过众律宝(内部电子签署服务——连接器待接入)
+发出,或纸质签署。
 
----
-
-## Quick start
-
-Invoke when a user says they need to hire someone or produce any hiring document.
-The skill walks a 6-phase workflow: gather context → research the market → write
-the job post → draft the interview guide → assemble the offer letter → (optionally)
-prepare it for signature.
-
-**Example trigger:**
-> "We're hiring a senior product manager. Can you put together the job post and
-> interview questions?"
+**关键法律定位:** 在中国,录用通知书只是**录用要约**,不是雇佣的最终凭证;法定凭证是**书面劳动合同**,须自用工之日起 **1 个月内**签订。本插件只生成招聘与录用材料,**不出具法律意见、不起草正式劳动合同**;劳动合同/竞业/解雇/员工手册的深度合规审查移交 crablaw-cn 法律插件的 `employment-contract-review`、`non-compete-review`、`termination-risk-review`、`employee-handbook-review` 等技能,或专业律师/HR。
 
 ---
 
-## Workflow
+## 快速上手
 
-1. **Gather role context** — Ask for role title, responsibilities, qualifications,
-   location, comp, interview process, and offer delivery preference (plain Word doc
-   vs. signature-ready for 众律宝). Source: conversation / AskUserQuestion.
-2. **Research comparable posts** — Search 腾讯文档 (via the tencent-docs connector)
-   and Desktop for existing JDs and templates; run web search for 3–5 live postings
-   for this role. Sources: tencent-docs MCP, local files, web search.
-3. **Write the job post** — Draft a market-informed job description using
-   `reference/job-post-structure.md`. Output: `[Role]-Job-Post.docx` via docx skill.
-4. **Draft interview guide + scoring rubric** — Build a stage-by-stage guide using
-   `reference/interview-guide-structure.md`. Output: `[Role]-Interview-Guide.docx`
-   via docx skill.
-5. **Assemble offer letter** — Build offer letter with bracketed placeholders using
-   `reference/offer-letter-template.md`. Output: `[Role]-Offer-Letter.docx` via
-   docx skill.
-6. **Prepare for signature (if requested)** — Finalize the offer letter with
-   signature and date blocks and a draft cover message. The owner sends it for
-   signature via 众律宝 (or on paper) manually — there is no e-sign connector yet.
+当用户表示需要招人或需要生成任何招聘文档时启用。本技能会走一套 6 个阶段的流程:
+收集背景 → 调研市场 → 撰写招聘启事 → 起草面试指南 → 组装录用通知书外加书面劳动
+合同要点清单 →(可选)为录用通知书准备签署。
+
+**触发示例:**
+> "我们要招一名高级产品经理,能帮我把招聘启事和面试题一起弄好吗?"
 
 ---
 
-## Approval gates
+## 工作流
 
-- **Never claim the offer was sent or routed for signature.** The skill prepares
-  the final document; sending it via 众律宝 (or printing it) is the owner's manual
-  step. Say so explicitly at handoff.
-- **Never send any email.** There is no email connector yet (腾讯企业邮 pending).
-  Any cover message or note is drafted in chat for the owner to copy and send.
-  Where a simple notification suffices (e.g., telling the owner or a teammate the
-  packet is ready), offer to send a DingTalk/Feishu message via the connected
-  connector — show the message and get approval first.
-- **Never publish the job post.** Produce the .docx file only. Posting to any job
-  board is the user's responsibility.
+1. **收集岗位背景** —— 询问岗位名称、职责、任职资格、工作地点、薪酬、面试流程,以及
+   录用通知书的交付方式(纯 Word 文档,还是为众律宝签署就绪)。来源:对话 / AskUserQuestion。
+2. **调研同类岗位** —— 在腾讯文档(通过 tencent-docs 连接器)和桌面上检索已有的职位
+   描述与模板;为该岗位做网络搜索,找 3–5 条在招的招聘信息。来源:tencent-docs MCP、
+   本地文件、网络搜索。
+3. **撰写招聘启事** —— 依据 `reference/job-post-structure.md`,起草一份贴合市场的职位
+   描述。产出:通过 docx 技能生成 `[岗位]-招聘启事.docx`。
+4. **起草面试指南 + 评分表** —— 依据 `reference/interview-guide-structure.md`,搭建
+   一份逐阶段的面试指南。产出:通过 docx 技能生成 `[岗位]-面试指南.docx`。
+5. **组装录用通知书** —— 依据 `reference/offer-letter-template.md`,用方括号占位符搭建
+   录用通知书,并从同一参考文件中带出书面劳动合同要点清单。产出:通过 docx 技能生成
+   `[岗位]-录用通知书.docx`。
+6. **准备签署(如用户要求)** —— 为录用通知书补齐签名与日期栏,并拟一条附言消息。企业主
+   通过众律宝(或纸质)自行发出签署——目前尚无电子签署连接器。
 
 ---
 
-## Phase 1 — Understand the Role
+## 审批红线
 
-Before researching or writing anything, gather enough context to do it well.
-Ask the user (via conversation or AskUserQuestion) for:
+- **绝不声称录用通知书已发出或已送去签署,也绝不代用户签署劳动合同。** 本技能只负责把
+  文档定稿;通过众律宝发出录用通知书(或打印)是企业主的手动步骤,众律宝签署始终由用户
+  发起。本技能**不**发出录用要约,也**不**替任何人签署劳动合同。交接时须明确说明这一点。
+- **绝不发送任何邮件。** 目前尚无邮件连接器(腾讯企业邮待接入)。任何附言或备注都只在
+  对话中拟好,供企业主自行复制发送。若只需一条简单通知(例如告知企业主或同事材料包已就绪),
+  可提出通过已连接的钉钉/飞书连接器发一条消息——先展示消息内容并取得批准。
+- **绝不发布招聘启事。** 只生成 .docx 文件。发布到任何招聘平台都是用户自己的责任。
 
-- **Role title** — exact title they want to post
-- **Team / function** — who this person reports to and works with
-- **Key responsibilities** — 3–5 things this person will own day-to-day
-- **Must-have qualifications** — hard requirements (years of experience, specific skills, credentials)
-- **Nice-to-have qualifications** — preferred but not required
-- **Location / remote policy** — on-site, hybrid, or fully remote; location if relevant
-- **Compensation range** — salary band if they have one (flag that this needs HR/legal sign-off)
-- **Existing JD or template?** — ask if there's a prior version in 腾讯文档 or on their Desktop to use as a starting point
-- **Offer letter delivery preference** — ask how they'd like the offer letter delivered:
-  - *Signature-ready for 众律宝* — skill finalizes the letter with signature and
-    date blocks plus a draft cover message; the user uploads and sends it in
-    众律宝 themselves (the 众律宝 connector is pending — the skill cannot send it)
-  - *Just the Word doc* — skill saves the offer letter as a .docx and stops there;
-    the user handles routing themselves
+---
 
-- **Interview process** — ask how their hiring process is structured:
-  - How many rounds/stages are there?
-  - Who conducts each stage? (e.g. recruiter, hiring manager, peer, skip-level, panel)
-  - What is each stage meant to assess? (e.g. culture fit, technical depth, cross-functional collaboration)
-  - Is there a take-home exercise or work sample at any stage?
+## 阶段 1 —— 了解岗位
 
-  This is critical — the interview guide will be organized by stage, and each stage
-  gets its own question set. If the user doesn't know yet, suggest a sensible default
-  based on the role level and company size, and confirm before proceeding.
+在调研或动笔之前,先收集足够的背景把事情做好。
+请通过对话或 AskUserQuestion 向用户询问:
 
-  Example default for a mid-senior IC role:
-  | Stage | Interviewer | Focus |
+- **岗位名称** —— 用户想发布的确切职位名
+- **团队 / 职能** —— 此人向谁汇报、与谁协作
+- **核心职责** —— 此人日常要负责的 3–5 件事
+- **硬性任职资格** —— 刚性要求(工作年限、特定技能、资质证书)
+- **加分项资格** —— 优先但非必需
+- **工作地点 / 远程政策** —— 到岗、混合还是全远程;必要时注明地点
+- **薪酬区间** —— 如果有薪酬带宽(提示这一项需经 HR / 法务确认)
+- **是否已有职位描述或模板?** —— 询问腾讯文档或桌面上是否有旧版可作为起点
+- **录用通知书交付方式** —— 询问用户希望录用通知书如何交付:
+  - *为众律宝签署就绪* —— 技能为录用通知书补齐签名与日期栏,并附一条草拟的附言消息;
+    由用户自行上传到众律宝并发送(众律宝连接器待接入——技能无法代发)
+  - *仅要 Word 文档* —— 技能把录用通知书存为 .docx 后即止;由用户自行处理后续发送
+
+- **面试流程** —— 询问其招聘流程如何组织:
+  - 一共有几轮 / 几个阶段?
+  - 各阶段由谁面试?(如招聘专员、用人经理、同级同事、越级上级、面试组)
+  - 各阶段分别考察什么?(如文化契合、技术深度、跨职能协作)
+  - 是否有某个阶段设带回家作业或工作样本?
+
+  这一点很关键——面试指南将按阶段组织,每个阶段有自己的一套问题。若用户尚未确定,
+  可根据岗位层级与公司规模给出一个合理的默认方案,并在推进前确认。
+
+  中高级独立贡献者岗位的默认方案示例:
+  | 阶段 | 面试官 | 考察重点 |
   |---|---|---|
-  | Phone screen | Recruiter | Communication, baseline fit, logistics |
-  | Hiring manager interview | HM | Scope, ownership, role-specific depth |
-  | Peer interview | Team member | Collaboration, working style |
-  | Skills/case exercise | Senior IC | Relevant technical or domain depth |
-  | Final / culture interview | Skip-level or exec | Values, long-term trajectory |
+  | 电话初筛 | 招聘专员 | 沟通、基本匹配、后勤事项 |
+  | 用人经理面试 | 用人经理 | 职责范围、主人翁意识、岗位相关深度 |
+  | 同级面试 | 团队成员 | 协作、工作风格 |
+  | 技能 / 案例演练 | 资深独立贡献者 | 相关技术或领域深度 |
+  | 终面 / 文化面 | 越级上级或高管 | 价值观、长期发展轨迹 |
 
-Capture the delivery preference in Phase 1 so the right Phase 5/6 path is clear
-before any writing starts. If the user already indicated a preference (e.g. "get
-it ready to send for signature"), extract it from their message rather than
-asking again.
+在阶段 1 就确定交付方式,这样在动笔之前就能明确该走阶段 5 / 6 的哪条路径。若用户已
+表明偏好(如"准备好直接发去签署"),从其消息中提取,而不要再问一遍。
 
-If the user has already provided most of this in their message, extract it and
-confirm before moving on rather than asking redundant questions. One focused
-clarifying question is better than a long form.
+如果用户在消息里已经提供了大部分信息,就提取出来并在推进前确认,而不要问重复的问题。
+一个聚焦的澄清问题胜过一份冗长的表单。
 
 ---
 
-## Phase 2 — Research Comparable Posts
+## 阶段 2 —— 调研同类岗位
 
-Good job posts are grounded in what the market actually says for this role.
-Do both of the following in parallel:
+好的招聘启事要立足于市场对该岗位的真实表述。请并行做以下两件事:
 
-**A. Check existing files first**
-Search 腾讯文档 (via the tencent-docs connector) and Desktop for prior JDs, offer
-letter templates, or interview guides the user may already have. Search with terms
-like the role title, "job description", "JD", "offer letter", "interview". If found,
-read them and use them as the baseline — preserving any existing language,
-structure, or requirements the user has established. If tencent-docs isn't
-connected, ask the user to upload any existing templates or point to local files.
+**A. 先检查已有文件**
+在腾讯文档(通过 tencent-docs 连接器)和桌面上,检索用户可能已有的旧版职位描述、
+录用通知书模板或面试指南。可用岗位名称、"职位描述""JD""录用通知书""面试"等词检索。
+若找到,就读取并以其为基线——保留用户已确立的措辞、结构或要求。若 tencent-docs 未
+连接,请用户上传已有模板或指出本地文件位置。
 
-**B. Web search for comparable posts**
-Search for current job postings for this role at comparable companies. Look for
-3–5 real postings on mainstream job boards and company career pages, and note:
-- Common responsibilities listed for this role
-- Qualifications that appear consistently (these are table stakes)
-- How companies describe the role's impact/scope
-- Any language patterns that make postings feel compelling vs. generic
+**B. 网络搜索同类岗位**
+搜索同类公司当前在招的该岗位招聘信息。在主流招聘平台和公司招聘页上找 3–5 条真实招聘
+信息,并留意:
+- 该岗位常见列出的职责
+- 反复出现的任职资格(这些是入场门槛)
+- 各公司如何描述该岗位的影响力 / 职责范围
+- 哪些措辞让招聘信息显得有吸引力,而非千篇一律
 
-Use this research to pressure-test the user's requirements (are they missing
-something standard? asking for something unusual?) and to make the job post
-feel current and market-aware.
+用这些调研来检验用户的要求(是否漏了某项标配?是否提了不寻常的要求?),并让招聘启事
+显得贴近当下、了解市场。
 
 ---
 
-## Phase 3 — Write the Job Post
+## 阶段 3 —— 撰写招聘启事
 
-Read `reference/job-post-structure.md` for the full recommended structure and
-writing guidance.
+阅读 `reference/job-post-structure.md`,了解完整的推荐结构与撰写指引。
 
-**If an existing job post or JD was found in Phase 2:**
-Use it as the structural template — mirror its section names, tone, ordering, and
-any boilerplate the user has established (e.g. company description, benefits blurb,
-how-to-apply language). The user's format is the source of truth.
+**若在阶段 2 找到了已有的招聘启事或职位描述:**
+以其为结构模板——沿用其章节名、语气、顺序,以及用户已确立的固定内容(如公司简介、
+福利介绍、投递方式说明)。用户的格式即准绳。
 
-Compare it against `reference/job-post-structure.md` and surface any missing
-components in a single question before writing:
+将其与 `reference/job-post-structure.md` 对照,在动笔前用一个问题带出所有缺失的部分:
 
-> "Your existing JD has a responsibilities section and requirements list, but I
-> didn't see an opening hook or a description of what success looks like in year one.
-> Want me to add those, or keep it to your current format?"
+> "你现有的职位描述有职责部分和要求清单,但我没看到开场钩子,也没看到'入职第一年
+> 怎样算成功'的描述。要不要我补上,还是保持你现在的格式?"
 
-Only add the missing components if the user confirms.
+只有在用户确认后才补上缺失的部分。
 
-**If no existing job post was found:**
-Build from scratch using `reference/job-post-structure.md` as the full template.
+**若没找到已有的招聘启事:**
+以 `reference/job-post-structure.md` 为完整模板从零搭建。
 
-**Either way:**
-- Lead with impact, not just tasks
-- Be honest about what's hard — candidates who self-select in are better fits
-- Use inclusive language; avoid jargon that implicitly filters for in-group candidates
-- Keep the required qualifications list tight — every line is a reason someone doesn't apply
-- If compensation isn't provided, omit the range rather than invent one
+**无论哪种情况:**
+- 以影响力开篇,而不只是罗列任务
+- 如实说明难点——自我筛选后仍愿投递的候选人更契合
+- 遵守中国就业反歧视要求(《就业促进法》《劳动法》):不得基于**民族、种族、性别、宗教信仰**等设置歧视性条件;不得以性别为由拒录或提高录用标准,不得将女性婚育情况作为录用条件;不得歧视**传染病病原携带者**(除法律规定不宜从事的岗位外)。**慎用**"仅限本地""35 岁以下""限男性""形象气质佳"等易引发就业歧视争议的表述 —— 详见 `reference/job-post-structure.md`
+- 任职要求清单要精简——每多一行,就多一个让人放弃投递的理由
+- 若未提供薪酬,就略去区间而不要臆造;薪酬用**月薪(¥/月)**表述
 
-Save as `[Role]-Job-Post.docx` using the docx skill —
-`crabcode-office-suite:crabcode-documents` (see Deliverable routing below).
+用 docx 技能 `crabcode-office-suite:crabcode-documents` 存为 `[岗位]-招聘启事.docx`
+(见下文"交付物路由")。
 
 ---
 
-## Phase 4 — Draft Interview Questions + Scoring Rubric
+## 阶段 4 —— 起草面试问题 + 评分表
 
-Read `reference/interview-guide-structure.md` for the full recommended format.
+阅读 `reference/interview-guide-structure.md`,了解完整的推荐格式。
 
-**If an existing interview guide was found in Phase 2:**
-Use the user's existing guide as the structural template — mirror its section names,
-ordering, and formatting conventions. The user's format is the source of truth; the
-reference file is a checklist, not an override.
+**若在阶段 2 找到了已有的面试指南:**
+以用户现有的指南为结构模板——沿用其章节名、顺序与格式约定。用户的格式即准绳;参考
+文件是一份清单,而非凌驾其上的规范。
 
-After mapping the existing guide's sections against the reference, surface any
-components present in the reference but missing from the user's guide. Present
-these as a short, friendly question before writing — for example:
+把现有指南的章节与参考文件对照后,带出参考文件里有、而用户指南里缺的部分。动笔前用
+一个简短友好的问题提出——例如:
 
-> "Your existing guide has a question bank and scoring rubric, but I noticed it
-> doesn't include an interview stage map or a debrief guide. Want me to add those,
-> or keep it to your current structure?"
+> "你现有的指南有题库和评分表,但我注意到它没有面试阶段图,也没有复盘指引。要不要我
+> 补上,还是保持你现在的结构?"
 
-Only add the missing components if the user confirms. Don't silently expand their
-format without asking.
+只有在用户确认后才补上缺失的部分。不要不问一声就擅自扩充其格式。
 
-**If no existing guide was found:**
-Build the guide from scratch using `reference/interview-guide-structure.md` as
-the full template. The reference defines the recommended sections, question format,
-rubric anchors, and debrief guidance — follow it completely.
+**若没找到已有的指南:**
+以 `reference/interview-guide-structure.md` 为完整模板从零搭建。该参考文件定义了推荐
+的章节、问题格式、评分锚点与复盘指引——请完整遵循。
 
-**Either way, organize the guide by interview stage using the process captured in Phase 1.**
+**无论哪种情况,都要用阶段 1 收集到的流程,按面试阶段来组织指南。**
 
-Structure the document so each stage is its own section:
+把文档组织成每个阶段自成一节:
 
-Each stage gets its own section with the stage name and interviewer as the heading,
-followed by: the focus area this stage assesses, 4-6 behavioral questions specific
-to that focus, 2-3 follow-up probes per question, and a 1/3/5 scoring rubric with
-anchors for each competency the stage owns.
+每个阶段自成一节,以阶段名和面试官作为标题,其后依次是:本阶段考察的重点领域、针对
+该重点的 4–6 个行为面试问题、每题 2–3 个追问,以及一张为本阶段负责的每项胜任力配好
+1/3/5 分档锚点的评分表。
 
-**Key principles for multi-stage guides:**
-- Each competency should be owned by one stage — avoid two interviewers asking
-  the same thing. If there's overlap, assign different angles.
-- For panel interviews, split questions across panelists explicitly so each person
-  knows what they're covering.
-- If there's a take-home exercise, include a structured debrief section for
-  reviewing it — what to look for, how to score it, follow-up questions.
-- The debrief guide goes at the end, after all stage sections.
-- 1/3/5 scoring anchors should be written for this specific role, not generic.
+**多阶段指南的关键原则:**
+- 每项胜任力应由一个阶段负责——避免两名面试官问同样的东西。若有重叠,分配不同的切入角度。
+- 面试组面试时,把问题在各面试官之间明确拆分,让每人都清楚自己负责什么。
+- 若有带回家作业,加入一节结构化的复盘——看什么、怎么打分、追问什么。
+- 复盘指引放在最后,排在所有阶段小节之后。
+- 1/3/5 分档锚点应针对这一具体岗位撰写,而非通用。
 
-Save as `[Role]-Interview-Guide.docx` using the docx skill.
+用 docx 技能存为 `[岗位]-面试指南.docx`。
 
 ---
 
-## Phase 5 — Assemble the Offer Letter Template
+## 阶段 5 —— 组装录用通知书
 
-Read `reference/offer-letter-template.md` for the full base template and field
-definitions.
+阅读 `reference/offer-letter-template.md`,了解完整的基础模板与字段定义。该参考文件是
+一套**两件套**:(A)录用通知书模板——它是一份招聘**要约**,不是劳动合同——以及
+(B)书面劳动合同要点清单。把录用通知书作为交付物来搭建,并把清单作为指引带出。
 
-**If an existing offer letter or template was found in Phase 2:**
-Use it as the structural template — preserve the user's formatting, clause ordering,
-signature blocks, and any legal language they've already established. Their version
-is the source of truth.
+**中国法律定位(务必贯彻):**
+- 录用通知书是**录用要约,不是劳动合同**;它必须写明"本通知非劳动合同,以书面劳动合同为准"。反悔可能承担缔约过失责任。
+- 法定雇佣凭证是**书面劳动合同**,须自**用工之日起 1 个月内**签订;逾期第 2 个月起**双倍工资**,满 1 年未签视为已订**无固定期限**合同。始终提示用户这条红线。
+- **中国没有"随意雇佣"制度**,不要写任何"可随时无理由解除"的条款;解除须有法定情形,由 crablaw-cn 或律师评估。
 
-Compare it against `reference/offer-letter-template.md` and surface any missing
-components in a single question before writing:
+**若在阶段 2 找到了已有的录用通知书或模板:**
+以其为结构模板——保留用户的格式、条款顺序、签名栏,以及他们已确立的措辞。用户的版本
+即准绳。但若发现其中含"随意雇佣"式随时无理由解除、以 offer 当最终凭证等**违反中国法**
+的条款,须提示用户并按中国口径修正。
 
-> "Your existing offer letter has compensation and position details, but I noticed
-> it doesn't include an at-will employment clause or a legal review disclaimer.
-> Want me to add those, or keep it to your current format?"
+将其与 `reference/offer-letter-template.md` 对照,在动笔前用一个问题带出所有缺失的部分:
 
-Only add the missing components if the user confirms.
+> "你现有的录用通知书写了岗位和薪酬,但我没看到'本通知非劳动合同'的声明、试用期
+> 上限说明,以及'入职 1 个月内须签书面劳动合同'的提示。要不要我补上,还是保持你
+> 现在的格式?"
 
-**If no existing offer letter was found:**
-Build from scratch using `reference/offer-letter-template.md` as the full template.
+只有在用户确认后才补上缺失的部分。
 
-**Either way:**
-- Use clearly marked `[BRACKETED]` placeholder fields for all candidate-specific values
-- Include: at-will clause (if applicable), contingency conditions, legal review disclaimer
-- Don't invent compensation figures — leave them as placeholders if not provided
+**若没找到已有的录用通知书:**
+以 `reference/offer-letter-template.md` 为完整模板从零搭建。
 
-Save as `[Role]-Offer-Letter.docx` using the docx skill.
+**无论哪种情况:**
+- 所有候选人专属数值都用清楚标注的 `[方括号]` 占位字段
+- 包含:"本通知非劳动合同"声明、岗位与月薪(¥/月)、报到时间、试用期(不超过第 19 条
+  上限)、五险一金、录用附条件(含身份/证件核验,外国人需就业许可)、答复期限,以及
+  "入职 1 个月内须签书面劳动合同"提示
+- **绝不**写入任何"随意雇佣"式"随时无理由解除"条款
+- 不要臆造薪酬数字——若未提供,就留作占位符
+- 页首保留红线:`【AI 辅助整理，非法律/人力资源意见，请经律师/HR 复核后使用】`
 
-**Then branch based on the delivery preference captured in Phase 1:**
-- If the user chose **signature-ready for 众律宝** → proceed to Phase 6
-- If the user chose **Word doc only** → skip Phase 6, deliver the .docx and close out
+**移交深度审查:** 正式书面劳动合同、竞业限制、解雇/裁员、员工手册的合规审查,本插件
+不承担 —— 以文字建议移交 crablaw-cn 法律插件的 `employment-contract-review`、
+`non-compete-review`、`termination-risk-review`、`employee-handbook-review` 等技能,
+或专业律师/HR。
 
----
+用 docx 技能存为 `[岗位]-录用通知书.docx`。
 
-## Phase 6 — Prepare the Offer Letter for Signature
-
-There is no e-sign connector yet — the 众律宝 connector is pending. This phase
-gets the document to the point where the owner's only remaining step is to send
-it via 众律宝 (or print it for a wet signature).
-
-1. **Collect candidate details.** Confirm the candidate's full name (and email,
-   if the owner wants it in the cover message) before finalizing — never hand off
-   a letter with a blank signer.
-
-2. **Finalize the DOCX.** Fill in every field that has a confirmed value; make
-   sure the acceptance section has clear Signature and Date lines. Any field that
-   still needs HR confirmation stays as a clearly marked `[BRACKETED]` placeholder
-   and is called out at handoff.
-
-3. **Draft a cover message** the owner can paste when sending — subject line
-   `Offer of Employment — [Role Title] at [Company Name]` and a short warm note:
-   > "Hi [Candidate First Name], we're thrilled to extend this offer and look
-   > forward to having you join the team. Please review and sign at your
-   > earliest convenience. Don't hesitate to reach out if you have any questions."
-
-   Present it in chat. Do not send it — there is no email connector.
-
-4. **Hand off.** Tell the user:
-   > "The offer letter is final at [file path]. Upload it to 众律宝 and send it to
-   > [Candidate Name] for signature — or print it for a wet signature. I can't
-   > send it for you yet (the 众律宝 connector is pending). The cover message
-   > above is ready to paste."
-
-**Optional notification:** If the user wants to nudge themselves or a teammate
-(e.g., "remind me to send this tonight"), offer to send a DingTalk/Feishu message
-via the connected connector. Show the message text and wait for approval before
-sending.
+**然后根据阶段 1 收集到的交付方式分支处理:**
+- 若用户选了**为众律宝签署就绪** → 进入阶段 6
+- 若用户选了**仅要 Word 文档** → 跳过阶段 6,交付 .docx 并收尾
 
 ---
 
-## Delivering the Packet
+## 阶段 6 —— 为录用通知书准备签署
 
-Once all three files are created, present them together:
+目前尚无电子签署连接器——众律宝连接器待接入。本阶段把文档做到这样一个程度:企业主
+唯一剩下的动作,就是通过众律宝发出(或打印后手写签署)。
 
-Present a summary listing the three deliverables by role title: the job post
-docx (ready to post), the interview guide docx (share with interviewers), and
-the offer letter docx (signature-ready for 众律宝, or a plain template if the
-user chose Word doc only).
+1. **收集候选人信息。** 定稿前先确认候选人全名(若企业主想写进附言,还要确认邮箱)——
+   绝不交出一份签署人空白的录用通知书。
 
-Remind the user:
-- The offer letter template needs legal review before use in any jurisdiction
-- Compensation ranges should be confirmed with HR before publishing the job post
-- This skill does not screen or rank applicants
+2. **给 DOCX 定稿。** 填入每一个已确认取值的字段;确保受聘确认部分有清晰的**签名**与
+   **日期**栏,并且"本通知非劳动合同"声明在位。任何仍需 HR 确认的字段,都保留为清楚标注
+   的 `[方括号]` 占位符,并在交接时点明。
+
+3. **拟一条附言消息**,供企业主发送时粘贴——标题为
+   `[公司名称] 录用通知书 —— [岗位名称]`,再加一句简短温暖的话:
+   > "[候选人姓名]你好,我们很高兴向你发出录用通知书,期待你的加入。请查阅并在
+   > 答复期限内签署确认。入职后我们会在 1 个月内与你签订书面劳动合同。如有任何
+   > 疑问,欢迎随时联系我们。"
+
+   在对话中展示。不要发送——没有邮件连接器。
+
+4. **交接。** 告诉用户:
+   > "录用通知书已定稿,路径 [文件路径]。请上传到众律宝发送给 [候选人姓名] 签署,
+   > 或打印后纸质签署。我暂时还不能替你发送(众律宝连接器待接入)。上面的通知消息
+   > 已可直接粘贴。提醒:候选人报到后请在 1 个月内签订书面劳动合同。"
+
+**可选通知:** 若用户想提醒自己或同事(如"提醒我今晚把这个发出去"),可提出通过已连接的
+钉钉/飞书连接器发一条消息。先展示消息文本,等用户批准后再发送。
 
 ---
 
-## Reference Files
+## 交付材料包
 
-Load these when reaching the relevant phase — don't load all upfront:
+三份文件都生成后,一并呈现:
 
-| File | Load when |
+给出一段小结,按岗位名称列出三份交付物:招聘启事 docx(可直接发布)、面试指南 docx
+(发给面试官),以及录用通知书 docx(为众律宝签署就绪;若用户只选了 Word 文档,则是
+一份普通模板)。
+
+提醒用户:
+- 录用通知书是**录用要约,不是劳动合同**;法定凭证是**书面劳动合同**,须自用工之日起
+  **1 个月内**签订,逾期第 2 个月起双倍工资,满 1 年未签视为无固定期限合同
+- 录用通知书与劳动合同要点在正式使用前需经 **HR / 律师复核**;正式劳动合同、竞业限制、
+  解雇、员工手册的深度合规审查移交 crablaw-cn 的 `employment-contract-review`、
+  `non-compete-review`、`termination-risk-review`、`employee-handbook-review` 等技能
+- 招聘启事不得含就业歧视性条件(民族/种族/性别/宗教信仰/传染病病原携带者等)
+- 薪酬用**月薪(¥/月)**;发放前与 HR 核实;最低工资、社保比例/基数以参保城市当年口径
+  (当地社保局 12333)为准,不硬编码
+- 本技能不筛选或排序应聘者
+
+---
+
+## 参考文件
+
+走到相应阶段时再加载——不要一开始就全部加载:
+
+| 文件 | 何时加载 |
 |---|---|
-| `reference/job-post-structure.md` | Phase 3 — before writing the job post |
-| `reference/interview-guide-structure.md` | Phase 4 — before writing the interview guide |
-| `reference/offer-letter-template.md` | Phase 5 — before writing the offer letter |
-| `reference/gotchas.md` | Any phase — non-obvious edge cases |
-| `reference/examples/worked-example.md` | For reference on expected output shape |
+| `reference/job-post-structure.md` | 阶段 3 —— 撰写招聘启事前 |
+| `reference/interview-guide-structure.md` | 阶段 4 —— 撰写面试指南前 |
+| `reference/offer-letter-template.md` | 阶段 5 —— 撰写录用通知书前 |
+| `reference/gotchas.md` | 任意阶段 —— 不易察觉的边界情况 |
+| `reference/examples/worked-example.md` | 参考预期产出的样子 |
 
 ---
 
-## Deliverable routing
+## 交付物路由
 
-- All three .docx deliverables (job post, interview guide, offer letter) are generated via `crabcode-office-suite:crabcode-documents` — that is the "docx skill" referenced in the phases above.
-- If triggering it reports Unknown skill, the office suite is not installed: guide the user to install `crabcode-office-suite` via `/plugin`, then retry; until then, present the drafts as markdown in chat for review.
+- 三份 .docx 交付物(招聘启事、面试指南、录用通知书)都通过 `crabcode-office-suite:crabcode-documents` 生成——也就是上文各阶段所称的"docx 技能"。
+- 若触发它时报告 Unknown skill,说明未安装办公套件:引导用户通过 `/plugin` 安装 `crabcode-office-suite` 后重试;在此之前,把草稿以 markdown 形式在对话中呈现供审阅。
 
-## Research upgrade path
+## 调研升级路径
 <!-- capability-route: deep-research=pending(general research plugin is planned; see docs/capability-routing.json) -->
 
-- Phase 2's market research runs on the web search available in the current session, plus any templates the user provides. If web search is unavailable in the session, ask the user to paste 3–5 comparable job postings and work from those.
-- Once the planned general deep-research plugin (`crabcode-deep-research`) ships, this section switches to a fully-qualified skill route; lint:refs will flag the pending marker for upgrade at that point.
+- 阶段 2 的市场调研依托当前会话中可用的网络搜索,外加用户提供的任何模板。若本次会话没有网络搜索,请用户粘贴 3–5 条同类招聘信息,据此展开。
+- 待规划中的通用深度研究插件(`crabcode-deep-research`)上线后,本节将切换为全限定技能路由;届时 lint:refs 会把这处待接入标记标出以便升级。

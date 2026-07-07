@@ -1,101 +1,101 @@
-# Gotchas
+# 坑
 
-## Gotcha: Confusing correlation with causation
+## 坑:把相关当成因果
 
-Sales data shows a product peaked in March. That doesn't mean March marketing caused it — it might be seasonal demand.
+销售数据显示某商品 6 月冲高。这不代表 6 月的营销带来了它——可能就是季节性需求(618 大促引流)。
 
-**Why it matters:** If you push hard on a slow-moving product just because it sold well once, you waste creative energy on something that doesn't actually resonate.
+**为什么要紧:** 如果只因某商品曾经卖过一次好,就去猛推一个本来慢动销的品,你会把创意精力浪费在一个其实并没引起共鸣的东西上。
 
-### ✗ Bad
-"Widgets sold 10 units in March. Push widgets hard in May because March worked."
+### ✗ 坏
+"帆布包 6 月卖了 10 个。8 月主推帆布包,因为 6 月好使。"
 
-### ✓ Good
-"Widgets sell well in March. Check if that's seasonal demand (tax-season gifting?) or a one-off spike. If seasonal, position for March next year. If one-off, don't over-index on it."
-
----
-
-## Gotcha: Ignoring low-velocity, high-margin products
-
-Revenue is tempting. A low-volume, high-margin service (like consulting) might generate less total revenue than a cheap commodity product, but it's far more profitable.
-
-**Why it matters:** If you obsess over volume winners and ignore margin leaders, you prioritize busy-work over profit.
-
-### ✗ Bad
-"Service packages sold $500 total, but widget bundles sold $2000. Push widgets."
-
-### ✓ Good
-"Ask: Which brings in the most profit per unit? Service packages might be 70% margin × $500 = $350 profit. Widget bundles might be 20% margin × $2000 = $400 profit. Different story now."
+### ✓ 好
+"帆布包 6 月卖得好。先看这是不是季节性需求(618 引流?),还是一次性尖峰。若是季节性,明年 618 前卡位。若是一次性,别过度下注。"
 
 ---
 
-## Gotcha: Seasonal benchmarks that don't fit your niche
+## 坑:忽视低动销、高毛利的商品
 
-"Retail peaks in November" is true for many, but not all. A tax prep service peaks in March; a swimming pool company peaks in May.
+收入很诱人。一个低销量、高毛利的服务(如咨询)总收入可能不如一个便宜的走量商品,但它利润高得多。
 
-**Why it matters:** Generic benchmarks steer you wrong. Always ask the user: "Does this seasonality match your reality?"
+**为什么要紧:** 如果你死盯走量赢家、忽视毛利领跑者,就是把瞎忙置于利润之上。
 
-### ✗ Bad
-"Industry benchmarks say Q4 is peak retail. You're a pool company. Push hard in Q4 anyway."
+### ✗ 坏
+"服务套餐总共卖了 ¥5,000,商品套装卖了 ¥20,000。主推商品套装。"
 
-### ✓ Good
-"Pool companies peak May–August. Q4 benchmarks don't apply. Confirm with user: 'Do your sales match May–August peak?'"
-
----
-
-## Gotcha: Missing the composite picture
-
-"What's selling" can mean by revenue, margin, velocity, customer lifetime value, or retention. Different metrics tell different stories.
-
-**Why it matters:** Pick the wrong metric and you prioritize products that look good once but don't deliver repeat customers.
-
-### ✗ Bad
-Assume "top seller" = highest revenue. Rank by revenue only.
-
-### ✓ Good
-"How do you measure success? Revenue? Profit? Customer lifetime value? Repeat purchases?" Then rank by their chosen metric — or combine multiple metrics for balance.
+### ✓ 好
+"该问:哪个每单利润更高?服务套餐可能是 70% 毛利 × ¥5,000 = ¥3,500 利润。商品套装可能是 20% 毛利 × ¥20,000 = ¥4,000 利润。故事就不一样了。"
 
 ---
 
-## Gotcha: Not accounting for inventory constraints
+## 坑:季节性基准套不上你的细分
 
-A product might be flying off the shelves, but if inventory is low, pushing hard could create stockouts and frustration.
+"零售在双11冲高"对很多店成立,但不是所有。游泳馆夏季(6–8 月)旺;火锅店冬季旺。
 
-**Why it matters:** You want to drive sales, not broken customer experiences.
+**为什么要紧:** 通用基准会把你带偏。永远要问店主:"这个季节性和你的实际对得上吗?"
 
-### ✗ Bad
-"Widget sales are strong. Push widgets harder."
+### ✗ 坏
+"行业基准说双11是零售高峰。你是游泳馆。双11照样猛推。"
 
-### ✓ Good
-"Widget sales are strong, but inventory is down to 5 units. Flag: 'Before pushing, confirm inventory. Consider promoting a similar alternative or pausing until restock.'"
-
----
-
-## Gotcha: Expecting the alipay connector to export transaction history
-
-The plugin's alipay connector creates payment links, queries a single payment by order number, and processes refunds. It cannot list or export transactions, settlements, or bills.
-
-**Why it matters:** If you try to "pull sales data from Alipay" via the connector, there is no tool for it — and querying orders one-by-one only works if you already know every order number, which defeats the purpose.
-
-### ✗ Bad
-User: "What should I post?"
-Skill: [tries to fetch transaction history through the alipay connector] → no such tool → dead end, or worse, fabricated numbers
-
-### ✓ Good
-User: "What should I post?"
-Skill: "I'll need your sales data as an export — log into 支付宝商家平台 and download the bill/transaction CSV for the last 90 days (微信支付商户平台 has the same export if you take WeChat Pay), or export revenue-by-product from 用友好会计/金蝶精斗云. A pasted report works too."
-User: [provides file or pastes data]
-Skill: [parses and analyzes]
+### ✓ 好
+"游泳馆 6–8 月旺,双11 基准不适用。找店主确认:'你的销售是不是也在 6–8 月见顶?'"
 
 ---
 
-## Gotcha: Payment-platform exports don't map cleanly to your product catalog
+## 坑:漏掉复合视角
 
-Alipay/WeChat Pay bill exports are per-transaction, and the order-title column (商品名称/订单标题) often carries checkout strings, not catalog names — and the export misses cash and other-channel sales entirely.
+"什么在卖"可以指按收入、毛利、动销速度、客户终身价值或复购。不同口径讲不同的故事。
 
-**Why it matters:** Grouping by raw order titles splits one product into five rows (or merges five products into one), and treating a payment-platform export as total revenue understates products that sell offline. The ranking — the whole point of the brief — comes out wrong.
+**为什么要紧:** 选错口径,你就会主推那些看着风光一时、却带不来回头客的商品。
 
-### ✗ Bad
-Group the Alipay CSV by the raw title column → "亚麻连衣裙-M-米白" and "亚麻连衣裙 M码" ranked as two different products → neither makes the top 5.
+### ✗ 坏
+默认"畅销"=收入最高,只按收入排。
 
-### ✓ Good
-Normalize titles into catalog products, confirm ambiguous groupings with the owner ("are these all the linen midi?"), and prefer the accounting-software export (用友好会计/金蝶精斗云) for item names and margins. State the coverage gap in the brief: "Based on 支付宝商家平台 export — excludes cash sales."
+### ✓ 好
+"你怎么定义成功?收入?利润?客户终身价值?复购?"再按他们选的口径排——或多口径组合求平衡。
+
+---
+
+## 坑:没考虑库存约束
+
+某商品可能卖得飞快,但如果库存告急,继续猛推会造成断货和客户不满。
+
+**为什么要紧:** 你要的是拉动销售,不是把客户体验搞砸。
+
+### ✗ 坏
+"连衣裙卖得猛,继续猛推。"
+
+### ✓ 好
+"连衣裙卖得猛,但库存只剩 5 件。标注:'主推前先确认库存。可考虑改推近似替代款,或等补货再推。'"
+
+---
+
+## 坑:指望支付宝连接器导出交易历史
+
+插件的支付宝连接器能创建收款链接、按订单号查单笔支付、处理退款。它无法列出或导出交易、结算或账单。
+
+**为什么要紧:** 如果你想通过连接器"从支付宝拉销售数据",根本没有这个工具——而逐个订单号查单,只有在你已经知道每个订单号时才成立,那就失去意义了。
+
+### ✗ 坏
+店主:"该发什么?"
+技能:[试图通过支付宝连接器拉取交易历史] → 没有这种工具 → 死路,或更糟,编出数字
+
+### ✓ 好
+店主:"该发什么?"
+技能:"我需要你的销售数据导出——登录支付宝商家平台,下载最近 90 天的账单/交易 CSV(收微信支付的话,微信支付商户平台有同样的导出);或从用友好会计/金蝶精斗云导出按商品的收入。粘贴报表也行。"
+店主:[给出文件或粘贴数据]
+技能:[解析并分析]
+
+---
+
+## 坑:支付平台导出对不上你的商品目录
+
+支付宝/微信支付账单导出是逐笔交易,订单标题列(商品名称/订单标题)往往是结账串,不是目录名——而且导出完全漏掉现金和其他渠道的销售。
+
+**为什么要紧:** 按原始订单标题归并,会把一个商品拆成五行(或把五个商品并成一个);把支付平台导出当成总收入,又会低估那些线下走货的商品。排名——整份简报的核心——就会算错。
+
+### ✗ 坏
+按原始标题列归并支付宝 CSV → "亚麻连衣裙-M-米白"和"亚麻连衣裙 M码"被排成两个不同商品 → 都进不了前 5。
+
+### ✓ 好
+把标题归一到目录商品,含糊归并和店主确认("这些都是那款亚麻中长裙吗?"),按商品名和毛利优先用会计软件导出(用友好会计/金蝶精斗云)。在简报里说明覆盖缺口:"基于支付宝商家平台导出——不含现金销售。"

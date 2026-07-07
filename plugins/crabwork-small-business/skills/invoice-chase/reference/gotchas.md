@@ -1,39 +1,63 @@
-# Gotchas
+# 常见坑(Gotchas)
 
-Known failure modes for invoice-chase.
-
----
-
-**Customer paid via bank transfer or WeChat Pay — not visible in the Alipay bill export.**
-
-The Alipay cross-reference only catches Alipay payments. A customer who paid by bank transfer or WeChat Pay may still appear as overdue in AR. Note this in the summary: "Alipay bill only — bank transfer / WeChat Pay payments not verified." Let the owner confirm before sending.
+invoice-chase 的已知失败模式。
 
 ---
 
-**The Alipay bill export is stale.**
+**客户走银行转账或微信支付——支付宝账单里看不到。**
 
-The "possibly paid" check is only as fresh as the bill file. If the export's end date is more than 2 days old, a customer may have paid since it was downloaded. Ask the owner for a fresh 支付宝商家平台 download before presenting drafts for approval; if they can't provide one, say so in the summary rather than presenting the check as current.
-
----
-
-**The accounting AR export includes internal or test accounts.**
-
-Some setups include internal billing accounts or test records in AR. Before drafting, filter out customers whose email domain matches the owner's domain, and flag any customer name containing "Test," "Internal," "Demo," or "测试."
+支付宝交叉核对只能抓到支付宝付款。走银行转账或微信支付付清的客户,在应收里仍可能显示为逾期。在汇总表中注明:"仅核对支付宝账单——银行转账 / 微信支付未核验。"发送前让店主确认。
 
 ---
 
-**Multiple overdue invoices from the same customer — send one reminder only.**
+**支付宝账单导出过期。**
 
-Never draft two separate reminders to the same customer in one batch. Consolidate all overdue invoices into one message with a total amount and a list of invoice numbers. Two messages to the same person in one batch looks disorganized and may get flagged as spam.
-
----
-
-**Alipay payment link creation fails or the connector is absent.**
-
-Creating a payment link requires the Alipay connector to be configured (via /plugin → Manage plugins → Configure); if it isn't, the connector simply won't appear. In that case — or if link creation returns an error — fall back to the owner's own收款 link or bank details in the draft, and report the fallback: "Alipay link unavailable for [customer] — draft uses your standard payment instructions instead." Do not silently drop the reminder.
+"疑似已付"检查的时效只等于账单文件的时效。若导出截止日期距今超过 2 天,客户可能在下载之后已付款。呈交草稿供批准前,向店主索要一份最新的支付宝商家平台下载;若拿不到,在汇总表中说明,而非把该检查当作实时结果呈现。
 
 ---
 
-**The WeChat Pay export and the accounting AR may both carry the same invoice.**
+**记账应收导出里混入内部或测试账户。**
 
-If the owner provided a 微信支付商户平台 export and a customer appears in both it and the accounting AR, it may be the same invoice tracked in two systems. Match on invoice/order number first; if no number match, match on amount + due date. When uncertain, flag to the owner and draft only one reminder rather than two.
+有些配置会把内部结算账户或测试记录也放进应收。起草前先过滤:剔除与店主属同一主体的关联 / 内部账户,并标记名称含"测试""内部""Demo""Test"的客户。
+
+---
+
+**同一客户多笔逾期——只发一条提醒。**
+
+绝不在同一批次里给同一客户起草两条独立提醒。把所有逾期账款合并成一条消息,给出合计金额并列出各笔编号。同一批次给同一人发两条,显得杂乱,还可能被判为骚扰 / 垃圾信息。
+
+---
+
+**支付宝收款链接创建失败,或连接器缺失。**
+
+创建收款链接需要支付宝连接器已配置(经 /plugin → 管理插件 → 配置);未配置时该连接器根本不会出现。此时——或链接创建报错时——回退到店主自己的收款链接或银行账户信息,并如实回报:"无法为 [客户] 生成支付宝链接——草稿改用你的常规收款方式。"不要悄悄丢掉这条提醒。
+
+---
+
+**微信支付导出与记账应收可能记着同一笔账款。**
+
+若店主提供了微信支付商户平台导出,而某客户在它与记账应收里都出现,可能是同一笔账款被两个系统各记了一次。先按发票 / 订单号匹配;无号可匹配时,按金额 + 到期日匹配。拿不准时,标记给店主,只起草一条提醒,而非两条。
+
+---
+
+**「款到才开票 vs 票到才付款」的死结——发票义务别漏、别混。**
+
+小微常被这个死结卡住:对方以「没收到发票」为由拖付款,或己方以「没收到款」为由不开票。切记**开具发票(增值税普通 / 专用发票、数电发票)是收款方的法定义务,客户索票是法定权利**,不能拿「款到才开票」当合法挡箭牌。起草前先厘清欠的是「款」还是「票」:该催款的催款,该开票 / 补票的按义务开,票、款两条线分别写清、分别推进,别混为一谈也别漏掉任一条。
+
+---
+
+**催收凭证没留存——3 年诉讼时效可能白白流逝。**
+
+依《民法典》,诉讼时效为 3 年,自权利人知道或应当知道权利受损及义务人之日起算;书面催告可中断时效重新起算。因此每一次催收(短信、微信、催款函、邮件)都要提醒店主**留存书面凭证**——既是催告,也是时效中断与日后主张的证据。话术要体现「及时主张、尽快结清」,别让账款拖到时效边缘才动。
+
+---
+
+**逾期利息 / 违约金——别硬编具体数值,别漫天要价。**
+
+逾期利息或违约金:有约定的按合同约定,没约定的可参照**当期 LPR**(全国银行间同业拆借中心贷款市场报价利率)主张资金占用损失。文案里**只写「按合同约定或参照当期 LPR」,绝不硬编码具体利率或金额**;约定违约金过分高于实际损失的可能被法院酌情调减,话术中不宜漫天要价,以免削弱正当主张。
+
+---
+
+**催收红线——语气可分级,合法不可越线。**
+
+温和 / 正式只是措辞轻重之别。**任何草稿都不得含威胁、恐吓、骚扰,不得公开欠款人隐私,不得向其亲友 / 同事等无关第三方施压。**正式催告的正确落点是「正式主张 + 保留书面证据 + 必要时通过法律途径解决」,靠事实与合法权利说话,而非制造恐惧或人身压力。每条催收产物末尾附「【AI 辅助整理,非法律意见,请核对合同】」提示。

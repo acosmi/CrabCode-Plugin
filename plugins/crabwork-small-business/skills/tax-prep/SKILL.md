@@ -1,53 +1,55 @@
 ---
 name: tax-prep
 version: 0.3.0
-description: Prepares tax-season materials — quarterly estimated tax calculation or year-end 1099 prep — and produces an accountant handoff packet (framed as deliverables, not tax advice). Works from owner-provided exports — accounting software (用友好会计 / 金蝶精斗云) CSV/Excel plus 支付宝商家平台 / 微信支付商户平台 bill exports. Trigger when the owner runs /tax-prep or mentions "estimated taxes," "quarterly taxes," "how much to set aside for taxes," "1099s," "1099-NEC," "contractor payments," "W-9s," "year-end tax prep," or "my accountant needs..." Accepts optional mode and year arguments.
+description: 整理报税季材料 —— 季度申报数据整理或年度汇算清缴数据整理 —— 并产出交给代账会计 / 税务师的交接包(定位为交接材料,不是税务意见,也绝不代客申报或报送税务机关)。依据业主提供的导出:记账软件(用友好会计 / 金蝶精斗云)CSV/Excel,加支付宝商家平台 / 微信支付商户平台账单。当业主运行 /tax-prep,或提到"季度申报""这季度交多少税""增值税""小规模纳税人""附加税费""企业所得税预缴""汇算清缴""经营所得""进销项发票""缺票""要给会计的材料"时触发。可接收可选的模式与年度参数。
 allowed-tools: Read, WebFetch, Bash
 ---
 
-Run the tax prep workflow using the `tax-season-organizer` skill. Act immediately — the user typed /tax-prep, so skip the discovery phase.
+用 `tax-season-organizer` 技能执行报税季整理流程。立即行动——用户既然输入了 /tax-prep,就跳过发现阶段。
 
-Parse arguments:
-- `--mode` (default: infer from date — Q1-Q3 defaults to `quarterly`, Q4/Jan defaults to `both`) — `quarterly` for estimated tax payment, `1099` for year-end 1099-NEC prep, `both` for combined
-- `--year` (default: current year)
+解析参数:
+- `--mode`(默认:按日期推断——汇算清缴季 1–5 月默认 `both`,其余默认 `quarterly`)——`quarterly` 为季度申报数据整理,`annual` 为年度汇算清缴数据整理,`both` 为两者合并。
+- `--year`(默认:当前年度)
 
-**Framing:** Open every deliverable with "Prepared for review by your accountant — not tax advice."
+**定位:** 每份交付物页首都标注 `【AI 辅助整理,非税务意见,请经会计/税务师复核后使用】`;只产出交接包,绝不代客申报或向税务机关报送。
 
-## Step 1 — Determine mode
+## 第一步 —— 判断模式
 
-If `--mode` was not provided:
-1. Check the current date. If Oct–Jan, default to `both`. Otherwise default to `quarterly`.
-2. Confirm with the owner: "Based on the time of year, I'll prepare [mode]. Want me to do something different?"
+若未提供 `--mode`:
+1. 看当前日期。若为 1–5 月(汇算清缴季,常与上年第四季度 / 当年第一季度申报重叠),默认 `both`;其余默认 `quarterly`。
+2. 与业主确认:"按当前时点,我先做[模式]整理。要改成别的吗?"
 
-## Step 2 — Quarterly estimated tax (if mode includes quarterly)
+## 第二步 —— 季度申报数据整理(模式含 quarterly 时)
 
-1. Ask the owner for a YTD Profit & Loss (Jan 1 through last completed quarter) exported from their accounting software (用友好会计 / 金蝶精斗云) as CSV/Excel — or pasted net income. There is no accounting-software connector yet; this is always an owner-provided export.
-2. If the owner can't export right now, work from pasted key numbers (gross revenue, total expenses, net income).
-3. Ask: "How much have you already paid in estimated taxes this year?"
-4. Calculate: SE tax, adjusted net income, federal income tax estimate (default 22% bracket), quarterly payment due.
-5. State every assumption explicitly — bracket, business type, exclusions.
-6. Deliver the formatted estimate with the due date for the current quarter.
+1. 请业主从记账软件(用友好会计 / 金蝶精斗云)导出当季经营数据(利润表、销售额、销项 / 进项,CSV/Excel),或直接粘贴关键数字。目前尚无记账软件连接器,始终是业主提供的导出。
+2. 若一时无法导出,就用粘贴的关键数字(当季销售额、成本费用、初步应纳税所得额)。
+3. 先判断增值税身份(小规模 / 一般纳税人)与所得税主体(公司 / 个体户等),再问:"本年前面季度已申报预缴了多少?"
+4. 分税种整理:增值税(小规模比对季度免征线、征收率;一般纳税人销项 − 进项)、附加税费(以实缴增值税为依据)、企业所得税季度预缴(小型微利优惠)或经营所得预缴。
+5. 写明每一项口径与假设——身份、征收率、优惠适用、时效(截至 2026、执行至 2027-12-31、请核实当年最新口径、以电子税务局为准)。
+6. 交付格式化的整理包,附本季申报期限(季度终了后 15 日内)。
 
-## Step 3 — Year-end 1099 prep (if mode includes 1099)
+## 第三步 —— 年度汇算清缴数据整理(模式含 annual 时)
 
-1. Gather contractor/vendor payments from owner-provided exports: the accounting-software vendor payment report (CSV/Excel) plus 支付宝商家平台 bill export — and 微信支付商户平台 bill export if the owner pays contractors via WeChat Pay (微信支付, not yet connected). Note: the alipay connector cannot export payment history, so bill data always comes from the 商家平台 export or pasted records.
-2. Aggregate by payee across sources. Flag likely duplicates for human review — never auto-merge.
-3. Apply the $600 threshold. Flag near-threshold payees ($400–$599).
-4. Check W-9 status from the accounting-software export for each flagged payee.
-5. Deliver the 1099-NEC candidate list with missing W-9 action items and a data coverage note stating which exports were provided.
+1. 从业主提供的导出汇总全年收入、成本费用:记账软件全年明细与进销项发票清单(CSV/Excel),加支付宝商家平台账单——若业主也用微信支付收付款,再加微信支付商户平台账单(微信支付暂未接入)。注意:支付宝连接器无法导出交易历史,账单数据只能来自商家平台导出或粘贴记录。
+2. 核对进销项发票与收付流水,交叉核对开票收入 vs 收款流水 vs 账载收入,差异逐项标注,不自动合并。
+3. 标记缺票 / 白条等不可税前扣除项(税前扣除凭证须为发票,区分发票与收据),只标记不擅自调整。
+4. 核对可享的小微优惠:企业所得税小型微利三条件,或个体工商户经营所得 ≤ 200 万元减半。
+5. 交付汇算清缴整理包:含缺票待补清单、数据覆盖说明,以及汇算期限(企业所得税次年 5 月 31 日前、经营所得次年 3 月 31 日前,以电子税务局为准)。
 
-## Approval gates
+## 审批红线
 
-- **Not tax advice.** State this in every output header.
-- **State every assumption.** Bracket, business type, excluded deductions — give the accountant the levers.
-- **Don't merge payees automatically.** Flag duplicates for human review.
-- **Don't file anything.** Output is prep material only.
+- **非税务意见。** 每份产出页首都要标注。
+- **绝不代客申报。** 只产出交接包,申报与向税务机关报送由用户 / 会计执行。
+- **写明每一项口径与假设。** 身份、征收率、优惠、时效——给会计可调的抓手。
+- **不硬编码易变税率为永久事实。** 一律附时效声明与"请核实当年最新口径"。
+- **税前扣除凭证须为发票。** 缺票项只标记、不擅自税前扣除。
+- **不自动合并、不擅自判定。** 疑似重复的交易对方 / 发票交人工核对。
 
-## Spreadsheet input routing
+## 表格文件路由
 
-- When the P&L or vendor-payment export arrives as an Excel file (.xlsx/.xls), parse it via `crabcode-office-suite:crabcode-spreadsheets`; CSV files and pasted numbers need no extra tooling. Use the same skill if the owner wants the 1099 candidate list delivered as a spreadsheet file for their accountant.
-- If that skill reports Unknown skill, the office suite is not installed: guide the owner to install `crabcode-office-suite` via `/plugin` and retry — or ask for a CSV export instead and deliver the prep material as markdown.
+- 当利润表、进销项发票或成本费用明细以 Excel 文件(.xlsx/.xls)上传时,用 `crabcode-office-suite:crabcode-spreadsheets` 解析;CSV 文件与粘贴的数字无需额外工具。若业主希望把整理好的交接包以表格文件形式交给会计,同样用该技能生成。
+- 若该技能报 Unknown skill,说明未安装办公套件:引导业主通过 `/plugin` 安装 `crabcode-office-suite` 后重试——或改为请其导出 CSV,并以 markdown 形式交付整理材料。
 
-## Output
+## 输出
 
-End with a next-steps checklist for the accountant: missing W-9s to collect, assumptions to verify, deadlines to hit.
+以给会计的下一步清单收尾:待补的缺票、待确认的口径与优惠、待赶的申报 / 汇算期限。

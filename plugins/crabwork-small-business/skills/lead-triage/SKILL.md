@@ -2,63 +2,85 @@
 name: lead-triage
 version: 0.3.0
 description: >
-  Scores inbound HubSpot leads by engagement signals, company fit, and urgency
-  markers to produce a "call these 5 today" list with talking points, drafts
-  the follow-ups for the owner to send, and proposes call slots against the
-  owner's DingTalk (钉钉日程) or Feishu (飞书日历) calendar. Use when the user
-  asks to prioritize leads, "who should I call first," "who are my hottest
-  leads," "what's in my pipeline," "which deals need attention," "who do I
-  follow up with," or wants inbound prospects ranked by who's most worth
-  contacting now.
+  按互动信号、公司匹配度与紧迫度给 CRM 入站线索打分,产出"今天先打这 5 个"的
+  跟进清单与话术要点,替业主起草待发跟进(仅草稿),并对照业主的钉钉日程或飞书日历
+  提议通话时段。对联系人打分排序属于处理个人信息且为自动化决策,内置《个人信息保护法》
+  护栏(合法取得 / 最小必要 / 不作差别待遇 / 保留人工干预)。触发词:给线索排序、
+  先打谁、谁最值得联系、我的销售管道、哪些商机要跟进、该联系谁。Scores inbound
+  CRM leads by engagement signals, company fit, and urgency markers to produce
+  a "call these 5 today" list with talking points, drafts the follow-ups for the
+  owner to send, and proposes call slots against the owner's DingTalk (钉钉日程) or
+  Feishu (飞书日历) calendar — scoring from the connected CRM (企业微信/钉钉/飞书/有赞;
+  HubSpot for cross-border), and degrading to a pasted/exported lead list when none is
+  connected. Use when the user asks to prioritize leads, "who should
+  I call first," "who are my hottest leads," "what's in my pipeline," "which deals
+  need attention," "who do I follow up with," or wants inbound prospects ranked by
+  who's most worth contacting now.
 ---
 
-# Lead Triage
+# 线索分诊(Lead Triage)
 
-## Quick start
+## 快速上手
 
-Pull inbound leads from HubSpot, score them, and surface a ranked call list with talking points. Drafts follow-ups and proposes calendar slots — never sends or books without owner approval.
+从你的 CRM(企业微信 / 钉钉 / 飞书 / 有赞;做外贸可选 HubSpot)拉取入站线索,打分,产出一份带话术要点的排序通话清单。可替业主起草跟进、提议日历时段——未经业主批准绝不代发、绝不代订。
+
+> **合规前提(《个人信息保护法》):** 对联系人打分排序既是**处理个人信息**,也是**自动化决策**(PIPL 第 24 条)。仅可使用**合法取得**(告知同意或合同必需等合法性基础)的联系人信息;打分**仅用于内部跟进优先级排序**,不得据此对客户在成交价格等条件上实行差别待遇(不做价格歧视 / 大数据杀熟)。详见下方"个人信息保护护栏"。
 
 ```
-User: "prioritize my leads"
-→ Pull contacts: lifecycle stage Lead or MQL, status ≠ Unqualified
-→ Score each across engagement, company fit, urgency, recency
-→ Return ranked list (size adapts to volume) with talking points
-→ Offer to draft follow-ups and propose calendar slots
+用户:"给我的线索排个序"
+→ 从已连接的 CRM 拉取线索联系人:处于"潜在客户 / 已验证"阶段、未标记为无效(各平台阶段字段映射见 lead-scoring.md)
+→ 逐条按互动、公司匹配、紧迫度、近期触达打分
+→ 返回排序清单(条数随线索量自适应),附话术要点
+→ 主动提议起草跟进、提议日历时段
 ```
 
-## Workflow
+## 工作流
 
-1. **Pull leads from HubSpot.** Fetch contacts with `lifecyclestage` = `Lead` or `MQL` and `hs_lead_status` ≠ `Unqualified`. Use the field list in [reference/hubspot-scoring.md](reference/hubspot-scoring.md). If HubSpot is unavailable, stop: *"HubSpot is disconnected — connect it and try again."*
+1. **从你的 CRM 拉取线索。** CRM 可为企业微信 / 钉钉 / 飞书 / 有赞(外贸可选 HubSpot)。拉取处于"潜在客户 / 已验证线索"阶段、未被标记为无效的联系人;各平台的阶段与字段映射见 [reference/lead-scoring.md](reference/lead-scoring.md)。若尚未连接任何 CRM,提示业主连接,或让其**粘贴 / 导出**线索清单后继续——二者皆可,但绝不臆造线索。(CRM 连接器以实际配置为准。)
 
-2. **Clarify if trigger is ambiguous.** If the user said only "pipeline" without a qualifier, ask: *"Quick pipeline overview (deal stages + total value) or prioritized call list?"* — then route accordingly. Do not score leads on a bare "pipeline."
+2. **触发词含糊先澄清。** 若业主只说"管道"而无限定词,先问:*"要快速的管道概览(各成交阶段 + 总金额),还是排好序的通话清单?"*——再据此路由。仅凭一个"管道"不要直接给线索打分。
 
-3. **Score each lead.** Apply the four-dimension model in [reference/hubspot-scoring.md](reference/hubspot-scoring.md):
-   - **Engagement** — email replies, opens, site visits in HubSpot (last 30 days only)
-   - **Company fit** — industry and employee count vs. owner's ICP (default: any industry, 1–50 employees)
-   - **Urgency** — lead age, stage duration, notes containing "urgent / ASAP / deadline / budget approved"
-   - **Recency penalty** — subtract points if last activity was <24 hours ago (already touched today)
+3. **逐条打分。** 套用 [reference/lead-scoring.md](reference/lead-scoring.md) 的四维模型:
+   - **互动** —— 你的 CRM 中的互动信号:回复 / 打开 / 浏览 / 到店 / 加购等,按平台等价映射(HubSpot=邮件回复/打开/网站访问;企业微信=客户消息/朋友圈互动/客户群;有赞=下单/复购/咨询)(仅近 30 天)
+   - **公司匹配** —— 行业与员工数对照业主的 ICP(默认:不限行业,1–50 人)
+   - **紧迫度** —— 线索存续时长、停留阶段时长、备注含紧迫措辞(如"急""尽快""截止""预算已批"等)
+   - **近期触达扣分** —— 若最后活动在 24 小时内(今天已碰过),扣分
 
-4. **Build the ranked list.** Sort descending by composite score. Adapt list size to volume:
-   - ≤10 leads → show all
-   - 11–30 leads → show top 5
-   - >30 leads → show top 8
+   打分前先确认字段来源:只使用为"排序跟进"这一目的所必需的字段,不引入来源不明或未获授权的个人信息(**最小必要**)。
 
-   For each lead: name, company, score, one-paragraph talking point, last activity summary. If engagement signals are all >30 days old, flag: *"Engagement signals are stale — approach as cold outreach."*
+4. **生成排序清单。** 按综合分降序排列。清单条数随量自适应:
+   - ≤10 条 → 全显
+   - 11–30 条 → 显示前 5
+   - >30 条 → 显示前 8
 
-5. **Offer follow-up drafts.** Ask: *"Draft follow-ups for any of these?"* If yes, write one email per selected lead, drawing tone and context from the lead's HubSpot notes and logged activity — there is no email connector, so if the owner wants the last thread matched exactly, ask them to paste it. Show the draft in chat; the owner copies it into their own email tool or WeChat and sends it. Never send.
+   每条线索给出:姓名、公司、分数、一段话术要点、最后活动摘要。清单顶部固定标注:*`【AI 辅助排序,基于合法取得的客户信息,仅供内部跟进优先级】`*。若互动信号全部早于 30 天,标注:*"互动信号已过时——按陌生拜访对待。"*
 
-6. **Offer calendar slots.** Ask: *"Propose call slots for any of these?"* If yes, check the owner's calendar via the connected DingTalk (钉钉日程) or Feishu (飞书日历) connector for open 30-minute windows in the next two business days (avoid slots with existing events ±15 min). Propose two options per lead. Do not create events — the owner books. If neither calendar connector is configured, propose reasonable times as a plain list and flag that availability wasn't checked.
+5. **提议起草跟进。** 问:*"要给其中哪些起草跟进?"* 若要,每个选定线索写一封邮件,语气与背景取自该线索的 CRM 备注与已记录活动——没有邮件连接器,若业主要精确衔接上一封往来,请其粘贴原文。草稿在对话中展示;由业主自行复制到自己的邮箱工具或微信发送。绝不代发。
 
-## Approval gates
+6. **提议日历时段。** 问:*"要给其中哪些提议通话时段?"* 若要,通过已连接的钉钉日程或飞书日历连接器,查未来两个工作日内空闲的 30 分钟窗口(避开前后 ±15 分钟已有日程)。每个线索提议两个选项。不创建日程——由业主自行预订。若两个日历连接器都未配置,则以纯文本列出合理时间,并标注"未核对空闲情况"。
 
-- **Never send an email.** Draft only; owner sends from their inbox.
-- **Never create calendar events.** Propose times; owner books.
-- **Never change lifecycle stage or mark a lead Unqualified** unless the owner explicitly asks.
-- **Never include `Customer` or `Evangelist` lifecycle contacts** in the lead list.
-- **If zero leads match the filter**, explain why and offer to check what lifecycle stages are in use — do not fabricate a list.
+## 个人信息保护护栏(《个人信息保护法》)
 
-## Reference
+对联系人打分排序既是**处理个人信息**,也是**自动化决策**(PIPL 第 24 条)。执行时守住四条:
 
-- [reference/hubspot-scoring.md](reference/hubspot-scoring.md) — HubSpot field names, scoring weights, ICP defaults
-- [reference/gotchas.md](reference/gotchas.md) — edge cases: stale data, zero leads, pipeline disambiguation, customer contamination
-- [reference/examples/happy-path-triage.md](reference/examples/happy-path-triage.md) — worked output for a 7-lead list with draft and slot proposal
+1. **合法取得。** 只对通过合法性基础(告知同意、合同必需等)取得的联系人信息打分;不得使用来源不明、未经授权或超出原始告知范围的个人信息。
+2. **最小必要。** 只使用实现"排序跟进"目的所必需的字段(见 lead-scoring.md 的字段清单),不为打分而过度收集或引入无关个人信息。
+3. **透明与结果公平。** 自动化决策须保证透明、结果公平;打分**仅用于内部跟进优先级**,不得据此对个人在成交价格等交易条件上实行不合理差别待遇(不做价格歧视 / 大数据杀熟)。
+4. **保留人工干预。** 不完全依赖自动打分——分数只是排序参考,由业主结合实际判断,可随时人工调整顺序或剔除某条。
+
+深度合规(个人信息处理活动分诊、个人信息保护影响评估)超出本技能范围,移交 crablaw-cn 数据合规插件的 `crablaw-cn:data-activity-triage` 技能处理。
+
+## 审批门禁
+
+- **绝不代发邮件。** 仅出草稿;由业主从自己的邮箱发送。
+- **绝不创建日历日程。** 只提议时间;由业主自行预订。
+- **绝不变更生命周期阶段、绝不标记线索为 Unqualified**,除非业主明确要求。
+- **绝不把 `Customer` 或 `Evangelist` 生命周期的联系人**纳入线索清单(他们已是客户,不是待转化线索)。
+- **打分与跟进基于合法取得的个人信息,仅作内部优先级排序,不作价格歧视等差别待遇。**
+- **若无线索匹配过滤条件**,解释原因并提议查看当前在用的生命周期阶段——不要编造清单。
+
+## 参考
+
+- [reference/lead-scoring.md](reference/lead-scoring.md) —— 中性字段→各平台映射、打分权重、ICP 默认值(以实际连接的 CRM 当年文档为准)
+- [reference/gotchas.md](reference/gotchas.md) —— 边界情况:过时数据、零线索、管道歧义、客户混入、个人信息合规
+- [reference/examples/happy-path-triage.md](reference/examples/happy-path-triage.md) —— 7 条线索清单的完整示例,含草稿与时段提议

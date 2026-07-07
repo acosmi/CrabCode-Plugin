@@ -1,6 +1,8 @@
 # Cleanup checklist
 
-The fields the `crm-maintenance` skill checks during a deal cleanup, plus the evidence needed to flag each. This runs when the user says "clean up HubSpot" or "is this deal up to date" scoped to a specific deal.
+The fields the `crm-maintenance` skill checks during a deal cleanup, plus the evidence needed to flag each. This runs when the user says "clean up the CRM" or "is this deal up to date" scoped to a specific deal.
+
+Field names below (`hs_lastactivitydate`, `hs_next_step`, `dealstage`, …) are the **HubSpot** examples; for 企业微信 / 钉钉 / 飞书 / 有赞 use that platform's equivalent per [crm-fields.md](crm-fields.md). For SCRM without a pipeline (企业微信), run the deal checks against the customer / 客户 record and skip pipeline-only items (stage, amount).
 
 Work through every item. Present findings as a review list; write only what the user approves.
 
@@ -50,7 +52,7 @@ Work through every item. Present findings as a review list; write only what the 
 
 **Evidence to flag:** An email CC (in a pasted thread) or a DingTalk/Feishu meeting attendee whose domain matches an existing deal contact's domain but who isn't on the deal.
 
-**Proposed action:** Propose adding the missing contact(s) to the deal. Create the contact in HubSpot first if they don't exist yet.
+**Proposed action:** Propose adding the missing contact(s) to the deal. Create the contact in your CRM first if they don't exist yet.
 
 ## 7. Notes hygiene
 

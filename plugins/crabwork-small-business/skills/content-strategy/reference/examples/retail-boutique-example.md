@@ -1,71 +1,75 @@
-# Example: Retail boutique — 18 months of data
+# 示例:复古服装店 —— 18 个月数据
 
-**Business:** Vintage clothing boutique
-**Trigger:** "What should I push this month?"
-**Data source:** 金蝶精斗云 revenue-by-product export, Excel (18 months) — cross-checked against 支付宝商家平台 bill CSV
-**User's metric:** Revenue
-**User's seasonality:** "We peak April–May and November–December. Dead in July–August."
-
----
-
-## Input data summary
-
-- Total revenue (18 months): ¥467,500
-- Top product category: Vintage leather jackets (¥126,200 / 27% of revenue)
-- Second: 90s band tees (¥84,100 / 18%)
-- Third: High-waisted denim (¥65,400 / 14%)
-- Slowest: Vintage hats (¥14,000 / 3%)
-
-**Trending up:** Band tees (growing 12% month-over-month for 3 months)
-**Trending down:** Vintage accessories (declining 8% month-over-month)
+**生意:** 古着(复古服装)店
+**触发:** "这个月该主推什么?"
+**数据源:** 金蝶精斗云 按商品收入导出,Excel(18 个月)——与支付宝商家平台账单 CSV 交叉核对
+**店主口径:** 收入
+**店主季节性:** "我们 4–5 月和 11–12 月旺,7–8 月很淡。"
 
 ---
 
-## The brief (ready for owner approval)
+## 输入数据摘要
 
-### Executive Summary
+- 总收入(18 个月):¥467,500
+- 头号品类:复古皮夹克(¥126,200 / 占收入 27%)
+- 第二:90 年代乐队 T 恤(¥84,100 / 18%)
+- 第三:高腰牛仔(¥65,400 / 14%)
+- 最慢:复古帽子(¥14,000 / 3%)
 
-Your bestseller is vintage leather jackets — they consistently drive 27% of revenue. Band tees are surging and should be featured. April peak season is starting; push jackets and tees hard. July slowdown is coming; plan summer clearance strategy for slower items.
-
-### Push hard (next 30 days)
-
-1. **Vintage leather jackets**
-   - What to say: "Built to last. Investment pieces with character." (customer testimonials about durability)
-   - Recommended angle: Behind-the-scenes sourcing story, care/styling tips
-   - Timeline: Start mid-April for May peak
-
-2. **90s band tees**
-   - What to say: "Nostalgia + authenticity. No reproductions, all vintage." (emphasize rarity)
-   - Recommended angle: "Which era are you? 1990s vs 2000s collector's guide"
-   - Timeline: Capitalize on momentum now; feature weekly
-
-### Hold steady
-
-- **High-waisted denim** — solid performer, 14% of revenue. Maintain weekly rotation in feed; don't over-index.
-
-### Reposition / pause
-
-- **Vintage hats** — only 3% of revenue. Options:
-  - Bundle with leather jackets ("Complete the look")
-  - Offer 20% off to test demand
-  - Or pause until holiday season (Christmas styling posts)
-
-- **Vintage accessories** — declining. Similar options: bundle or pause until Q4.
-
-### Seasonal opportunity
-
-- **July–August slowdown:** Plan clearance content for May/June. "Summer refresh" angle for lighter pieces. (Consider a flash sale in early July to drive traffic during slow season.)
-- **November–December:** Position leather jackets as holiday gifts (luxury, timeless); feature gift guides in October.
-
-### Recommended offers
-
-1. **Bundle:** Jacket + tee + belt = styled outfit at 5–10% bundle discount
-2. **Flash sale:** Mid-July, 15% off slower items to build July traffic
-3. **Free perks:** First buyer gets free styling guide or cleaning cloth
+**上行:** 乐队 T 恤(连续 3 个月环比增长 12%)
+**下行:** 复古配饰(环比下降 8%)
 
 ---
 
-## Next steps
+## 简报(待店主批准)
 
-- **Owner approval:** "Does this feel right? Anything to adjust?"
-- **Feed to design-creator:** Once approved, pass this brief to `design-creator` to build the posting calendar, draft the copy and emails, and write the design briefs for the next 30 days (the owner renders the visuals in their design tool).
+### 执行摘要
+
+你的头号畅销品是复古皮夹克——稳定贡献 27% 收入。乐队 T 恤在起势,应重点展示。4 月旺季开始;皮夹克和 T 恤重点猛推。7 月淡季将至;为慢动销品排一套夏季清仓策略。
+
+### 重点主推(未来 30 天)
+
+1. **复古皮夹克**
+   - 怎么说:"耐穿,有故事的传世单品。"(客户关于耐用度的真实评价)
+   - 建议角度:选品幕后故事、保养/搭配贴士
+   - 时点:4 月中启动,迎 5 月高峰
+
+2. **90 年代乐队 T 恤**
+   - 怎么说:"怀旧 + 真品。全是古着,没有复刻。"(强调稀缺)
+   - 建议角度:"你是哪个年代的?90 年代 vs 2000 年代收藏指南"
+   - 时点:趁势而上,每周上新展示
+
+### 维持
+
+- **高腰牛仔**——稳健,占 14% 收入。在动态里保持每周轮播;不过度下注。
+
+### 重新定位 / 暂停
+
+- **复古帽子**——仅占 3% 收入。选项:
+  - 与皮夹克搭售("整套搭配")
+  - 打 8 折试探需求
+  - 或按住到年底旺季(圣诞 / 春节搭配帖)
+
+- **复古配饰**——在走弱。同类选项:搭售或按住到四季度(双11 / 双12)。
+
+### 季节性机会
+
+- **7–8 月淡季:** 5/6 月就排清仓内容。"夏日焕新"角度主打轻薄款。(可考虑 7 月初做一场限时特卖,在淡季拉流量。)
+- **11–12 月:** 把皮夹克定位成年终礼物(质感、经典);10 月就上礼物指南,卡位双11 / 双12。
+
+### 建议促销
+
+1. **搭售:** 夹克 + T 恤 + 腰带 = 整套造型,享 5–10% 套装优惠
+2. **限时特卖:** 7 月中,慢动销品 85 折,拉动 7 月流量
+3. **赠品福利:** 首购送搭配指南或清洁布
+
+> **价格法视角(落地文案时核对):** 上面这些折扣、搭售、赠品是策略方向,写成对外文案前要过《价格法》自检——**原价须真实**(不虚标划线价、不虚构原价),**折扣要算得对**("8 折""85 折"须与真实成交价一致),**买赠 / 满减写清条件**(赠什么、送多少、满多少、到几号、限不限量)。含糊或虚构会触碰《价格法》《消费者权益保护法》。成品促销文案由 `design-creator` 把关,拿不准移交 `crablaw-cn:marketing-claims-review`。
+>
+> `【AI 辅助策略,落地文案须过《广告法》/《价格法》合规自检】`
+
+---
+
+## 下一步
+
+- **店主批准:** "感觉对吗?有要调的吗?"
+- **交给 design-creator:** 一旦批准,把这份简报交给 `design-creator`,去搭发布日历、起草文案和邮件、为未来 30 天写设计简报(视觉素材由店主在自己的设计工具里渲染)。

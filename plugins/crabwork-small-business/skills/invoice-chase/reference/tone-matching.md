@@ -1,46 +1,58 @@
-# Tone Matching
+# 语气匹配(Tone Matching)
 
-Scoring logic and reminder tone guidelines for invoice-chase.
+invoice-chase 的评分逻辑与催收语气准则。
 
-## Scoring
+## 评分
 
-Score each customer using the last 12 months of payment history from the owner's accounting software export (用友好会计 / 金蝶精斗云). Require a minimum of 3 invoices to score; fewer than 3 defaults to `occasionally-late`.
+用店主记账软件导出(用友好会计 / 金蝶精斗云)中最近 12 个月的付款历史为每位客户评分。至少需 3 笔账款才评分;不足 3 笔默认为 `occasionally-late`(偶尔逾期)。
 
-| Score | Criteria |
+| 评分 | 标准 |
 |---|---|
-| `good-payer` | Paid on time or early in ≥ 75% of invoices |
-| `occasionally-late` | Paid late in 25–50% of invoices, or fewer than 3 invoices on record |
-| `repeat-late` | Paid late in > 50% of invoices |
+| `good-payer`(守信) | ≥ 75% 的账款按时或提前付清 |
+| `occasionally-late`(偶尔逾期) | 25–50% 的账款逾期,或在册账款不足 3 笔 |
+| `repeat-late`(屡次逾期) | > 50% 的账款逾期 |
 
-"On time" means payment received on or before the invoice due date.
+"按时"指在账款到期日当天或之前收到付款。
 
-## Tone by score
+## 按评分定语气
 
-| Score | Tone | Character |
+| 评分 | 语气 | 特征 |
 |---|---|---|
-| `good-payer` | Gentle | Friendly, assumes oversight. Opens with grace. |
-| `occasionally-late` | Neutral | Professional, no judgment. Factual follow-up. |
-| `repeat-late` | Firm | Direct, states a deadline. No warmth, no accusation. |
+| `good-payer` | 温和 | 友好,假定是一时疏忽。以善意开场。 |
+| `occasionally-late` | 中性 | 专业,不带评判。就事论事地跟进。 |
+| `repeat-late` | 正式 | 直接,给出明确期限。不带暖色,也不含指控。 |
 
-## Subject lines
+**三级语气只是措辞轻重不同,任何一级都必须合法**:不威胁、不恐吓、不骚扰、不公开欠款人隐私,不向无关第三方施压。正式(firm)= 正式主张 + 保留书面证据 + 必要时通过法律途径解决,不是施压恐吓。
 
-Use as the email subject, or as the first line when the owner sends via WeChat/IM:
+## 主题行 / 首句
 
-- Gentle: `Quick reminder: Invoice #[N] for ¥[amount]`
-- Neutral: `Following up: Invoice #[N] — ¥[amount] past due`
-- Firm: `Past due notice: Invoice #[N] — ¥[amount] ([X] days overdue)`
+用作邮件主题,或店主通过微信 / IM 发送时的第一句:
 
-## Body structure (all tones)
+- 温和:`温馨提醒:第 [N] 号账款 ¥[金额] 待付`
+- 中性:`跟进:第 [N] 号账款 ¥[金额] 已逾期`
+- 正式:`逾期催告:第 [N] 号账款 ¥[金额](逾期 [X] 天)`
 
-Every reminder includes: invoice number(s), total amount due, original due date, days overdue, and payment instructions — an Alipay payment link created via the connector (with owner approval), or the owner's own payment details if the connector is unavailable.
+## 正文结构(各语气通用)
 
-Tone-specific additions:
-- **Gentle**: one acknowledgment sentence ("I know things get busy")
-- **Neutral**: none — facts only
-- **Firm**: one deadline sentence ("Please remit by [date]")
+每条提醒都包含:账款 / 发票编号、应付总额、原到期日、逾期天数,以及付款方式——经店主批准后由连接器创建的支付宝收款链接,或连接器不可用时店主自己的收款信息。
 
-One call to action per reminder. Never two.
+同时厘清**票、款两条线**:
 
-## Consolidation rule
+- **催付款**:明确欠款金额与逾期情况。
+- **催 / 补开发票**:若尚未开票或需补开数电发票 / 增值税发票,在同一条消息里一并说明——开票是收款方的法定义务,别把它和催款混为一谈,也别漏掉。破解「款到才开票 vs 票到才付款」的死结:能先开的先开,票、款分别推进。
 
-If a customer has multiple overdue invoices, combine into one reminder. List each invoice (number, amount, due date), then state the combined total. Use the customer's score, not the most overdue invoice's score.
+**逾期利息 / 违约金**:如需主张,只写"按合同约定或参照当期 LPR 计算逾期利息",**不硬编码具体利率或金额**;约定违约金过高可能被法院调减,不漫天要价。
+
+**诉讼时效**:正式提醒可点到"请及时结清,以免影响双方权益";每条催收都应留存书面凭证——既是催告,也可中断 3 年诉讼时效。
+
+各语气的附加句:
+
+- **温和**:一句体谅("知道最近事情多")
+- **中性**:无——只列事实
+- **正式**:一句明确期限("请于 [日期] 前付清")+ 一句依法主张("逾期未付,我方将保留通过法律途径主张欠款及相应利息的权利")
+
+每条提醒只设**一个行动号召(付款)**。绝不设两个。发票说明与依法主张是陈述,不另算行动号召。
+
+## 合并规则
+
+若某客户有多笔逾期账款,合并为一条提醒。逐笔列出(编号、金额、到期日),再给出合计总额。用客户的评分,而非最逾期那笔账款的评分。

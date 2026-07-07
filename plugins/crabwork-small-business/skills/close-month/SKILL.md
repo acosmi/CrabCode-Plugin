@@ -1,7 +1,7 @@
 ---
 name: close-month
 version: 0.3.0
-description: Closes the month — reconciles the owner's accounting-software export (用友好会计 / 金蝶精斗云) against payment-platform bill exports (支付宝商家平台, 微信支付商户平台), flags gaps and uncategorized transactions, writes a plain-English P&L narrative, and exports an xlsx + PDF close packet. Trigger when the owner runs /close-month or says "close the month," "close the books," "month-end close," "reconcile last month," "do the monthly close," or hands the books off to their accountant. Accepts optional month and save-to arguments.
+description: Closes the month — reconciles the owner's accounting-software export (用友好会计 / 金蝶精斗云) against payment-platform bill exports (支付宝商家平台, 微信支付商户平台), flags gaps and uncategorized transactions, writes a plain-English P&L narrative, and exports an xlsx + PDF close packet. Trigger when the owner runs /close-month or says "close the month," "close the books," "month-end close," "reconcile last month," "do the monthly close," or hands the books off to their accountant. Accepts optional month and save-to arguments. 亦触发于:"月结""结账""对账""月底结账""把这个月的账结了"。
 allowed-tools: Read, WebFetch, Bash
 ---
 
@@ -28,7 +28,7 @@ Trigger the `month-end-prep` skill workflow:
 Surface in the same report:
 - **Uncategorized transactions** — book entries with no category
 - **Suspicious duplicates** — same amount, same vendor, within 3 days
-- **Missing receipts** — book entries above $75 with no attachment noted in the export
+- **Missing receipts** — book entries above ¥75 with no attachment noted in the export
 
 For each, recommend an action for the owner to take in their accounting software: categorize as X, delete duplicate, attach receipt.
 
@@ -39,8 +39,8 @@ Wait for owner to triage flagged items before generating the narrative. Do not a
 After triage, generate a plain-English P&L narrative:
 
 ```
-{Month YYYY} closed at ${revenue} revenue ({+/-}{X}% vs prior month).
-Top driver: {category/customer}. Biggest swing: {category} {direction} ${amount}
+{Month YYYY} closed at ¥{revenue} revenue ({+/-}{X}% vs prior month).
+Top driver: {category/customer}. Biggest swing: {category} {direction} ¥{amount}
 because {reason inferred from transactions}.
 
 Margin: {X}% ({+/-}Y pts vs prior). {Cost-side commentary}.

@@ -1,59 +1,66 @@
 ---
 name: run-campaign
 version: 0.3.0
-description: Runs an end-to-end marketing campaign — sales analysis from the owner's Alipay merchant-platform / accounting-software exports, content brief, per-channel copy plus design briefs (owner renders the visuals), HubSpot staging, and audience segmentation. Trigger when the owner runs /run-campaign or says "run a campaign," "I need more customers," "sales are down, help me promote," "launch a promotion," "do a full marketing push," or wants soup-to-nuts campaign execution from analysis through staged posts. Accepts optional lookback and channel arguments.
+description: 端到端跑一场营销战役 —— 从业主的支付宝商家平台 / 记账软件导出做销售分析,产出内容简报、逐渠道文案与设计说明(视觉由业主渲染)、你的 CRM 暂存、以及受众分群。当业主运行 /run-campaign,或说"跑个营销活动""我要更多客户""销量下滑帮我推一把""搞个促销""做一整轮营销""run a campaign""launch a promotion""sales are down, help me promote"时触发。可接收可选的回看窗口与渠道参数。
 allowed-tools: Read, WebFetch, Bash
 ---
 
-Run the full campaign pipeline by chaining three skills in order. The owner approves at each handoff — never roll past a gate without explicit confirmation.
+按顺序串联三个技能,跑完整条战役流水线。每个交接点都要业主批准 —— 未经明确确认,绝不越过任何闸口。
 
-Parse arguments:
-- `--lookback` (default `90d`) — how far back to look for the revenue dip
-- `--channel` (default `both`) — `email`, `social`, or `both`
+解析参数:
+- `--lookback`(默认 `90d`)—— 回看多久以定位营收下滑
+- `--channel`(默认 `both`)—— `email`、`social` 或 `both`
 
-## Step 1 — Sales analysis + content brief (content-strategy)
+## 第 1 步 —— 销售分析 + 内容简报(content-strategy)
 
-Trigger the `content-strategy` skill workflow:
-1. Ask the owner for sales data covering the lookback window: a 支付宝商家平台 bill export (CSV), a 微信支付商户平台 bill export (CSV) if they take WeChat Pay, and/or a revenue-by-product export from their accounting software (用友好会计 / 金蝶精斗云) — or a pasted report. There is no connector that can pull transaction history (the alipay connector only creates/queries single payments and refunds).
-2. Identify the revenue dip — which product/service, which time period, magnitude. Note the data source and its coverage (e.g., excludes cash sales).
-3. Produce a 30-day prioritized content brief: what to push, what offer to run, what to hold.
-4. Present the brief to the owner. Wait for explicit "approved, build the campaign" before continuing.
+触发 `content-strategy` 技能工作流:
+1. 请业主提供回看窗口内的销售数据:支付宝商家平台账单导出(CSV)、微信支付商户平台账单导出(CSV,若收微信支付)、和/或记账软件(用友好会计 / 金蝶精斗云)的按产品营收导出 —— 或粘贴报表。没有能拉取交易历史的连接器(支付宝连接器只能创建/查询单笔收款与退款)。
+2. 定位营收下滑 —— 哪个产品/服务、哪个时段、幅度多少。注明数据来源及其覆盖范围(如不含现金销售)。
+3. 产出 30 天优先级内容简报:主推什么、上什么促销、按住什么。
+4. 把简报呈交业主。等到明确"批准,开始搭战役"再继续。
 
-If the owner edits the brief, incorporate edits and re-present.
+若业主修改简报,吸收修改后重新呈现。
 
-## Step 2 — Copy, design briefs + staging (design-creator)
+> **合规把关**:content-strategy 出的是**策略**;其中促销/折扣/卖点建议落地成对外文案时,须在第 2 步经 design-creator 的《广告法》/《价格法》自检(避免极限词、虚构原价等)。
 
-After Step 1 approval, trigger the `design-creator` skill workflow:
-1. Take the approved brief from Step 1 as input.
-2. Build the posting calendar matched to the brief's priorities.
-3. Write a precise design brief per post (dimensions, layout, exact text overlay, brand colors). The owner renders each asset in their design tool — 自营云端设计 once its connector ships, or whatever they use today — and hands the files back; verify each rendered asset against its brief on screen before moving on. Do not claim to generate images.
-4. Draft caption copy for each post and full text for each email (emails are drafted inline for the owner to send from their own tool — there is no email connector).
-5. Stage the campaign in HubSpot (do NOT send — staging only). Domestic platforms (公众号/小红书/抖音/视频号) can't be published by HubSpot: those rows get a publish-ready package + scheduling CSV logged against the HubSpot campaign.
-6. Present the staged campaign to the owner. Wait for explicit "approved, send to segment X" before Step 3.
+## 第 2 步 —— 文案、设计说明 + 暂存(design-creator)
 
-## Step 3 — Audience segmentation (lead-triage)
+第 1 步批准后,触发 `design-creator` 技能工作流:
+1. 以第 1 步批准的简报为输入。
+2. 按简报优先级搭建发布日历。
+3. 为每条帖子写精确的设计说明(尺寸、版式、确切的文字叠加、品牌色)。视觉由业主在设计工具中渲染 —— 自营云端设计连接器就位后用它,在此之前用业主现有工具 —— 交回文件后,逐个在屏幕上对照设计说明核验。不得声称生成了图片。
+4. 为每条帖子起草文案、为每封邮件写全文(邮件内联起草,由业主用自己的工具发送 —— 尚无邮件连接器)。**每条对外文案须先过 design-creator 内置的《广告法》/《价格法》合规自检**(极限词/虚假宣传/特殊行业/价格法/明示广告);命中高风险的改写或移交 `crablaw-cn:marketing-claims-review`,不得直接投放。
+5. 把战役登记到你的 CRM / 营销系统(企业微信 / 钉钉 / 飞书 / 有赞;做外贸可选 HubSpot)(**不发送 —— 仅暂存**)。国内平台(公众号/小红书/抖音/视频号)原生发布:这些行产出可直接发布的打包 + 排期 CSV,登记在你的 CRM 战役下。
+6. 把暂存好的战役呈交业主。等到明确"批准,发给分群 X"再进第 3 步。
 
-After Step 2 approval, trigger the `lead-triage` skill workflow:
-1. Pull HubSpot contacts that match the campaign's target segment (from the approved brief).
-2. Score by engagement, company fit, urgency markers.
-3. Produce two deliverables:
-   - **Bulk send list** — the segment receiving the staged campaign from Step 2
-   - **High-priority call list** — top 5 leads the owner should call personally with talking points
-4. Propose call slots for the call list and, on the owner's confirmation, block them on the owner's calendar via the connected DingTalk (钉钉日程) or Feishu (飞书日历) connector; if neither is connected, present the proposed times as a plain list.
-5. Present both lists. Wait for explicit "send" before pushing the HubSpot campaign live.
+## 第 3 步 —— 受众分群(lead-triage)
 
-## Approval gates (must hold)
+第 2 步批准后,触发 `lead-triage` 技能工作流:
+1. 拉取匹配战役目标分群(来自批准的简报)的 CRM(企业微信 / 钉钉 / 飞书 / 有赞;做外贸可选 HubSpot)联系人。
+2. 按互动、契合度、紧迫度打分。
+3. 产出两份交付物:
+   - **群发名单** —— 接收第 2 步暂存战役的分群
+   - **高优先呼叫清单** —— 业主该亲自致电的前 5 个线索,含话术
+4. 为呼叫清单提议通话时段,经业主确认后,通过已连接的钉钉日程 / 飞书日历连接器占位;两者都未连接时,以纯列表呈现建议时间。
+5. 呈现两份名单。等到明确"发送"再把你的 CRM 战役推上线。
 
-- Never auto-progress between steps. Each handoff requires explicit owner approval.
-- Never send the HubSpot campaign without the owner's "send" command in Step 3.
-- Never present an image as generated — assets exist only when the owner hands back rendered files.
-- If HubSpot is unreachable, stop, report it, and ask whether to retry or abort. If the sales exports are missing, ask the owner to export or paste the data — don't proceed on invented numbers. If DingTalk/Feishu is unavailable, skip calendar blocking and note it.
+> **合规把关**:分群与打分基于**合法取得**的客户个人信息,仅作内部跟进优先级排序,不用于价格歧视/大数据杀熟等差别待遇(《个人信息保护法》第 24 条);详见 lead-triage 的 PIPL 护栏。
 
-## Output
+## 审批闸口(必须守住)
 
-End the run with a one-paragraph recap: revenue dip identified, posts produced (copy + design briefs, assets verified), segment size, calls booked. Link to the HubSpot campaign URL once sent.
+- 步骤间绝不自动推进。每个交接都需业主明确批准。
+- 未经业主在第 3 步下达"发送"指令,绝不发送你的 CRM 战役。
+- 绝不把图片说成已生成 —— 只有业主交回渲染文件后素材才存在。
+- **对外文案未过《广告法》/《价格法》自检、命中极限词或特殊行业未改写/送审的,绝不投放;分群基于合法取得的个人信息。**
+- 你的 CRM 连接器尚未就绪(企微 / 有赞封装在规划中)时,改用导出 / 粘贴继续,战役登记与名单以离线清单交付,不臆造数据。销售导出缺失时,请业主导出或粘贴数据 —— 不在臆造数字上推进。钉钉/飞书不可用时,跳过日历占位并说明。
 
-## Media publishing routing
+## 输出
 
-- For domestic-platform publishing workflows (公众号/小红书/抖音/视频号 platform adaptation, content compliance review, and publish logging), route to `crabcode-media-ops:media-platform-adapter` and `crabcode-media-ops:media-ops` instead of hand-rolling platform rules here.
-- If triggering them returns Unknown skill, the media-ops plugin is not installed: guide the owner to install `crabcode-media-ops` via `/plugin`, then retry. Until then, deliver the publish-ready package for native manual publishing as described above.
+以一段话收尾:定位的营收下滑、产出的帖子(文案 + 设计说明、素材已核验)、分群规模、已约通话。发送后附上你的 CRM 战役链接。
+
+> 交付提示:`【AI 辅助营销执行,对外文案投放前须过《广告法》/《价格法》自检并按需送审】`
+
+## 媒体发布路由
+
+- 国内平台发布工作流(公众号/小红书/抖音/视频号 平台适配、内容合规审查、发布留痕),路由到 `crabcode-media-ops:media-platform-adapter` 与 `crabcode-media-ops:media-ops`,不在此手搓平台规则。
+- 若触发它们返回 Unknown skill,说明未安装 media-ops 插件:引导业主通过 `/plugin` 安装 `crabcode-media-ops` 后重试。在此之前,按上文交付可直接发布的打包供原生手动发布。

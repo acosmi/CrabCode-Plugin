@@ -1,7 +1,7 @@
 ---
 name: friday-brief
 version: 0.3.0
-description: Delivers the Friday end-of-week pulse from the owner's 支付宝商家平台 bill export and HubSpot — revenue vs prior week, top sellers, wins and watches. Trigger when the owner runs /friday-brief or says "how did we do this week," "end-of-week recap," "Friday recap," "wrap up the week," "wins and watches," or wants a week-in-review summary. Accepts optional lookback window of 7 or 14 days.
+description: Delivers the Friday end-of-week pulse from the owner's 支付宝商家平台 bill export and your CRM — revenue vs prior week, top sellers, wins and watches. Trigger when the owner runs /friday-brief or says "how did we do this week," "end-of-week recap," "Friday recap," "wrap up the week," "wins and watches," or wants a week-in-review summary. Accepts optional lookback window of 7 or 14 days. 亦触发于:"这周做得怎么样""周总结""周五收个尾""本周战报"。
 allowed-tools: Read, WebFetch, Bash
 ---
 
@@ -15,7 +15,7 @@ Parse arguments:
 Using the `business-pulse` skill workflow:
 
 1. Load transaction data for the lookback period from the owner's 支付宝商家平台 bill export (CSV) or pasted data. The alipay connector cannot export transaction history, so ask the owner for the export if it hasn't been provided. If they take 微信支付 too, ask for that export as well (WeChat Pay connector pending).
-2. Pull any HubSpot deal closes for the same window.
+2. Pull any deal closes from your CRM for the same window (for SCRM without a pipeline, use customer conversions / activity; 有赞 close ≈ 订单).
 3. Calculate week-over-week revenue delta.
 4. Surface top 3 revenue sources (product / customer / channel) ranked by contribution.
 
@@ -41,12 +41,12 @@ WATCHES
 • {watch 1} — {recommended action}
 • {watch 2} — {recommended action}
 
-Revenue this week: ${amount} ({+/-}X% vs last week)
+Revenue this week: ¥{amount} ({+/-}X% vs last week)
 ```
 
 ## Data failures
 
-Run with whatever is available — this command degrades gracefully. If no 支付宝 bill export was provided, skip transaction data and note "no 支付宝 bill export this week — revenue data from HubSpot deals only." If HubSpot is missing, skip deal closes and note it. If neither is available, stop and tell the owner: "No revenue sources available. Upload a 支付宝商家平台 bill export (CSV) or connect HubSpot to run the Friday brief."
+Run with whatever is available — this command degrades gracefully. If no 支付宝 bill export was provided, skip transaction data and note "no 支付宝 bill export this week — revenue data from your CRM deals only." If your CRM is not connected, skip deal closes and note it. If neither is available, stop and tell the owner: "No revenue sources available. Upload a 支付宝商家平台 bill export (CSV) or connect your CRM (企业微信/钉钉/飞书/有赞; HubSpot for cross-border) to run the Friday brief."
 
 ## Approval gates
 
