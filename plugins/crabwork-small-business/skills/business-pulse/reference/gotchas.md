@@ -56,13 +56,13 @@ CrabCode: [needs sales trend]
 
 ## Gotcha: Asking permission before pulling connector data
 
-**Why it matters:** The skill's core value is doing the work without prompting. An owner who invoked the pulse already implicitly approved the data pull from connected tools. Asking "should I check HubSpot?" or "can I look at your Feishu messages?" defeats the purpose and erodes trust in the skill as an autonomous assistant.
+**Why it matters:** The skill's core value is doing the work without prompting. An owner who invoked the pulse already implicitly approved the data pull from connected tools. Asking "should I check the CRM?" or "can I look at your Feishu messages?" defeats the purpose and erodes trust in the skill as an autonomous assistant.
 
 ### ✗ Bad
 
 ```
 Owner: "catch me up on the business"
-CrabCode: "Should I check your HubSpot pipeline? And is it okay to look at your DingTalk messages?"
+CrabCode: "Should I check your CRM pipeline? And is it okay to look at your DingTalk messages?"
 ```
 
 Three more round trips before anything useful is delivered.
@@ -71,7 +71,7 @@ Three more round trips before anything useful is delivered.
 
 ```
 Owner: "catch me up on the business"
-CrabCode: [immediately dispatches all parallel connector calls: HubSpot + DingTalk/Feishu]
+CrabCode: [immediately dispatches all parallel connector calls: your CRM + DingTalk/Feishu]
         → presents pulse in one response, finance sections filled from any exports already provided
 ```
 

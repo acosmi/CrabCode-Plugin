@@ -4,7 +4,7 @@ version: 0.3.0
 description: >
   Produces a one-page cross-functional business snapshot for SMB owners —
   cash position (owner's accounting-software export), sales trend (支付宝/微信支付
-  bill exports), pipeline movement (HubSpot), this week's commitments
+  bill exports), customer activity (your CRM — 企业微信/钉钉/飞书/有赞; HubSpot for cross-border), this week's commitments
   (钉钉日程/飞书日历), urgent watch-list items (DingTalk/Feishu messages), and
   the single most important thing needing attention today. Proactively pulls
   every available connector and gracefully scopes to whatever is connected or
@@ -25,7 +25,7 @@ One prompt, one page. Pull live data from every connected tool, fold in any fina
 
 Live connectors to attempt simultaneously:
 
-- **HubSpot** — pipeline by stage, deals moved/closed, deals gone cold, new leads
+- **Your CRM** — pipeline/customers by stage, deals/customers moved or gone cold, new leads (企业微信 SCRM has no pipeline — read "pipeline movement" as customer activity; 有赞 deal ≈ 订单)
 - **DingTalk (钉钉) / Feishu (飞书)** — calendar/schedule: key meetings, deadlines, events this week and next 7 days (via the connected connector)
 - **DingTalk / Feishu messages** — urgent internal signals, threads needing owner attention
 
@@ -45,7 +45,7 @@ If a connector errors or returns no data, record it internally and move on. Neve
 Read `reference/thresholds.md` for red/yellow/green cutoffs. Compute:
 
 - **AR aging** — open invoices from the accounting export grouped by days since due date (0–30, 31–60, 61+)
-- **Pipeline coverage** — HubSpot weighted pipeline ÷ monthly revenue target
+- **Pipeline coverage** — your CRM's weighted pipeline ÷ monthly revenue target (skip for SCRM without a pipeline)
 - **Revenue trend** — this month's revenue vs. prior month from the accounting export (or 7-day 支付宝/微信支付 settlements vs. prior 7 days from the bill export)
 
 Assign a 🟢/🟡/🔴 status to each section. If a source returned nothing, mark the metric "n/a" and note it in the appendix.
@@ -55,7 +55,7 @@ Assign a 🟢/🟡/🔴 status to each section. If a source returned nothing, ma
 Scan for actionable items. Every risk entry must name a specific record and a next step — "some overdue invoices" is useless; "¥3,400 from 明发商贸, 47 days overdue, no response since 2026-03-12" is actionable.
 
 - Invoices in the accounting export past due > 30 days — name customer, amount, days overdue
-- HubSpot deals with no activity in 7+ days, or close date in past but still open
+- Your CRM deals/customers with no activity in 7+ days, or a close date in the past but still open
 - DingTalk/Feishu messages marked urgent or containing "escalation," "complaint," "cancel," "refund" (投诉 / 退款 / 取消 equivalents)
 - Failed or pending transactions > ¥500 in the 支付宝/微信支付 bill exports
 
@@ -63,7 +63,7 @@ Scan for actionable items. Every risk entry must name a specific record and a ne
 
 Use the exact template in `reference/output_template.md`. Include only sections where real data exists — omit headers for sources that weren't available. Adapt depth to context: a casual "how are we doing" gets a fuller report; "quick snapshot before a call" gets a tighter one.
 
-Cross-source synthesis is where this skill earns its keep. If a Feishu message connects to a stalled HubSpot deal, surface that link in the #1 Priority section. Synthesis is what makes the pulse more useful than checking each tool separately.
+Cross-source synthesis is where this skill earns its keep. If a Feishu message connects to a stalled deal in your CRM, surface that link in the #1 Priority section. Synthesis is what makes the pulse more useful than checking each tool separately.
 
 Writing rules:
 - Numbers lead, words follow. Never write "revenue is healthy" — write "¥43k this month, ▲ 8% MoM" and let the owner judge.
@@ -90,7 +90,7 @@ The owner may ask for a narrower cut:
 
 ## What not to do
 
-- **Do not ask permission before pulling connector data.** If the skill was invoked, run it. Asking "should I check HubSpot?" defeats the whole point. (Requesting a finance export the connectors cannot reach is different — do that once, at the end, without blocking.)
+- **Do not ask permission before pulling connector data.** If the skill was invoked, run it. Asking "should I check the CRM?" defeats the whole point. (Requesting a finance export the connectors cannot reach is different — do that once, at the end, without blocking.)
 - **Do not invent or estimate numbers.** If a source returned nothing, say "n/a" explicitly. Never fill a gap with guesswork.
 - **Do not skip the delta.** A number without a comparison is a missed insight. If there's no prior-period baseline, say "(no prior baseline)" rather than omitting the field.
 - **Do not surface connector errors mid-pulse.** Log them to the appendix. The pulse leads with what was delivered.
