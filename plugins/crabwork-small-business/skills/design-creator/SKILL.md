@@ -4,7 +4,7 @@ version: 0.3.0
 description: >
   接收一份已审批的内容简报(content brief),端到端执行一场营销战役:排布发布
   日历、逐渠道撰写文案、为每个视觉素材写出精确的设计简报(尺寸、版式、文字叠加、
-  品牌色),并在 HubSpot 中暂存(stage)整场战役。所有对外文案在交付前必过
+  品牌色),并把整场战役暂存 / 登记到你的 CRM 或营销系统(国内平台走原生定时发布;外贸用 HubSpot 海外社媒)。所有对外文案在交付前必过
   《广告法》/《价格法》合规自检。素材渲染由店主在自己的设计工具中完成——自营云端
   设计(自营云端设计)连接器上线后由其承接,在此之前用店主当前的工具。本技能不生成
   图片。邮件正文以纯文本起草,由店主用自己的工具发送。每一步都需要店主显式批准。
@@ -12,7 +12,8 @@ description: >
   the posting calendar, drafts per-channel copy, runs an Advertising-Law /
   Price-Law compliance self-check on every outbound line, writes a precise
   design brief (dimensions, layout, text overlay, brand colors) for every
-  visual asset, and stages the campaign in HubSpot. This skill does not
+  visual asset, and stages/registers the campaign in your CRM or marketing
+  system (domestic platforms publish natively; HubSpot for cross-border social). This skill does not
   generate images. Email content is drafted as plain text for the owner to
   send from their own tool. Every step requires explicit owner approval. Use
   when the user says "撰写文案""生成推文""做素材""把这个变成一场战役""过一遍
@@ -27,12 +28,12 @@ description: >
 本技能把一场战役拆成五个顺序阶段,每个阶段都以店主批准为闸口:
 
 ```
-简报 → 日历 → 素材清单 → 设计简报 → 文案 → HubSpot 暂存
+简报 → 日历 → 素材清单 → 设计简报 → 文案 → 暂存 / 登记(CRM 或本地)
 ```
 
 | 路径 | 渠道 | 本技能产出 |
 |------|------|-----------|
-| 设计简报(社交) | 公众号、视频号、小红书、抖音 | 设计简报 + 最终文案 + HubSpot 中暂存的战役条目 |
+| 设计简报(社交) | 公众号、视频号、小红书、抖音 | 设计简报 + 最终文案 + 登记到 CRM / 本地的战役条目 + 原生发布打包件 |
 | 纯文本 | 邮件(newsletter、营销、drip) | 主题行 + 预览文字(preheader)+ 正文,内联呈现供店主发送 |
 
 **本技能不渲染图片。** 自营云端设计的连接器尚未上线。对每个视觉素材,本技能产出
@@ -56,10 +57,12 @@ description: >
 2. **渲染工具。** 询问店主将用哪个工具渲染素材(自营云端设计连接器上线后用它,
    否则用当前设计工具)。这只影响交接措辞——简报本身与工具无关。
 
-3. **HubSpot 版本(tier)。** 社交暂存需要 Marketing Hub Professional,且 HubSpot
-   Social 只能自动发布到在 HubSpot 内已连接的账号。国内平台(公众号、小红书、抖音、
-   视频号)无法接入 HubSpot Social——这些行改为拿到一份可直接发布的打包件和一份
-   排期 CSV(见 [reference/hubspot-staging.md](reference/hubspot-staging.md))。
+3. **发布路径。** 国内平台(公众号、小红书、抖音、视频号)为**主路径**:每行产出可直接
+   发布的打包件 + 一份排期 CSV,由店主在各平台**原生发布**(见
+   [reference/campaign-staging.md](reference/campaign-staging.md))。战役登记到你的
+   CRM / 营销系统或本地——不强绑单一平台。仅当店主做**外贸 / 跨境**、用 HubSpot 经营
+   海外社媒(Instagram / Facebook 等)时,社交暂存才需 HubSpot Marketing Hub
+   Professional 且只能发布到 HubSpot 内已连接的海外账号——见该参考的外贸附录。
 
 4. **品牌素材。** 确认磁盘上产品照片的路径,以及品牌色/字体(若店主有十六进制
    色值——问一次,每份简报复用)。
@@ -268,34 +271,36 @@ linen_midi_01.jpg"),请店主只重渲这一个。战役可逐行推进——已
 
 ---
 
-### 阶段 5 — HubSpot 暂存 + 交接
+### 阶段 5 — 战役暂存 / 登记 + 交接
 
-HubSpot 仍是战役的系统记录(system of record)。邮件正文不进暂存——它内联呈现,
-供店主复制进自己的邮件工具。API 字段参考见
-[reference/hubspot-staging.md](reference/hubspot-staging.md)。
+战役需要一个记录中枢,但**不强绑单一平台**。国内平台走**原生发布**;战役登记到你的
+CRM / 营销系统或本地。邮件正文不进暂存——它内联呈现,供店主复制进自己的邮件工具。
+口径与(外贸)API 字段参考见
+[reference/campaign-staging.md](reference/campaign-staging.md)。
 
-1. **创建战役(campaign)。** `POST /marketing/v3/campaigns`,带上日历里的战役名与
-   起止日期。
+1. **打包国内平台行(主路径)。** 公众号、小红书、抖音、视频号无法经任何海外社媒 API
+   自动发布。对这些行中的每一行,产出一份可直接发布的打包件——日期/时间、渠道、最终
+   文案、已核验素材文件——外加一份覆盖全部的排期 CSV(格式见
+   [reference/campaign-staging.md](reference/campaign-staging.md))。店主在各平台原生
+   发布(公众号在自己的编辑器里支持定时发布)。
 
-2. **暂存 HubSpot 可连接的行(若有)。** HubSpot Social 只能自动发布到在 HubSpot 内
-   已连接的账号。若店主连了这类渠道,逐行 `POST` 到 HubSpot Social API:
-   - `channel`:把日历渠道映射到 HubSpot 账号 ID
+2. **登记战役(system of record)。** 把战役与各行登记到你的 CRM / 营销系统
+   (企业微信 / 钉钉 / 飞书 / 有赞;对象与字段以该平台当年文档为准),或——无 CRM 时——
+   登记为本地文件 / 表格,让追踪集中一处。企微 / 有赞 wrapper 未上线前走导出 / 粘贴 /
+   本地清单。
+
+3. **(外贸 / 跨境可选)暂存 HubSpot 海外社媒行。** 仅当店主做外贸、用 HubSpot 经营
+   海外社媒(Instagram / Facebook 等)时才走这步。逐行 `POST` 到 HubSpot Social API,
+   字段见 campaign-staging.md 的外贸附录:
    - `scheduledAt`:ISO 8601 时间——调用前确认在未来
    - `content.body`:已批准的文案
    - `attachments`:已核验渲染素材的公开托管 URL——若素材只是本地文件,不带附件
      暂存该帖,并告知店主在 HubSpot 里补图
    - `status`:`SCHEDULED`(绝不 `PUBLISHED`)
 
-3. **打包国内平台行。** 公众号、小红书、抖音、视频号无法经 HubSpot Social 发布。对
-   这些行中的每一行,产出一份可直接发布的打包件——日期/时间、渠道、最终文案、已核验
-   素材文件——外加一份覆盖全部的排期 CSV(格式见
-   [reference/hubspot-staging.md](reference/hubspot-staging.md))。店主在各平台原生
-   发布(公众号在自己的编辑器里支持定时发布)。把打包件登记到 HubSpot 战役下,让
-   追踪集中一处。
-
-4. **确认队列。** 对已暂存的 HubSpot 帖,调用
-   `GET /marketing/v3/social/posts?status=SCHEDULED`,并给出通往 HubSpot 战役
-   视图的直达链接。对打包行,给出发布排期表。
+4. **确认队列。** 对国内平台行,给出发布排期表。若走了外贸 HubSpot 暂存,调用
+   `GET /marketing/v3/social/posts?status=SCHEDULED`,并给出通往 HubSpot 战役视图的
+   直达链接。
 
 5. **交接邮件正文。** 对每个邮件行,把已批准的主题行 + 预览文字 + 正文按发送日期
    分组内联呈现。店主复制进自己的邮件工具。
@@ -306,7 +311,7 @@ HubSpot 仍是战役的系统记录(system of record)。邮件正文不进暂存
 **最终检查点。**
 
 ```
-战役"夏日亚麻"已在 HubSpot 建好:[链接]
+战役"夏日亚麻"已登记:[CRM 链接 / 本地文件]
 
 发布排期(由你原生发布):
   6月2日 10:00 — 小红书 — 亚麻上新图文(素材:已核验)
@@ -330,14 +335,14 @@ HubSpot 仍是战役的系统记录(system of record)。邮件正文不进暂存
   绝不直接投放;每条交付附红线提示
   `【AI 辅助草稿,非广告合规意见,投放前请自检《广告法》并按需送审】`。
 - **邮件行不出设计简报。** 写每份简报前复查 `路径` 列。
-- **不发布。** HubSpot 帖只暂存为 `SCHEDULED`;国内平台行以打包件交接;上线由店主
+- **不发布。** 外贸 HubSpot 帖只暂存为 `SCHEDULED`;国内平台行以打包件交接;上线由店主
   全程掌控。
 - **绝不暂存渲染素材未对照简报核验的帖。** 简报批准 ≠ 素材批准。
 - **绝不把公众号/小红书/抖音/视频号行走 HubSpot Social API。** 这些行走发布打包件
   + CSV。
 - **绝不在简报里留未解决的图片位。** 先逐位盘点;"待定"会送出占位图。
 - **绝不跳过检查点 1。** 日历批准前就写简报,是本技能最大的返工来源。
-- **每次 HubSpot 暂存调用前检查 `scheduledAt` 在未来。**
+- **外贸 HubSpot 暂存每次调用前检查 `scheduledAt` 在未来。**
 
 ---
 
@@ -345,8 +350,8 @@ HubSpot 仍是战役的系统记录(system of record)。邮件正文不进暂存
 
 - [reference/design-brief-spec.md](reference/design-brief-spec.md) —— 设计简报模板、
   逐渠道尺寸、渲染交接与核验清单
-- [reference/hubspot-staging.md](reference/hubspot-staging.md) —— HubSpot 战役/Social
-  API 与国内平台排期 CSV
+- [reference/campaign-staging.md](reference/campaign-staging.md) —— 国内平台原生发布
+  + 排期 CSV(主路径),HubSpot 战役/Social API(外贸/跨境附录)
 - [reference/gotchas.md](reference/gotchas.md) —— 本技能在实战中踩过的每个失败模式的
   好 / 坏 对照(含《广告法》/《价格法》)
 - [reference/examples/boutique-brief-campaign.md](reference/examples/boutique-brief-campaign.md)
