@@ -1,21 +1,102 @@
 [
-  { "id": "language-server", "displayName": "语言服务", "description": "各语言的 LSP 桥接,提供代码智能、诊断与重构。" },
-  { "id": "integrations", "displayName": "第三方集成", "description": "外部 SaaS / 平台的 MCP 集成(任务、消息、代码托管、云、基础设施等)。" },
-  { "id": "dev-workflow", "displayName": "开发工作流", "description": "面向研发流程的工作流(评审、特性开发、提交、现代化、会话报告等)。" },
-  { "id": "showcase", "displayName": "示例与演示", "description": "示例、参考与演示类插件,用于学习与展示能力。" },
-  { "id": "dev-tools", "displayName": "开发工具(扩展)", "description": "构建 CrabCode 自身扩展(技能/插件/Agent/MCP/钩子)的开发工具。" },
-  { "id": "enterprise-workbench", "displayName": "企业工作台", "description": "面向企业的综合工作台工作流(效率、检索、插件管理、行业研究、小微企业等)。" },
-  { "id": "code-tools", "displayName": "代码工具连接器", "description": "连接外部代码服务的连接器(文档检索、代码审查、框架增强、语义导航)。" },
-  { "id": "biz-ops", "displayName": "业务运营", "description": "企业内部运营职能工作流(产品、人力、设计、运营)。" },
-  { "id": "go-to-market", "displayName": "市场开拓", "description": "面向市场与增长的工作流(销售、市场、客户支持)。" },
-  { "id": "content-office", "displayName": "内容与办公", "description": "内容创作与办公文档类能力(前端设计、办公套件)。" },
-  { "id": "essentials", "displayName": "基础必备", "description": "上手即用的基础能力(初始化配置、插件/技能管理中心)。" },
-  { "id": "security", "displayName": "安全", "description": "安全审查与安全实践指引。" },
-  { "id": "session-style", "displayName": "会话风格", "description": "调整会话输出风格的能力(讲解型、学习型)。" },
-  { "id": "eng-data", "displayName": "工程与数据", "description": "工程与数据方向的专业工作流。" },
-  { "id": "media-ops", "displayName": "新媒体运营", "description": "新媒体/自媒体内容运营(公众号、小红书、头条等),独立于内容与办公。" },
-  { "id": "memory", "displayName": "记忆管理", "description": "项目记忆(CRABCODE.md)的维护与改进,独立成类。" },
-  { "id": "legal-workflow", "displayName": "法律工作流", "description": "中国法律实务工作流伞插件。" },
-  { "id": "finance", "displayName": "金融", "description": "金融业(证券/投行/私募/财富/基金)工作流伞插件。" },
-  { "id": "ip-management", "displayName": "知识产权材料管理", "description": "知识产权申报材料的准备与管理工作流(软著登记等),独立于法律工作流。" }
+  {
+    "id": "language-server",
+    "displayName": "语言服务",
+    "description": "各语言的 LSP 桥接,提供代码智能、诊断与重构。"
+  },
+  {
+    "id": "integrations",
+    "displayName": "第三方集成",
+    "description": "外部 SaaS / 平台的 MCP 集成(任务、消息、代码托管、云、基础设施等)。"
+  },
+  {
+    "id": "dev-workflow",
+    "displayName": "开发工作流",
+    "description": "面向研发流程的工作流(评审、特性开发、提交、现代化、会话报告等)。"
+  },
+  {
+    "id": "showcase",
+    "displayName": "示例与演示",
+    "description": "示例、参考与演示类插件,用于学习与展示能力。"
+  },
+  {
+    "id": "dev-tools",
+    "displayName": "开发工具(扩展)",
+    "description": "构建 CrabCode 自身扩展(技能/插件/Agent/MCP/钩子)的开发工具。"
+  },
+  {
+    "id": "enterprise-workbench",
+    "displayName": "企业工作台",
+    "description": "面向企业的综合工作台工作流(效率、检索、插件管理、行业研究、小微企业等)。"
+  },
+  {
+    "id": "code-tools",
+    "displayName": "代码工具连接器",
+    "description": "连接外部代码服务的连接器(文档检索、代码审查、框架增强、语义导航)。"
+  },
+  {
+    "id": "biz-ops",
+    "displayName": "业务运营",
+    "description": "企业内部运营职能工作流(产品、人力、设计、运营)。"
+  },
+  {
+    "id": "go-to-market",
+    "displayName": "市场开拓",
+    "description": "面向市场与增长的工作流(销售、市场、客户支持)。"
+  },
+  {
+    "id": "content-office",
+    "displayName": "内容与办公",
+    "description": "内容创作与办公文档类能力(前端设计、办公套件)。"
+  },
+  {
+    "id": "essentials",
+    "displayName": "基础必备",
+    "description": "上手即用的基础能力(初始化配置、插件/技能管理中心)。"
+  },
+  {
+    "id": "security",
+    "displayName": "安全",
+    "description": "安全审查与安全实践指引。"
+  },
+  {
+    "id": "session-style",
+    "displayName": "会话风格",
+    "description": "调整会话输出风格的能力(讲解型、学习型)。"
+  },
+  {
+    "id": "eng-data",
+    "displayName": "工程与数据",
+    "description": "工程与数据方向的专业工作流。"
+  },
+  {
+    "id": "media-ops",
+    "displayName": "新媒体运营",
+    "description": "新媒体/自媒体内容运营(公众号、小红书、头条等),独立于内容与办公。"
+  },
+  {
+    "id": "memory",
+    "displayName": "记忆管理",
+    "description": "项目记忆(CRABCODE.md)的维护与改进,独立成类。"
+  },
+  {
+    "id": "legal-workflow",
+    "displayName": "法律工作流",
+    "description": "中国法律实务工作流伞插件。"
+  },
+  {
+    "id": "finance",
+    "displayName": "金融",
+    "description": "金融业(证券/投行/私募/财富/基金)工作流伞插件。"
+  },
+  {
+    "id": "ip-management",
+    "displayName": "知识产权材料管理",
+    "description": "知识产权申报材料的准备与管理工作流(软著登记等),独立于法律工作流。"
+  },
+  {
+    "id": "html-video",
+    "displayName": "HTML 视频",
+    "description": "HTML→视频分镜创作与确定性渲染（seek-and-capture）。"
+  }
 ]

@@ -2398,6 +2398,41 @@
           ]
         }
       ]
+    },
+    {
+      "name": "crabcode-html-video",
+      "source": "./plugins/crabcode-html-video",
+      "version": "0.1.0",
+      "displayName": "HTML 视频渲染",
+      "shortDescription": "HTML→视频：content-graph 分镜 + 逐帧 HTML + 确定性渲染 sidecar",
+      "longDescription": "按 content-graph 生成分镜，逐帧产出可 seek 的 HTML，经用户确认后由 MCP sidecar 调用渲染 worker 合成为 MP4。Sidecar 不调模型、不持 key。",
+      "defaultPrompt": [
+        "帮我把这段产品介绍做成 30 秒讲解视频",
+        "用 /render-video 从零创作一条数据可视化短片",
+        "检查本机 HTML 视频渲染环境（doctor）"
+      ],
+      "brandColor": "#06b6d4",
+      "description": "HTML-to-video storyboard + seekable frame HTML + deterministic render sidecar.",
+      "category": "html-video",
+      "tags": [
+        "html-video",
+        "video",
+        "render",
+        "storyboard",
+        "mcp",
+        "media"
+      ],
+      "tier": "capability",
+      "groups": [
+        {
+          "name": "storyboard",
+          "displayName": "分镜与帧",
+          "skills": [
+            "video-storyboard",
+            "video-frames"
+          ]
+        }
+      ]
     }
   ]
 }
