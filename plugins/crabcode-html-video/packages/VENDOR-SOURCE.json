@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "sourceRepository": "https://github.com/acosmi/crabcode-html-video",
+  "sourceCommit": "7152b959c77c80b8b369aaff268e93771efbf73f",
+  "sourcePaths": [
+    "packages/content-graph",
+    "packages/seek-shim",
+    "packages/multi-segment"
+  ],
+  "syncDirection": "source-to-plugin",
+  "policy": "The engine repository is the canonical source. Sync through a reviewed script or release artifact and fail CI on unrecorded drift; never hand-rsync silently.",
+  "pluginLocalPatches": [
+    "default in-process producer strategy",
+    "parsed-DOM/CSP authored HTML policy and CSS-only contract",
+    "model-facing path, URL, payload, frame and pixel-frame limits",
+    "remote worker readiness, bearer authentication and same-origin token download contract",
+    "MCP cancellation, wall timeouts, render slots and atomic no-clobber output publication",
+    "Hyperframes 0.7.46 HFMASK workaround by externalizing trusted CSS",
+    "pinned Puppeteer-compatible browser installer without npx",
+    "audio pad/trim duration preservation and private concat temp files"
+  ]
+}

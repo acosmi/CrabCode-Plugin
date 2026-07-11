@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "html-video": {
+      "command": "bun",
+      "args": ["--no-env-file", "--cwd", "${CRABCODE_PLUGIN_ROOT}", "${CRABCODE_PLUGIN_ROOT}/dist/bootstrap.js"],
+      "env": {
+        "CRABCODE_HTML_VIDEO_DATA": "${CRABCODE_PLUGIN_DATA}"
+      }
+    }
+  }
+}

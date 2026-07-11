@@ -1,0 +1,26 @@
+{
+  "name": "@crabcode/multi-segment",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@crabcode/content-graph": "file:../content-graph",
+    "@crabcode/seek-shim": "file:../seek-shim",
+    "@hyperframes/producer": "0.7.46",
+    "@puppeteer/browsers": "3.0.6",
+    "linkedom": "0.18.13"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}
