@@ -29,19 +29,30 @@ const files = [
 ]
 
 const violations: string[] = []
+const credentialRules = [
+  ['private-key-header', /-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/],
+  ['aws-access-key', /(?:A3T[A-Z0-9]|AKIA|ASIA)[A-Z0-9]{16}/],
+  ['github-token', /gh[pousr]_[A-Za-z0-9]{30,}/],
+  ['model-api-style-key', /sk-[A-Za-z0-9_-]{20,}/],
+  ['slack-token', /xox[baprs]-[A-Za-z0-9-]{10,}/],
+  ['google-api-key', /AIza[0-9A-Za-z_-]{30,}/],
+] as const
 for (const file of new Set(files)) {
   const text = readFileSync(file, 'utf8')
   for (const term of prohibitedTerms) {
     const match = new RegExp(`\\b${escapeRegExp(term)}\\b`, 'i').exec(text)
     if (match) violations.push(`${relative(root, file)}:${match.index + 1}:${term}`)
   }
+  for (const [rule, pattern] of credentialRules) {
+    if (pattern.test(text)) violations.push(`${relative(root, file)}:[${rule}]`)
+  }
 }
 
 if (violations.length > 0) {
-  throw new Error(`model/provider brand literals found in first-party or executable distribution files:\n${violations.join('\n')}`)
+  throw new Error(`brand or credential-shaped literals found in first-party or executable distribution files:\n${violations.join('\n')}`)
 }
 
-console.log(`distribution brand scan passed (${new Set(files).size} files)`)
+console.log(`distribution brand/credential scan passed (${new Set(files).size} files)`)
 
 // Execute a copy containing only the four shipped files. This catches bundle
 // regressions such as a dependency retaining a node_modules-relative JSON

@@ -53,7 +53,23 @@ const portable = bundled.replace(
 )
 if (portable === bundled) throw new Error('expected bundled esbuild path marker was not found')
 if (portable.includes(root)) throw new Error('MCP bundle contains the build machine plugin path')
-writeFileSync(serverPath, portable, { encoding: 'utf8', mode: 0o755 })
+
+// Upstream bundles can contain credential-shaped example literals even when the
+// sidecar receives a sanitized environment. They are not required at runtime and
+// must not be redistributed. Replace only complete, high-confidence token shapes;
+// the distribution check independently fails if any survive.
+const credentialLiteralPatterns = [
+  /(?:A3T[A-Z0-9]|AKIA|ASIA)[A-Z0-9]{16}/g,
+  /gh[pousr]_[A-Za-z0-9]{30,}/g,
+  /sk-[A-Za-z0-9_-]{20,}/g,
+  /xox[baprs]-[A-Za-z0-9-]{10,}/g,
+  /AIza[0-9A-Za-z_-]{30,}/g,
+]
+let sanitized = portable
+for (const pattern of credentialLiteralPatterns) {
+  sanitized = sanitized.replace(pattern, 'CRABCODE_REDACTED_CREDENTIAL')
+}
+writeFileSync(serverPath, sanitized, { encoding: 'utf8', mode: 0o755 })
 
 // bootstrap.js is the security boundary: it may contain this repository's
 // dependency-free sanitizer and node:url, but never the MCP/producer bundle.
