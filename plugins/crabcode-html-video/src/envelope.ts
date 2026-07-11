@@ -4,10 +4,12 @@ export type Envelope =
 
 export function toToolResult(env: Envelope): {
   content: Array<{ type: 'text'; text: string }>
+  structuredContent: Record<string, unknown>
   isError?: boolean
 } {
   return {
     content: [{ type: 'text', text: JSON.stringify(env, null, 2) }],
+    structuredContent: env as unknown as Record<string, unknown>,
     isError: env.success ? undefined : true,
   }
 }

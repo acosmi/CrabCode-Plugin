@@ -2,7 +2,7 @@
 name: video-frames
 description: >
   按 content-graph 拓扑顺序为每个节点生成独立单文件 HTML 帧。
-  动画必须可 seek（CSS/WAAPI）；禁止 rAF/setTimeout。渲染前用 lintFrame/previewFrame 自检。
+  动画必须可 seek（作者侧仅 CSS @keyframes）；禁止脚本、rAF/setTimeout。渲染前用 lintFrame/previewFrame 自检。
 ---
 
 # video-frames
@@ -15,13 +15,13 @@ description: >
 
 **允许**
 - CSS `@keyframes` + `animation: name Xs linear both`（shim 会强制 paused）
-- Web Animations API（可 pause + currentTime）
 - 静态布局 + 透明度/位移动画
 
 **禁止**
 - `requestAnimationFrame` / 自走 `setTimeout`/`setInterval` 动画
 - 依赖真实墙钟的随机闪烁
 - 需要用户交互才能显示的内容
+- `<script>`、内联事件、iframe/object/embed、外网 URL 与 CSS `@import`
 
 ## 帧 HTML 最低模板
 
@@ -56,7 +56,7 @@ sidecar 的 `lintFrame` / `previewFrame` 会自动 wrap 为带 `data-composition
 1. 读取 graph → 调 `validateGraph` 拿 `order`
 2. 按 order 为每个 node 生成 HTML
 3. 对每帧 `lintFrame`；失败即改
-4. 可选 `previewFrame`（`render:true` 需 worker）
+4. 可选 `previewFrame`；只写 wrapped HTML 不需确认，`render:true` 仍须用户确认并传 `confirmed:true`
 5. 全部通过后 **向用户确认**，再调 `renderFrames` 且 `confirmed: true`
 
 ## 工具

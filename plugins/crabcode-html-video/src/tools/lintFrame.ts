@@ -1,32 +1,24 @@
 import { lintFrameHtml, wrapFrameAsComposition } from '@crabcode/seek-shim'
 import { ok, fail, type Envelope } from '../envelope.ts'
+import { lintFrameInputSchema, validationMessage } from '../contracts.ts'
 
 export const name = 'lintFrame'
 export const description =
   'Lint a single frame HTML for seekability (no rAF/setTimeout) and optionally preview the wrapped composition shell.'
 
-export const inputSchema = {
-  type: 'object',
-  properties: {
-    html: { type: 'string', description: 'Plain or full HTML for one frame' },
-    id: { type: 'string' },
-    width: { type: 'number' },
-    height: { type: 'number' },
-    durationSec: { type: 'number' },
-    wrap: { type: 'boolean', description: 'If true, return wrapped composition HTML' },
-  },
-  required: ['html'],
+export const inputSchema = lintFrameInputSchema
+export const annotations = {
+  title: 'Lint Video Frame',
+  readOnlyHint: true,
+  destructiveHint: false,
+  idempotentHint: true,
+  openWorldHint: false,
 }
 
-export async function handler(args: {
-  html?: string
-  id?: string
-  width?: number
-  height?: number
-  durationSec?: number
-  wrap?: boolean
-}): Promise<Envelope> {
-  if (!args?.html) return fail('invalid_args', 'html is required')
+export async function handler(raw: unknown): Promise<Envelope> {
+  const parsed = inputSchema.safeParse(raw)
+  if (!parsed.success) return fail('invalid_args', validationMessage(parsed.error))
+  const args = parsed.data
   const lint = lintFrameHtml(args.html)
   if (!lint.ok) {
     return fail('lint_failed', lint.errors.join('; '), lint)

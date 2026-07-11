@@ -9,6 +9,8 @@ import { mkdtempSync, writeFileSync, existsSync, rmSync, statSync, mkdirSync } f
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { dirname } from 'node:path'
+import { seekRuntimeScript } from '@crabcode/seek-shim'
+import { parseHTML } from 'linkedom'
 
 export type RenderEngine = 'hyperframes-producer' | 'solid-fallback'
 
@@ -21,6 +23,8 @@ export interface HfRenderOptions {
   requireProducer?: boolean
   /** Explicit allow solid fallback (dev/CI without browser only). */
   allowSolidFallback?: boolean
+  /** Abort an in-flight producer job (propagated from the MCP request). */
+  signal?: AbortSignal
   log?: (msg: string) => void
 }
 
@@ -29,6 +33,86 @@ export interface HfRenderResult {
   fileSize: number
   engine: RenderEngine
   durationSec?: number
+}
+
+export interface PreparedProducerDocument {
+  html: string
+  stylesheet: string
+  stylesheetName: string
+}
+
+const PRODUCER_STYLESHEET = 'crab-author-styles.css'
+let producerModulePromise: Promise<typeof import('@hyperframes/producer')> | undefined
+
+async function loadEmbeddedProducer(): Promise<typeof import('@hyperframes/producer')> {
+  if (producerModulePromise) return producerModulePromise
+  producerModulePromise = (async () => {
+    // Hyperframes 0.7.46 mistakes an embedding entry named src/server.ts for
+    // its own CLI. Hide that name during module evaluation to prevent an
+    // unintended unauthenticated listener from opening on :9847.
+    const entry = process.argv[1]
+    if (entry) process.argv[1] = `${entry}.embedded`
+    try {
+      return await import('@hyperframes/producer')
+    } finally {
+      if (entry) process.argv[1] = entry
+    }
+  })()
+  return producerModulePromise
+}
+
+/**
+ * Hyperframes 0.7.46's Bun timing compiler can restore inert inline blocks as
+ * HFMASK placeholders. Externalize trusted CSS and remove the trusted shim;
+ * Hyperframes' virtual-time bridge drives the CSS timeline during capture.
+ */
+export function prepareProducerDocument(html: string): PreparedProducerDocument {
+  const document = parseHTML(html).document
+  if (document.documentElement?.localName.toLowerCase() !== 'html' || !document.head) {
+    throw new Error('producer composition must be a complete HTML document')
+  }
+
+  const styles = Array.from(document.querySelectorAll('style'))
+  const stylesheet = styles.map((style) => style.textContent ?? '').join('\n\n')
+  for (const style of styles) style.remove()
+
+  const trustedDocument = parseHTML(seekRuntimeScript()).document
+  const trustedSeekText = trustedDocument.querySelector('script')?.textContent
+  if (!trustedSeekText) throw new Error('trusted seek runtime is malformed')
+  for (const script of document.querySelectorAll('script')) {
+    if (script.textContent !== trustedSeekText || script.attributes.length !== 0) {
+      throw new Error('author <script> is not allowed in the isolated render contract')
+    }
+    script.remove()
+  }
+
+  removeCommentNodes(document)
+  const csp = document.querySelector('meta[http-equiv="Content-Security-Policy" i]')
+  if (!csp) throw new Error('producer composition must contain the trusted CSP')
+  const content = csp.getAttribute('content') ?? ''
+  const preparedCsp = content.replace(/style-src\s+([^;]*);/i, (_full, sources: string) => {
+    const normalized = /(?:^|\s)'self'(?:\s|$)/.test(sources)
+      ? sources.trim()
+      : `'self' ${sources.trim()}`
+    return `style-src ${normalized};`
+  })
+  if (preparedCsp === content && !/style-src\s+/i.test(content)) {
+    throw new Error('producer composition CSP must contain style-src')
+  }
+  csp.setAttribute('content', preparedCsp)
+
+  const link = document.createElement('link')
+  link.setAttribute('rel', 'stylesheet')
+  link.setAttribute('href', `./${PRODUCER_STYLESHEET}`)
+  document.head.appendChild(link)
+  return { html: document.toString(), stylesheet, stylesheetName: PRODUCER_STYLESHEET }
+}
+
+function removeCommentNodes(node: { childNodes: ArrayLike<Node> }): void {
+  for (const child of Array.from(node.childNodes)) {
+    if (child.nodeType === 8) child.parentNode?.removeChild(child)
+    else if (child.childNodes.length > 0) removeCommentNodes(child)
+  }
 }
 
 /**
@@ -48,9 +132,10 @@ export async function renderHtmlWithProducer(opts: HfRenderOptions): Promise<HfR
   const quality = opts.quality ?? 'standard'
 
   mkdirSync(dirname(opts.outputPath), { recursive: true })
+  opts.signal?.throwIfAborted()
 
   try {
-    const producer = await import('@hyperframes/producer')
+    const producer = await loadEmbeddedProducer()
     const { createRenderJob, executeRenderJob } = producer as {
       createRenderJob: (c: { fps: number; quality: string }) => { id: string; status: string }
       executeRenderJob: (
@@ -58,6 +143,7 @@ export async function renderHtmlWithProducer(opts: HfRenderOptions): Promise<HfR
         projectDir: string,
         outputPath: string,
         onProgress?: (j: unknown, msg?: string) => void | Promise<void>,
+        abortSignal?: AbortSignal,
       ) => Promise<void>
     }
 
@@ -67,12 +153,14 @@ export async function renderHtmlWithProducer(opts: HfRenderOptions): Promise<HfR
 
     const projectDir = mkdtempSync(join(tmpdir(), 'crab-hf-project-'))
     try {
-      writeFileSync(join(projectDir, 'index.html'), opts.html, 'utf-8')
+      const prepared = prepareProducerDocument(opts.html)
+      writeFileSync(join(projectDir, 'index.html'), prepared.html, 'utf-8')
+      writeFileSync(join(projectDir, prepared.stylesheetName), prepared.stylesheet, 'utf-8')
       const job = createRenderJob({ fps, quality })
       log(`executeRenderJob start job=${(job as { id?: string }).id} fps=${fps} quality=${quality}`)
       await executeRenderJob(job, projectDir, opts.outputPath, (_j, message) => {
         if (message) log(`progress: ${message}`)
-      })
+      }, opts.signal)
     } finally {
       try {
         rmSync(projectDir, { recursive: true, force: true })
@@ -93,6 +181,7 @@ export async function renderHtmlWithProducer(opts: HfRenderOptions): Promise<HfR
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e)
     log(`producer failed: ${msg}`)
+    rmSync(opts.outputPath, { force: true })
     if (requireProducer || !opts.allowSolidFallback) {
       throw new Error(`hyperframes producer render failed: ${msg}`)
     }

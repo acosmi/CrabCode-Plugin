@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process'
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { tmpdir } from 'node:os'
 import { randomUUID } from 'node:crypto'
@@ -8,6 +8,12 @@ export interface FfmpegRunResult {
   code: number
   stdout: string
   stderr: string
+}
+
+export interface ProcessRunOptions {
+  cwd?: string
+  timeoutMs?: number
+  signal?: AbortSignal
 }
 
 /**
@@ -81,12 +87,12 @@ function canRunBinary(bin: string): boolean {
   }
 }
 
-export async function runFfmpeg(args: string[], opts?: { cwd?: string; timeoutMs?: number }): Promise<FfmpegRunResult> {
+export async function runFfmpeg(args: string[], opts?: ProcessRunOptions): Promise<FfmpegRunResult> {
   const bin = resolveFfmpegPath()
   return runProcess(bin, args, opts)
 }
 
-export async function runFfprobe(args: string[], opts?: { cwd?: string; timeoutMs?: number }): Promise<FfmpegRunResult> {
+export async function runFfprobe(args: string[], opts?: ProcessRunOptions): Promise<FfmpegRunResult> {
   const bin = resolveFfprobePath()
   return runProcess(bin, args, opts)
 }
@@ -94,8 +100,9 @@ export async function runFfprobe(args: string[], opts?: { cwd?: string; timeoutM
 function runProcess(
   bin: string,
   args: string[],
-  opts?: { cwd?: string; timeoutMs?: number },
+  opts?: ProcessRunOptions,
 ): Promise<FfmpegRunResult> {
+  if (opts?.signal?.aborted) return Promise.reject(opts.signal.reason ?? new Error('process cancelled'))
   return new Promise((resolvePromise, reject) => {
     const child = spawn(bin, args, {
       cwd: opts?.cwd,
@@ -104,32 +111,50 @@ function runProcess(
     })
     let stdout = ''
     let stderr = ''
-    const timer =
+    let settled = false
+    let timer: ReturnType<typeof setTimeout> | null = null
+    const finishReject = (error: unknown) => {
+      if (settled) return
+      settled = true
+      cleanup()
+      reject(error)
+    }
+    const onAbort = () => {
+      child.kill('SIGKILL')
+      finishReject(opts?.signal?.reason ?? new Error(`${bin} cancelled`))
+    }
+    const cleanup = () => {
+      if (timer) clearTimeout(timer)
+      opts?.signal?.removeEventListener('abort', onAbort)
+    }
+    timer =
       opts?.timeoutMs && opts.timeoutMs > 0
         ? setTimeout(() => {
             child.kill('SIGKILL')
-            reject(new Error(`${bin} timed out after ${opts.timeoutMs}ms`))
+            finishReject(new Error(`${bin} timed out after ${opts.timeoutMs}ms`))
           }, opts.timeoutMs)
         : null
+    opts?.signal?.addEventListener('abort', onAbort, { once: true })
 
     child.stdout.on('data', (d) => {
-      stdout += String(d)
+      if (stdout.length < 2_000_000) stdout += String(d)
     })
     child.stderr.on('data', (d) => {
-      stderr += String(d)
+      if (stderr.length < 2_000_000) stderr += String(d)
     })
     child.on('error', (err) => {
-      if (timer) clearTimeout(timer)
-      reject(err)
+      finishReject(err)
     })
     child.on('close', (code) => {
-      if (timer) clearTimeout(timer)
+      if (settled) return
+      settled = true
+      cleanup()
       resolvePromise({ code: code ?? 1, stdout, stderr })
     })
   })
 }
 
-export async function probeDurationSec(filePath: string): Promise<number> {
+export async function probeDurationSec(filePath: string, opts?: ProcessRunOptions): Promise<number> {
   const probe = resolveFfprobePath()
   if (probe) {
     const r = await runProcess(probe, [
@@ -140,7 +165,7 @@ export async function probeDurationSec(filePath: string): Promise<number> {
       '-of',
       'default=noprint_wrappers=1:nokey=1',
       filePath,
-    ])
+    ], opts)
     if (r.code === 0) {
       const n = parseFloat(r.stdout.trim())
       if (isFinite(n) && n > 0) return n
@@ -148,7 +173,7 @@ export async function probeDurationSec(filePath: string): Promise<number> {
   }
 
   // Fallback: parse `ffmpeg -i` Duration line (works when only ffmpeg-static is present)
-  const r = await runFfmpeg(['-i', filePath], { timeoutMs: 30_000 })
+  const r = await runFfmpeg(['-i', filePath], { ...opts, timeoutMs: opts?.timeoutMs ?? 30_000 })
   const m = (r.stderr || r.stdout).match(/Duration:\s*(\d+):(\d+):(\d+(?:\.\d+)?)/)
   if (!m) {
     throw new Error(`probeDurationSec failed for ${filePath}: ${r.stderr || r.stdout}`)
@@ -167,12 +192,17 @@ export async function probeDurationSec(filePath: string): Promise<number> {
  * Concat demuxer (-c copy) when all segments share compatible params.
  * Falls back to re-encode if copy fails.
  */
-export async function concatVideos(segmentPaths: string[], outputPath: string): Promise<void> {
+export async function concatVideos(
+  segmentPaths: string[],
+  outputPath: string,
+  opts?: ProcessRunOptions,
+): Promise<void> {
   if (segmentPaths.length === 0) throw new Error('concatVideos: no segments')
   if (segmentPaths.length === 1) {
     // Single segment: just remux/copy to destination
     const r = await runFfmpeg(['-y', '-i', segmentPaths[0]!, '-c', 'copy', '-movflags', '+faststart', outputPath], {
-      timeoutMs: 120_000,
+      ...opts,
+      timeoutMs: opts?.timeoutMs ?? 120_000,
     })
     if (r.code !== 0) {
       // re-encode fallback
@@ -191,7 +221,7 @@ export async function concatVideos(segmentPaths: string[], outputPath: string): 
           '+faststart',
           outputPath,
         ],
-        { timeoutMs: 300_000 },
+        { ...opts, timeoutMs: opts?.timeoutMs ?? 300_000 },
       )
       if (r2.code !== 0) throw new Error(`ffmpeg single-copy failed: ${r2.stderr}`)
     }
@@ -201,61 +231,72 @@ export async function concatVideos(segmentPaths: string[], outputPath: string): 
   mkdirSync(dirname(outputPath), { recursive: true })
   const listFile = join(tmpdir(), `crab-concat-${randomUUID()}.txt`)
   const body = segmentPaths.map((p) => `file '${resolve(p).replace(/'/g, "'\\''")}'`).join('\n') + '\n'
-  writeFileSync(listFile, body, 'utf-8')
+  writeFileSync(listFile, body, { encoding: 'utf-8', flag: 'wx', mode: 0o600 })
 
-  const copy = await runFfmpeg(
-    ['-y', '-f', 'concat', '-safe', '0', '-i', listFile, '-c', 'copy', '-movflags', '+faststart', outputPath],
-    { timeoutMs: 300_000 },
-  )
-  if (copy.code === 0) return
+  try {
+    const copy = await runFfmpeg(
+      ['-y', '-f', 'concat', '-safe', '0', '-i', listFile, '-c', 'copy', '-movflags', '+faststart', outputPath],
+      { ...opts, timeoutMs: opts?.timeoutMs ?? 300_000 },
+    )
+    if (copy.code === 0) return
 
-  // Re-encode path for mismatched GOPs/codecs
-  const re = await runFfmpeg(
-    [
-      '-y',
-      '-f',
-      'concat',
-      '-safe',
-      '0',
-      '-i',
-      listFile,
-      '-c:v',
-      'libx264',
-      '-pix_fmt',
-      'yuv420p',
-      '-preset',
-      'veryfast',
-      '-crf',
-      '18',
-      '-c:a',
-      'aac',
-      '-b:a',
-      '192k',
-      '-movflags',
-      '+faststart',
-      outputPath,
-    ],
-    { timeoutMs: 600_000 },
-  )
-  if (re.code !== 0) {
-    throw new Error(`ffmpeg concat failed (copy+reencode): ${re.stderr || copy.stderr}`)
+    // Re-encode path for mismatched GOPs/codecs
+    const re = await runFfmpeg(
+      [
+        '-y',
+        '-f',
+        'concat',
+        '-safe',
+        '0',
+        '-i',
+        listFile,
+        '-c:v',
+        'libx264',
+        '-pix_fmt',
+        'yuv420p',
+        '-preset',
+        'veryfast',
+        '-crf',
+        '18',
+        '-c:a',
+        'aac',
+        '-b:a',
+        '192k',
+        '-movflags',
+        '+faststart',
+        outputPath,
+      ],
+      { ...opts, timeoutMs: opts?.timeoutMs ?? 600_000 },
+    )
+    if (re.code !== 0) {
+      throw new Error(`ffmpeg concat failed (copy+reencode): ${re.stderr || copy.stderr}`)
+    }
+  } finally {
+    rmSync(listFile, { force: true })
   }
 }
 
 /**
  * Mux a silent/concat video with an optional audio file (or generate silence).
  */
-export async function muxAudio(videoPath: string, audioPath: string | null, outputPath: string): Promise<void> {
+export async function muxAudio(
+  videoPath: string,
+  audioPath: string | null,
+  outputPath: string,
+  opts?: ProcessRunOptions,
+): Promise<void> {
   mkdirSync(dirname(outputPath), { recursive: true })
   if (!audioPath) {
     // Ensure faststart even without audio
     const r = await runFfmpeg(['-y', '-i', videoPath, '-c', 'copy', '-movflags', '+faststart', outputPath], {
-      timeoutMs: 120_000,
+      ...opts,
+      timeoutMs: opts?.timeoutMs ?? 120_000,
     })
     if (r.code !== 0) throw new Error(`ffmpeg remux failed: ${r.stderr}`)
     return
   }
 
+  const videoDurationSec = await probeDurationSec(videoPath, opts)
   const r = await runFfmpeg(
     [
       '-y',
@@ -263,25 +304,35 @@ export async function muxAudio(videoPath: string, audioPath: string | null, outp
       videoPath,
       '-i',
       audioPath,
+      '-filter_complex',
+      `[1:a:0]aresample=async=1:first_pts=0,apad,atrim=duration=${videoDurationSec}[a]`,
       '-map',
       '0:v:0',
       '-map',
-      '1:a:0?',
+      '[a]',
       '-c:v',
       'copy',
       '-c:a',
       'aac',
       '-b:a',
       '192k',
-      '-shortest',
+      '-t',
+      String(videoDurationSec),
       '-movflags',
       '+faststart',
       outputPath,
     ],
-    { timeoutMs: 300_000 },
+    { ...opts, timeoutMs: opts?.timeoutMs ?? 300_000 },
   )
   if (r.code !== 0) {
     throw new Error(`ffmpeg mux audio failed: ${r.stderr}`)
+  }
+  const outputDurationSec = await probeDurationSec(outputPath, opts)
+  if (Math.abs(outputDurationSec - videoDurationSec) > 0.25) {
+    rmSync(outputPath, { force: true })
+    throw new Error(
+      `audio mux changed video duration from ${videoDurationSec.toFixed(3)}s to ${outputDurationSec.toFixed(3)}s`,
+    )
   }
 }
 

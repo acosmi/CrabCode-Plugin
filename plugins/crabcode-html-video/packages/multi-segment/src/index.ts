@@ -12,12 +12,21 @@
 
 export { renderMultiSegment, type MultiSegmentInput, type MultiSegmentResult, type SegmentInput } from './render.ts'
 export { concatVideos, muxAudio, probeDurationSec, runFfmpeg, resolveFfmpegPath } from './ffmpeg.ts'
-export { ensureBrowser, resolveBrowserPath, type BrowserResolveResult } from './browser.ts'
+export {
+  ensureBrowser,
+  resolveBrowserPath,
+  probeBrowserExecutable,
+  type BrowserResolveResult,
+  type BrowserProbeResult,
+} from './browser.ts'
 export {
   renderViaProducerHttp,
   producerHealth,
+  probeProducer,
+  validateProducerBaseUrl,
   type ProducerRenderOptions,
   type ProducerRenderResult,
+  type ProducerProbeResult,
 } from './producerClient.ts'
 export { generateToneAudio, generateSilentAudio } from './ffmpeg.ts'
 export {
@@ -27,4 +36,9 @@ export {
   type HfRenderResult,
   type RenderEngine,
 } from './hfRender.ts'
-export { resolveSafeOutputPath, assertPathUnderRoots } from './safePath.ts'
+export {
+  resolveSafeOutputPath,
+  assertPathUnderRoots,
+  reserveOutputFile,
+  type OutputReservation,
+} from './safePath.ts'

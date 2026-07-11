@@ -1,7 +1,7 @@
 {
   "name": "crabcode-html-video",
   "version": "0.1.0",
-  "description": "HTML→视频：content-graph 分镜 + 逐帧 HTML 创作 + 确定性渲染 sidecar（seek-and-capture）。Sidecar 不调模型、不持 key。",
+  "description": "HTML→视频：content-graph 分镜 + 逐帧 HTML 创作 + 确定性渲染 sidecar（seek-and-capture）。Sidecar 启动时清洗宿主环境，不调模型、不持模型或供应商 API key。",
   "author": {
     "name": "CrabCode"
   },

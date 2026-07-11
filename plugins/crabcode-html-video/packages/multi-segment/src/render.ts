@@ -1,10 +1,12 @@
-import { mkdirSync, writeFileSync, existsSync, rmSync } from 'node:fs'
+import { constants, copyFileSync, linkSync, mkdirSync, writeFileSync, existsSync, rmSync, unlinkSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { randomUUID } from 'node:crypto'
 
 import { wrapFrameAsComposition, lintFrameHtml } from '@crabcode/seek-shim'
 import { concatVideos, muxAudio, probeDurationSec } from './ffmpeg.ts'
 import { renderViaProducerHttp } from './producerClient.ts'
+import { renderHtmlWithProducer } from './hfRender.ts'
+import { reserveOutputFile } from './safePath.ts'
 
 export interface SegmentInput {
   /** Stable id (content-graph node id). */
@@ -25,22 +27,22 @@ export interface MultiSegmentInput {
   width: number
   height: number
   fps?: number
-  /** Producer HTTP base URL. Required for remote/local producer render. */
-  producerUrl: string
+  /** Explicit remote producer HTTP base URL. Omit for the default in-process producer. */
+  producerUrl?: string
   /** Optional audio file to mux over the full timeline. */
   audioPath?: string | null
   /** Work directory for intermediate segments. */
   workDir?: string
   /** Keep intermediate segment mp4s. Default false. */
   keepIntermediates?: boolean
-  /** Skip lint errors (not recommended). Default false. */
-  force?: boolean
   /** Progress callback. */
   onProgress?: (event: { stage: string; index?: number; total?: number; message: string }) => void
   /** Auth headers for producer. */
   headers?: Record<string, string>
   /** Per-segment render timeout. Default 10min. */
   segmentTimeoutMs?: number
+  /** Cancel producer and ffmpeg work. */
+  signal?: AbortSignal
 }
 
 export interface MultiSegmentResult {
@@ -55,7 +57,7 @@ export interface MultiSegmentResult {
  * Render multiple independent HTML frames → concat → optional audio mux.
  */
 export async function renderMultiSegment(input: MultiSegmentInput): Promise<MultiSegmentResult> {
-  if (!input.segments.length) throw new Error('renderMultiSegment: segments is empty')
+  validateInput(input)
 
   const fps = input.fps ?? 30
   const workDir = input.workDir ?? join(process.cwd(), '.crabcode-html-video-work', randomUUID())
@@ -64,12 +66,14 @@ export async function renderMultiSegment(input: MultiSegmentInput): Promise<Mult
   mkdirSync(segDir, { recursive: true })
   mkdirSync(wrappedDir, { recursive: true })
   mkdirSync(resolve(input.outputPath, '..'), { recursive: true })
+  const outputReservation = reserveOutputFile(input.outputPath)
 
   const progress = input.onProgress ?? (() => {})
   const segmentPaths: string[] = []
 
   try {
     for (let i = 0; i < input.segments.length; i++) {
+      input.signal?.throwIfAborted()
       const seg = input.segments[i]!
       progress({
         stage: 'lint',
@@ -79,7 +83,7 @@ export async function renderMultiSegment(input: MultiSegmentInput): Promise<Mult
       })
 
       const lint = lintFrameHtml(seg.html)
-      if (!lint.ok && !input.force) {
+      if (!lint.ok) {
         throw new Error(`segment ${seg.id} lint failed: ${lint.errors.join('; ')}`)
       }
       for (const w of lint.warnings) {
@@ -106,14 +110,31 @@ export async function renderMultiSegment(input: MultiSegmentInput): Promise<Mult
         message: `Rendering segment ${seg.id} via producer`,
       })
 
-      await renderViaProducerHttp({
-        baseUrl: input.producerUrl,
-        html: wrapped.html,
-        outputPath: segOut,
-        fps,
-        timeoutMs: input.segmentTimeoutMs ?? 600_000,
-        headers: input.headers,
-      })
+      if (input.producerUrl) {
+        await renderViaProducerHttp({
+          baseUrl: input.producerUrl,
+          // The remote worker owns validation + wrapping. Sending our wrapped
+          // document would violate its untrusted-HTML contract and double-wrap.
+          html: seg.html,
+          outputPath: segOut,
+          fps,
+          id: seg.id,
+          width: seg.width ?? input.width,
+          height: seg.height ?? input.height,
+          durationSec: seg.durationSec,
+          timeoutMs: input.segmentTimeoutMs ?? 600_000,
+          headers: input.headers,
+          signal: input.signal,
+        })
+      } else {
+        await renderHtmlWithProducer({
+          html: wrapped.html,
+          outputPath: segOut,
+          fps,
+          requireProducer: true,
+          signal: input.signal,
+        })
+      }
 
       if (!existsSync(segOut)) {
         throw new Error(`segment render produced no file: ${segOut}`)
@@ -123,20 +144,16 @@ export async function renderMultiSegment(input: MultiSegmentInput): Promise<Mult
 
     progress({ stage: 'concat', message: `Concatenating ${segmentPaths.length} segments` })
     const concatPath = join(workDir, 'concat.mp4')
-    await concatVideos(segmentPaths, concatPath)
+    input.signal?.throwIfAborted()
+    await concatVideos(segmentPaths, concatPath, { signal: input.signal })
 
     progress({ stage: 'mux', message: input.audioPath ? 'Muxing audio' : 'Finalizing (no audio)' })
     const finalTmp = join(workDir, 'final.mp4')
-    await muxAudio(concatPath, input.audioPath ?? null, finalTmp)
+    await muxAudio(concatPath, input.audioPath ?? null, finalTmp, { signal: input.signal })
 
-    // Move to destination
-    const { copyFileSync, renameSync, statSync } = await import('node:fs')
-    try {
-      renameSync(finalTmp, input.outputPath)
-    } catch {
-      copyFileSync(finalTmp, input.outputPath)
-    }
+    publishWithoutOverwrite(finalTmp, input.outputPath)
 
+    const { statSync } = await import('node:fs')
     const durationSec = await probeDurationSec(input.outputPath)
     const fileSize = statSync(input.outputPath).size
 
@@ -150,6 +167,7 @@ export async function renderMultiSegment(input: MultiSegmentInput): Promise<Mult
       fileSize,
     }
   } finally {
+    outputReservation.release()
     if (!input.keepIntermediates) {
       try {
         rmSync(workDir, { recursive: true, force: true })
@@ -160,6 +178,80 @@ export async function renderMultiSegment(input: MultiSegmentInput): Promise<Mult
   }
 }
 
+function publishWithoutOverwrite(source: string, destination: string): void {
+  try {
+    linkSync(source, destination)
+    unlinkSync(source)
+    return
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'EEXIST') throw error
+  }
+  copyFileSync(source, destination, constants.COPYFILE_EXCL)
+  unlinkSync(source)
+}
+
 function pad(n: number): string {
   return String(n).padStart(3, '0')
+}
+
+function validateInput(input: MultiSegmentInput): void {
+  if (!input.segments.length) throw new Error('renderMultiSegment: segments is empty')
+  if (input.segments.length > 40) throw new Error('renderMultiSegment: maximum 40 segments')
+  if (!Number.isInteger(input.width) || input.width < 64 || input.width > 3840) {
+    throw new Error('renderMultiSegment: width must be an integer from 64 to 3840')
+  }
+  if (!Number.isInteger(input.height) || input.height < 64 || input.height > 2160) {
+    throw new Error('renderMultiSegment: height must be an integer from 64 to 2160')
+  }
+  if (input.width % 2 !== 0 || input.height % 2 !== 0) {
+    throw new Error('renderMultiSegment: width and height must be even for yuv420p output')
+  }
+  if (input.width * input.height > 8_294_400) throw new Error('renderMultiSegment: pixel limit exceeded')
+  const fps = input.fps ?? 30
+  if (!Number.isInteger(fps) || fps < 1 || fps > 60) throw new Error('renderMultiSegment: fps must be 1..60')
+
+  let totalDuration = 0
+  let totalHtmlBytes = 0
+  let totalFrames = 0
+  let pixelFrames = 0
+  const ids = new Set<string>()
+  for (const segment of input.segments) {
+    if (!/^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/.test(segment.id)) {
+      throw new Error(`renderMultiSegment: unsafe segment id ${JSON.stringify(segment.id)}`)
+    }
+    if (ids.has(segment.id)) throw new Error(`renderMultiSegment: duplicate segment id ${segment.id}`)
+    ids.add(segment.id)
+    if (!Number.isFinite(segment.durationSec) || segment.durationSec < 0.1 || segment.durationSec > 30) {
+      throw new Error(`renderMultiSegment: invalid duration for ${segment.id}`)
+    }
+    if (!segment.html || segment.html.length > 256 * 1024 || Buffer.byteLength(segment.html, 'utf8') > 256 * 1024) {
+      throw new Error(`renderMultiSegment: invalid HTML size for ${segment.id}`)
+    }
+    const segmentWidth = segment.width ?? input.width
+    const segmentHeight = segment.height ?? input.height
+    if (
+      !Number.isInteger(segmentWidth) ||
+      !Number.isInteger(segmentHeight) ||
+      segmentWidth < 64 ||
+      segmentHeight < 64 ||
+      segmentWidth > 3840 ||
+      segmentHeight > 2160 ||
+      segmentWidth % 2 !== 0 ||
+      segmentHeight % 2 !== 0 ||
+      segmentWidth * segmentHeight > 8_294_400
+    ) {
+      throw new Error(`renderMultiSegment: invalid dimensions for ${segment.id}`)
+    }
+    const frames = Math.ceil(segment.durationSec * fps)
+    totalFrames += frames
+    pixelFrames += segmentWidth * segmentHeight * frames
+    totalDuration += segment.durationSec
+    totalHtmlBytes += Buffer.byteLength(segment.html, 'utf8')
+  }
+  if (totalDuration > 120) throw new Error('renderMultiSegment: total duration exceeds 120s')
+  if (totalHtmlBytes > 5_000_000) throw new Error('renderMultiSegment: total HTML exceeds 5MB')
+  if (totalFrames > 7_200) throw new Error('renderMultiSegment: total frame count exceeds 7200')
+  if (pixelFrames > 1920 * 1080 * 120 * 30) {
+    throw new Error('renderMultiSegment: pixel-frame work exceeds safety limit')
+  }
 }
