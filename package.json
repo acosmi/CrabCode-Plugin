@@ -1,6 +1,6 @@
 {
   "name": "crabcode-setup",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Analyze a repository and recommend CrabCode-native automations such as skills, hooks, agents, plugins, and MCP servers.",
   "license": "Apache-2.0",
   "type": "module",

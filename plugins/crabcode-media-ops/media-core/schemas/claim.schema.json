@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crabcode.local/media/claim.schema.json",
+  "title": "Media claim",
+  "type": "object",
+  "required": ["id", "claim", "status"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "claim": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["verified", "doubtful", "unsourced"] },
+    "sourceUrl": { "type": "string", "format": "uri" }
+  },
+  "additionalProperties": false
+}

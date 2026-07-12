@@ -25,8 +25,11 @@ import * as readiness from './tools/readiness.ts'
 import * as approval from './tools/approval.ts'
 import * as packageTool from './tools/package.ts'
 import * as history from './tools/history.ts'
+import * as style from './tools/style.ts'
+import * as platformRules from './tools/platform-rules.ts'
+import { VERSION } from './domain.ts'
 
-const server = new McpServer({ name: 'mediaops', version: '0.1.0' })
+const server = new McpServer({ name: 'mediaops', version: VERSION })
 
 /** Register a tool whose handler returns an Envelope, wiring it to the MCP result shape. */
 function register(
@@ -64,15 +67,27 @@ register(content.listName, content.listDescription, content.listInputSchema, con
 register(profiles.saveName, profiles.saveDescription, profiles.saveInputSchema, profiles.saveHandler)
 register(profiles.getName, profiles.getDescription, profiles.getInputSchema, profiles.getHandler)
 register(profiles.listName, profiles.listDescription, profiles.listInputSchema, profiles.listHandler)
+register(profiles.historyName, profiles.historyDescription, profiles.historyInputSchema, profiles.historyHandler)
+register(profiles.rollbackName, profiles.rollbackDescription, profiles.rollbackInputSchema, profiles.rollbackHandler)
+
+register(style.templateName, style.templateDescription, style.templateInputSchema, style.templateHandler)
+register(style.saveDraftName, style.saveDraftDescription, style.saveDraftInputSchema, style.saveDraftHandler)
+register(style.submitName, style.submitDescription, style.submitInputSchema, style.submitHandler)
+register(style.getFormName, style.getFormDescription, style.getFormInputSchema, style.getFormHandler)
+register(style.proposeName, style.proposeDescription, style.proposeInputSchema, style.proposeHandler)
+register(style.confirmName, style.confirmDescription, style.confirmInputSchema, style.confirmHandler)
 
 register(preview.name, preview.description, preview.inputSchema, preview.handler)
 register(readiness.name, readiness.description, readiness.inputSchema, readiness.handler)
 
 register(approval.requestName, approval.requestDescription, approval.requestInputSchema, approval.requestHandler)
+register(approval.decideName, approval.decideDescription, approval.decideInputSchema, approval.decideHandler)
+register(approval.getName, approval.getDescription, approval.getInputSchema, approval.getHandler)
 register(approval.listName, approval.listDescription, approval.listInputSchema, approval.listHandler)
 
 register(packageTool.name, packageTool.description, packageTool.inputSchema, packageTool.handler)
 register(history.name, history.description, history.inputSchema, history.handler)
+register(platformRules.name, platformRules.description, platformRules.inputSchema, platformRules.handler)
 
 await server.connect(new StdioServerTransport())
 

@@ -75,7 +75,10 @@
       "keywords": ["公众号", "自媒体"],
       "providers": [
         { "skill": "crabcode-media-ops:media-ops", "status": "available" },
-        { "skill": "crabcode-media-ops:media-platform-adapter", "status": "available" }
+        { "skill": "crabcode-media-ops:media-platform-adapter", "status": "available" },
+        { "skill": "crabcode-media-ops:media-publish-gate", "status": "available" },
+        { "skill": "crabcode-media-ops:wechat-original-opinion", "status": "available" },
+        { "skill": "crabcode-media-ops:media-style-intake", "status": "available" }
       ],
       "providerPlugins": ["crabcode-media-ops"]
     },

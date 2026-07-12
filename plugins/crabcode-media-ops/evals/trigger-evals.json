@@ -1,0 +1,22 @@
+[
+  {"query":"我们要从本周 AI 热点开始，做公众号、小红书和头条三平台内容，最终出审批发布包。","should_trigger":true,"expected_skill":"media-ops"},
+  {"query":"帮我找国产大模型最近七天的选题，先核验是不是旧闻复炒，暂时不要写稿。","should_trigger":true,"expected_skill":"media-topic-research"},
+  {"query":"写一篇有判断的公众号科技评论，主题是 AI 让普通人完成原本不会的事。","should_trigger":true,"expected_skill":"wechat-original-opinion"},
+  {"query":"把这篇现有公众号观点稿改得更深入，加上最强反方和结论边界。","should_trigger":true,"expected_skill":"wechat-original-opinion"},
+  {"query":"只审一下这篇稿是不是像洗稿，别改正文，也别给我编原创率。","should_trigger":true,"expected_skill":"media-originality-review"},
+  {"query":"我没旧文，给我一个快速风格问卷，填一半先保存。","should_trigger":true,"expected_skill":"media-style-intake"},
+  {"query":"加载我已有 profile，只更新小红书语气和禁用词，其他保持不变。","should_trigger":true,"expected_skill":"media-style-intake"},
+  {"query":"三篇旧文分析结果和我表单里的锐度冲突了，列出差异让我选。","should_trigger":true,"expected_skill":"media-style-manager"},
+  {"query":"把当前 profile 回滚到上个月那版，但保留历史记录。","should_trigger":true,"expected_skill":"media-style-manager"},
+  {"query":"把已审主稿改成小红书格式，保留来源和 AI 披露记录。","should_trigger":true,"expected_skill":"media-platform-adapter"},
+  {"query":"检查最终变体，等我人工批准后生成可移动发布包。","should_trigger":true,"expected_skill":"media-publish-gate"},
+  {"query":"把这条新闻压缩成三句话摘要，不要评论。","should_trigger":false,"near_miss":"纯新闻摘要不是公众号原创观点默认任务"},
+  {"query":"给这个 SaaS 产品写一篇公众号品牌软文，强调优惠和转化。","should_trigger":false,"near_miss":"品牌营销软文应路由营销能力"},
+  {"query":"帮我把这封媒体合作邮件写得礼貌一点。","should_trigger":false,"near_miss":"邮件写作不是媒体运营工作流"},
+  {"query":"帮我保证这篇文章微信原创率达到 90%。","should_trigger":false,"near_miss":"插件应拒绝保证而非接受目标"},
+  {"query":"抓取全网文章做完整查重并给法律无侵权保证。","should_trigger":false,"near_miss":"全网查重和法律保证不在范围"},
+  {"query":"直接登录我的公众号后台点发布，不用再问我。","should_trigger":false,"near_miss":"浏览器最终发布属于 Gate B"},
+  {"query":"自动回复今天所有小红书评论并发送。","should_trigger":false,"near_miss":"自动评论发送属于 Gate B"},
+  {"query":"写一篇网贷催收曝光稿，按金融帮账号风格。","should_trigger":false,"near_miss":"应路由金融监督曝光专用能力"},
+  {"query":"分析十份合同并给诉讼策略。","should_trigger":false,"near_miss":"法律事项应路由法律插件"}
+]

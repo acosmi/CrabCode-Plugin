@@ -1,37 +1,3 @@
-# 发布操作手册（Runbook）
+# 发布手册入口
 
-本手册说明本插件的发布形态、人工确认 gate、各平台流程，以及 Gate B 凭证清单。**当前阶段（Gate A）：仅生成发布包 + 人工确认；真平台发布 API、浏览器辅助投递、评论发送属 Gate B，未配凭证不可用。**
-
-## 一、两种发布形态
-
-### 1. 发布包模式（Gate A，现可用）
-- 经 `mediaops.publish.package` 生成结构化发布包：成稿内容 + 资源（图片占位/链接）+ 平台发布元数据 + 审计痕迹。
-- 发布包是"可交付物"：运营者据此手动在平台后台发布，或在 Gate B 开放后由真 API 消费。
-- 零凭证，确定性产物，可回查（`mediaops.publish.history`）。
-
-### 2. 浏览器辅助模式（Gate B，暂不可用）
-- 在浏览器中半自动填充平台后台表单（标题/正文/图片/标签），由人工最终点击发布。
-- 需要平台登录态与浏览器辅助通道；属 Gate B，未配置前标注"待平台凭证配置（Gate B）"。
-
-## 二、人工确认 Gate（不可绕过）
-1. 发布前调 `mediaops.readiness.inspect` 做最终就绪度检查，并确认 **AI 辅助显式标识** 存在。
-2. 调 `mediaops.approval.request` 提交待批（variant + 预览 + 就绪结论）。
-3. 仅在人工明确批准后才 `mediaops.publish.package`。未获批不打包、不发布。
-
-## 三、微信公众号草稿箱流程（参考，真 API 属 Gate B）
-1. 选定类型：图文消息（news）或图片消息（newspic）。
-2. Gate A：生成发布包（含标题/摘要/封面图占位/正文/配图清单）。
-3. Gate B（待凭证）：经 draft 接口写入草稿箱 → 人工在后台核对 → freepublish 群发/发布。
-4. 全程保留审计：AI 辅助痕迹 + 人工确认记录。
-
-## 四、Gate B 凭证清单（开放真发布前需配置）
-- **微信公众号**：AppID / AppSecret、素材与草稿/发布接口权限、IP 白名单、access_token 管理。
-- **抖音 / 微博 / B站**：各平台开放平台 App 凭证（client key/secret）、OAuth 授权与发布 scope。
-- **浏览器辅助**：各平台后台登录态/会话、浏览器辅助通道授权。
-- **评论发送**：对应平台评论接口权限与发送通道。
-
-凭证配置与启用属 Gate B 范围，本阶段不实现真调用，所有真 API 路径一律标注"待平台凭证配置（Gate B）"，不伪造发布/发送成功。
-
-## 五、审计与回查
-- 每次打包/审批写入审计记录（内容 id、来源、AI 辅助痕迹、人工确认人/时间）。
-- 经 `mediaops.publish.history` 按平台/时间/状态回查历史。
+请读取 `../platform-delivery/references/publish-runbook.md`。发布包只接受 contentId、approvalId 和 packagedBy，并会复核当前 revisionId/contentHash。

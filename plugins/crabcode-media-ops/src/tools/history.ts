@@ -7,11 +7,14 @@ export const description = 'List publish-package history records, optionally fil
 
 export const inputSchema = {
   platform: z.string().optional(),
+  contentId: z.string().uuid().optional(),
+  brandId: z.string().optional(),
 }
 
-type Args = { platform?: string }
+type Args = { platform?: string; contentId?: string; brandId?: string }
 
 export async function handler(args: Args): Promise<Envelope> {
-  const records = await listRecords('publish-history', args.platform ? { platform: args.platform } : undefined)
+  const filter = Object.fromEntries(Object.entries(args).filter(([, value]) => value !== undefined))
+  const records = await listRecords('publish-history', Object.keys(filter).length ? filter : undefined)
   return ok({ count: records.length, history: records }, storageWarnings())
 }

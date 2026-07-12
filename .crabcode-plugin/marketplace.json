@@ -4,7 +4,7 @@
     "name": "CrabCode"
   },
   "metadata": {
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Official CrabCode plugin marketplace hosted at acosmi/CrabCode-Plugin."
   },
   "plugins": [
@@ -1538,17 +1538,17 @@
     {
       "name": "crabcode-media-ops",
       "source": "./plugins/crabcode-media-ops",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "displayName": "CrabCode 新媒体运营",
-      "shortDescription": "新媒体运营工具箱:选题、智能体辅助撰写、人工审核、多平台适配、AI 标识合规与审批发布",
-      "longDescription": "面向新媒体/自媒体内容运营的工具箱:趋势选题发现、智能体辅助起草、人工审核、多平台(微信、小红书、今日头条等)适配、AI 生成内容标识合规,以及经审批后通过本地发布包发布。",
+      "shortDescription": "研究、公众号原创观点、创作者风格表单、审校、多平台适配与哈希绑定审批发布",
+      "longDescription": "面向媒体与自媒体团队的可审计工作流：可信来源研究、公众号原创观点、快速/完整/增量创作者风格表单、事实与原创复核、多平台适配、AI 披露留痕，以及内容哈希绑定的人工审批与本地发布包。",
       "defaultPrompt": [
         "帮我发现这个领域的内容选题",
         "把这篇内容适配成小红书风格",
-        "起草一篇公众号文章"
+        "通过快速表单建立我的创作者风格"
       ],
       "brandColor": "#8957e5",
-      "description": "Media operations toolkit: trend discovery, agent-assisted drafting, human review, platform adaptation, AI-label compliance, and approved publishing via local publish packages.",
+      "description": "Governed media operations with original-opinion writing, creator-style intake, review gates, versioned profiles and hash-bound publish approval.",
       "category": "media-ops",
       "tags": [
         "media-ops",
@@ -1564,15 +1564,27 @@
           "name": "media-authoring",
           "displayName": "内容创作与运营",
           "skills": [
-            "media-ops"
+            "media-ops",
+            "media-topic-research"
           ]
         },
         {
-          "name": "media-refine",
-          "displayName": "审校与平台适配",
+          "name": "editorial",
+          "displayName": "原创、审校与创作者风格",
           "skills": [
             "media-human-editor",
-            "media-platform-adapter"
+            "wechat-original-opinion",
+            "media-originality-review",
+            "media-style-intake",
+            "media-style-manager"
+          ]
+        },
+        {
+          "name": "platform-delivery",
+          "displayName": "平台适配与审批交付",
+          "skills": [
+            "media-platform-adapter",
+            "media-publish-gate"
           ]
         }
       ]

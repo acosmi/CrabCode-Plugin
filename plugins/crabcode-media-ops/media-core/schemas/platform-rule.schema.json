@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crabcode.local/media/platform-rule.schema.json",
+  "title": "Versioned platform rule",
+  "type": "object",
+  "required": ["id", "scope", "ruleType", "sourceUrl", "verifiedAt", "maxAgeDays", "note"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "scope": { "type": "string", "minLength": 1 },
+    "ruleType": { "enum": ["hard-limit", "platform-dynamic", "editorial-guidance"] },
+    "sourceUrl": { "type": "string", "format": "uri" },
+    "verifiedAt": { "type": "string", "format": "date-time" },
+    "maxAgeDays": { "type": "integer", "minimum": 1 },
+    "note": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": false
+}

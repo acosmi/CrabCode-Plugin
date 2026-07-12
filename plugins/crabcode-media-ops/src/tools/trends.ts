@@ -82,7 +82,19 @@ function normalizeTitle(title: string): string {
 }
 
 function tokenSet(title: string): Set<string> {
-  return new Set(normalizeTitle(title).split(' ').filter(Boolean))
+  const normalized = normalizeTitle(title)
+  const tokens = new Set<string>()
+  for (const part of normalized.split(/\s+/).filter(Boolean)) {
+    const latin = part.match(/[a-z0-9]+(?:[.-][a-z0-9]+)*/g) ?? []
+    latin.forEach((token) => tokens.add(token))
+    const hanParts = part.match(/[一-鿿]+/g) ?? []
+    for (const han of hanParts) {
+      for (const character of han) tokens.add(`char:${character}`)
+      for (let i = 0; i < han.length - 1; i++) tokens.add(han.slice(i, i + 2))
+      for (let i = 0; i < han.length - 2; i++) tokens.add(han.slice(i, i + 3))
+    }
+  }
+  return tokens
 }
 
 /** Jaccard similarity over token sets. */
@@ -91,11 +103,13 @@ function similarity(a: Set<string>, b: Set<string>): number {
   let inter = 0
   for (const t of a) if (b.has(t)) inter++
   const union = a.size + b.size - inter
-  return union === 0 ? 0 : inter / union
+  const jaccard = union === 0 ? 0 : inter / union
+  const overlap = Math.min(a.size, b.size) === 0 ? 0 : inter / Math.min(a.size, b.size)
+  return Math.max(jaccard, overlap * 0.8)
 }
 
 export async function clusterHandler(args: ClusterArgs): Promise<Envelope> {
-  const SIM_THRESHOLD = 0.5
+  const SIM_THRESHOLD = 0.30
   const items = args.signals.map((s) => ({ signal: s, tokens: tokenSet(s.title) }))
   const clusters: { repTitle: string; members: ClusterArgs['signals']; topScore: number }[] = []
 

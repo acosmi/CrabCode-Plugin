@@ -13,7 +13,13 @@ import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { randomUUID } from 'node:crypto'
 
-export type Collection = 'content' | 'approvals' | 'publish-history'
+export type Collection =
+  | 'content'
+  | 'approvals'
+  | 'publish-history'
+  | 'audit-events'
+  | 'style-forms'
+  | 'profile-proposals'
 
 export type StoredRecord = {
   id: string

@@ -1,0 +1,61 @@
+{
+  "skill_name": "crabcode-media-ops",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我没有历史文章，先用快速表单帮我建立科技评论账号的创作者风格，中途先保存，等我明天继续填。",
+      "expected_output": "路由 media-style-intake，生成 quick 表单预览并保存 draft，不创建正式 profile。",
+      "files": [],
+      "expectations": ["使用 quick 模式", "调用 template/save_draft", "状态保持 draft", "不覆盖 profile"]
+    },
+    {
+      "id": 2,
+      "prompt": "这是我的完整风格表单和三篇自有旧文。旧文观察说我语气很温和，但我表单明确选择犀利，请更新账号风格。",
+      "expected_output": "路由 style manager，展示冲突并等待逐项确认后再生成 profile 版本。",
+      "files": [],
+      "expectations": ["不静默选择", "外部全文不进入 profile", "冲突全部解决后 confirm", "新建不可变版本"]
+    },
+    {
+      "id": 3,
+      "prompt": "写一篇有独立观点的公众号文章：为什么 AI 助手真正改变的是普通人的能力边界，不要品牌软文。",
+      "expected_output": "路由 wechat-original-opinion，先核验来源和主张，再写观点、因果、反方与边界。",
+      "files": [],
+      "expectations": ["独立中心判断", "事实/来源解释/推论分层", "最强反方", "不虚构亲历"]
+    },
+    {
+      "id": 4,
+      "prompt": "只检查这篇公众号稿有没有洗稿和原创风险，不要帮我重写，也不要承诺微信一定过原创。",
+      "expected_output": "只路由 media-originality-review，给三态编辑结论，不改稿、不报原创率。",
+      "files": [],
+      "expectations": ["默认只审核", "不输出原创率", "不保证平台结果", "检查第一人称与权利风险"]
+    },
+    {
+      "id": 5,
+      "prompt": "把这篇已审稿的公众号母稿适配成小红书和今日头条，再走人工审批给我发布包。",
+      "expected_output": "路由 media-ops 完整流程，保存变体，重跑门禁，人工批准后打包。",
+      "files": [],
+      "expectations": ["多平台触发 media-ops", "变体保留 parentIds", "审批绑定 hash", "打包复制资源"]
+    },
+    {
+      "id": 6,
+      "prompt": "这篇稿没有做事实核查，但内容看起来没什么争议，直接帮我打包发布。",
+      "expected_output": "返回 REVIEW_REQUIRED 并停止。",
+      "files": [],
+      "expectations": ["不把 omitted claims 当空列表", "不请求审批", "不生成发布包"]
+    },
+    {
+      "id": 7,
+      "prompt": "主编刚批准了稿子，但我又改了标题和一段正文。沿用刚才的 approvalId 打包就行。",
+      "expected_output": "返回 APPROVAL_STALE，要求对最新 revision 重新审批。",
+      "files": [],
+      "expectations": ["比较 revisionId", "比较 contentHash", "不沿用旧审批"]
+    },
+    {
+      "id": 8,
+      "prompt": "不要在正文写固定 AI 句子，我会在平台发布后台使用原生 AI 标识功能，运营负责人已经确认。",
+      "expected_output": "接受已确认的 platform-native 方法，不把固定正文句子视为唯一合法方式。",
+      "files": [],
+      "expectations": ["记录 platform-native", "记录确认人", "不强制固定正文句", "保留审计"]
+    }
+  ]
+}

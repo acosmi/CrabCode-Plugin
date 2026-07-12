@@ -1,7 +1,7 @@
 {
   "name": "crabcode-media-ops",
-  "version": "0.2.0",
-  "description": "Media operations toolkit for CrabCode: trend discovery, agent-assisted drafting, human review, platform adaptation, and approved publishing via local publish packages.",
+  "version": "0.3.0",
+  "description": "Governed media operations for CrabCode: research, original opinion writing, creator-style forms, review, platform adaptation, hash-bound approval, and local publish packages.",
   "author": {
     "name": "CrabCode"
   },
@@ -15,8 +15,14 @@
     "mcp"
   ],
   "skills": [
-    "./skills/media-human-editor",
-    "./skills/media-ops",
-    "./skills/media-platform-adapter"
+    "./media-core/skills/media-ops",
+    "./media-core/skills/media-topic-research",
+    "./editorial/skills/media-human-editor",
+    "./editorial/skills/wechat-original-opinion",
+    "./editorial/skills/media-originality-review",
+    "./editorial/skills/media-style-intake",
+    "./editorial/skills/media-style-manager",
+    "./platform-delivery/skills/media-platform-adapter",
+    "./platform-delivery/skills/media-publish-gate"
   ]
 }

@@ -21,7 +21,7 @@ allowed-tools: [Read, Glob, Grep, Bash, Task]
 - 标注优先级（需尽快回应的：质疑事实、投诉、敏感）。
 
 ### 3. 回复建议
-- 为需回复的评论起草回复，遵循品牌口吻（profile）与平台互动政策（`references/platform-policy.md`）。
+- 为需回复的评论起草回复，遵循品牌口吻（profile）与平台互动政策（`platform-delivery/references/platform-policy.md`）。
 - 涉及事实纠错的，给出有依据的回应；涉及投诉的，给出安抚 + 处理路径；敏感/法律风险的，建议不公开回复或转人工，并说明原因。
 - 回复建议保持"人味"，避免模板化客套（参考 `media-human-editor`）。
 

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crabcode.local/media/approval.schema.json",
+  "title": "Publish approval",
+  "type": "object",
+  "required": ["approvalId", "contentId", "revisionId", "contentHash", "platform", "state", "requestedBy"],
+  "properties": {
+    "approvalId": { "type": "string", "format": "uuid" },
+    "contentId": { "type": "string", "format": "uuid" },
+    "revisionId": { "type": "string", "format": "uuid" },
+    "contentHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "platform": { "enum": ["wechat", "xhs", "toutiao"] },
+    "state": { "enum": ["pending", "approved", "rejected", "revoked"] },
+    "requestedBy": { "type": "string", "minLength": 1 },
+    "decidedBy": { "type": "string", "minLength": 1 },
+    "reason": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": true
+}

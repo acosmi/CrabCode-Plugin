@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crabcode.local/media/content-manifest.schema.json",
+  "title": "Versioned media content manifest",
+  "type": "object",
+  "required": ["contentId", "revisionId", "revision", "kind", "brandId", "profileVersion", "stage", "title", "bodyMarkdown", "contentHash", "savedBy", "createdAt"],
+  "properties": {
+    "contentId": { "type": "string", "format": "uuid" },
+    "revisionId": { "type": "string", "format": "uuid" },
+    "revision": { "type": "integer", "minimum": 1 },
+    "kind": { "enum": ["brief", "draft", "variant"] },
+    "brandId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$" },
+    "profileVersion": { "type": "string", "minLength": 1 },
+    "stage": { "enum": ["intake", "researched", "drafted", "reviewed"] },
+    "platform": { "enum": ["wechat", "xhs", "toutiao"] },
+    "title": { "type": "string", "minLength": 1 },
+    "bodyMarkdown": { "type": "string" },
+    "contentHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "review": { "type": "object" },
+    "originalityReview": { "type": "object" },
+    "legalReview": { "type": "object" },
+    "aiDisclosure": { "type": "object" },
+    "assets": { "type": "array" },
+    "savedBy": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": true
+}
