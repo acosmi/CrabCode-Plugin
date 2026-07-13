@@ -1,5 +1,9 @@
 ---
-name: crabcode-documents
+name: Word 文档
+short-description: "创建、编辑、修订并规范排版 Word 文档"
+brand-color: "#3578E5"
+icon-small: "./assets/icon.png"
+icon-large: "./assets/icon.png"
 description: "Create, read, edit, or restructure Word documents (.docx): headings, tables of contents, tracked changes, memos, letters, reports. 中文场景:Word 文档、合同文书、法律备忘录、审查报告、纪要决议等成文交付。Trigger on \"word doc\", \".docx\", or any professional document file request."
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---

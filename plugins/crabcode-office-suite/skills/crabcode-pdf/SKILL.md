@@ -1,5 +1,9 @@
 ---
-name: crabcode-pdf
+name: PDF 处理
+short-description: "读取、提取、合并、拆分、加水印、填写表单与 OCR 处理 PDF"
+brand-color: "#E5484D"
+icon-small: "./assets/icon.png"
+icon-large: "./assets/icon.png"
 description: "Read, extract, merge, split, watermark, create, fill, encrypt, or OCR PDF files. 中文场景:PDF 读取与表格抽取、合并拆分、加水印、表单填写、加密解密、扫描件 OCR。Trigger whenever the user mentions a .pdf filename or asks to produce or process one."
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---

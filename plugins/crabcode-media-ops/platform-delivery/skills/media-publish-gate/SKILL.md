@@ -1,5 +1,9 @@
 ---
-name: media-publish-gate
+name: 发布审批门禁
+short-description: "校验发布条件、记录人工审批并生成发布包"
+brand-color: "#B5652A"
+icon-small: "./assets/icon.png"
+icon-large: "./assets/icon.png"
 description: 对最终媒体变体执行完整 Media Gate、请求并记录人工审批，并在内容哈希匹配且批准后生成可移动发布包。用户要求审批、打包、发布前检查或追溯发布记录时必须使用；不执行真实平台 API 或浏览器最终发布。
 ---
 

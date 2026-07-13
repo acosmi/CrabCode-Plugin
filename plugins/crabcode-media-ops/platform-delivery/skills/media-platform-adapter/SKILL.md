@@ -1,5 +1,9 @@
 ---
-name: media-platform-adapter
+name: 多平台内容适配
+short-description: "将主稿适配为微信、小红书与头条版本"
+brand-color: "#3178B8"
+icon-small: "./assets/icon.png"
+icon-large: "./assets/icon.png"
 description: 把已完成主稿适配为微信、小红书或今日头条变体，保留来源、审稿、原创、法律和 AI 披露状态。用户要求一稿多发、改成小红书/头条/公众号格式或平台预览时使用；不负责批准或真实发布。
 ---
 

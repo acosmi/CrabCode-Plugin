@@ -1,5 +1,9 @@
 ---
-name: media-human-editor
+name: 媒体稿人工编辑
+short-description: "去除 AI 味并提升媒体稿结构与可读性"
+brand-color: "#7C5CC4"
+icon-small: "./assets/icon.png"
+icon-large: "./assets/icon.png"
 description: 对已有媒体稿进行去 AI 味、结构压缩、语言自然化和移动端可读性编辑，同时保留事实、来源、观点边界与 AI 披露。用户要求润色、改得像人写、压缩套话或人工编辑时使用；不负责独立原创审计和批准。
 ---
 

@@ -1,5 +1,9 @@
 ---
-name: media-ops
+name: 新媒体运营
+short-description: "编排选题、创作、审校、适配与发布包流程"
+brand-color: "#8957E5"
+icon-small: "./assets/icon.png"
+icon-large: "./assets/icon.png"
 description: 编排从选题研究、创作审校、多平台适配到人工审批发布包的完整媒体运营流程。用户要求多阶段继续执行、多平台分发、批量内容、审批留痕或发布包时必须使用；只写一篇公众号观点稿时改用 wechat-original-opinion。
 ---
 

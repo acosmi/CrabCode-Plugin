@@ -1,5 +1,9 @@
 ---
-name: media-topic-research
+name: 媒体选题研究
+short-description: "检索热点、核验来源并建立媒体主张台账"
+brand-color: "#3B82C4"
+icon-small: "./assets/icon.png"
+icon-large: "./assets/icon.png"
 description: 为媒体选题做热点检索、去重聚类、可信来源核验与主张台账。用户要求找选题、追热点、联网核验、判断旧闻复炒或为文章准备证据时使用；不负责成稿或发布。
 ---
 

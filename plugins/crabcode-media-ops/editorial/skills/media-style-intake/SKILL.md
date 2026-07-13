@@ -1,5 +1,9 @@
 ---
-name: media-style-intake
+name: 创作者风格采集
+short-description: "通过结构化表单采集并更新创作者风格"
+brand-color: "#D96C3F"
+icon-small: "./assets/icon.png"
+icon-large: "./assets/icon.png"
 description: 通过快速、完整或增量创作者风格采集表单建立和更新账号风格。用户要收集创作者类型、首次建档、没有历史文章也要定风格、填写风格问卷或保存表单草稿时必须使用；表单只提交草案，不能直接覆盖正式 profile。
 ---
 

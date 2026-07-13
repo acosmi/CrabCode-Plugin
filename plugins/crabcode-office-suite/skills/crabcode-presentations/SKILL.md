@@ -1,5 +1,9 @@
 ---
-name: crabcode-presentations
+name: 演示文稿
+short-description: "创建、编辑、解析和合并 PowerPoint 演示文稿"
+brand-color: "#E47A2E"
+icon-small: "./assets/icon.png"
+icon-large: "./assets/icon.png"
 description: "Create, edit, parse, or merge .pptx slide decks: pitch decks, templates, layouts, speaker notes. 中文场景:演示文稿、幻灯片、路演材料、PPT 制作与内容提取。Trigger whenever a .pptx file or the words \"deck\", \"slides\", \"presentation\" are involved as input or output."
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---

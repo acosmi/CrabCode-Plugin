@@ -1,5 +1,9 @@
 ---
-name: media-style-manager
+name: 创作者风格管理
+short-description: "合并风格证据、处理冲突并管理版本回滚"
+brand-color: "#7B61A8"
+icon-small: "./assets/icon.png"
+icon-large: "./assets/icon.png"
 description: 合并已提交的创作者风格表单与历史作品的抽象观察，展示冲突、生成 profile diff，并在创作者逐项确认后保存版本或回滚。用户要求学习旧文风格、更新账号风格、查看风格历史、处理风格冲突或回滚时使用。
 ---
 

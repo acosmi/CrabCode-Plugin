@@ -1,5 +1,9 @@
 ---
-name: crabcode-spreadsheets
+name: 电子表格
+short-description: "创建、编辑、分析和校验 Excel、CSV 与 TSV 表格"
+brand-color: "#299764"
+icon-small: "./assets/icon.png"
+icon-large: "./assets/icon.png"
 description: "Create, read, edit, or repair spreadsheets (.xlsx/.xlsm/.csv/.tsv): formulas, formatting, charts, recalculation. 中文场景:电子表格、Excel 文件、财务报表、财务模型、数据清单的创建与编辑。Trigger whenever a spreadsheet file is the input or output."
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---
