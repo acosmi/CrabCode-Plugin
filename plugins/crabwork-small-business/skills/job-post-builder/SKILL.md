@@ -1,5 +1,6 @@
 ---
-name: job-post-builder
+name: 招聘职位材料
+short-description: 根据岗位需求生成职位描述、招聘文案与候选人筛选要点
 version: 0.3.0
 description: >
   从一次简短的招聘沟通出发,生成端到端的招聘材料包——招聘启事、含评分表的结构化

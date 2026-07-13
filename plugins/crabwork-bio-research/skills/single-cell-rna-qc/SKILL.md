@@ -1,5 +1,6 @@
 ---
-name: single-cell-rna-qc
+name: 单细胞 RNA 质控
+short-description: 按 scverse 方法检查并过滤单细胞 RNA 测序低质量细胞
 description: Performs quality control on single-cell RNA-seq data (.h5ad AnnData or 10X Genomics .h5 / Cell Ranger output) using scverse best practices—MAD-based outlier filtering, mitochondrial/ribosomal/hemoglobin metrics, and before/after visualizations. Use when users want to QC scRNA-seq data, filter low-quality cells, remove outliers, compute or plot QC metrics, set count/gene/MT% thresholds, or follow scverse/scanpy best practices. Triggers on "run QC on my single-cell data", "filter low-quality cells", h5ad/scanpy/AnnData QC, MAD filtering, percent mito cutoff, or assessing single-cell data quality before downstream analysis.
 ---
 

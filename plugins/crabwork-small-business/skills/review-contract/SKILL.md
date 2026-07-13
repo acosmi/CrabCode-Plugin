@@ -1,5 +1,6 @@
 ---
-name: review-contract
+name: 合同条款复核
+short-description: 按民法典口径标记合同红旗并生成带修改建议的文档
 version: 0.3.0
 description: 以《民法典》合同编口径用大白话审查合同,按严重程度标出红旗,并生成带修改标记的 docx/PDF 供业主谈判使用。Reviews a contract in plain language, surfaces red flags with severity ratings, and produces a marked-up docx/PDF with suggested redlines. 触发:业主运行 /review-contract,或说"审合同""帮我看看这份合同""这个该不该签""看看这份保密协议/服务合同""有没有坑""看看这些条款",或说 "review this contract," "what am I signing," "should I sign this," "check this NDA/MSA/agreement," "any red flags in this," "look at these terms," 或上传/粘贴合同、法律文件。可选接收文件路径;有本地文件或粘贴文本即可离线运行(尚无邮箱或电子签连接器)。
 allowed-tools: Read, WebFetch, Bash

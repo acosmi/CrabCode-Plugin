@@ -1,5 +1,6 @@
 ---
-name: interview-prep
+name: 面试准备
+short-description: 设计岗位面试目标、结构化问题、评分标准与追问方向
 description: Create structured interview plans with competency-based questions, scoring rubrics, panel assignments, and debrief templates. Trigger with "interview plan for", "interview questions for", "how should we interview", "scorecard for", "interview rubric", "behavioral questions for a [role]", "who should be on the panel", or when the user is preparing to interview candidates or wants to make interviews more consistent and less biased.
 ---
 

@@ -1,5 +1,6 @@
 ---
-name: skills-qa
+name: 技能质量检查
+short-description: 检查技能前置元数据、命名、可用性并解答使用问题
 description: 对技能做质量检查并解答其使用疑问,核对 frontmatter、命名与可用性。当用户提到这个技能怎么用、技能报错、检查 skill 质量、为什么不生效、技能写得对不对,或需要排查与答疑时使用本技能(即使未明说"检查")。
 argument-hint: "[技能名 / 问题描述]"
 ---

@@ -1,5 +1,6 @@
 ---
-name: call-summary
+name: 销售通话总结
+short-description: 提炼通话要点、客户需求、承诺事项和下一步跟进动作
 description: Process call notes or a transcript — extract action items, draft follow-up email, generate internal summary. Use when pasting rough notes or a transcript after a discovery, demo, or negotiation call, drafting a customer follow-up, logging the activity for your CRM, or capturing objections and next steps for your team.
 argument-hint: "<call notes or transcript>"
 ---

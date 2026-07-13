@@ -1,5 +1,6 @@
 ---
-name: plugin-settings
+name: 插件设置模式
+short-description: 使用本地配置文件为插件实现安全、可维护的用户设置
 description: This skill should be used when the user asks about "plugin settings", "store plugin configuration", "user-configurable plugin", ".local.md files", "plugin state files", "read YAML frontmatter", "per-project plugin settings", or wants to make plugin behavior configurable. Documents the .crabcode/plugin-name.local.md pattern for storing plugin-specific configuration with YAML frontmatter and markdown content.
 version: 0.1.0
 ---

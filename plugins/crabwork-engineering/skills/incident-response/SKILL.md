@@ -1,5 +1,6 @@
 ---
-name: incident-response
+name: 生产事故响应
+short-description: 组织事故分级、排障、沟通、恢复与无责复盘全流程
 description: Run an incident response workflow — triage, communicate, and write postmortem. Trigger with "we have an incident", "production is down", "we have an outage", "the site is broken for users", an alert or page that needs severity (SEV) assessment, an on-call situation, a status update mid-incident, or when writing a blameless postmortem / RCA after resolution.
 argument-hint: "<incident description or alert>"
 ---

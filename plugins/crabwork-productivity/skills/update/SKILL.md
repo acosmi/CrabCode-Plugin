@@ -1,5 +1,6 @@
 ---
-name: update
+name: 工作进展更新
+short-description: 根据当前任务状态与近期活动生成清晰的工作进度更新
 description: Sync tasks and refresh memory from current activity. Use when pulling new assignments from a project tracker (Asana, Linear, Jira) or GitHub Issues into TASKS.md, when the user says "sync my tasks", "what's new", "refresh", "catch me up", or "clean up my list"; when triaging stale or overdue tasks; when filling memory gaps for unknown people, projects, or terms found in tasks; or when running a comprehensive deep scan of chat, email, calendar, and docs to surface todos and new memories buried in activity. Invoked as /crabwork-productivity:update (add --comprehensive for the deep scan).
 argument-hint: "[--comprehensive]"
 ---

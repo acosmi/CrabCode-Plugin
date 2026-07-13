@@ -1,5 +1,6 @@
 ---
-name: capacity-plan
+name: 产能规划
+short-description: 根据需求、资源、约束与服务目标制定可执行的产能计划
 description: Plans resource capacity — workload analysis, utilization forecasting, and headcount scenarios. Use when heading into quarterly or annual planning, the team feels overallocated and you need the numbers, deciding whether to hire, contract, or deprioritize, stress-testing whether upcoming projects fit the people you have, or when the user asks "do we have the capacity for this", "are we overallocated", "how many people do we need", or wants a resource/staffing/utilization plan.
 argument-hint: "<team or project scope>"
 ---

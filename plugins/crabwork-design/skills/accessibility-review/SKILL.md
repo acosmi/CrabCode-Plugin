@@ -1,5 +1,6 @@
 ---
-name: accessibility-review
+name: 无障碍设计审查
+short-description: 按可感知、可操作与可理解原则审查产品无障碍问题
 description: Runs a WCAG 2.1 AA accessibility audit on a design, mockup, or live page. Trigger with "audit accessibility", "check a11y", "is this accessible?", "WCAG audit", "does this pass accessibility", or when reviewing for color contrast ratios, keyboard navigation and focus order, touch target size (44x44), screen reader announcements, ARIA roles, alt text, or focus traps before handoff or launch.
 argument-hint: "<Figma URL, URL, or description>"
 ---

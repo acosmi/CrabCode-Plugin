@@ -1,5 +1,6 @@
 ---
-name: invoice-chase
+name: 逾期账款催收
+short-description: 整理逾期应收并起草分级、合规且可持续跟进的催款信息
 version: 0.3.0
 description: >
   从店主记账软件的应收账龄(用友好会计 / 金蝶精斗云 导出)出发,起草逾期账款催收提醒,

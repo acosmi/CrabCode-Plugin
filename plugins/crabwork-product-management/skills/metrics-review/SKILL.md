@@ -1,5 +1,6 @@
 ---
-name: metrics-review
+name: 产品指标复盘
+short-description: 检查核心产品指标、变化原因、异常和下一步实验
 description: Reviews and analyzes product metrics with trend analysis and actionable insights. Use when running a weekly, monthly, or quarterly metrics review or business review, investigating a sudden spike or drop in DAU/WAU/MAU, retention, conversion, funnel, NPS, MRR, or activation, asking "how are we tracking against targets/OKRs?", "why did this number move?", or "what's our product health?", or turning a raw metrics table or analytics dump into a scorecard with recommended actions. Triggers on "metrics review", "KPI check", "review the numbers", or pasting a stats table.
 argument-hint: "<time period or metric focus>"
 ---

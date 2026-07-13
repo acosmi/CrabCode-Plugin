@@ -1,5 +1,6 @@
 ---
-name: stakeholder-update
+name: 利益相关方更新
+short-description: 把产品进展、决策、风险和下一步整理为清晰沟通
 description: Drafts a stakeholder update tailored to audience and cadence. Use when writing a weekly or monthly status report or progress update for leadership, exec, board, or cross-functional partners, announcing a launch, escalating a risk or blocker, setting a Green/Yellow/Red status, writing an ADR or decision doc, or translating the same progress into exec-brief, engineering-detail, or customer-facing versions. Triggers on "write a status update", "draft the weekly update", "summarize progress for leadership", or "I need to tell stakeholders about X".
 argument-hint: "<update type and audience>"
 ---

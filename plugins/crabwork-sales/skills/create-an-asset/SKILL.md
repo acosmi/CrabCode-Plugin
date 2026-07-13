@@ -1,5 +1,6 @@
 ---
-name: create-an-asset
+name: 销售材料制作
+short-description: 制作提案、单页、案例或跟进材料，支持具体销售机会推进
 description: Generates tailored, customer-facing sales assets — interactive landing pages, presentation decks, executive one-pagers, and workflow/architecture demos — from your deal context, branded to the prospect. Trigger with "create an asset", "build a demo", "make a landing page for [prospect]", "mock up a workflow", "build a deck", "one-pager for [company]", or when you need a polished deliverable to send a customer after a discovery, demo, or exec-alignment conversation.
 ---
 

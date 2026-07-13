@@ -1,5 +1,6 @@
 ---
-name: status-report
+name: 运营状态报告
+short-description: 汇总业务进展、指标、风险、决策和下一步行动
 description: Generates a status report with KPIs, risks, decisions, and next steps. Use when writing a weekly, monthly, or quarterly update for leadership or stakeholders, summarizing project or team health with green/yellow/red (RAG) status, surfacing risks and decisions that need attention, turning a pile of project-tracker activity into a readable narrative, or when the user says "write a status update", "weekly report", "where are we on this", "exec summary", or "what should I tell leadership".
 argument-hint: "[weekly | monthly | quarterly] [project or team]"
 ---

@@ -1,5 +1,6 @@
 ---
-name: competitive-brief
+name: 市场竞争简报
+short-description: 分析竞品定位、信息策略、渠道动作与市场机会
 description: Researches competitors and generates a positioning and messaging comparison with content gaps, opportunities, and threats. Use when asked to "do a competitive analysis", "research [competitor]", "build a battlecard", "how do we stack up against X?", "what's [competitor]'s positioning?", or "compare us to our competitors"; when finding positioning gaps and messaging angles competitors haven't claimed; or when a competitor makes a move (launch, funding, pricing change) and you need to assess the impact.
 argument-hint: "<competitor or market segment>"
 ---

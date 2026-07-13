@@ -1,5 +1,6 @@
 ---
-name: process-optimization
+name: 流程优化
+short-description: 识别流程瓶颈、浪费和风险并设计可衡量的改进方案
 description: Analyzes and improves business processes — maps current state, finds waste and bottlenecks, and designs a leaner future state with estimated impact. Use when a workflow feels slow, manual, or error-prone, when there are too many steps, handoffs, or approvals, when work keeps getting stuck or redone, or when the user says "this process is slow", "how can we improve this", "streamline this workflow", "cut the steps", "reduce handoffs", "automate this", or "where's the bottleneck".
 ---
 

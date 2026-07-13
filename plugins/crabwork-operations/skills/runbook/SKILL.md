@@ -1,5 +1,6 @@
 ---
-name: runbook
+name: 运行手册编写
+short-description: 编写可执行的运营步骤、检查点、异常处理和升级路径
 description: Creates or updates an operational runbook for a recurring task or procedure — prerequisites, exact step-by-step commands, verification, troubleshooting, rollback, and escalation. Use when documenting a task that on-call or ops needs to run repeatably, turning tribal knowledge into exact commands, adding troubleshooting or rollback steps to an existing procedure, writing escalation paths for when things go wrong, or when the user says "write a runbook", "document the on-call steps", "how do we run this", or "what do we do when this breaks". For higher-level process docs with RACI and flowcharts rather than commands, use the process-doc skill instead.
 argument-hint: "<process or task name>"
 ---

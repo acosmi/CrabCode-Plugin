@@ -1,5 +1,6 @@
 ---
-name: design-creator
+name: 营销设计创作
+short-description: 根据业务目标生成营销视觉方案、规格与可交付设计素材
 version: 0.3.0
 description: >
   接收一份已审批的内容简报(content brief),端到端执行一场营销战役:排布发布

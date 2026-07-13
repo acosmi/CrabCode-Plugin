@@ -1,5 +1,6 @@
 ---
-name: statistical-analysis
+name: 统计分析
+short-description: 运用描述统计、检验、预测与异常检测形成可靠统计结论
 description: Reference for sound statistical methods -- descriptive stats and percentiles, trend analysis and forecasting, outlier and anomaly detection, hypothesis testing (t-test, A/B, ANOVA, chi-squared), and common traps. Use when summarizing a distribution, deciding mean vs median, judging whether a difference is significant or just noise, detecting anomalies, computing or interpreting correlations, or guarding against Simpson's paradox, survivorship bias, and correlation-as-causation. Load whenever an analysis makes a statistical claim.
 user-invocable: false
 ---

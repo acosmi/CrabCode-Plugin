@@ -1,5 +1,6 @@
 ---
-name: synthesize-research
+name: 用户研究综合
+short-description: 整合访谈、反馈与数据，提炼主题、洞察和产品机会
 description: Synthesizes user research from interviews, surveys, and feedback into structured insights. Use when you have a pile of interview notes, transcripts, survey responses, sales-call notes, or support tickets to make sense of, need to extract themes, do thematic analysis or affinity mapping, rank findings by frequency and impact, build evidence-based personas, or turn raw feedback into roadmap recommendations. Triggers on "synthesize my research", "what are the themes in these interviews?", "analyze this feedback", "what did users say?", or pasting research notes.
 argument-hint: "<research topic or question>"
 ---

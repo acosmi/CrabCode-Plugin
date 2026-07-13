@@ -1,5 +1,6 @@
 ---
-name: forecast
+name: 销售预测
+short-description: 基于商机阶段、金额、时间和风险形成可解释的销售预测
 description: Generates a weighted sales forecast with best/likely/worst scenarios, commit vs. upside breakdown, and gap analysis. Use when preparing a quarterly or monthly forecast call, assessing gap-to-quota from a pipeline CSV, deciding which deals to commit vs. call upside, or checking pipeline coverage against your number. Trigger with "forecast my quarter", "what's my forecast", "am I going to hit quota", "build my commit", or when you paste deals and a quota and ask what will close.
 argument-hint: "<period>"
 ---

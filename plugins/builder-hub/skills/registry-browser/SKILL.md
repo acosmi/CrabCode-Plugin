@@ -1,5 +1,6 @@
 ---
-name: registry-browser
+name: 插件市场浏览
+short-description: 按分类和关键词浏览插件市场，发现可安装的新技能
 description: 浏览 CrabCode 插件市场上可用的技能目录,按分类和关键词检索可安装项。当用户提到逛市场、看有哪些技能可装、搜索插件、找某类能力、浏览 marketplace 目录,或需要发现新技能时使用本技能(即使未明说"浏览")。
 argument-hint: "[搜索关键词 / 分类]"
 ---

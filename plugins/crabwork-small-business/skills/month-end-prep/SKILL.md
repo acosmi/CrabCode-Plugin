@@ -1,5 +1,6 @@
 ---
-name: month-end-prep
+name: 月末准备
+short-description: 整理对账、票据、应计与待确认事项，为月度结账做好准备
 version: 0.3.0
 description: >
   Walks an SMB owner through month-end close: reconciles the books from their

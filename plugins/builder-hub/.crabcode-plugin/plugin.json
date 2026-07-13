@@ -1,6 +1,6 @@
 {
   "name": "builder-hub",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Plugin and skill management meta-tooling: install, uninstall, enable/disable, browse the registry, surface related skills, run auto-update checks, and skill QA.",
   "author": {
     "name": "CrabLaw"

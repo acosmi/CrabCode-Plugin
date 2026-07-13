@@ -1,5 +1,6 @@
 ---
-name: start
+name: 效率工作台入门
+short-description: 介绍效率工作流的可用能力、使用方式和推荐起步路径
 description: Initialize the productivity system (TASKS.md, working memory, deep memory, and the visual dashboard) and open the dashboard. Use on first-time setup ("set up the plugin", "get me started", "initialize my tasks/memory"), when bootstrapping working memory from an existing todo list or task app (Asana, Linear, Jira, Notion, Todoist), when the user wants to open or see the dashboard, or when doing the initial decode of the nicknames, acronyms, and project codenames found in their todos. Invoked as /crabwork-productivity:start.
 ---
 

@@ -1,5 +1,6 @@
 ---
-name: smb-onboard
+name: 小微企业工作台入门
+short-description: 采集业务基础信息和数据源，建立适合企业的工作流起点
 version: 0.3.0
 description: >
   CrabCode as the trainer. Walks an SMB owner through connecting their first two

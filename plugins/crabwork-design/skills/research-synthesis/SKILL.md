@@ -1,5 +1,6 @@
 ---
-name: research-synthesis
+name: 设计研究综合
+short-description: 整合用户研究证据，提炼主题、洞察和设计机会
 description: Synthesizes raw user research into themes, insights, and prioritized recommendations. Trigger with "synthesize this research", "find themes in these interviews", "what are the takeaways from this survey?", "analyze these usability notes", "make sense of this feedback", or when you have interview transcripts, survey results, usability test notes, support tickets, app store reviews, or NPS/CSAT responses that need distilling into patterns, user segments, and next steps.
 argument-hint: "<research data, transcripts, or survey results>"
 ---

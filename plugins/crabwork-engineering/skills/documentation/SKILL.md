@@ -1,5 +1,6 @@
 ---
-name: documentation
+name: 技术文档编写
+short-description: 编写和维护项目说明、接口文档、运行手册与入职指南
 description: Write and maintain technical documentation. Trigger with "write docs for", "document this", "create a README", "write a runbook", "write an onboarding guide", "document this API", "explain how this works for the team", or when the user needs help with any form of technical writing — README, API reference, architecture docs, operational runbooks, or onboarding guides.
 ---
 

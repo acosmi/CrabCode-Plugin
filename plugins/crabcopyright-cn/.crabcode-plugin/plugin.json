@@ -1,6 +1,6 @@
 {
   "name": "crabcopyright-cn",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "软著申请管家:面向中国版权保护中心软件著作权登记的知识产权材料管理工作流伞插件。统筹材料清单、源代码鉴别材料、说明书鉴别材料(引导 crabcode-office-suite 处理 Word/PDF)、一致性校验、申请包生成与在线填报指导。",
   "author": {
     "name": "CrabCopyright"

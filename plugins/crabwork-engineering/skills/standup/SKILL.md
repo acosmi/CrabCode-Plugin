@@ -1,5 +1,6 @@
 ---
-name: standup
+name: 站会进展总结
+short-description: 把近期提交、任务进展与阻塞整理为清晰的站会更新
 description: Generate a standup update from recent activity. Use when preparing for daily standup, asking "what did I work on yesterday/this week", summarizing recent commits and PRs and ticket moves, formatting work into yesterday/today/blockers, writing a status update or progress report, or structuring a few rough notes into a shareable update.
 argument-hint: "[yesterday | today | blockers]"
 ---

@@ -1,5 +1,6 @@
 ---
-name: policy-lookup
+name: 人力政策查询
+short-description: 检索并解释适用的人力资源政策、流程与员工指引
 description: Find and explain company policies in plain language. Trigger with "what's our PTO policy", "can I work remotely from another country", "how do expenses work", or any plain-language question about benefits, travel, leave, or handbook rules.
 argument-hint: "<policy topic — PTO, benefits, travel, expenses, etc.>"
 ---

@@ -1,5 +1,6 @@
 ---
-name: performance-report
+name: 营销效果报告
+short-description: 汇总渠道与活动数据，解释表现并提出后续优化建议
 description: Builds a marketing performance report with key metrics, trend analysis, wins and misses, and prioritized optimization recommendations. Use when asked to "build a performance report", "how did the campaign do?", "summarize last month's results", "put together a QBR", "report on our email/social/paid/SEO numbers", or "what do these metrics mean?"; when wrapping a campaign; when preparing weekly, monthly, or quarterly channel summaries for stakeholders; or when you need data translated into an executive summary with next-period priorities.
 argument-hint: "<time period or campaign>"
 ---

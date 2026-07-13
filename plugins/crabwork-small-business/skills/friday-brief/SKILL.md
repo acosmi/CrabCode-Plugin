@@ -1,5 +1,6 @@
 ---
-name: friday-brief
+name: 周五经营简报
+short-description: 汇总本周营收、热销、进展和风险，形成周末复盘简报
 version: 0.3.0
 description: Delivers the Friday end-of-week pulse from the owner's 支付宝商家平台 bill export and your CRM — revenue vs prior week, top sellers, wins and watches. Trigger when the owner runs /friday-brief or says "how did we do this week," "end-of-week recap," "Friday recap," "wrap up the week," "wins and watches," or wants a week-in-review summary. Accepts optional lookback window of 7 or 14 days. 亦触发于:"这周做得怎么样""周总结""周五收个尾""本周战报"。
 allowed-tools: Read, WebFetch, Bash

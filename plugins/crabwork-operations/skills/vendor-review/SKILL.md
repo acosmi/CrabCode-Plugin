@@ -1,5 +1,6 @@
 ---
-name: vendor-review
+name: 供应商审查
+short-description: 评估供应商能力、成本、风险、合规与履约表现
 description: Evaluates a vendor or supplier — total cost of ownership, risk assessment, performance, fit, and a clear recommendation. Use when reviewing a new vendor proposal or RFP response, deciding whether to renew, replace, or churn a contract, comparing two or more vendors side-by-side, building a TCO breakdown or negotiation points before procurement sign-off, or when the user says "should we renew this", "evaluate this vendor", "compare these suppliers", "is this contract worth it", or "review this proposal".
 argument-hint: "<vendor name or proposal>"
 ---

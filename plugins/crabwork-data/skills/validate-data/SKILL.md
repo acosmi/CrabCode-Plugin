@@ -1,5 +1,6 @@
 ---
-name: validate-data
+name: 数据分析校验
+short-description: 在交付前核查分析方法、计算、偏差和结论可信度
 description: QA a data analysis before it ships -- check methodology, calculations, and bias, then rate confidence. Use when the user says "double-check this", "does this look right", "sanity-check my numbers", "review before I send it to the execs", "is my conclusion supported", or worries about a join inflating counts, a partial-period comparison, or average-of-averages. Triggers on validating an analysis, report, notebook, or a SQL query and its results before a stakeholder presentation or decision.
 argument-hint: "<analysis to review>"
 ---

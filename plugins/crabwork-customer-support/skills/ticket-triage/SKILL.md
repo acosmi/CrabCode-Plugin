@@ -1,5 +1,6 @@
 ---
-name: ticket-triage
+name: 客服工单分诊
+short-description: 按主题、紧急度、影响与负责团队分类并排序客服工单
 description: Triages an incoming support ticket or customer issue — categorizes it, assigns a P1-P4 priority, recommends routing, checks for duplicates and known issues, and drafts a suggested first response. Use when a new ticket comes in and needs categorization, you need to set its priority, decide which team or queue should handle it, or confirm whether it duplicates a known issue before routing. Trigger with "triage this ticket", "what priority is this", "who should this go to", "is this a P1", "route this", "categorize this issue", or pasting a raw customer message that needs assessment.
 argument-hint: "<ticket or issue description>"
 ---

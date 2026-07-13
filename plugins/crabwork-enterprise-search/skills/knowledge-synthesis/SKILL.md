@@ -1,5 +1,6 @@
 ---
-name: knowledge-synthesis
+name: 企业知识综合
+short-description: 跨文档和消息整合证据，形成带来源的结构化结论
 description: Combines raw search results from multiple work sources into one coherent, deduplicated answer with inline source attribution. Use after gathering results from chat, email, cloud storage, or a project tracker and before replying — to merge duplicates across sources, score confidence by freshness and authority, surface conflicts between sources, and right-size the summary to the result count. Pull in whenever a search or digest returns hits from more than one source.
 user-invocable: false
 ---

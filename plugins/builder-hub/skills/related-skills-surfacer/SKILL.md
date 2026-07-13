@@ -1,5 +1,6 @@
 ---
-name: related-skills-surfacer
+name: 关联技能推荐
+short-description: 根据当前任务上下文推荐相关的已安装或可安装技能
 description: 基于当前任务上下文推荐关联技能,提示可能有用的已装或可装 skill。当用户提到推荐技能、还有什么能帮上忙、有没有相关插件、这个任务该用哪个 skill,或在执行某任务时需要发现配套能力时使用本技能(即使未明说"推荐")。
 argument-hint: "[当前任务描述 / 关键词]"
 ---

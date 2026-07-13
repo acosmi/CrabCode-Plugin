@@ -1,5 +1,6 @@
 ---
-name: handle-complaint
+name: 客户投诉处理
+short-description: 核查订单与适用规则，起草投诉回复并提出防复发改进
 version: 0.3.0
 description: 端到端处理一条客户投诉——拉取订单与账户背景(CRM 历史、按订单号查支付宝支付状态;CRM 连接器以实际配置为准),先依《消费者权益保护法》判定是否属法定应退(七天无理由退货、三包质量问题、欺诈退一赔三),再以店主语气起草一封语气匹配、供店主发送的回复,并给出一条运营改进建议以防复发。触发:店主运行 /handle-complaint,或说 "a customer is upset"、"handle this complaint"、"angry customer email"、"deal with this complaint"、"respond to this unhappy customer",或"有客户不满"、"处理这条投诉"、"愤怒邮件"、"回一下这个不满的客户"、"这个要退款吗",或粘贴一条负面消息。可接受可选的工单 ID 参数。
 allowed-tools: Read, WebFetch, Bash

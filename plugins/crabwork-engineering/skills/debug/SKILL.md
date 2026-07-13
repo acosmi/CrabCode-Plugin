@@ -1,5 +1,6 @@
 ---
-name: debug
+name: 结构化调试
+short-description: 通过复现、隔离与验证定位故障根因并制定修复方案
 description: Structured debugging session — reproduce, isolate, diagnose, and fix. Trigger with an error message or stack trace, "why is this failing?", "this works in staging but not prod", "something broke after the deploy", "help me track down this bug", "this test is flaky", or when behavior diverges from expected and the root cause isn't obvious.
 argument-hint: "<error message or problem description>"
 ---

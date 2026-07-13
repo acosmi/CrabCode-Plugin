@@ -188,7 +188,7 @@ describe("presentation validator", () => {
     expect(issues.some((entry) => entry.field?.startsWith("groups") && entry.message.includes("undeclared"))).toBe(true);
   });
 
-  test("keeps legacy workflows compatible until they opt in with local presentation assets", async () => {
+  test("requires localized skill copy even when workflow raster fields are omitted", async () => {
     const root = await makeTempRoot();
     await writeFixture(root, {
       entry: { composerIcon: undefined, logo: undefined },
@@ -201,6 +201,10 @@ describe("presentation validator", () => {
       ].join("\n"),
       writeIcons: false,
     });
-    expect(await validatePresentation(root)).toEqual([]);
+    const issues = await validatePresentation(root);
+    expect(issues.some((entry) => entry.field?.endsWith(".name"))).toBe(true);
+    expect(issues.some((entry) => entry.field?.endsWith(".short-description"))).toBe(true);
+    expect(issues.some((entry) => entry.field === "composerIcon")).toBe(false);
+    expect(issues.some((entry) => entry.field === "logo")).toBe(false);
   });
 });

@@ -1,6 +1,6 @@
 ---
 name: 创作者风格采集
-short-description: "通过结构化表单采集并更新创作者风格"
+short-description: "通过结构化表单采集并更新创作者风格档案"
 brand-color: "#D96C3F"
 icon-small: "./assets/icon.png"
 icon-large: "./assets/icon.png"

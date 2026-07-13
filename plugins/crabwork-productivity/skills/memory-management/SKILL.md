@@ -1,5 +1,6 @@
 ---
-name: memory-management
+name: 工作记忆管理
+short-description: 整理长期记忆、会话上下文与可复用知识，保持信息易于检索
 description: Two-tier workplace memory that decodes the shorthand, acronyms, nicknames, and project codenames in a user's requests so they are understood like a colleague would. Use whenever a request contains an unfamiliar name, initialism, or codename to look up (e.g. "ask todd about the PSR for phoenix"); when the user says "remember this", "X means Y", "who is X", or "what does X stand for"; when capturing a person's role, a project's details, or a preference for later; or when promoting frequently-used terms into working memory and demoting stale ones. Working memory lives in CRABCODE.md (the hot cache), full knowledge base in the memory/ directory.
 user-invocable: false
 ---

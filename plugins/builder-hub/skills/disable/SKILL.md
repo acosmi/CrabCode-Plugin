@@ -1,5 +1,6 @@
 ---
-name: disable
+name: 技能启停管理
+short-description: 启用或禁用已安装技能，无需卸载即可控制能力可用状态
 description: 启用或禁用已安装的技能,无需卸载即可临时关闭某个能力。当用户提到禁用技能、关闭某个 skill、暂时停用插件、重新启用之前关掉的能力,或需要切换技能开关状态时使用本技能(即使未明说"禁用")。
 argument-hint: "[技能名] [enable|disable]"
 ---

@@ -1,5 +1,6 @@
 ---
-name: source-code-material
+name: 源程序鉴别材料制作
+short-description: 按前后各三十页规范生成带页眉页码的源程序材料
 description: 扫描源代码目录,按中国版权保护中心规范生成软著源程序鉴别材料 PDF(前30+后30页、每页≥50行、页眉含软件名+版本号、右上角连续页码),并引导用 crabcode-office-suite 办公套件完成 PDF 排版。当用户说"整理软著源代码""生成源程序鉴别材料""软著代码怎么弄成60页""源代码 PDF 页眉页码",或软著申请管家分派到源码环节时使用。
 argument-hint: "[源代码目录] [软件全称] [版本号]"
 allowed-tools:

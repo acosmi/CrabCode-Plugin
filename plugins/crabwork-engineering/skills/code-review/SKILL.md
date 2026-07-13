@@ -1,5 +1,6 @@
 ---
-name: code-review
+name: 代码审查
+short-description: 从安全、性能、正确性和边界条件等方面审查代码变更
 description: Review code changes for security, performance, and correctness. Trigger with a PR URL or diff, "review this before I merge", "look over my changes", "any issues with this code?", "give me PR feedback", "is this code safe?", or when checking a change for N+1 queries, injection risks (SQLi/XSS/SSRF), race conditions, missing edge cases, or error handling gaps.
 argument-hint: "<PR URL, diff, or file path>"
 ---

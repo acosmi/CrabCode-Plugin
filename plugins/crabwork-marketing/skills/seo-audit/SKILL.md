@@ -1,5 +1,6 @@
 ---
-name: seo-audit
+name: SEO 审计
+short-description: 检查网站技术、内容与关键词问题并形成搜索优化清单
 description: Runs a comprehensive SEO audit — keyword research, on-page analysis, content gaps, technical checks, and competitor comparison. Use when asked to "audit our SEO", "do keyword research", "why aren't we ranking?", "check our site's SEO", "find content gaps", "run a technical SEO check", or "how do we compare to [competitor] on search"; when assessing a site's SEO health; or when you need a prioritized action plan split into quick wins and strategic investments.
 argument-hint: "<url or topic> [audit type]"
 ---

@@ -1,5 +1,6 @@
 ---
-name: business-pulse
+name: 经营脉搏看板
+short-description: 汇总营收、现金、客户和待办，呈现小微企业经营重点
 version: 0.3.0
 description: >
   Produces a one-page cross-functional business snapshot for SMB owners —

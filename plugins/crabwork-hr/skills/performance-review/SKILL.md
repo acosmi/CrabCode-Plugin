@@ -1,5 +1,6 @@
 ---
-name: performance-review
+name: 绩效评估
+short-description: 整理目标、事实与反馈，形成平衡且可执行的绩效评估
 description: Structure a performance review with self-assessment, manager template, and calibration prep. Use when review season kicks off and you need a self-assessment template, writing a manager review for a direct report, prepping rating distributions and promotion cases for calibration, or turning vague feedback into specific behavioral examples.
 argument-hint: "<employee name or review cycle>"
 ---

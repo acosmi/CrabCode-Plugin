@@ -1,5 +1,6 @@
 ---
-name: smb-router
+name: 小微企业任务路由
+short-description: 识别经营需求并将任务分派到最合适的小微企业技能
 version: 0.3.0
 description: >
   The front door to the Small Business plugin. Listens to what the owner needs

@@ -1,5 +1,6 @@
 ---
-name: design-system
+name: 设计系统维护
+short-description: 建立和维护设计令牌、组件规范、模式与治理规则
 description: Audits, documents, or extends a design system. Trigger with "audit our design system", "document this component", "design a new component", "check for hardcoded values", "are our tokens consistent?", or when checking for naming inconsistencies or hardcoded values across components, writing documentation for a component's variants, states, props, and accessibility notes, or designing a new pattern that fits the existing system.
 argument-hint: "[audit | document | extend] <component or system>"
 ---

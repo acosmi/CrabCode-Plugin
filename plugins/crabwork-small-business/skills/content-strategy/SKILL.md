@@ -1,5 +1,6 @@
 ---
-name: content-strategy
+name: 内容策略
+short-description: 结合业务目标、目标受众与渠道制定可执行的内容策略
 version: 0.3.0
 description: >
   产出未来 30 天的内容策略 / 营销计划(月度窗口,区别于两周快速计划)。分析店主从支付宝商家平台导出的账单,以及会计软件(用友好会计 / 金蝶精斗云)

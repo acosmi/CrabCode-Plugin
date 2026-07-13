@@ -1,5 +1,6 @@
 ---
-name: people-report
+name: 人力资源报告
+short-description: 汇总人员、招聘、流动和组织数据并解释关键变化
 description: Generate headcount, attrition, diversity, or org health reports. Use when pulling a headcount snapshot for leadership, analyzing turnover trends by team, preparing diversity representation metrics, or assessing span of control and flight risk across the org.
 argument-hint: "<report type — headcount, attrition, diversity, org health>"
 ---

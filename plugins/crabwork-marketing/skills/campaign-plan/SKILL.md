@@ -1,5 +1,6 @@
 ---
-name: campaign-plan
+name: 营销活动规划
+short-description: 制定营销目标、受众、渠道、内容、预算与衡量指标
 description: Generates a full campaign brief with objectives, audience, messaging, channel strategy, content calendar, and success metrics. Use when asked to "plan a campaign", "build a go-to-market plan", "plan our product launch", "create a lead-gen campaign", "map out an awareness push", or "I need a marketing plan for X"; when you need a week-by-week content calendar with dependencies and a channel/budget breakdown; or when translating a marketing goal into a structured, executable plan.
 argument-hint: "<campaign objective or product>"
 ---

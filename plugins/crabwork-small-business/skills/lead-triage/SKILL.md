@@ -1,5 +1,6 @@
 ---
-name: lead-triage
+name: 销售线索分诊
+short-description: 按匹配度、业务价值和时效对销售线索分级并安排跟进
 version: 0.3.0
 description: >
   按互动信号、公司匹配度与紧迫度给 CRM 入站线索打分,产出"今天先打这 5 个"的

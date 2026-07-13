@@ -1,5 +1,6 @@
 ---
-name: compliance-tracking
+name: 合规事项跟踪
+short-description: 建立合规要求、责任人、证据、期限与状态跟踪
 description: Tracks compliance requirements and audit readiness — control inventories, gap analyses, evidence collection, and audit-prep checklists. Use when preparing for an audit, building or updating a control inventory or risk register for a framework, figuring out what evidence to collect and where it lives, doing a gap analysis against requirements, or when the user mentions "compliance", "audit prep", "controls", "evidence", "SOC 2", "ISO 27001", "GDPR", "HIPAA", "PCI DSS", or a regulatory/certification requirement.
 ---
 

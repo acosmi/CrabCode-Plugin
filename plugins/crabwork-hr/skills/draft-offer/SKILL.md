@@ -1,5 +1,6 @@
 ---
-name: draft-offer
+name: 录用通知起草
+short-description: 根据岗位、薪酬和录用条款起草清晰规范的录用通知
 description: Draft an offer letter with comp details and terms. Use when a candidate is ready for an offer, assembling a total comp package (base, equity, signing bonus), writing the offer letter text itself, or prepping negotiation guidance for the hiring manager.
 argument-hint: "<role and level>"
 ---

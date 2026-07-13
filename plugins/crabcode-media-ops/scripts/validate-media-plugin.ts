@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises'
-import { resolve, join, dirname } from 'node:path'
+import { resolve, join, dirname, basename } from 'node:path'
 import { existsSync } from 'node:fs'
 
 const pluginRoot = resolve(import.meta.dir, '..')
@@ -48,10 +48,18 @@ for (const relative of manifest.skills ?? []) {
     errors.push(`${relative}: missing SKILL.md`)
     continue
   }
+  const invocationName = basename(relative.replace(/[\\/]+$/, ''))
   const name = text.match(/^name:\s*([^\n]+)$/m)?.[1]?.trim()
+  const shortDescription = text.match(/^short-description:\s*([^\n]+)$/m)?.[1]?.trim()
   const description = text.match(/^description:\s*([^\n]+)$/m)?.[1]?.trim()
-  if (!name || !description) errors.push(`${relative}: frontmatter requires name and description`)
-  if (name) skillNames.add(name)
+  if (!name || !shortDescription || !description) {
+    errors.push(`${relative}: frontmatter requires display name, short-description and description`)
+  }
+  if (name && !/[\u3400-\u9fff]/u.test(name)) errors.push(`${relative}: display name must contain Chinese text`)
+  if (shortDescription && !/[\u3400-\u9fff]/u.test(shortDescription)) {
+    errors.push(`${relative}: short-description must contain Chinese text`)
+  }
+  skillNames.add(invocationName)
   if (!text.includes('PRACTICE.md')) errors.push(`${relative}: must reference shared PRACTICE.md`)
   for (const match of text.matchAll(/`((?:\.\.\/)+[^`]+\.md)`/g)) {
     const target = resolve(dirname(path), match[1])

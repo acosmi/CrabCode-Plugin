@@ -1,5 +1,6 @@
 ---
-name: competitive-brief
+name: 产品竞争简报
+short-description: 分析竞品功能、定位、反馈与差异，支持产品决策
 description: Creates a competitive analysis brief for one or more competitors or a feature area. Use when sizing up a competitor, building a feature-comparison matrix, doing a win/loss analysis, mapping the competitive landscape, building sales battle cards, prepping board or investor materials, or deciding where to differentiate vs. achieve parity. Triggers on "compare us to [competitor]", "competitive analysis", "how do we stack up against X?", "build a battle card", or "what's the market doing?".
 argument-hint: "<competitor or feature area>"
 ---

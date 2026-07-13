@@ -1,5 +1,6 @@
 ---
-name: instrument-data-to-allotrope
+name: 实验仪器数据标准化
+short-description: 将实验仪器文件转换为 Allotrope 标准数据或扁平表格
 description: Converts laboratory instrument output files (PDF, CSV, Excel/XLSX, TXT, XML) into Allotrope Simple Model (ASM) JSON or flattened 2D CSV, with auto-detection of instrument type. Use when scientists need to standardize, harmonize, or normalize lab instrument data for LIMS/ELN/SDMS systems, data lakes, or downstream analysis, or when they hand off a parser to data engineering. Outputs full ASM JSON, flattened CSV for easy import, and exportable Python (allotropy) parser code. Triggers on "convert this instrument file", "to Allotrope/ASM format", standardize/normalize lab data, prepare data for LIMS/ELN upload, allotropy, or specific instruments such as Vi-CELL, NanoDrop, TapeStation, SoftMax Pro, QuantStudio, CFX, EnVision, Lunatic, Empower, or Chromeleon (cell counters, spectrophotometers, plate readers, ELISA, qPCR, electrophoresis, chromatography).
 ---
 

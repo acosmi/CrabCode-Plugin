@@ -1,6 +1,6 @@
 ---
 name: 多平台内容适配
-short-description: "将主稿适配为微信、小红书与头条版本"
+short-description: "将主稿内容适配为微信、小红书与今日头条版本"
 brand-color: "#3178B8"
 icon-small: "./assets/icon.png"
 icon-large: "./assets/icon.png"

@@ -1,5 +1,6 @@
 ---
-name: tech-debt
+name: 技术债务管理
+short-description: 识别、分类并按影响与成本排序技术债务和重构事项
 description: Identify, categorize, and prioritize technical debt. Trigger with "tech debt", "technical debt audit", "what should we refactor", "where should we clean up", "this codebase needs modernizing", "deal with our legacy code", "code health", or when the user asks about code quality, refactoring priorities, or a maintenance/cleanup backlog.
 ---
 

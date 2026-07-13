@@ -1,5 +1,6 @@
 ---
-name: process-doc
+name: 流程文档编写
+short-description: 把业务流程整理为角色、步骤、输入输出和关键控制点
 description: Documents a business process as a complete SOP — purpose, scope, RACI matrix, process flow, detailed steps, and edge cases. Use when formalizing a process that lives in someone's head, building a RACI to clarify who owns what, writing an SOP or process doc for a handoff, onboarding, or audit, capturing the exceptions and edge cases of how work actually gets done, or when the user says "document this process", "write an SOP", "who's responsible for what", or "we need this written down". For step-by-step operational procedures with commands and troubleshooting, use the runbook skill instead.
 argument-hint: "<process name or description>"
 ---

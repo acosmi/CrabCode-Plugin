@@ -1,5 +1,6 @@
 ---
-name: skill-installer
+name: 技能与插件安装
+short-description: 从官方插件市场安装技能或插件并接入本地工作流
 description: 把 CrabCode 插件市场上的插件或技能安装到本地 CrabCode 环境。当用户提到安装技能、装插件、把某个 skill 加进来、从 marketplace 拉取,或需要将一个新能力接入工作流时使用本技能(即使未明说"安装")。
 argument-hint: "[插件名 / 技能名 / marketplace 来源]"
 ---

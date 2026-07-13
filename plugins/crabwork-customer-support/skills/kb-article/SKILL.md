@@ -1,5 +1,6 @@
 ---
-name: kb-article
+name: 知识库文章编写
+short-description: 将已解决问题整理为清晰、可搜索且便于复用的知识库文章
 description: Drafts a publish-ready knowledge base article (how-to, troubleshooting, FAQ, known issue, or reference) from a resolved ticket, common question, or workaround, structured for searchability and self-service. Use when a ticket resolution is worth documenting, the same question keeps coming up, a workaround needs publishing, or a known issue should be communicated to customers. Trigger with "turn this into a KB article", "document this fix", "write a help article", "create an FAQ for this", "we should have a doc on this", "make this self-service", or "write up this known issue".
 argument-hint: "<resolved issue or ticket>"
 ---

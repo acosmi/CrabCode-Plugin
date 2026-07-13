@@ -1,5 +1,6 @@
 ---
-name: roadmap-update
+name: 产品路线图更新
+short-description: 结合目标、进展、依赖和新信息更新产品路线图
 description: Updates, creates, or reprioritizes a product roadmap. Use when adding a new initiative and deciding what moves to make room, reprioritizing with RICE/ICE/MoSCoW or a value-vs-effort matrix, shifting priorities after new information, moving timelines due to a dependency slip, mapping dependencies, or building a Now/Next/Later or quarterly roadmap from scratch. Triggers on "update the roadmap", "where does this fit on the roadmap?", "reprioritize", "what comes off if we add X?", or "build a Now/Next/Later".
 argument-hint: "<update description>"
 ---

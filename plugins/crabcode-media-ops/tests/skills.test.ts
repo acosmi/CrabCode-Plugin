@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { basename, resolve } from 'node:path'
 
 const root = resolve(import.meta.dir, '..')
 
@@ -8,13 +8,21 @@ describe('skill routing contracts', () => {
   test('manifest exposes exactly the nine planned skills with valid frontmatter', () => {
     const manifest = JSON.parse(readFileSync(resolve(root, '.crabcode-plugin/plugin.json'), 'utf8'))
     expect(manifest.skills).toHaveLength(9)
-    const names = manifest.skills.map((path: string) => {
+    const invocationNames = manifest.skills.map((path: string) => basename(path))
+    const displayNames = manifest.skills.map((path: string) => {
       const text = readFileSync(resolve(root, path, 'SKILL.md'), 'utf8')
       expect(text).toContain('PRACTICE.md')
       expect(text).toMatch(/^description:\s*.+$/m)
+      expect(text).toMatch(/^short-description:\s*.*[\u3400-\u9fff].*$/m)
       return text.match(/^name:\s*(.+)$/m)?.[1]
     })
-    expect(new Set(names).size).toBe(9)
+    expect(new Set(invocationNames)).toEqual(new Set([
+      'media-ops', 'media-topic-research', 'media-human-editor', 'wechat-original-opinion',
+      'media-originality-review', 'media-style-intake', 'media-style-manager',
+      'media-platform-adapter', 'media-publish-gate',
+    ]))
+    expect(displayNames.every((name: string | undefined) => name != null && /[\u3400-\u9fff]/u.test(name))).toBe(true)
+    expect(new Set(displayNames).size).toBe(9)
   })
 
   test('wechat opinion and full orchestration descriptions state their near-miss boundary', () => {

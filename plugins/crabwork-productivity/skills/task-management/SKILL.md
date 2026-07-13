@@ -1,5 +1,6 @@
 ---
-name: task-management
+name: 任务管理
+short-description: 拆解、排序和跟踪任务，明确负责人、期限与下一步行动
 description: Simple task tracking in a shared TASKS.md file that the user and the assistant both edit. Use when the user asks "what's on my plate", "what are my tasks", "what am I waiting on", or "what's overdue"; says "add a task", "remind me to", "I need to", "follow up on", or "put X on my list"; reports "done with X", "finished X", or "X is complete"; or when extracting action items and commitments ("I'll send that over") from a meeting or conversation to offer adding them. Covers the Active / Waiting On / Someday / Done sections, completion strikethrough, and dashboard sync.
 user-invocable: false
 ---

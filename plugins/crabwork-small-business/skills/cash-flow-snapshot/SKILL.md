@@ -1,5 +1,6 @@
 ---
-name: cash-flow-snapshot
+name: 现金流快照
+short-description: 汇总现金流入流出、余额和近期压力，形成经营快照
 version: 0.3.0
 description: >
   Builds a 30/60/90-day cash flow forecast with percentage-variance confidence

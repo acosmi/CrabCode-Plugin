@@ -1,5 +1,6 @@
 ---
-name: quarterly-review
+name: 季度经营复盘
+short-description: 汇总营收、毛利、客户与机会风险，形成季度经营报告
 version: 0.3.0
 description: Generates a full QBR narrative — revenue trend, margin trend, customer health, top opportunities and risks — as a presentation-ready PDF or online doc, working from the owner's accounting exports (用友好会计 / 金蝶精斗云) plus your CRM. Trigger when the owner runs /quarterly-review or says "quarterly review," "QBR," "build a board deck," "how did the quarter go," "end-of-quarter summary," or wants a quarter-over-quarter business recap. Accepts optional quarter and save-to arguments. 亦触发于:"季度回顾""季度总结""季度经营分析""这季度怎么样""季度复盘"。
 allowed-tools: Read, WebFetch, Bash

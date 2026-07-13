@@ -1,5 +1,6 @@
 ---
-name: crm-cleanup
+name: CRM 数据清理
+short-description: 识别重复、缺失与沉睡记录，并按确认结果清理客户数据
 version: 0.3.0
 description: Scans your CRM (企业微信/钉钉/飞书/有赞; HubSpot for cross-border) for stale deals/dormant customers, duplicate contacts, and missing fields, then fixes what the owner approves. Trigger when the owner runs /crm-cleanup or says "clean up the CRM," "客户资料一团乱," "dedupe my contacts," "fix stale deals," "tidy up my pipeline," or wants their CRM data cleaned. Accepts optional scope argument for deals, contacts, or all. 亦触发于:"清理一下 CRM""客户资料太乱了""合并重复客户""清理僵尸商机 / 沉睡客户""整理管道"。
 allowed-tools: Read, WebFetch, Bash

@@ -1,5 +1,6 @@
 ---
-name: design-critique
+name: 设计评审
+short-description: 从目标、层级、交互、一致性和可用性评审设计方案
 description: Gives structured design feedback on usability, visual hierarchy, consistency, and accessibility. Trigger with "review this design", "critique this mockup", "what do you think of this screen?", "feedback on my UI", "does this layout work?", "roast my design", or when sharing a Figma link, screenshot, or mockup for feedback at any stage from early exploration to final polish.
 argument-hint: "<Figma URL, screenshot, or description>"
 ---

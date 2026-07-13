@@ -1,5 +1,6 @@
 ---
-name: sprint-planning
+name: 迭代规划
+short-description: 梳理优先级、团队容量、依赖与验收标准，制定迭代计划
 description: Plans a sprint — scopes work, estimates capacity, sets goals, and drafts a sprint plan. Use when kicking off a new sprint or iteration, sizing a backlog against team availability (accounting for PTO, on-call, and meetings), setting a sprint goal, deciding what's P0 vs. P1 vs. stretch, or handling carryover from the last sprint. Triggers on "plan our sprint", "what can we fit this sprint?", "sprint planning", "how much capacity do we have?", or "scope the next iteration".
 argument-hint: "[sprint name or date range]"
 ---

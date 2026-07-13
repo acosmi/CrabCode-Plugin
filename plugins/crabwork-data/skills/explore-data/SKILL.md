@@ -1,5 +1,6 @@
 ---
-name: explore-data
+name: 数据探索与画像
+short-description: 分析陌生数据集的结构、质量、分布、缺失与潜在模式
 description: Profile a table or file to understand its shape, quality, and patterns before analyzing it. Use when the user says "explore this data", "profile this table", "what's in this dataset/CSV", "give me the lay of the land", "is this data any good", or asks about null rates, cardinality, duplicates, column distributions, or which columns are dimensions vs metrics. Triggers when someone hands over an unfamiliar table or file and wants an overview, data-quality flags, or suggestions for what to analyze next.
 argument-hint: "<table or file>"
 ---

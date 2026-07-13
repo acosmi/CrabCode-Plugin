@@ -1,5 +1,6 @@
 ---
-name: design-handoff
+name: 设计交付
+short-description: 整理规格、状态、资源和验收说明，支持设计向开发交付
 description: Generates developer handoff specs from a design. Trigger with "create a handoff spec", "spec this for engineering", "dev handoff", "redlines", "what do developers need to build this?", or when a design is ready for engineering and needs a spec sheet covering layout and measurements, design tokens, component props and variants, interaction and hover states, responsive breakpoints, edge cases, and animation/motion details.
 argument-hint: "<Figma URL or design description>"
 ---

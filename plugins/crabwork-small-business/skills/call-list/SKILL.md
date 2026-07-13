@@ -1,5 +1,6 @@
 ---
-name: call-list
+name: 客户联系清单
+short-description: 根据客户状态、业务价值和优先级生成当日联系清单
 version: 0.3.0
 description: >
   从你的 CRM 中排出"今天最值得打的前 5 个线索",用 CRM 活动历史给出话术要点,

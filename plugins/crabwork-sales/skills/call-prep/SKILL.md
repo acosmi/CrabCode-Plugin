@@ -1,5 +1,6 @@
 ---
-name: call-prep
+name: 销售通话准备
+short-description: 整理客户背景、通话目标、问题清单与异议预案
 description: Prepare for a sales call with account context, attendee research, and suggested agenda. Works standalone with user input and web research, supercharged when you connect your CRM, email, chat, or transcripts. Trigger with "prep me for my call with [company]", "I'm meeting with [company] prep me", "call prep [company]", or "get me ready for [meeting]".
 ---
 

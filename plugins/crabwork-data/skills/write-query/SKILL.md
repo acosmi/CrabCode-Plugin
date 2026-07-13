@@ -1,5 +1,6 @@
 ---
-name: write-query
+name: SQL 查询编写
+short-description: 根据自然语言需求编写正确、高效且可解释的 SQL 查询
 description: Write an optimized SQL query from a natural-language description, tuned to the user's dialect. Use when the user says "write a query", "give me the SQL for", "how do I query", "I need a query that", or describes data to pull (counts, joins, aggregations, cohort retention, funnels, top-N). Triggers on building multi-CTE queries with window functions, optimizing slow SQL on large partitioned tables, and getting dialect-specific syntax for Snowflake, BigQuery, Postgres, Redshift, Databricks, MySQL, SQL Server, DuckDB, or SQLite.
 argument-hint: "<description of what data you need>"
 ---

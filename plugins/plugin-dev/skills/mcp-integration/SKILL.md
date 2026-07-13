@@ -1,5 +1,6 @@
 ---
-name: mcp-integration
+name: 插件 MCP 集成
+short-description: 在 CrabCode 插件中配置并接入外部 MCP 服务与工具
 description: This skill should be used when the user asks to "add MCP server", "integrate MCP", "configure MCP in plugin", "use .mcp.json", "set up Model Context Protocol", "connect external service", mentions "${CRABCODE_PLUGIN_ROOT} with MCP", or discusses MCP server types (SSE, stdio, HTTP, WebSocket). Provides comprehensive guidance for integrating Model Context Protocol servers into CrabCode plugins for external tool and service integration.
 version: 0.1.0
 ---

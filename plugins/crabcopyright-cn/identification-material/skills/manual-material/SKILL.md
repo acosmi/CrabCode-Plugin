@@ -1,5 +1,6 @@
 ---
-name: manual-material
+name: 说明书鉴别材料制作
+short-description: 整理软件说明书并生成含封面、目录和功能截图的规范材料
 description: 把软件说明书/用户手册的 Word 文档(.doc/.docx)整理成符合中国版权保护中心规范的软著文档鉴别材料 PDF(封面、目录、概述、功能说明含截图、运行环境;每页≥30行;页眉含软件名+版本号),核心是引导用 crabcode-office-suite 办公套件处理 Word 文档并导出 PDF。当用户说"整理软著说明书""生成文档鉴别材料""软著说明书怎么写/怎么排版""把 word 说明书弄成软著要的 PDF""说明书要加封面目录页码",或软著申请管家分派到说明书环节时使用。
 argument-hint: "[说明书doc/docx路径] [软件全称] [版本号]"
 allowed-tools:

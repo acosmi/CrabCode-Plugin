@@ -1,5 +1,6 @@
 ---
-name: competitive-intelligence
+name: 销售竞争情报
+short-description: 分析竞品定位、客户反馈与输赢原因，支持销售应对
 description: Research your competitors and build an interactive battlecard. Outputs an HTML artifact with clickable competitor cards and a comparison matrix. Trigger with "competitive intel", "research competitors", "how do we compare to [competitor]", "battlecard for [competitor]", or "what's new with [competitor]".
 ---
 

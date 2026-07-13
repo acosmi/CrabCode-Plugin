@@ -1,5 +1,6 @@
 ---
-name: product-brainstorming
+name: 产品创意探索
+short-description: 围绕用户问题、约束和机会生成并评估产品方案
 description: Acts as a sharp product thinking partner to brainstorm ideas, explore problem spaces, and challenge assumptions. Use when exploring a new opportunity, generating solutions to a product problem, stress-testing or poking holes in an idea, applying frameworks like How Might We, Jobs-to-be-Done, or first-principles thinking, or when a PM needs a sounding board to think out loud and be pushed back on before converging. Triggers on "help me brainstorm", "think through this with me", "what am I missing?", "poke holes in this idea", or "be my sounding board".
 ---
 

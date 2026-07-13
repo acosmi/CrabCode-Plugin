@@ -1,5 +1,6 @@
 ---
-name: daily-briefing
+name: 销售每日简报
+short-description: 汇总客户动态、会议、商机变化和当日优先行动
 description: Start your day with a prioritized sales briefing. Works standalone when you tell me your meetings and priorities, supercharged when you connect your calendar, CRM, and email. Trigger with "morning briefing", "daily brief", "what's on my plate today", "prep my day", or "start my day".
 ---
 

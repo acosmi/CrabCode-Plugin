@@ -1,5 +1,6 @@
 ---
-name: data-context-extractor
+name: 数据上下文提取
+short-description: 从数据文件与业务资料中提取分析所需的结构、口径和背景
 description: >
   Generate or improve a company-specific data analysis skill by extracting tribal knowledge from analysts.
 

@@ -1,5 +1,6 @@
 ---
-name: draft-content
+name: 营销内容初稿
+short-description: 根据内容简报快速起草结构完整且可继续编辑的营销文案
 description: Drafts marketing copy — blog posts, LinkedIn/Twitter(X)/Instagram/Facebook social posts, email newsletters, landing pages, press releases, and case studies — with channel-specific formatting and SEO recommendations. Use when asked to "write a blog post", "draft a LinkedIn post", "write an email", "write copy for our landing page", "draft a press release", or "turn this into a case study"; when you need headline, hook, or subject-line options; or when adapting one message into versions for a specific platform, audience, and brand voice.
 argument-hint: "<content type and topic>"
 ---

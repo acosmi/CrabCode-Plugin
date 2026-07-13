@@ -1,5 +1,6 @@
 ---
-name: crm-maintenance
+name: CRM 日常维护
+short-description: 建立客户数据检查、更新、去重与跟进的日常维护流程
 version: 0.3.0
 description: >
   Keeps your CRM current without the owner opening it: creates and updates

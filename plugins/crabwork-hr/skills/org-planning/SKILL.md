@@ -1,5 +1,6 @@
 ---
-name: org-planning
+name: 组织规划
+short-description: 分析团队结构、能力缺口与岗位配置，规划组织调整
 description: Headcount planning, org design, and team structure optimization. Trigger with "org planning", "headcount plan", "team structure", "reorg", "who should we hire next", or when the user is thinking about team size, reporting structure, or organizational design.
 ---
 

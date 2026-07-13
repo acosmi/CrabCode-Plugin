@@ -1,5 +1,6 @@
 ---
-name: hook-development
+name: 插件钩子开发
+short-description: 开发事件驱动的插件钩子，校验工具调用并实现自动化控制
 description: This skill should be used when the user asks to "create a hook", "add a PreToolUse/PostToolUse/Stop hook", "validate tool use", "implement prompt-based hooks", "use ${CRABCODE_PLUGIN_ROOT}", "set up event-driven automation", "block dangerous commands", or mentions hook events (PreToolUse, PostToolUse, Stop, AgentStop, SessionStart, SessionEnd, UserPromptSubmit, PreCompact, Notification). Provides comprehensive guidance for creating and implementing CrabCode plugin hooks with focus on advanced prompt-based hooks API.
 version: 0.1.0
 ---

@@ -1,5 +1,6 @@
 ---
-name: write-spec
+name: 产品需求文档
+short-description: 编写包含问题、目标、范围、流程与验收标准的产品规格
 description: Writes a feature spec, PRD, or one-pager from a problem statement or feature idea. Use when turning a vague idea or user request into a structured document, scoping a feature with goals and non-goals, writing user stories and acceptance criteria, defining success metrics, or breaking a big ask into a phased spec. Triggers on "write a spec", "write a PRD", "spec out this feature", "turn this into requirements", or "draft a one-pager for X".
 argument-hint: "<feature or problem statement>"
 ---

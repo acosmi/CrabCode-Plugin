@@ -1,5 +1,6 @@
 ---
-name: user-research
+name: 用户研究规划
+short-description: 制定研究问题、方法、招募、访谈与分析计划
 description: Plans and structures user research studies — choosing methods, writing interview guides, designing surveys and usability tests, and framing analysis. Trigger with "user research plan", "write an interview guide", "design a survey", "plan a usability test", "what research method should I use?", "research questions", "card sort", "how many participants do I need?", or when figuring out how to understand users through research. For analyzing data you already collected, see the research-synthesis skill.
 ---
 

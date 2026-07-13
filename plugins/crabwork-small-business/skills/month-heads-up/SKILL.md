@@ -1,5 +1,6 @@
 ---
-name: month-heads-up
+name: 月末现金预警
+short-description: 预测未来现金状况并提示月末前需要关注的收支风险
 version: 0.3.0
 description: Shows the next 30-day forward cash-flow outlook from the owner's accounting-software export (用友好会计 / 金蝶精斗云) and 支付宝商家平台 bill data, and flags anything that needs attention before month-end — designed to run around the 25th. Trigger when the owner runs /month-heads-up or asks "what does next month look like," "cash forecast," "what's my runway," "anything I need to watch before month-end," "will I be okay on cash," or wants a look-ahead at upcoming cash. Accepts optional 30 or 60 day horizon. 亦触发于:"下个月现金够不够""下月现金流""月底前要注意啥""还能撑多久"。
 allowed-tools: Read, WebFetch, Bash

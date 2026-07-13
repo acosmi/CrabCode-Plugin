@@ -1,5 +1,6 @@
 ---
-name: ticket-deflector
+name: 客服自助分流
+short-description: 把常见问题转为自助答案，减少重复工单并保留升级路径
 version: 0.3.0
 description: >
   读取粘贴进来的客户邮件或工单,按订单号从支付宝查支付/退款状态、从你的 CRM 拉账户

@@ -1,5 +1,6 @@
 ---
-name: nextflow-development
+name: nf-core 流程部署
+short-description: 部署并运行 nf-core 流程处理转录组、基因组和 ATAC 测序数据
 description: Runs nf-core bioinformatics pipelines (rnaseq, sarek, atacseq) end-to-end on sequencing data—either local FASTQ/BAM/CRAM files or public datasets pulled from GEO/SRA. Use when analyzing bulk RNA-seq, WGS/WES, or ATAC-seq, calling variants, quantifying gene expression, running differential expression, calling peaks, or reanalyzing a published dataset. Triggers on nf-core, Nextflow, "run the rnaseq/sarek/atacseq pipeline", FASTQ analysis, variant calling (germline/somatic, haplotypecaller/mutect2), gene/transcript counts, GEO/SRA reanalysis, GSE/GSM/SRR/SRP accessions, iGenomes/GRCh38, samplesheet creation, or aligning reads to a reference genome.
 ---
 

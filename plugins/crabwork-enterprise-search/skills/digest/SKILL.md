@@ -1,5 +1,6 @@
 ---
-name: digest
+name: 企业信息摘要
+short-description: 汇总多个企业信息源的最新内容，形成去重后的重点摘要
 description: Generates a daily or weekly digest of activity across all connected work sources (chat, email, cloud storage, project tracker, CRM, wiki), grouped by project with action items first. Trigger with "what did I miss", "catch me up", "what happened this week", "give me a summary of today", "what's on my plate", "any action items", "what came in while I was out", or when starting the day or returning from time off and wanting mentions, decisions, and document updates rolled up. Accepts --daily, --weekly, or --since <date>.
 argument-hint: "[--daily | --weekly | --since <date>]"
 ---

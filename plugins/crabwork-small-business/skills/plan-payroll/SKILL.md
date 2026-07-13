@@ -1,5 +1,6 @@
 ---
-name: plan-payroll
+name: 发薪资金规划
+short-description: 预测现金并安排应收催款，判断工资能否按期足额支付
 version: 0.3.0
 description: Forecasts cash, ranks overdue invoices, drafts payment reminders, and stages Alipay (支付宝) payment links so the owner can confidently run payroll. Works from owner-provided accounting exports (用友好会计 / 金蝶精斗云) and 支付宝商家平台 bill data. Trigger when the owner runs /plan-payroll or says "can I make payroll," "do I have enough to pay my team," "cash is tight before payroll," "plan for payroll," "will payroll clear," or worries about covering wages. Accepts optional horizon and payroll-date arguments. 亦触发于:"发得出工资吗""够不够发工资""这个月工资有没有着落""发薪前手头紧""工资能按时发吗""发完工资还剩多少"。
 allowed-tools: Read, WebFetch, Bash

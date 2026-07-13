@@ -1,5 +1,6 @@
 ---
-name: sql-queries
+name: SQL 查询参考
+short-description: 提供多种数据仓库方言的正确写法、优化模式与排错建议
 description: Reference for correct, performant SQL across major warehouse dialects (Snowflake, BigQuery, Databricks, PostgreSQL, Redshift, and more). Use for dialect-specific date/string/JSON syntax and performance tips, for window-function and CTE patterns, for cohort-retention, funnel, and deduplication templates, and for debugging failed queries. Load whenever writing, optimizing, or translating analytical SQL.
 user-invocable: false
 ---

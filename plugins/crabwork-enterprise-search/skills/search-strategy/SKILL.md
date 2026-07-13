@@ -1,5 +1,6 @@
 ---
-name: search-strategy
+name: 企业搜索策略
+short-description: 规划多源检索关键词、筛选条件、排序方式与回退方案
 description: Decomposes a natural language question into parallel, source-specific searches and ranks the merged results. Use before querying sources to classify the query type (decision, status, document, person, factual, temporal, exploratory), pick semantic vs keyword search per source, translate enterprise filters (from:, in:, after:, type:) into each tool's native syntax, generate keyword variants, and plan ranking, ambiguity handling, and query-broadening fallbacks. Pull in at the start of any multi-source search before results come back.
 user-invocable: false
 ---

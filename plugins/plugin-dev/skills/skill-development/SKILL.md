@@ -1,5 +1,6 @@
 ---
-name: skill-development
+name: 插件技能开发
+short-description: 设计和优化插件技能的结构、描述与渐进披露内容
 description: This skill should be used when the user wants to "create a skill", "add a skill to plugin", "write a new skill", "improve skill description", "organize skill content", or needs guidance on skill structure, progressive disclosure, or skill development best practices for CrabCode plugins.
 version: 0.1.0
 ---

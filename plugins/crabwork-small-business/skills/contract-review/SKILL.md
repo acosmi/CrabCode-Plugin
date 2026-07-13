@@ -1,5 +1,6 @@
 ---
-name: contract-review
+name: 合同审查
+short-description: 用通俗语言识别合同风险并提出修改与谈判建议
 version: 0.3.0
 description: >
   为没有专职法务的中小企业做保密协议、服务合同(MSA)、供应商合同的轻量审查,

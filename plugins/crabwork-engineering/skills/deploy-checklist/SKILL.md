@@ -1,5 +1,6 @@
 ---
-name: deploy-checklist
+name: 部署前检查
+short-description: 核对发布状态、迁移、开关、审批与回滚条件，判断是否可上线
 description: Pre-deployment verification checklist. Use when about to ship a release, asking "are we ready to ship?" or "is this ready for prod?", deploying a change with database migrations or feature flags, verifying CI status and approvals before going to production, checking release readiness, or documenting rollback triggers ahead of time.
 argument-hint: "[service or release name]"
 ---

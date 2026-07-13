@@ -1,5 +1,6 @@
 ---
-name: draft-outreach
+name: 销售触达文案
+short-description: 根据客户背景起草个性化邮件、私信和后续跟进文案
 description: Research a prospect then draft personalized outreach. Uses web research by default, supercharged with enrichment and CRM. Trigger with "draft outreach to [person/company]", "write cold email to [prospect]", "reach out to [name]".
 ---
 

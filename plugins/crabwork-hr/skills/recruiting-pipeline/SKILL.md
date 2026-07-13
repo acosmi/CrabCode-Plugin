@@ -1,5 +1,6 @@
 ---
-name: recruiting-pipeline
+name: 招聘管道复盘
+short-description: 检查候选人漏斗、阶段停滞与招聘风险并提出行动
 description: Track and manage the recruiting pipeline from sourcing to offer acceptance — stages, conversion rates, and velocity. Trigger with "recruiting update", "candidate pipeline", "how many candidates", "hiring status", "where are we on the req", "time to fill", "offer acceptance rate", "which source produces hires", or when the user discusses sourcing, screening, interviewing, debriefs, extending offers, or ATS funnel metrics.
 ---
 

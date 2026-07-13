@@ -1,5 +1,6 @@
 ---
-name: customer-pulse
+name: 客户反馈脉搏
+short-description: 汇总客户评价与反馈，识别趋势、痛点和改进机会
 version: 0.3.0
 description: >
   汇总支付纠纷/退款记录(支付宝商家平台 / 微信支付商户平台 导出或粘贴的数据)、

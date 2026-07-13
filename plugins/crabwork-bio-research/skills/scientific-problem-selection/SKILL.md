@@ -1,5 +1,6 @@
 ---
-name: scientific-problem-selection
+name: 科研问题选择
+short-description: 评估研究问题、项目风险、成功标准与继续或转向决策
 description: Guides scientists through research problem selection, project ideation, troubleshooting stuck projects, and strategic scientific decisions, using a conversational framework from Fischbach & Walsh (Cell, 2024). Use when a researcher wants to pitch a new project idea, work through a problem in a current project, assess project risks, define success metrics, plan research strategy, navigate decision trees, or decide what to work on. Triggers on "I have an idea for a project", "I'm stuck on my research", "help me evaluate this project", "what should I work on", "is this worth pursuing", "how do I choose a thesis/PhD project", "should I pivot", "I need strategic advice about my research", or requests for go/no-go analysis, risk assessment, or impact assessment of a scientific direction.
 ---
 

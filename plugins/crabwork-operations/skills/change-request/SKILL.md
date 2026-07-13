@@ -1,5 +1,6 @@
 ---
-name: change-request
+name: 变更请求管理
+short-description: 记录变更范围、影响、风险、审批与实施回滚计划
 description: Creates a change management request with impact analysis, risk assessment, and rollback plan. Use when proposing a system or process change that needs approval, preparing a change record or ticket for CAB review, documenting risk and rollback steps before a deployment or migration, planning stakeholder communications for a rollout, or when the user says "raise a change request", "I need a change ticket", "what's the rollback plan", or "who needs to approve this change".
 argument-hint: "<change description>"
 ---

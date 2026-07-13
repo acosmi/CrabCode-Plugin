@@ -1,5 +1,6 @@
 ---
-name: start
+name: 生物科研工作流入门
+short-description: 检查科研数据源与分析能力，并为研究目标推荐起步路径
 description: Orients a biological researcher to the bio-research plugin—checks which literature, drug-discovery, data-repository, and visualization MCP servers are connected, and surveys the available analysis skills. Use when getting started or onboarding, when the user asks "what can this plugin do", "what tools/MCP servers are available", "how do I begin", "help me get set up", "what skills are here", or when they describe a research goal but are unsure where to start.
 ---
 

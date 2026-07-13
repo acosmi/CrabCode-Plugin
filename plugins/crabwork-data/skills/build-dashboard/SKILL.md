@@ -1,5 +1,6 @@
 ---
-name: build-dashboard
+name: 交互式数据看板
+short-description: 构建包含图表、筛选、指标卡与表格的独立网页看板
 description: Build a self-contained interactive HTML dashboard with charts, filters, KPI cards, and sortable tables that opens in any browser with no server. Use when the user wants a dashboard, an executive or exec overview, a KPI scorecard, a metrics dashboard, a monitoring snapshot, or a shareable report; when turning query results or a pasted CSV into one browser-openable .html file; or for asks like "build me a dashboard", "make an interactive report", "put these charts in one page I can send around", "MRR/churn/sales dashboard", or "Chart.js dashboard with filters".
 argument-hint: "<description> [data source]"
 ---

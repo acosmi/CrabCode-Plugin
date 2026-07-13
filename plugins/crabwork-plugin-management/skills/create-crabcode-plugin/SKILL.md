@@ -1,5 +1,6 @@
 ---
-name: create-crabcode-plugin
+name: CrabCode 插件创建
+short-description: 从需求出发创建符合规范的 CrabCode 插件结构与清单
 description: >
   Guides the user through creating a brand-new CrabCode plugin from scratch via conversation — discovery,
   component planning, design, implementation, and packaging into an installable .plugin file.

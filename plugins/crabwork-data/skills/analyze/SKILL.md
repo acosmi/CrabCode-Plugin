@@ -1,5 +1,6 @@
 ---
-name: analyze
+name: 数据问题分析
+short-description: 从数据中回答指标、趋势、分群和业务驱动因素问题
 description: Answer a data question, from a quick metric lookup to a full analysis to a formal stakeholder report. Use when the user asks "how many", "what's the", "why did X drop/spike", "what's driving this trend", "compare A vs B", "break this down by segment", or wants a quarterly review, KPI summary, or data report. Triggers on natural-language questions about metrics, users, revenue, conversion, churn, growth, or any number in a warehouse, CSV, or pasted results -- even when the user does not name a table or a tool.
 argument-hint: "<question>"
 ---

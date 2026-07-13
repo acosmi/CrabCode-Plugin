@@ -1,5 +1,6 @@
 ---
-name: build-mcp-server
+name: MCP 服务器开发
+short-description: 设计并实现适配远程 HTTP、本地 stdio 或 MCPB 的服务
 description: This skill should be used when the user asks to "build an MCP server", "create an MCP", "make an MCP integration", "wrap an API for CrabCode", "expose tools to CrabCode", "make an MCP app", or discusses building something with the Model Context Protocol. It is the entry point for MCP server development — it interrogates the user about their use case, determines the right deployment model (remote HTTP, MCPB, local stdio), picks a tool-design pattern, and hands off to specialized skills.
 version: 0.1.0
 ---

@@ -1,5 +1,6 @@
 ---
-name: margin-analyzer
+name: 产品毛利分析
+short-description: 按产品拆解收入、成本与毛利，识别盈利和定价问题
 version: 0.3.0
 description: >
   Analyzes unit economics by product or service from the owner's payment bill

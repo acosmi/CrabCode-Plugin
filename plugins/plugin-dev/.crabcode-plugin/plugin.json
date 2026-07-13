@@ -1,6 +1,6 @@
 {
   "name": "plugin-dev",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Plugin development toolkit with skills for creating agents, commands, hooks, MCP integrations, and plugin structure guidance for CrabCode.",
   "author": {
     "name": "CrabCode"

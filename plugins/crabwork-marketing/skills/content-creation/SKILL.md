@@ -1,5 +1,6 @@
 ---
-name: content-creation
+name: 营销内容创作
+short-description: 围绕营销目标与目标受众创作清晰、有说服力的内容
 description: Reference frameworks for marketing content — per-channel structure templates (blog, social, email, landing page, press release, case study), writing best practices by channel, SEO fundamentals, and headline, hook, and CTA formulas. Consult when drafting or reviewing any marketing copy and you need the structural template, on-page SEO checklist, or a headline/hook/CTA pattern to apply.
 user-invocable: false
 ---

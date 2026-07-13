@@ -1,5 +1,6 @@
 ---
-name: plugin-customizer
+name: 插件定制
+short-description: 根据用户工作流调整现有插件的配置、提示和能力组合
 description: >
   Tailors an existing CrabCode plugin to a specific organization's tools, workflows, and conventions,
   then packages it as an installable .plugin file. Use when the user wants to customize, set up, configure,

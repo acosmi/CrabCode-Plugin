@@ -1,5 +1,6 @@
 ---
-name: onboarding
+name: 员工入职计划
+short-description: 制定新员工入职任务、培训、关系建立与阶段目标
 description: Generate an onboarding checklist and first-week plan for a new hire. Use when someone has a start date coming up, building the pre-start task list (accounts, equipment, buddy), scheduling Day 1 and Week 1, or setting 30/60/90-day goals for a new team member.
 argument-hint: "<new hire name and role>"
 ---

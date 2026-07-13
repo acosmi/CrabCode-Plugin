@@ -1,5 +1,6 @@
 ---
-name: data-visualization
+name: 数据可视化设计
+short-description: 根据数据关系选择图表并优化颜色、排版与无障碍表现
 description: Reference for effective data visualization -- chart-type selection, Python code patterns (matplotlib, seaborn, plotly), and design and accessibility principles. Use when building any chart and unsure which type fits the data relationship, when applying color, typography, layout, or colorblind-safe choices, or when you need ready-made plotting snippets. Load this whenever generating a visualization for analysis, a report, or a dashboard.
 user-invocable: false
 ---

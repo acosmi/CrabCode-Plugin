@@ -1,5 +1,6 @@
 ---
-name: scvi-tools
+name: 单细胞深度学习分析
+short-description: 使用 scvi-tools 完成单细胞整合、批次校正与多模态分析
 description: Runs deep-learning single-cell analysis with scvi-tools. Use for (1) data integration and batch correction with scVI/scANVI, (2) ATAC-seq analysis with PeakVI, (3) CITE-seq multi-modal analysis with totalVI, (4) multiome RNA+ATAC analysis with MultiVI, (5) spatial transcriptomics deconvolution with DestVI, (6) label transfer and reference mapping with scANVI/scArches, (7) RNA velocity with veloVI, (8) cross-technology batch correction with sysVI, or any deep-learning-based single-cell method. Triggers on scVI, scANVI, totalVI, PeakVI, MultiVI, DestVI, veloVI, sysVI, scArches, variational autoencoder/VAE, batch correction, data integration, multi-modal, CITE-seq, multiome, reference mapping, query-to-reference mapping, latent space, or "integrate my scRNA-seq / h5ad datasets with deep learning".
 ---
 

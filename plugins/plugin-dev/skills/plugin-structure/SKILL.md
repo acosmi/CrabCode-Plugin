@@ -1,5 +1,6 @@
 ---
-name: plugin-structure
+name: 插件结构设计
+short-description: 规划插件目录、manifest 清单与组件自动发现结构
 description: This skill should be used when the user asks to "create a plugin", "scaffold a plugin", "understand plugin structure", "organize plugin components", "set up plugin.json", "use ${CRABCODE_PLUGIN_ROOT}", "add commands/agents/skills/hooks", "configure auto-discovery", or needs guidance on plugin directory layout, manifest configuration, component organization, file naming conventions, or CrabCode plugin architecture best practices.
 version: 0.1.0
 ---

@@ -1,5 +1,6 @@
 ---
-name: uninstall
+name: 技能与插件卸载
+short-description: 安全卸载本地技能或插件，并清理对应安装登记
 description: 从本地 CrabCode 环境卸载已安装的插件或技能并清理登记。当用户提到卸载技能、删除插件、移除某个 skill、清理不用的能力,或需要从已装清单中摘除条目时使用本技能(即使未明说"卸载")。
 argument-hint: "[要卸载的插件名 / 技能名]"
 ---

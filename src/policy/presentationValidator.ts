@@ -47,7 +47,7 @@ const SAFE_RASTER_EXTENSION = /\.(?:png|jpe?g|webp)$/i;
 const TEMPLATE_DESCRIPTION = /^this skill should be used when\b/i;
 const MAX_RASTER_BYTES = 256 * 1024;
 const MAX_PROMPT_CHARS = 128;
-const MIN_SHORT_DESCRIPTION_CHARS = 8;
+const MIN_SHORT_DESCRIPTION_CHARS = 18;
 const MAX_SHORT_DESCRIPTION_CHARS = 72;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -317,11 +317,12 @@ async function validateSkillPresentation(
 /**
  * Validate the official marketplace's user-facing workflow metadata.
  *
- * Plugin-level fields are required for every workflow entry. Skill-level
- * presentation is an opt-in strict contract: declaring a local composerIcon or
- * logo enables it for every manifest-declared skill. This lets old and
- * third-party packages remain runtime-compatible while first-party workflows
- * migrate without a name-keyed UI translation table.
+ * Plugin-level fields are required for every official workflow entry. Every
+ * manifest-declared skill must provide Chinese presentation copy; its stable
+ * invocation identity remains the skill directory basename. Raster fields are
+ * optional, but any declared local asset is validated strictly. Runtime
+ * compatibility for third-party packages is handled by CrabCode's UI fallback,
+ * not by weakening this official marketplace quality gate.
  */
 export async function validatePresentation(root: string): Promise<PresentationIssue[]> {
   const absRoot = path.resolve(root);
@@ -402,12 +403,9 @@ export async function validatePresentation(root: string): Promise<PresentationIs
       );
     }
 
-    const strictSkillPresentation = entry.composerIcon !== undefined || entry.logo !== undefined;
     for (const iconField of ["composerIcon", "logo"] as const) {
       const icon = entry[iconField];
-      if (strictSkillPresentation && icon === undefined) {
-        issues.push(issue(marketplacePath, entryName, iconField, `presentation-enabled workflow must declare ${iconField}`));
-      } else if (icon !== undefined) {
+      if (icon !== undefined) {
         issues.push(...(await validateRaster(pluginRoot, icon, marketplacePath, entryName, iconField)));
       }
     }
@@ -442,10 +440,8 @@ export async function validatePresentation(root: string): Promise<PresentationIs
         }
       }
     }
-    if (strictSkillPresentation) {
-      for (const skillPath of skillPaths) {
-        issues.push(...(await validateSkillPresentation(pluginRoot, skillPath, marketplacePath, entryName)));
-      }
+    for (const skillPath of skillPaths) {
+      issues.push(...(await validateSkillPresentation(pluginRoot, skillPath, marketplacePath, entryName)));
     }
   }
   return issues;

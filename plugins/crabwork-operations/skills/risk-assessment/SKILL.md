@@ -1,5 +1,6 @@
 ---
-name: risk-assessment
+name: 运营风险评估
+short-description: 识别运营风险的概率、影响、控制措施与处置优先级
 description: Identifies, assesses, and mitigates operational risks using a likelihood/impact matrix and a prioritized risk register. Use when evaluating what could go wrong with a project, vendor, process, launch, or decision, when building or updating a risk register, when scoring risks by likelihood and impact, or when the user says "what are the risks", "risk assessment", "risk register", "what could go wrong", "worst case", or "how do we mitigate this".
 ---
 

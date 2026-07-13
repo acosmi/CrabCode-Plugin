@@ -1,5 +1,6 @@
 ---
-name: build-mcpb
+name: MCPB 本地服务打包
+short-description: 将本地 MCP 服务与运行时打包为可直接安装的 MCPB 文件
 description: This skill should be used when the user wants to "package an MCP server", "bundle an MCP", "make an MCPB", "ship a local MCP server", "distribute a local MCP", discusses ".mcpb files", mentions bundling a Node or Python runtime with their MCP server, or needs an MCP server that interacts with the local filesystem, desktop apps, or OS and must be installable without the user having Node/Python set up.
 version: 0.1.0
 ---

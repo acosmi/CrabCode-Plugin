@@ -1,5 +1,6 @@
 ---
-name: email-sequence
+name: 营销邮件序列
+short-description: 设计分阶段邮件触达节奏、主题、正文和行动号召
 description: Designs and drafts multi-email sequences with full copy, timing, branching logic, exit conditions, and performance benchmarks. Use when asked to "build a drip campaign", "write an onboarding sequence", "create a nurture flow", "set up a welcome series", "draft a win-back / re-engagement email series", or "map out a product-launch email flow"; when you need a complete sequence with A/B test suggestions; or when mapping the emails, branches, and exits end-to-end with a flow diagram.
 argument-hint: "[sequence type]"
 ---

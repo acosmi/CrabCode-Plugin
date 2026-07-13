@@ -1,5 +1,6 @@
 ---
-name: ux-copy
+name: 用户体验文案
+short-description: 编写清晰、一致且符合交互场景的界面文案与错误提示
 description: Writes or reviews UX copy — microcopy, error messages, empty states, CTAs, tooltips, confirmation dialogs, and onboarding text. Trigger with "write copy for", "what should this button say?", "review this error message", "name this CTA", "word this dialog", "fix this microcopy", or when filling an empty state, wording a confirmation, setting loading-state text, or matching tone for a screen.
 argument-hint: "<context or copy to review>"
 ---

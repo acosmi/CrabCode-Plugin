@@ -1,5 +1,6 @@
 ---
-name: run-campaign
+name: 营销活动执行
+short-description: 从销售分析到内容、渠道与受众分群编排完整营销活动
 version: 0.3.0
 description: 端到端跑一场营销战役 —— 从业主的支付宝商家平台 / 记账软件导出做销售分析,产出内容简报、逐渠道文案与设计说明(视觉由业主渲染)、你的 CRM 暂存、以及受众分群。当业主运行 /run-campaign,或说"跑个营销活动""我要更多客户""销量下滑帮我推一把""搞个促销""做一整轮营销""run a campaign""launch a promotion""sales are down, help me promote"时触发。可接收可选的回看窗口与渠道参数。
 allowed-tools: Read, WebFetch, Bash

@@ -1,5 +1,6 @@
 ---
-name: draft-response
+name: 客户回复起草
+short-description: 结合工单背景起草准确、同理且具有可执行性的客户回复
 description: Drafts a professional customer-facing reply (email, ticket, or chat) tailored to the situation, customer relationship, and tone needed, with internal notes on rationale and risks. Use when answering a product question, responding to an escalation or outage, delivering bad news such as a delay or won't-fix, declining a feature request or discount, replying to a billing issue, or following up after silence. Trigger with "draft a reply to the customer", "write a response", "how do I tell them", "help me word this", "respond to this complaint", "reply to this email", or "write the customer update".
 argument-hint: "<situation description>"
 ---
