@@ -1,6 +1,6 @@
 {
   "name": "crabcode-media-ops",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Governed media operations for CrabCode: research, original opinion writing, creator-style forms, review, platform adaptation, hash-bound approval, and local publish packages.",
   "author": {
     "name": "CrabCode"

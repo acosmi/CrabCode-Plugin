@@ -1,6 +1,6 @@
 {
   "name": "crabcode-office-suite",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "CrabCode skills and TypeScript helpers for authoring and editing Office documents: spreadsheets, word documents, presentations, and PDFs.",
   "author": {
     "name": "CrabCode"

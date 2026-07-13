@@ -21,6 +21,10 @@ import {
   formatReferenceIssues,
   validateReferences,
 } from "../src/policy/referenceValidator.ts";
+import {
+  formatPresentationIssues,
+  validatePresentation,
+} from "../src/policy/presentationValidator.ts";
 
 const root = path.resolve(process.argv[2] ?? ".");
 
@@ -50,6 +54,13 @@ if (marketplace.length > 0) {
   hasOutput = true;
   process.stderr.write(`[marketplace]\n${formatMarketplaceIssues(marketplace, root)}\n`);
   if (marketplace.some((issue) => issue.severity === "error")) hasError = true;
+}
+
+const presentation = await validatePresentation(root);
+if (presentation.length > 0) {
+  hasOutput = true;
+  process.stderr.write(`[presentation]\n${formatPresentationIssues(presentation, root)}\n`);
+  if (presentation.some((entry) => entry.severity === "error")) hasError = true;
 }
 
 const layout = await validateLayout(root);

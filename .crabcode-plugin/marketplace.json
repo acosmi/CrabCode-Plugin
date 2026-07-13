@@ -4,7 +4,7 @@
     "name": "CrabCode"
   },
   "metadata": {
-    "version": "0.3.0",
+    "version": "0.4.0",
     "description": "Official CrabCode plugin marketplace hosted at acosmi/CrabCode-Plugin."
   },
   "plugins": [
@@ -34,7 +34,7 @@
     {
       "name": "crablaw-cn",
       "source": "./plugins/crablaw-cn",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "displayName": "法律工作流",
       "shortDescription": "中国法律实务工作流:案件管理、合同、诉讼、知产、公司、劳动、数据合规、AI 治理、监管、产品与法援",
       "longDescription": "CrabLaw-CN 中国法律实务工作流伞插件。一次安装即获得 11 个实务板块(案件管理、合同、数据合规、劳动用工、公司、诉讼、知识产权、监管、AI 治理、产品、法律援助)共 86 项技能,板块以分组形式在能力区展示、按需带入。",
@@ -44,6 +44,8 @@
         "梳理这起诉讼的证据清单与时间线"
       ],
       "brandColor": "#b5462f",
+      "composerIcon": "./assets/icon.png",
+      "logo": "./assets/icon.png",
       "description": "CrabLaw-CN 中国法律实务工作流伞插件。一次安装即获得 11 个实务板块(案件管理、合同、数据合规、劳动用工、公司、诉讼、知识产权、监管、AI 治理、产品、法律援助)共 86 项技能,板块以分组形式在能力区展示、按需带入。",
       "category": "legal-workflow",
       "tier": "workflow",
@@ -1445,7 +1447,7 @@
     {
       "name": "crabcode-office-suite",
       "source": "./plugins/crabcode-office-suite",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "displayName": "CrabCode 办公套件",
       "shortDescription": "撰写与编辑 Office 文档的技能与工具:表格、Word、演示文稿与 PDF",
       "longDescription": "用于撰写和编辑 Office 文档的 CrabCode 技能与 TypeScript 辅助工具,覆盖电子表格(xlsx)、Word 文档(docx)、演示文稿(pptx)与 PDF 的创建与编辑。",
@@ -1455,6 +1457,8 @@
         "生成一份格式规范的 Word 文档"
       ],
       "brandColor": "#2ea043",
+      "composerIcon": "./assets/icon.png",
+      "logo": "./assets/icon.png",
       "description": "CrabCode skills and TypeScript helpers for authoring and editing Office documents: spreadsheets, word documents, presentations, and PDFs.",
       "category": "content-office",
       "tags": [
@@ -1538,7 +1542,7 @@
     {
       "name": "crabcode-media-ops",
       "source": "./plugins/crabcode-media-ops",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "displayName": "CrabCode 新媒体运营",
       "shortDescription": "研究、公众号原创观点、创作者风格表单、审校、多平台适配与哈希绑定审批发布",
       "longDescription": "面向媒体与自媒体团队的可审计工作流：可信来源研究、公众号原创观点、快速/完整/增量创作者风格表单、事实与原创复核、多平台适配、AI 披露留痕，以及内容哈希绑定的人工审批与本地发布包。",
@@ -1548,6 +1552,8 @@
         "通过快速表单建立我的创作者风格"
       ],
       "brandColor": "#8957e5",
+      "composerIcon": "./assets/icon.png",
+      "logo": "./assets/icon.png",
       "description": "Governed media operations with original-opinion writing, creator-style intake, review gates, versioned profiles and hash-bound publish approval.",
       "category": "media-ops",
       "tags": [
@@ -1592,9 +1598,9 @@
     {
       "name": "crabfin-cn",
       "source": "./plugins/crabfin-cn",
-      "version": "0.2.0",
-      "displayName": "金融·投行资管工作流",
-      "shortDescription": "中国金融工作流:财务建模、股票研究、投行、私募股权、财富管理、基金行政与 KYC",
+      "version": "0.2.1",
+      "displayName": "金融/投行工作流",
+      "shortDescription": "股票研究、投行、私募股权、财富管理、基金行政与 KYC",
       "longDescription": "CrabFin-CN 中国金融工作流伞插件。一次安装即获得 7 个板块(财务建模、股票研究、投资银行、私募股权、财富管理、基金行政、KYC 运营)共 54 项技能,板块以分组形式在能力区展示、按需带入。",
       "defaultPrompt": [
         "对这家公司做一份股票研究报告",
@@ -1602,6 +1608,8 @@
         "执行本月基金行政月末结账流程"
       ],
       "brandColor": "#0ea5e9",
+      "composerIcon": "./assets/icon.png",
+      "logo": "./assets/icon.png",
       "description": "CrabFin-CN 中国金融工作流伞插件。一次安装即获得 7 个板块(财务建模、股票研究、投资银行、私募股权、财富管理、基金行政、KYC 运营)共 54 项技能,板块以分组形式在能力区展示、按需带入。",
       "category": "finance",
       "tier": "workflow",
