@@ -1,5 +1,6 @@
 ---
-name: gl-recon
+name: 基金总账对账
+short-description: 核对基金总账、托管行和份额登记数据并形成对账结果
 description: 当用户说"总账对账""GL recon""跟托管行对账""总账和TA数据不一致""四维对账"时触发。即使未明确提"总账对账"也触发。
 license: Apache-2.0
 ---

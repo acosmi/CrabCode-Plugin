@@ -1,5 +1,6 @@
 ---
-name: compliance-deadline-watcher
+name: 合规期限看护
+short-description: 持续监控结构化的合规与合同期限，并将临期或逾期事项推入律师复核队列
 argument-hint: "[matter id | --sweep] [optional: stop]"
 description: 启动并自动续期一个会话内自调度的看护任务,持续盯防结构化的合规与合同期限,将临期或逾期项推入复核队列供律师处理;只测算与提醒,绝不对外发送或提交。当用户提到盯期限/到期提醒/期限看护/别漏了截止日/合规期限/续约到期/逾期监控,或需要持续监看各类截止日时使用本技能(即使未明说"看护")。
 ---

@@ -1,5 +1,6 @@
 ---
-name: material-contract-schedule
+name: 重大合同清单
+short-description: 在中国尽职调查中识别并编制目标公司重大合同清单,产出 diligence-finding 记录
 description: 在中国尽职调查中识别并编制目标公司重大合同清单,产出 diligence-finding 记录。当用户提到重大合同/合同清单/合同梳理/尽调合同盘点、需要列示关键合同及其风险条款时使用本技能(即使未明说"合同清单")。
 argument-hint: "[合同文件路径、合同清单或粘贴文本]"
 ---

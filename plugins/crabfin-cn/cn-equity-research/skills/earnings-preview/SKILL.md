@@ -1,5 +1,6 @@
 ---
-name: earnings-preview
+name: 财报前瞻
+short-description: 结合业绩预告与经营信息形成财报前瞻和预期差判断
 description: 当用户要求做财报前瞻、业绩预览、问"下季度业绩大概什么水平""这只票会不会发预告""业绩会不会超预期/低预期"时触发。即使未明确提"业绩前瞻"也触发。
 license: Apache-2.0
 ---

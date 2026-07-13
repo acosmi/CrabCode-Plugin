@@ -1,5 +1,6 @@
 ---
-name: accrual-schedule
+name: 基金费用计提表
+short-description: 计算并维护基金管理费、托管费和业绩报酬等费用计提表
 description: 当用户说"计提表""管理费怎么算""业绩报酬预提""accrual schedule""费用计提"时触发。即使未明确提"计提"也触发。
 license: Apache-2.0
 ---

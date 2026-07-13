@@ -1,5 +1,6 @@
 ---
-name: deal-sourcing
+name: 私募项目搜寻
+short-description: 按基金策略、行业准入与投资者约束搜寻中国私募股权标的
 description: 当用户说"帮我找项目""deal sourcing""source deal""哪里有合适的标的"时触发，即使未明确提"项目搜寻"也触发。按基金策略+中国行业准入系统搜寻——AMAC禁入行业(民间借贷/P2P/配资)、外商投资负面清单交叉筛选、LP制度约束(合格投资者穿透≤50/200人)
 license: Apache-2.0
 ---

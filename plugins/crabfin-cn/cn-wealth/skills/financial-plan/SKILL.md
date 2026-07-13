@@ -1,5 +1,6 @@
 ---
-name: financial-plan
+name: 理财规划
+short-description: 围绕现金流、保障、教育、养老与税务需求制定理财规划
 description: 当用户说"理财规划""资产配置方案""财务规划""税务筹划""退休规划""投资方案"时触发。即使未明确提"理财规划"也触发。
 license: Apache-2.0
 ---

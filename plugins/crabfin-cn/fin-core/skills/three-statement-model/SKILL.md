@@ -1,5 +1,6 @@
 ---
-name: three-statement-model
+name: 三大财务报表模型
+short-description: 按企业会计准则填充并勾稽利润表、资产负债表和现金流量表
 description: 三表财务模型(利润表/资产负债表/现金流量表)填充与勾稽(中国版底座)。按企业会计准则(CAS)科目口径填充并联动三表,数据取自巨潮资讯网/交易所定期报告(非 SEC/10-K)。当用户要填/补全/搭建三表模型、做三表联动与勾稽时触发(triggers: 3-statement model, IS/BS/CF, 三表模型, 三表联动, 利润表/资产负债表/现金流量表, fill/populate/complete model template)。执行前先读 references/cn-data-sources.md。
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---

@@ -1,5 +1,6 @@
 ---
-name: process-letter
+name: 并购交易流程函
+short-description: 起草并购交易流程函，说明竞标步骤、材料要求与时间安排
 description: 当用户要求撰写并购交易流程函、说"流程函""process letter""交易流程""写给卖方的流程说明""交易执行时间表"时触发。即使未明确提"流程函"也触发。
 license: Apache-2.0
 ---

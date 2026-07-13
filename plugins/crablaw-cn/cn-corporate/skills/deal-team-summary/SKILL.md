@@ -1,5 +1,6 @@
 ---
-name: deal-team-summary
+name: 并购交易摘要
+short-description: 基于审查/尽调成果,生成面向业务团队的中国并购或股权交易法律摘要
 description: 基于审查/尽调成果,生成面向业务团队的中国并购或股权交易法律摘要。当用户提到给业务团队/管理层汇报交易、交易摘要/法律要点提炼、需要把尽调与审查结论转成易读摘要时使用本技能(即使未明说"摘要")。
 argument-hint: "[review queue / diligence-finding 条目 id 或尽调摘要]"
 ---

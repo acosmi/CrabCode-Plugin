@@ -1,5 +1,6 @@
 ---
-name: merger-model
+name: 并购财务测算
+short-description: 测算并购对价、融资结构、合并报表与每股收益增厚摊薄
 description: 当用户要求进行并购财务测算、合并模拟、说"并购测算""对价模型""EPS增厚""并购模型""合并模拟""业绩承诺测算"时触发。即使未明确提"并购测算"也触发。
 license: Apache-2.0
 ---

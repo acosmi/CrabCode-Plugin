@@ -1,5 +1,6 @@
 ---
-name: unit-economics
+name: 单位经济模型
+short-description: 拆解收入成本驱动、LTV/CAC、边际贡献与盈亏平衡点
 description: 当用户说"算一下UE""LTV/CAC""单位经济模型""单客赚不赚钱"时触发，即使未明确提"单位经济"也触发。拆解收入/成本驱动因子——LTV/CAC须>3x为健康、边际贡献率、盈亏平衡点。区别于海外UE模板：适配中国市场CAS 14号收入确认规则、申万行业同口径可比公司对标
 license: Apache-2.0
 ---

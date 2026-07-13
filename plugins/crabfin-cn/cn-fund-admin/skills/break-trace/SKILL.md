@@ -1,5 +1,6 @@
 ---
-name: break-trace
+name: 基金差异追溯
+short-description: 追踪基金账务、托管与估值数据差异，定位差异来源
 description: 当用户说"账差在哪""break trace""差异追溯""为什么托管行和我们的数对不上""差异追踪"时触发。即使未明确提"差异追溯"也触发。
 license: Apache-2.0
 ---

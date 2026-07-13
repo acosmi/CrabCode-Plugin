@@ -1,5 +1,6 @@
 ---
-name: teaser
+name: 匿名项目简介
+short-description: 制作匿名项目简介，概述标的亮点、关键财务与交易机会
 description: 当用户要求制作并购交易Teaser、说"teaser""项目简介""交易摘要""保密摘要""blind profile""单页"时触发。即使未明确提"teaser"也触发。
 license: Apache-2.0
 ---

@@ -1,5 +1,6 @@
 ---
-name: initiating-coverage
+name: 首次覆盖报告
+short-description: 编制 A 股卖方首次覆盖报告，形成投资逻辑、盈利预测与目标价
 description: 当用户要求写首次覆盖报告、深度研报、出研报、问"帮我出一份XX公司的深度""这只票还没覆盖过，研究一下""给个目标价"时触发。即使用户未明确提"首次覆盖"也触发。
 license: Apache-2.0
 ---

@@ -1,5 +1,6 @@
 ---
-name: non-compete-review
+name: 竞业限制审查
+short-description: 审查中国法竞业限制条款、限制范围、经济补偿与可执行性风险
 description: 审查中国法竞业限制条款、限制范围、经济补偿与可执行性风险。当用户提到竞业限制/竞业禁止/竞业协议/离职后不能去同行/竞业补偿/违约金太高,或需要判断某竞业安排是否有效可执行时使用本技能(即使未明说"竞业审查")。
 argument-hint: "[clause, agreement, employee facts, or dispute facts]"
 ---

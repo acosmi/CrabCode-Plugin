@@ -1,5 +1,6 @@
 ---
-name: kyc-doc-parse
+name: 开户文档解析
+short-description: 提取并核验身份证、营业执照等开户与 KYC 文档的关键信息
 description: 当用户说"解析开户文档""KYC doc parse""提取身份证/营业执照信息""开户资料审核"时触发。即使未明确提"开户文档解析"也触发。
 license: Apache-2.0
 ---

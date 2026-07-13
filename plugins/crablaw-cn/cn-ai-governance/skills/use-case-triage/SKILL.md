@@ -1,5 +1,6 @@
 ---
-name: use-case-triage
+name: AI 用例风险分级
+short-description: 对 AI 用例进行风险分级，并判断其算法备案与上线合规路径
 description: 对 AI 用例做风险分级分流并判定备案路径,更新 ai-usecase 的 riskLevel 与 filingStatus。当用户提到 AI 用例/模型上线/算法应用风险/这个 AI 功能能不能用/要不要做算法备案、需要判断 AI 应用合规风险等级时使用本技能(即使未明说"分级")。
 argument-hint: "[AI 用例事实或已登记的 ai-usecase id]"
 ---

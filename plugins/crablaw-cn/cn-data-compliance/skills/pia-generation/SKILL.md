@@ -1,5 +1,6 @@
 ---
-name: pia-generation
+name: 个人信息保护影响评估
+short-description: 起草中国法个人信息保护影响评估(PIA/PIPIA)工作底稿
 description: 起草中国法个人信息保护影响评估(PIA/PIPIA)工作底稿。当用户提到做 PIA/个人信息保护影响评估/影响评估报告/PIPIA/出个评估底稿,或需要为某处理活动形成影响评估文档时使用本技能(即使未明说"评估生成")。
 argument-hint: "[processing activity or prior triage]"
 ---

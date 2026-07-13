@@ -1,5 +1,6 @@
 ---
-name: diligence-issue-extraction
+name: 尽调问题提取
+short-description: 从被尽调文件中提取中国法下的尽职调查风险与缺口,产出 diligence-finding 记录
 description: 从被尽调文件中提取中国法下的尽职调查风险与缺口,产出 diligence-finding 记录。当用户提到尽调/尽职调查/风险点/瑕疵/缺口提取、审阅目标公司资料找问题时使用本技能(即使未明说"尽调发现")。
 argument-hint: "[被尽调文件路径或粘贴文本]"
 ---

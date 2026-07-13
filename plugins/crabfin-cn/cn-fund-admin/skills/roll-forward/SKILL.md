@@ -1,5 +1,6 @@
 ---
-name: roll-forward
+name: 基金科目滚存
+short-description: 编制基金科目期初至期末滚存表并解释变动
 description: 当用户说"滚存""roll forward""期初到期末怎么变的""科目滚存表"时触发。即使未明确提"滚存"也触发。
 license: Apache-2.0
 ---

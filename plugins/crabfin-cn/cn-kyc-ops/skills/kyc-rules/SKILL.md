@@ -1,5 +1,6 @@
 ---
-name: kyc-rules
+name: KYC 规则评估
+short-description: 按客户风险、受益所有人和反洗钱规则评估 KYC 尽调等级
 description: 当用户说"KYC rule""客户风险评级""尽职调查等级""可疑交易评估""受益所有人合规""反洗钱评估"时触发。即使未明确提"KYC规则"也触发。
 license: Apache-2.0
 ---

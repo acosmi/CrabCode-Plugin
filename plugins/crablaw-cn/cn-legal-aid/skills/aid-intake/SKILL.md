@@ -1,5 +1,6 @@
 ---
-name: aid-intake
+name: 法律援助受理
+short-description: 收集法律援助申请与受援人信息，建立受援人档案和法律援助事项
 description: 法律援助申请受理与受援人信息收集,产出受援人(client)与援助事项(matter,matterType=legal-aid)草案。当用户提到法律援助申请、接待受援人、援助接案、收集受援人身份与争议信息,要新开一个法律援助事项时使用本技能(即使未明说"受理")。
 argument-hint: "[受援人身份、争议事实、诉求或已有材料]"
 ---

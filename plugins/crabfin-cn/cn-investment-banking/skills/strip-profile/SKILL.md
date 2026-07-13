@@ -1,5 +1,6 @@
 ---
-name: strip-profile
+name: 标的公司简况
+short-description: 提炼标的公司业务、财务和交易亮点，生成一页公司简况
 description: 当用户要求生成标的公司简况、一页概要、说"公司简况""strip profile""一页公司概要""标的简介""tear sheet"时触发。即使未明确提"strip profile"也触发。
 license: Apache-2.0
 ---

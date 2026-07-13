@@ -1,5 +1,6 @@
 ---
-name: oss-review
+name: 开源许可证审查
+short-description: 审查开源软件许可证合规草稿(义务、传染性 copyleft、兼容性),标注红线
 description: 审查开源软件许可证合规草稿(义务、传染性 copyleft、兼容性),标注红线。当用户提到开源许可证/GPL/MIT/Apache、copyleft/传染性、开源合规、用了开源代码能不能闭源/能不能商用、开源协议冲突或 SBOM 时使用本技能(即使未明说"开源审查")。
 argument-hint: "[涉及的开源组件及许可证、分发方式(SaaS/分发二进制/内部使用)、是否修改]"
 ---

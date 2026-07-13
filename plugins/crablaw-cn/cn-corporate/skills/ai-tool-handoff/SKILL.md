@@ -1,5 +1,6 @@
 ---
-name: ai-tool-handoff
+name: 事务交接包
+short-description: 生成事务的结构化交接说明包(已读范围/未决项/红线/citationTag 现状),供其他工具或 AI 接手
 description: 生成事务的结构化交接说明包(已读范围/未决项/红线/citationTag 现状),供其他工具或 AI 接手。当用户提到交接/移交/handoff/把事务转给别的工具或助手、需要打包当前进度与未决事项时使用本技能(即使未明说"交接包")。
 argument-hint: "[拟交接的事务范围或接收方说明]"
 ---

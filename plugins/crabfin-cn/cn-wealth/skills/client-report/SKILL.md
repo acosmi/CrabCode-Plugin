@@ -1,5 +1,6 @@
 ---
-name: client-report
+name: 客户组合报告
+short-description: 汇总客户持仓、收益、风险与资产配置变化，生成定期组合报告
 description: 当用户说"生成客户报告""出个组合报告""季度回顾报告""客户持仓报告""组合回顾"时触发。即使未明确提"客户报告"也触发。
 license: Apache-2.0
 ---

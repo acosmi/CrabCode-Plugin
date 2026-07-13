@@ -1,5 +1,6 @@
 ---
-name: matter-update
+name: 案件进展更新
+short-description: 同步开庭、裁定和送达后的案件状态与关键合规期限
 description: 案件进展更新,开庭/裁定/送达后同步 litigation-matter 状态与 compliance-deadline 期限。当用户提到案件有新进展/开庭了/收到裁定/送达回执/更新案件状态时使用本技能(即使未明说"进展更新")。
 argument-hint: "[案件 caseId 与进展事件，如开庭/裁定/送达回执]"
 ---

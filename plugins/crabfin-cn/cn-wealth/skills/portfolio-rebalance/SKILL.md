@@ -1,5 +1,6 @@
 ---
-name: portfolio-rebalance
+name: 投资组合再平衡
+short-description: 检查组合偏离度、风险暴露与约束，提出可执行的再平衡建议
 description: 当用户说"组合再平衡""调仓建议""资产再平衡""偏离度检查""仓位调整"时触发。即使未明确提"再平衡"也触发。
 license: Apache-2.0
 ---

@@ -1,5 +1,6 @@
 ---
-name: privacy-policy-review
+name: 隐私政策审查
+short-description: 在中国法数据合规工作流中审查隐私政策、App 告知、小程序告知或个人信息处理规则
 description: 在中国法数据合规工作流中审查隐私政策、App 告知、小程序告知或个人信息处理规则。当用户提到审隐私政策/隐私协议看看/用户协议合规/App 告知/收集使用规则/个人信息处理规则,或需要对隐私文本做合规把关时使用本技能(即使未明说"审查")。
 argument-hint: "[policy text or file path]"
 ---

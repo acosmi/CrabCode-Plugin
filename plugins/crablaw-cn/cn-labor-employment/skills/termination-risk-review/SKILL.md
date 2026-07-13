@@ -1,5 +1,6 @@
 ---
-name: termination-risk-review
+name: 解除劳动关系风险审查
+short-description: 形成中国法下解除/终止劳动关系或不续签的风险研判工作底稿
 description: 形成中国法下解除/终止劳动关系或不续签的风险研判工作底稿。当用户提到辞退/开除/解除劳动合同/裁员/不续签/能不能辞退他/违法解除风险/赔偿金,或需要评估某员工离职处理的法律风险时使用本技能(即使未明说"解雇风险")。
 argument-hint: "[termination facts and records]"
 ---

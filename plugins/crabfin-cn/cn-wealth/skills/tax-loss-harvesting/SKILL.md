@@ -1,5 +1,6 @@
 ---
-name: tax-loss-harvesting
+name: 中国税务优化
+short-description: 结合中国个人所得税、股息红利和专项扣除规则制定税务优化建议
 description: 当用户说"税务优化""个税筹划""tax-loss-harvesting""股息税率""专项扣除"时触发。注意：中国个人股票投资无资本利得税，本技能基于中国现行税优空间重新设计，非美国TLH。
 license: Apache-2.0
 ---

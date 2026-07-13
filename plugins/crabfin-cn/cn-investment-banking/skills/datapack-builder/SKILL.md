@@ -1,5 +1,6 @@
 ---
-name: datapack-builder
+name: 交易数据包整理
+short-description: 整理并购尽调数据、交易数据和数据室文件，形成可核验数据包
 description: 当用户要求整理并购交易数据包、说"整理数据包""datapack""尽调数据""交易数据清单""数据室文件"时触发。即使用户未明确提"数据包"也触发。
 license: Apache-2.0
 ---

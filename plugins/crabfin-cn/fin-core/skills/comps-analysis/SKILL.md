@@ -1,5 +1,6 @@
 ---
-name: comps-analysis
+name: 可比公司分析
+short-description: 按申万行业与中国市场数据构建可比公司估值分析
 description: |
   可比公司估值分析(中国版底座)。构建机构级 comps——营运指标、估值倍数、统计基准;数据取自巨潮资讯网/交易所披露与 Wind/同花顺(非 SEC),可比公司同申万行业优先。当用户要做可比公司、comps、估值倍数对标、PE/PB/EV-EBITDA 同业比较时触发(triggers: comparable company analysis, comps, trading multiples, 可比公司, 估值倍数, 同业估值)。先读 references/cn-data-sources.md 套用中国数据源。
   Build institutional-grade comparable company analyses with operating metrics, valuation multiples, and statistical benchmarking in Excel/spreadsheet format.

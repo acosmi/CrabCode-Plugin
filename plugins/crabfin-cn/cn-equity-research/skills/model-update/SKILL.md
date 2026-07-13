@@ -1,5 +1,6 @@
 ---
-name: model-update
+name: 财务模型更新
+short-description: 将最新财报数据映射到财务模型并更新盈利预测和估值
 description: 当用户要求更新财务模型、滚动预测、问"把最新季报数据填进模型""更新一下这只票的盈利预测""三表模型需要refresh"时触发。即使未明确提"模型更新"也触发。
 license: Apache-2.0
 ---

@@ -1,5 +1,6 @@
 ---
-name: deal-tracker
+name: 并购交易进度跟踪
+short-description: 跟踪并购交易里程碑、审批流程、责任人与关键日期
 description: 当用户询问并购交易进度、时间表、说"交易进度""并购时间表""审批流程""交易到哪一步了""deal timeline""里程碑"时触发。即使未明确提"交易进度"也触发。
 license: Apache-2.0
 ---

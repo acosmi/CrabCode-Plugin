@@ -1,5 +1,6 @@
 ---
-name: buyer-list
+name: 潜在买方名单
+short-description: 按交易逻辑筛选潜在战略或财务买方并形成长短名单
 description: 当用户要求寻找潜在买方、生成买方名单、说"帮我找潜在买方""long list""short list""谁可能买XX公司""竞标名单"时触发。即使用户未明确提"买方名单"也触发。
 license: Apache-2.0
 ---

@@ -1,5 +1,6 @@
 ---
-name: deadlines
+name: 法律援助期限管理
+short-description: 识别并登记法律援助案件的时效、上诉、举证和申请期限
 description: 法律援助案件期限管理,识别并登记诉讼时效、起诉/上诉/举证/申请等期限到 compliance-deadline。当用户提到案件期限、上诉期、举证期限、诉讼时效、申请期限、关键时间节点、别错过期限,需要管理援助案件时间节点时使用本技能(即使未明说"期限")。
 argument-hint: "[受援人 matter id 与已知期限/诉讼阶段]"
 ---

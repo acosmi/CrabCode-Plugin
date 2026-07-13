@@ -1,5 +1,6 @@
 ---
-name: ppt-template-creator
+name: PPT 模板创建
+short-description: 从用户提供的 PowerPoint 模板创建可复用的 PPT 技能模板
 description: Creates self-contained PPT template SKILLS (not presentations) from user-provided PowerPoint templates. Use ONLY when a user wants to create a reusable skill from their template. For creating actual presentations, use the pptx skill instead.
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---

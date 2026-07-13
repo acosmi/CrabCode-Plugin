@@ -1,5 +1,6 @@
 ---
-name: matter-deep-analysis
+name: 事项深度尽调
+short-description: 针对某事项的多份文件,经"读取/分析/撰写"三层工作流做深度尽调分析,产出供律师复核的备忘录
 description: 针对某事项的多份文件,经"读取/分析/撰写"三层工作流做深度尽调分析,产出供律师复核的备忘录。当用户提到尽调/深度分析/一堆材料帮我看/多份文件梳理/把这些文件分析一下/做个 memo,或需要跨多份文档做体系化研判时使用本技能(即使未明说"尽调")。
 argument-hint: "[matter id] [document paths or pasted text]"
 ---

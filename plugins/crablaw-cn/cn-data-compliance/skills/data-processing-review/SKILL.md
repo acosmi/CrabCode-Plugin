@@ -1,5 +1,6 @@
 ---
-name: data-processing-review
+name: 数据处理安排审查
+short-description: 在中国法数据合规工作流中审查委托处理、共同处理、第三方 SDK 及供应商数据条款
 description: 在中国法数据合规工作流中审查委托处理、共同处理、第三方 SDK 及供应商数据条款。当用户提到供应商数据协议/委托处理协议/共同处理/接入了 SDK/数据处理条款/外包数据/合作方拿数据,或需要审查第三方/供应商的数据安排时使用本技能(即使未明说"审查")。
 argument-hint: "[agreement, SDK list, vendor facts, or clause text]"
 ---

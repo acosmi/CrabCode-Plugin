@@ -1,5 +1,6 @@
 ---
-name: reg-feed-watcher
+name: 监管动态监控
+short-description: 监控中国监管动态、新规与征求意见稿并登记为 reg-policy 条目
 description: 监控中国监管动态、新规与征求意见稿并登记为 reg-policy 条目。当用户提到监管动态/新规跟踪/有什么新规定/征求意见稿、需要盯住某领域监管变化时使用本技能(即使未明说"监控")。
 argument-hint: "[关注领域、发文机关或政策法规线索]"
 ---

@@ -1,5 +1,6 @@
 ---
-name: gap-surfacer
+name: 合规缺口扫描
+short-description: 主动广度扫描业务以浮现潜在合规缺口,产出 diligence-finding
 description: 主动广度扫描业务以浮现潜在合规缺口,产出 diligence-finding。当用户提到合规体检/全面排查/有没有合规风险/还有哪些没顾到、需要广度优先发现潜在监管缺口时使用本技能(即使未明说"扫描")。
 argument-hint: "[业务概况、经营范围或待扫描资料范围]"
 ---

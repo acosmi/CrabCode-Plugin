@@ -1,5 +1,6 @@
 ---
-name: ai-inventory
+name: AI 用例盘点
+short-description: 盘点并登记企业 AI 用例/算法系统,逐条产出 ai-usecase 台账记录
 description: 盘点并登记企业 AI 用例/算法系统,逐条产出 ai-usecase 台账记录。当用户提到 AI 盘点/算法清单/我们都用了哪些 AI/建 AI 资产台账/排查 AI 系统、需要梳理生成式AI与算法应用底数时使用本技能(即使未明说"盘点")。
 argument-hint: "[AI 用例/系统清单、产品线或部门范围]"
 ---

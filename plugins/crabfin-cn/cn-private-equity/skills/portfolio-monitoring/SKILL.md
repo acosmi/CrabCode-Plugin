@@ -1,5 +1,6 @@
 ---
-name: portfolio-monitoring
+name: 被投组合监控
+short-description: 跟踪被投企业经营、对赌里程碑、备案合规和退出窗口
 description: 当用户说"组合最近怎么样""portfolio update""被投企业报表出来了""投后监控"时触发，即使未明确提"组合监控"也触发。跟踪对赌里程碑(实际vs承诺净利润偏差>30%即预警)、AMAC合规(季度终了10工作日更新+年度4月内报告)、退出窗口判断(A股科创板6-9月/北交所3-6月)
 license: Apache-2.0
 ---

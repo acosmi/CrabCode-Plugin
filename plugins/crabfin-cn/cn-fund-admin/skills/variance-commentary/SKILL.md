@@ -1,5 +1,6 @@
 ---
-name: variance-commentary
+name: 基金差异说明
+short-description: 分析基金净值、费用与收益偏差并形成差异说明
 description: 当用户说"差异说明""variance commentary""为什么这个月NAV跌了这么多""管理费超预算说明""收益归因"时触发。即使未明确提"差异说明"也触发。
 license: Apache-2.0
 ---

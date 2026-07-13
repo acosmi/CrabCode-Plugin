@@ -1,5 +1,6 @@
 ---
-name: policy-monitor
+name: AI 政策监控
+short-description: 监控中国 AI/算法/深度合成监管动态,逐条登记为 reg-policy 记录并提示影响
 description: 监控中国 AI/算法/深度合成监管动态,逐条登记为 reg-policy 记录并提示影响。当用户提到 AI 新规/算法监管更新/生成式AI政策跟踪/网信办又出文件了/盯一下深度合成立法、需要跟踪 AI 监管变化时使用本技能(即使未明说"监控")。
 argument-hint: "[关注的监管领域、机关或具体法规线索]"
 ---

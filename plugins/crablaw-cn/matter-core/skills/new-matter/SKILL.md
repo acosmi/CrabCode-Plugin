@@ -1,5 +1,6 @@
 ---
-name: new-matter
+name: 新建法律事项
+short-description: 在 CrabLaw-CN 工作流中新建事项/案件工作区,并绑定客户、当事方、服务范围、权限与资料来源策略
 description: 在 CrabLaw-CN 工作流中新建事项/案件工作区,并绑定客户、当事方、服务范围、权限与资料来源策略。当用户提到开案/立案/新建事项/建一个案子/开个新 matter/把这个案子建起来,或需要为某客户开启一项具体法律工作时使用本技能(即使未明说"开案")。
 argument-hint: "[client id] [matter title or facts]"
 ---

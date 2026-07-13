@@ -1,5 +1,6 @@
 ---
-name: matter-intake
+name: 诉讼案件受理
+short-description: 诉讼/仲裁立案前信息收集,产出 litigation-matter 草案
 description: 诉讼/仲裁立案前信息收集,产出 litigation-matter 草案。当用户提到新案件/接案/立案前准备/收集当事人与争议信息、要开一个新诉讼或仲裁事项时使用本技能(即使未明说"立案信息")。
 argument-hint: "[当事人、争议事实、诉讼请求或已有材料]"
 ---

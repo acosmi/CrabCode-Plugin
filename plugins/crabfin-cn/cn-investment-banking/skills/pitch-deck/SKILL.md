@@ -1,5 +1,6 @@
 ---
-name: pitch-deck
+name: 并购提案材料
+short-description: 制作并购项目提案和客户推介材料，呈现交易逻辑与执行方案
 description: 当用户要求制作并购推介提案、说"提案""pitch""推介材料""项目建议书""并购提案""pitch book"时触发。即使未明确提"pitch deck"也触发。
 license: Apache-2.0
 ---

@@ -1,5 +1,6 @@
 ---
-name: pptx-author
+name: PPTX 生成
+short-description: 按金融演示规范生成可追溯到模型数据的 PPTX 文件
 description: Produce a .pptx file on disk with finance deck conventions (one idea per slide, numbers trace to the model, firm template support); engine work routes to crabcode-office-suite.
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---

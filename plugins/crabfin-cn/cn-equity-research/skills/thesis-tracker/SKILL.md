@@ -1,5 +1,6 @@
 ---
-name: thesis-tracker
+name: 投资逻辑跟踪
+short-description: 持续跟踪持仓投资逻辑、催化因素与证伪信号并提示风险
 description: 当用户要求跟踪投资逻辑、验证持仓假设、问"帮我盯着这只票的逻辑有没有坏""XX公司最近有什么雷吗""这个持仓要不要跑"时触发。即使未明确提"投资逻辑跟踪"也触发。
 license: Apache-2.0
 ---

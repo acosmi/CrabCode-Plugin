@@ -1,5 +1,6 @@
 ---
-name: catalyst-calendar
+name: 催化剂日历
+short-description: 梳理 A 股或港股公司的财报、解禁、股东大会等关键事件并形成催化剂日历
 description: 当用户要求做催化剂日历、事件时间线、问"XX股票近期有什么重要日子""这只票接下来有哪些事件""帮我列一份事件驱动时间表"时触发。即使未明确提"催化剂日历"也触发。
 license: Apache-2.0
 ---

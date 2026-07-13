@@ -1,5 +1,6 @@
 ---
-name: cim-builder
+name: 保密信息备忘录编制
+short-description: 编制并购交易保密信息备忘录，呈现标的业务、财务与投资亮点
 description: 当用户要求编制CIM、保密信息备忘录、说"写CIM""保密信息备忘录""investment memorandum""尽调报告"时触发。即使用户未明确提"CIM"也触发。
 license: Apache-2.0
 ---

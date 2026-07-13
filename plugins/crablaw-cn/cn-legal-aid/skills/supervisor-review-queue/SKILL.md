@@ -1,5 +1,6 @@
 ---
-name: supervisor-review-queue
+name: 法律援助督导复核
+short-description: 法律援助质量监督/督导复核队列,整理待复核交付物、复核要点与质量监督结论,用 review-queue
 description: 法律援助质量监督/督导复核队列,整理待复核交付物、复核要点与质量监督结论,用 review-queue。当用户提到质量监督、督导复核、案件质量检查、复核队列、把材料交主任/督导审,需要对援助交付物做质量把关时使用本技能(即使未明说"复核队列")。
 argument-hint: "[受援人 matter id 或待复核的 reviewItemId 与复核范围]"
 ---

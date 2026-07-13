@@ -1,5 +1,6 @@
 ---
-name: new-client
+name: 客户建档
+short-description: 在 CrabLaw-CN 工作流中创建或更新客户档案,作为开展任何具体事项前的客户基础
 description: 在 CrabLaw-CN 工作流中创建或更新客户档案,作为开展任何具体事项前的客户基础。当用户提到新客户/建客户/录入客户信息/客户资料/新来一个委托人/接了个客户,或需要先把客户档案建起来再开案时使用本技能(即使未明说"建档")。
 argument-hint: "[client name or profile facts]"
 ---

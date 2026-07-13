@@ -1,5 +1,6 @@
 ---
-name: competitive-analysis
+name: 竞争格局分析
+short-description: 分析中国市场竞争格局、竞品定位、同业对标与战略差异
 description: 竞争格局分析与竞品 deck(中国版底座)。做市场定位、竞品深扒、对标比较、战略综合;可比公司同申万行业优先,公司数据取自巨潮资讯网/交易所披露与 Wind/同花顺(非 SEC)。当用户要做竞争格局、竞品分析、同业对标、市场地图、投资备忘 deck 时触发(triggers: competitive landscape, competitor analysis, peer comparison, market map, 竞争格局, 竞品分析, 同业对标, "X 的竞争对手有哪些")。涉及取数与行业分类先读 references/cn-data-sources.md。
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---

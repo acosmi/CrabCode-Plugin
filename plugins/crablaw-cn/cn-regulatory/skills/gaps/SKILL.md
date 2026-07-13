@@ -1,5 +1,6 @@
 ---
-name: gaps
+name: 监管合规差距分析
+short-description: 针对特定法规或监管要求做合规差距分析(现状 vs 要求),产出 diligence-finding
 description: 针对特定法规或监管要求做合规差距分析(现状 vs 要求),产出 diligence-finding。当用户提到合规差距/差距分析/现状对标/达标情况/缺口比对、需要看某规定下企业差多少时使用本技能(即使未明说"差距")。
 argument-hint: "[目标法规/监管要求 + 企业现状资料或 reg-policy 条目]"
 ---

@@ -1,5 +1,6 @@
 ---
-name: investment-proposal
+name: 投资建议方案
+short-description: 结合客户目标、风险等级与产品适当性形成投资建议方案
 description: 当用户说"出个投资方案""投资建议书""资产配置建议""产品推荐方案""投资建议"时触发。即使未明确提"投资方案"也触发。
 license: Apache-2.0
 ---

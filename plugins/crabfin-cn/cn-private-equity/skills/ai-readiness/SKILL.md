@@ -1,5 +1,6 @@
 ---
-name: ai-readiness
+name: AI 就绪度评估
+short-description: 评估被投企业的数据基础、技术团队、业务数字化与 AI 吸收能力
 description: 当用户说"这家公司能不能用AI""AI就绪度怎么样""IT基础评估"时触发，即使未明确提"AI就绪度"也触发。对标企业评估数据基础设施与技术团队的AI吸收能力，融入中国私募尽调清单(AMAC备案必查项)，不适用境外AI框架直接套用
 license: Apache-2.0
 ---

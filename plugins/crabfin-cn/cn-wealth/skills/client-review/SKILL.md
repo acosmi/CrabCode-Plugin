@@ -1,5 +1,6 @@
 ---
-name: client-review
+name: 客户适当性复核
+short-description: 复核客户画像、风险承受能力、适当性与 KYC 信息变化
 description: 当用户说"客户回顾""适当性复核""重新测评""客户复盘""KYC检查""适当性检查"时触发。即使未明确提"客户回顾"也触发。
 license: Apache-2.0
 ---

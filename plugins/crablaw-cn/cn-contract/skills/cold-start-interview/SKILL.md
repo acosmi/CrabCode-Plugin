@@ -1,5 +1,6 @@
 ---
-name: cold-start-interview
+name: 合同审查偏好采集
+short-description: 为某客户或法务团队采集中国法合同审查偏好、模板、审批矩阵与资料来源策略
 description: 为某客户或法务团队采集中国法合同审查偏好、模板、审批矩阵与资料来源策略。当用户提到配置合同审查/我们团队的审查习惯/设定模板/审批流程/初始化偏好/第一次用先配一下,或需要在批量审合同前先建立团队规则时使用本技能(即使未明说"冷启动")。
 argument-hint: "[practice facts or seed materials]"
 ---

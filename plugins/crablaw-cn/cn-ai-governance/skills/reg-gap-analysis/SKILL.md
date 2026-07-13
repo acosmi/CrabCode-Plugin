@@ -1,5 +1,6 @@
 ---
-name: reg-gap-analysis
+name: AI 合规差距分析
+short-description: 对照生成式 AI、算法推荐和深度合成规则识别企业合规差距
 description: 将企业 AI 现状逐条对照生成式AI办法/算法推荐规定/深度合成规定做合规差距分析,产出 diligence-finding。当用户提到 AI 合规差距/我们差哪些合规动作/对照新规自查/算法合规体检/合规 gap、需要找 AI 合规缺口与整改项时使用本技能(即使未明说"差距分析")。
 argument-hint: "[AI 用例/系统现状、已登记 ai-usecase id 或自查范围]"
 ---

@@ -1,5 +1,6 @@
 ---
-name: vendor-ai-review
+name: 第三方 AI 服务审查
+short-description: 审查第三方 AI 服务合规性，并登记供应商 AI 用例风险
 description: 审查第三方/供应商提供的 AI 服务合规性,并登记为 vendor-provided 的 ai-usecase。当用户提到接入第三方大模型/采购 AI 服务/供应商 AI 合规/调用别人家的 AI 接口/嵌入第三方算法、需要评估外部 AI 服务能不能接时使用本技能(即使未明说"供应商审查")。
 argument-hint: "[供应商 AI 服务信息、合同/接口文档或集成场景]"
 ---

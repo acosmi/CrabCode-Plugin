@@ -1,5 +1,6 @@
 ---
-name: nav-tieout
+name: 基金 NAV 勾稽
+short-description: 勾稽基金总账、估值表、份额与净值，核验 NAV 一致性
 description: 当用户说"NAV勾稽""nav tieout""估值表和总账NAV对不上""份额净值核对"时触发。即使未明确提"NAV勾稽"也触发。
 license: Apache-2.0
 ---

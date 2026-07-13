@@ -1,5 +1,6 @@
 ---
-name: xlsx-author
+name: XLSX 生成
+short-description: 按金融建模规范生成含输入、校验和公式结构的 XLSX 文件
 description: Produce a .xlsx file on disk with finance conventions (inputs tab, blue/black/green color coding, checks tab); engine work and recalculation route to crabcode-office-suite.
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---

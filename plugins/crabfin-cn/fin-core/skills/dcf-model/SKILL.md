@@ -1,5 +1,6 @@
 ---
-name: dcf-model
+name: DCF 估值模型
+short-description: 按中国数据源和企业会计准则构建含敏感性分析的 DCF 估值模型
 description: DCF 现金流折现估值建模(中国版底座)。为 A股/港股/中国企业做内在价值估值——数据取自巨潮资讯网/交易所定期报告与 Wind/同花顺(非 SEC),无风险利率用中国10年期国债收益率,按企业会计准则(CAS)口径建模,输出含敏感性分析的专业 Excel。当用户要做 DCF、估值、内在价值、目标价、现金流折现、终值测算时触发(triggers: DCF, discounted cash flow, intrinsic value, valuation model, 目标价, 估值, 现金流折现)。执行前先读 references/cn-data-sources.md 套用中国数据源。
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---

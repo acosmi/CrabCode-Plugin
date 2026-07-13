@@ -1,5 +1,6 @@
 ---
-name: idea-generation
+name: 选股思路生成
+short-description: 按行业、估值、景气度与催化因素筛选 A 股或港股研究标的
 description: 当用户要求选股、筛股票池、问"帮我筛一批标的""这个赛道有哪些票可以看看""推荐几只股票"时触发。即使未明确提"选股"也触发——用户表达投资筛选需求即应调用。
 license: Apache-2.0
 ---

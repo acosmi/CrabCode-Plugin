@@ -1,5 +1,6 @@
 ---
-name: returns-analysis
+name: 投资回报分析
+short-description: 测算私募投资的 MOIC、IRR 和 DPI，并分析税后收益与退出路径
 description: 当用户说"算一下这笔投资的回报""IRR多少""MOIC""DPI"时触发，即使未明确提"回报分析"也触发。测算中国私募核心指标MOIC/IRR/DPI——须用"先分后税"口径算LP税后收益(合伙制LP经营所得5-35%或20%、各地口径有差异)、GP carry税负风险标注。退出路径概率加权(IPO/并购/S基金/回购×各路径MOIC)
 license: Apache-2.0
 ---

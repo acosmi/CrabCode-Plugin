@@ -1,5 +1,6 @@
 ---
-name: lbo-model
+name: LBO 杠杆收购模型
+short-description: 填充并校验杠杆收购模型的融资、回报与交易假设
 description: This skill should be used when completing LBO (Leveraged Buyout) model templates in Excel for private equity transactions, deal materials, or investment committee presentations. The skill fills in formulas, validates calculations, and ensures professional formatting standards that adapt to any template structure.
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---

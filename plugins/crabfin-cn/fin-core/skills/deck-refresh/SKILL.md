@@ -1,5 +1,6 @@
 ---
-name: deck-refresh
+name: 演示文稿更新
+short-description: 用最新财务、市场和可比数据更新既有演示文稿中的数字
 description: Updates a presentation with new numbers — quarterly refreshes, earnings updates, comp rolls, rebased market data. Use whenever the user asks to "update the deck with Q4 numbers", "refresh the comps", "roll this forward", "swap in the new earnings", "change all the $485M to $512M", or any request to swap figures across an existing deck without rebuilding it.
 license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---
