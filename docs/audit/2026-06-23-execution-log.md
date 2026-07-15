@@ -645,3 +645,16 @@ $ git commit -m "fix(plugin): accept safely missing optional hooks"
 $ git status --short
 [无输出；下游任务分支干净]
 ```
+
+## 9. 主仓交付提交
+
+```text
+$ git commit -m "feat: add CrabAccount workflow plugin"
+[codex/crabaccount-migration f8e1ca6] feat: add CrabAccount workflow plugin
+22 files changed, 4509 insertions(+), 6 deletions(-)
+
+$ git status --short
+?? docs/audit/2026-07-15-crabcode-media-ops-原创与可信来源修复补全实施方案.md
+```
+
+`git diff HEAD -- <全部 CrabAccount 任务路径>` 无输出，证明实施方案、执行日志、Marketplace、插件、测试与快照均已进入 `f8e1ca6`。唯一剩余未跟踪文件仍是共享工作区中不属于本任务的 media-ops 方案，继续不暂存、不提交。本段作为审计闭环使用独立 docs follow-up 提交；其最终 SHA 在任务交付信息中报告，避免提交对象自引用。
