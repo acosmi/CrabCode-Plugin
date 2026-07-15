@@ -4,9 +4,9 @@ import { readFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 
 const root = resolve(import.meta.dir, '..')
-const EXPECTED_WORKFLOW_SKILLS = 313
-const EXPECTED_INVOCATION_SET_SHA256 = '47ad5f6c797e5fe12b701327eeb484079bd4d39fb8697016d6abccbac1bea4e2'
-const EXPECTED_MODEL_CONTENT_SHA256 = 'e2c3fa55e7d50143e6bcf31ce08a0e7fa19d6d56c063570d175d52255678a6fb'
+const EXPECTED_WORKFLOW_SKILLS = 315
+const EXPECTED_INVOCATION_SET_SHA256 = 'f7b0838eba63cdf4c8e37e00a86c91185d3af4d98a3bdb816d406477e9e036af'
+const EXPECTED_MODEL_CONTENT_SHA256 = '95aedfcb1b63d12437277394ddc4aef1caf54c2b19359069a1068689c0f63c2c'
 const HAN = /[\u3400-\u9fff]/u
 
 function sha256(value: string): string {
@@ -29,7 +29,7 @@ function stableModelContent(text: string): string {
 }
 
 describe('official workflow skill presentation completeness', () => {
-  test('keeps all 313 invocation identities and model-facing contents stable while localizing cards', () => {
+  test('keeps all 315 invocation identities and model-facing contents stable while localizing cards', () => {
     const marketplace = JSON.parse(
       readFileSync(join(root, '.crabcode-plugin', 'marketplace.json'), 'utf8'),
     ) as {
@@ -71,7 +71,7 @@ describe('official workflow skill presentation completeness', () => {
     expect(new Set(invocationKeys).size).toBe(EXPECTED_WORKFLOW_SKILLS)
     expect(sha256(JSON.stringify(invocationKeys))).toBe(EXPECTED_INVOCATION_SET_SHA256)
     expect(sha256(JSON.stringify(modelContentHashes))).toBe(EXPECTED_MODEL_CONTENT_SHA256)
-    expect(marketplace.metadata.version).toBe('0.4.1')
+    expect(marketplace.metadata.version).toBe('0.4.2')
 
     const mediaEntry = workflows.find((entry) => entry.name === 'crabcode-media-ops')
     expect(mediaEntry).toBeDefined()

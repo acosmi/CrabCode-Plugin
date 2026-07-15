@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crabcode.dev/schemas/crabaccount/import-batch-v1.json",
+  "title": "CrabAccount import batch",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "batch", "defaults", "transactions"],
+  "properties": {
+    "schemaVersion": { "const": "1" },
+    "batch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceType", "inputSha256", "sourceName"],
+      "properties": {
+        "sourceType": { "enum": ["pasted-json", "markdown-table", "csv", "tsv", "xls", "xlsx", "xlsm", "pdf", "scanned-pdf"] },
+        "inputSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "sourceName": { "type": "string", "maxLength": 120 }
+      }
+    },
+    "defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["currency", "timeZone"],
+      "properties": {
+        "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+        "timeZone": { "type": "string", "minLength": 1, "maxLength": 80 }
+      }
+    },
+    "transactions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "occurredAt", "amount", "currency", "kind", "status", "rawDescription", "note", "parseConfidence", "warnings", "duplicateStatus", "duplicateDecision", "ledger"],
+        "properties": {
+          "source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["sheet", "row", "page", "externalId"],
+            "properties": {
+              "sheet": { "type": ["string", "null"] },
+              "row": { "type": ["integer", "null"], "minimum": 1 },
+              "page": { "type": ["integer", "null"], "minimum": 1 },
+              "externalId": { "type": ["string", "null"], "maxLength": 200 }
+            }
+          },
+          "occurredAt": { "type": "string", "format": "date-time" },
+          "postedAt": { "type": ["string", "null"], "format": "date-time" },
+          "amount": { "type": "string", "pattern": "^(?:0|[1-9][0-9]{0,11})(?:\\.[0-9]{1,2})?$" },
+          "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+          "kind": { "enum": ["expense", "income", "transfer", "refund"] },
+          "status": { "const": "posted" },
+          "sourceAccountHint": { "type": ["string", "null"], "maxLength": 200 },
+          "targetAccountHint": { "type": ["string", "null"], "maxLength": 200 },
+          "categoryHint": { "type": ["string", "null"], "maxLength": 200 },
+          "counterparty": { "type": ["string", "null"], "maxLength": 300 },
+          "rawDescription": { "type": "string", "maxLength": 1000 },
+          "note": { "type": "string", "maxLength": 1000 },
+          "parseConfidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "warnings": { "type": "array", "items": { "type": "string" } },
+          "duplicateStatus": { "enum": ["none", "confirmed", "possible"] },
+          "duplicateDecision": { "enum": ["import", "skip", "review"] },
+          "ledger": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["accountId", "typeId", "actionId", "expectedHandle", "collect"],
+            "properties": {
+              "accountId": { "type": "integer", "minimum": 1 },
+              "typeId": { "type": "integer", "minimum": 1 },
+              "actionId": { "type": "integer", "minimum": 1 },
+              "expectedHandle": { "enum": [0, 1, 2] },
+              "accountToId": { "type": ["integer", "null"], "minimum": 1 },
+              "collect": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

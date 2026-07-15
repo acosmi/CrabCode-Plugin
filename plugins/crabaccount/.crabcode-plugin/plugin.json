@@ -1,0 +1,19 @@
+{
+  "name": "crabaccount",
+  "version": "0.1.0",
+  "description": "CrabCode workflows for safe personal bookkeeping and reviewed statement import against a compatible self-hosted ledger.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "personal-finance",
+    "bookkeeping",
+    "statement-import",
+    "self-hosted"
+  ],
+  "skills": [
+    "./skills/bookkeeping",
+    "./skills/statement-import"
+  ]
+}

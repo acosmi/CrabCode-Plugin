@@ -4,7 +4,7 @@
     "name": "CrabCode"
   },
   "metadata": {
-    "version": "0.4.1",
+    "version": "0.4.2",
     "description": "Official CrabCode plugin marketplace hosted at acosmi/CrabCode-Plugin."
   },
   "plugins": [
@@ -2452,6 +2452,29 @@
             "video-frames"
           ]
         }
+      ]
+    },
+    {
+      "name": "crabaccount",
+      "source": "./plugins/crabaccount",
+      "version": "0.1.0",
+      "displayName": "CrabAccount 智能记账",
+      "shortDescription": "连接自托管账本，完成安全记账、查账与经核对的账单导入",
+      "longDescription": "面向个人和家庭的自托管记账工作流，支持日常收支、查账、统计、转账、流水修改，以及表格或 PDF 账单的标准化、映射、查重、预览和确认后导入。",
+      "defaultPrompt": [
+        "记一笔今天的午餐支出",
+        "查一下这个月的收支情况",
+        "导入这份银行账单，先核对再写入"
+      ],
+      "brandColor": "#0F766E",
+      "description": "Safe personal bookkeeping and reviewed statement import for a compatible self-hosted ledger.",
+      "category": "finance",
+      "tier": "workflow",
+      "tags": [
+        "personal-finance",
+        "bookkeeping",
+        "statement-import",
+        "self-hosted"
       ]
     }
   ]

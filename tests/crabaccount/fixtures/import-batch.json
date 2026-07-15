@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "1",
+  "batch": {
+    "sourceType": "csv",
+    "inputSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "sourceName": "statement.csv"
+  },
+  "defaults": {
+    "currency": "CNY",
+    "timeZone": "Asia/Shanghai"
+  },
+  "transactions": [
+    {
+      "source": {
+        "sheet": "流水",
+        "row": 2,
+        "page": null,
+        "externalId": "txn-001"
+      },
+      "occurredAt": "2026-07-01T12:00:00+08:00",
+      "amount": "12.30",
+      "currency": "CNY",
+      "kind": "expense",
+      "status": "posted",
+      "rawDescription": "已入账午餐",
+      "note": "午餐",
+      "parseConfidence": 1,
+      "warnings": [],
+      "duplicateStatus": "confirmed",
+      "duplicateDecision": "skip",
+      "ledger": {
+        "accountId": 1,
+        "typeId": 10,
+        "actionId": 100,
+        "expectedHandle": 1,
+        "collect": false
+      }
+    },
+    {
+      "source": {
+        "sheet": "流水",
+        "row": 3,
+        "page": null,
+        "externalId": "txn-002"
+      },
+      "occurredAt": "2026-07-02T08:00:00+08:00",
+      "amount": "8.00",
+      "currency": "CNY",
+      "kind": "expense",
+      "status": "posted",
+      "rawDescription": "早餐",
+      "note": "早餐",
+      "parseConfidence": 0.99,
+      "warnings": [],
+      "duplicateStatus": "none",
+      "duplicateDecision": "import",
+      "ledger": {
+        "accountId": 1,
+        "typeId": 10,
+        "actionId": 100,
+        "expectedHandle": 1,
+        "collect": false
+      }
+    }
+  ]
+}
