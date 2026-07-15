@@ -19,6 +19,12 @@ import * as doctor from './tools/doctor.ts'
 import * as policy from './tools/policy.ts'
 import * as trends from './tools/trends.ts'
 import * as content from './tools/content.ts'
+import * as references from './tools/references.ts'
+import * as researchCapture from './tools/research-capture.ts'
+import * as research from './tools/research.ts'
+import * as originality from './tools/originality.ts'
+import * as editorialReview from './tools/editorial-review.ts'
+import * as delivery from './tools/delivery.ts'
 import * as profiles from './tools/profiles.ts'
 import * as preview from './tools/preview.ts'
 import * as readiness from './tools/readiness.ts'
@@ -28,6 +34,7 @@ import * as history from './tools/history.ts'
 import * as style from './tools/style.ts'
 import * as platformRules from './tools/platform-rules.ts'
 import { VERSION } from './domain.ts'
+import { StorageCorruptionError } from './storage.ts'
 
 const server = new McpServer({ name: 'mediaops', version: VERSION })
 
@@ -47,7 +54,8 @@ function register(
         return toToolResult(env)
       } catch (e) {
         const message = e instanceof Error ? e.message : String(e)
-        return toToolResult({ success: false, status: 'error', error: { code: 'internal', message } })
+        const code = e instanceof StorageCorruptionError ? e.code : 'INTERNAL_ERROR'
+        return toToolResult({ success: false, status: 'error', error: { code, message } })
       }
     },
   )
@@ -63,6 +71,16 @@ register(trends.clusterName, trends.clusterDescription, trends.clusterInputSchem
 register(content.saveName, content.saveDescription, content.saveInputSchema, content.saveHandler)
 register(content.getName, content.getDescription, content.getInputSchema, content.getHandler)
 register(content.listName, content.listDescription, content.listInputSchema, content.listHandler)
+
+register(references.registerName, references.registerDescription, references.registerInputSchema, references.registerHandler)
+register(references.getName, references.getDescription, references.getInputSchema, references.getHandler)
+register(researchCapture.name, researchCapture.description, researchCapture.inputSchema, researchCapture.handler)
+register(research.name, research.description, research.inputSchema, research.handler)
+register(originality.scanName, originality.scanDescription, originality.scanInputSchema, originality.scanHandler)
+register(originality.reviewName, originality.reviewDescription, originality.reviewInputSchema, originality.reviewHandler)
+register(editorialReview.name, editorialReview.description, editorialReview.inputSchema, editorialReview.handler)
+register(delivery.renderName, delivery.renderDescription, delivery.renderInputSchema, delivery.renderHandler)
+register(delivery.verifyName, delivery.verifyDescription, delivery.verifyInputSchema, delivery.verifyHandler)
 
 register(profiles.saveName, profiles.saveDescription, profiles.saveInputSchema, profiles.saveHandler)
 register(profiles.getName, profiles.getDescription, profiles.getInputSchema, profiles.getHandler)

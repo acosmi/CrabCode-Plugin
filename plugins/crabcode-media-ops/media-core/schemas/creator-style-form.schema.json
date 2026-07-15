@@ -9,18 +9,175 @@
     "formId": { "type": "string", "format": "uuid" },
     "mode": { "enum": ["quick", "full", "incremental"] },
     "state": { "enum": ["draft", "submitted", "confirmed", "superseded"] },
-    "data": {
-      "type": "object",
-      "required": ["displayName", "creatorTypes", "positioning", "audience", "expression", "structure", "language", "truthBoundaries", "samples", "platformDifferences", "consent"],
-      "properties": {
-        "creatorTypes": { "type": "array", "minItems": 1 },
-        "truthBoundaries": { "type": "object" },
-        "samples": { "type": "array" },
-        "consent": { "type": "object" }
-      },
-      "additionalProperties": true
-    },
-    "updatedBy": { "type": "string", "minLength": 1 }
+    "data": { "$ref": "#/$defs/formData" },
+    "updatedBy": { "type": "string", "minLength": 1, "maxLength": 300 },
+    "submittedAt": { "type": "string", "format": "date-time" },
+    "profileVersion": { "type": "string" },
+    "supersededByProfileVersion": { "type": "string" }
   },
-  "additionalProperties": true
+  "allOf": [
+    {
+      "if": { "properties": { "state": { "enum": ["submitted", "confirmed", "superseded"] } }, "required": ["state"] },
+      "then": {
+        "properties": {
+          "data": {
+            "required": ["displayName", "creatorTypes", "positioning", "audience", "expression", "structure", "language", "truthBoundaries", "samples", "platformDifferences", "consent"]
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "level": { "enum": ["low", "medium", "high"] },
+    "stringArray": { "type": "array", "maxItems": 200, "items": { "type": "string", "maxLength": 2000 } },
+    "referenceSample": {
+      "type": "object",
+      "required": ["referenceId", "role", "rightsStatus", "allowedUses"],
+      "properties": {
+        "referenceId": { "type": "string", "format": "uuid" },
+        "role": { "enum": ["user_owned_draft", "authorized_sample", "third_party_reference", "factual_source"] },
+        "rightsStatus": { "enum": ["owned", "licensed", "public_domain", "unknown"] },
+        "allowedUses": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "contains": { "const": "abstract_style_features" },
+          "items": { "enum": ["rewrite", "fact_leads", "abstract_style_features", "attributed_quotation", "originality_comparison"] }
+        },
+        "date": { "type": "string", "maxLength": 50 },
+        "confidence": { "$ref": "#/$defs/level" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "role": { "const": "third_party_reference" } }, "required": ["role"] },
+          "then": { "properties": { "allowedUses": { "not": { "contains": { "const": "rewrite" } } } } }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "formData": {
+      "type": "object",
+      "properties": {
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "creatorTypes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": { "enum": ["opinion-commentary", "knowledge-explainer", "news-policy-analysis", "tutorial-method", "product-review", "investigative-watchdog", "industry-observer", "brand-founder", "lifestyle-growth", "storytelling", "interview-editor", "custom"] }
+        },
+        "customCreatorType": { "type": "string", "maxLength": 500 },
+        "positioning": {
+          "type": "object",
+          "required": ["accountPositioning", "domains", "credentials", "purposes", "mainPlatforms"],
+          "properties": {
+            "accountPositioning": { "type": "string", "minLength": 1, "maxLength": 2000 },
+            "domains": { "$ref": "#/$defs/stringArray" },
+            "credentials": { "$ref": "#/$defs/stringArray" },
+            "purposes": { "$ref": "#/$defs/stringArray" },
+            "mainPlatforms": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "enum": ["wechat", "xhs", "toutiao"] } },
+            "cadence": { "type": "string", "maxLength": 500 }
+          },
+          "additionalProperties": false
+        },
+        "audience": {
+          "type": "object",
+          "required": ["segments", "knowledgeLevel", "painPoints", "desiredOutcome"],
+          "properties": {
+            "segments": { "type": "array", "minItems": 1, "maxItems": 200, "items": { "type": "string", "maxLength": 2000 } },
+            "knowledgeLevel": { "type": "string", "minLength": 1, "maxLength": 500 },
+            "painPoints": { "$ref": "#/$defs/stringArray" },
+            "readingContext": { "type": "string", "maxLength": 2000 },
+            "desiredOutcome": { "type": "string", "minLength": 1, "maxLength": 2000 }
+          },
+          "additionalProperties": false
+        },
+        "expression": {
+          "type": "object",
+          "properties": {
+            "formality": { "$ref": "#/$defs/level" },
+            "intimacy": { "$ref": "#/$defs/level" },
+            "humor": { "$ref": "#/$defs/level" },
+            "sharpness": { "$ref": "#/$defs/level" },
+            "emotion": { "$ref": "#/$defs/level" },
+            "technicalDensity": { "$ref": "#/$defs/level" },
+            "personalNarrative": { "$ref": "#/$defs/level" },
+            "evidenceDensity": { "$ref": "#/$defs/level" },
+            "actionStrength": { "$ref": "#/$defs/level" },
+            "personPreference": { "enum": ["first", "second", "third", "mixed"] },
+            "punctuationNotes": { "type": "string", "maxLength": 2000 }
+          },
+          "additionalProperties": false
+        },
+        "structure": {
+          "type": "object",
+          "properties": {
+            "openings": { "$ref": "#/$defs/stringArray" },
+            "argumentPatterns": { "$ref": "#/$defs/stringArray" },
+            "headingPreference": { "type": "string", "maxLength": 2000 },
+            "counterargumentStyle": { "type": "string", "maxLength": 2000 },
+            "endingActions": { "$ref": "#/$defs/stringArray" },
+            "typicalLength": { "type": "string", "maxLength": 500 },
+            "mobileParagraphLength": { "type": "string", "maxLength": 500 }
+          },
+          "additionalProperties": false
+        },
+        "language": {
+          "type": "object",
+          "properties": {
+            "preferredWords": { "$ref": "#/$defs/stringArray" },
+            "bannedWords": { "$ref": "#/$defs/stringArray" },
+            "bannedCliches": { "$ref": "#/$defs/stringArray" },
+            "nonImitableExpressions": { "$ref": "#/$defs/stringArray" },
+            "humanReviewTopics": { "$ref": "#/$defs/stringArray" }
+          },
+          "additionalProperties": false
+        },
+        "truthBoundaries": {
+          "type": "object",
+          "required": ["supportedFirstPersonExperiences", "forbiddenIdentityInferences", "allowedStancePhrases", "evidenceRules", "commercialDisclosureRule"],
+          "properties": {
+            "supportedFirstPersonExperiences": { "$ref": "#/$defs/stringArray" },
+            "forbiddenIdentityInferences": { "type": "array", "minItems": 1, "maxItems": 200, "items": { "type": "string", "maxLength": 2000 } },
+            "allowedStancePhrases": { "$ref": "#/$defs/stringArray" },
+            "evidenceRules": { "type": "object", "maxProperties": 200, "additionalProperties": { "type": "string", "maxLength": 2000 } },
+            "commercialDisclosureRule": { "type": "string", "minLength": 1, "maxLength": 2000 }
+          },
+          "additionalProperties": false
+        },
+        "samples": { "type": "array", "maxItems": 24, "items": { "$ref": "#/$defs/referenceSample" } },
+        "platformDifferences": {
+          "type": "object",
+          "maxProperties": 20,
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "tone": { "type": "string", "maxLength": 2000 },
+              "title": { "type": "string", "maxLength": 2000 },
+              "paragraph": { "type": "string", "maxLength": 2000 },
+              "emoji": { "type": "string", "maxLength": 2000 },
+              "tags": { "type": "string", "maxLength": 2000 },
+              "images": { "type": "string", "maxLength": 2000 },
+              "invariantFeatures": { "$ref": "#/$defs/stringArray" },
+              "adaptableFeatures": { "$ref": "#/$defs/stringArray" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "baseProfileVersion": { "type": "string", "maxLength": 500 },
+        "changeRequests": { "type": "object", "maxProperties": 200 },
+        "consent": {
+          "type": "object",
+          "required": ["storeAbstractStyle", "allowFutureSuggestions", "confirmedBy"],
+          "properties": {
+            "storeAbstractStyle": { "const": true },
+            "allowFutureSuggestions": { "type": "boolean" },
+            "confirmedBy": { "type": "string", "minLength": 1, "maxLength": 300 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
 }

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crabcode.local/media/article-doc.schema.json",
+  "title": "Canonical article document",
+  "type": "object",
+  "required": ["schemaVersion", "language", "title", "body", "citations", "assets", "disclosures"],
+  "properties": {
+    "schemaVersion": { "const": "article-doc@1" },
+    "language": { "type": "string", "pattern": "^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$" },
+    "title": { "type": "string", "minLength": 1, "maxLength": 500, "pattern": "^[^\\r\\n]+$" },
+    "summary": { "type": "string", "maxLength": 2000 },
+    "body": { "$ref": "#/$defs/node" },
+    "citations": { "type": "array", "maxItems": 200, "items": { "$ref": "#/$defs/citation" } },
+    "assets": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/asset" } },
+    "disclosures": { "type": "array", "maxItems": 20, "items": { "type": "string", "minLength": 1, "maxLength": 1000 } }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "citation": { "type": "object", "required": ["url", "title"], "properties": { "sourceId": { "type": "string", "format": "uuid" }, "url": { "type": "string", "pattern": "^https?://" }, "title": { "type": "string", "minLength": 1, "maxLength": 500 }, "publisher": { "type": "string", "maxLength": 300 }, "publishedAt": { "type": "string", "format": "date-time" }, "accessedAt": { "type": "string", "format": "date-time" } }, "additionalProperties": false },
+    "asset": { "type": "object", "required": ["assetId", "role", "rightsStatus", "sha256", "byteSize", "mediaType"], "properties": { "assetId": { "type": "string", "format": "uuid" }, "role": { "type": "string", "minLength": 1, "maxLength": 80 }, "rightsStatus": { "enum": ["owned", "licensed", "public-domain", "pending"] }, "alt": { "type": "string", "minLength": 1, "maxLength": 500 }, "caption": { "type": "string", "minLength": 1, "maxLength": 1000 }, "sourceUrl": { "type": "string", "pattern": "^https?://" }, "width": { "type": "integer", "minimum": 1 }, "height": { "type": "integer", "minimum": 1 }, "sha256": { "$ref": "#/$defs/sha256" }, "byteSize": { "type": "integer", "minimum": 1 }, "mediaType": { "enum": ["image/png", "image/jpeg", "image/gif", "image/webp"] }, "packagePath": { "type": "string" } }, "additionalProperties": false },
+    "node": { "type": "object", "required": ["type"], "properties": { "type": { "enum": ["root", "paragraph", "heading", "text", "emphasis", "strong", "delete", "inlineCode", "code", "blockquote", "list", "listItem", "link", "image", "thematicBreak", "break", "table", "tableRow", "tableCell", "footnoteDefinition", "footnoteReference"] }, "value": { "type": "string" }, "depth": { "enum": [2, 3, 4] }, "url": { "type": "string" }, "title": { "type": ["string", "null"] }, "alt": { "type": "string" }, "lang": { "type": ["string", "null"] }, "meta": { "type": ["string", "null"] }, "ordered": { "type": "boolean" }, "start": { "type": ["integer", "null"] }, "spread": { "type": "boolean" }, "checked": { "type": ["boolean", "null"] }, "align": { "type": "array", "items": { "enum": ["left", "right", "center", null] } }, "identifier": { "type": "string" }, "label": { "type": "string" }, "children": { "type": "array", "items": { "$ref": "#/$defs/node" } } }, "additionalProperties": false }
+  },
+  "additionalProperties": false
+}

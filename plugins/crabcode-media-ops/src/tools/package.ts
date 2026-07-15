@@ -1,67 +1,75 @@
-import { randomUUID } from 'node:crypto'
-import { existsSync } from 'node:fs'
-import { copyFile, writeFile } from 'node:fs/promises'
-import { basename, join } from 'node:path'
+import { createHash, randomUUID } from 'node:crypto'
+import { copyFile, mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import { z } from 'zod'
 import { err, ok, type Envelope } from '../envelope.ts'
-import { renderDocument, toPlainText } from '../markdown.ts'
+import { DeliveryManifestSchema, VERSION, stableHash } from '../domain.ts'
 import { getPlatform } from '../platforms/registry.ts'
 import { appendRecord, dataDir, ensureDir, storageWarnings } from '../storage.ts'
 import { getApproval } from './approval.ts'
 import { getLatestContent } from './content.ts'
+import { getDeliveryManifest, verifyDeliveryBytes } from './delivery.ts'
 import { inspectContent } from './readiness.ts'
 
 export const name = 'mediaops.publish.package'
 export const description =
-  'Build a movable manual publish package only from the latest reviewed content revision and a matching approved hash.'
+  'Atomically copy an approved, verified and frozen delivery candidate into a manual publish package. It never rereads original assets or rerenders content.'
 export const inputSchema = {
   contentId: z.string().uuid(),
   approvalId: z.string().uuid(),
   packagedBy: z.string().min(1),
 }
 
-function safeAssetName(index: number, path: string): string {
-  return `${String(index + 1).padStart(2, '0')}-${basename(path).replace(/[^a-zA-Z0-9._-]+/g, '-')}`
+function sha256(bytes: Uint8Array): string {
+  return createHash('sha256').update(bytes).digest('hex')
 }
 
 export async function handler(args: { contentId: string; approvalId: string; packagedBy: string }): Promise<Envelope> {
   const content = await getLatestContent(args.contentId)
   if (!content) return err('NOT_FOUND', `No content ${args.contentId}.`)
+  if (!('schemaVersion' in content) || content.schemaVersion !== 2) return err('SCHEMA_UPGRADE_REQUIRED', 'Legacy content cannot be packaged by the integrity workflow.')
   const approval = await getApproval(args.approvalId)
-  if (!approval) return err('APPROVAL_REQUIRED', `No approval ${args.approvalId}.`)
-  if (approval.contentId !== content.contentId || approval.platform !== content.platform) {
-    return err('PACKAGE_INPUT_MISMATCH', 'Approval does not target this content/platform pair.')
-  }
+  if (!approval) return err('APPROVAL_REQUIRED', `No v2 approval ${args.approvalId}.`)
+  if (approval.contentId !== content.contentId || approval.platform !== content.platform) return err('PACKAGE_INPUT_MISMATCH', 'Approval does not target this content/platform pair.')
   if (approval.state === 'pending') return err('APPROVAL_PENDING', 'Approval is still pending.')
   if (approval.state === 'rejected') return err('APPROVAL_REJECTED', 'Approval was rejected.')
   if (approval.state !== 'approved') return err('APPROVAL_REQUIRED', `Approval state ${approval.state} cannot package content.`)
-  if (approval.revisionId !== content.revisionId || approval.contentHash !== content.contentHash) {
-    return err('APPROVAL_STALE', 'The content changed after approval; request and obtain a new approval.')
+  if (approval.revisionId !== content.revisionId || approval.contentHash !== content.contentHash || approval.articleDocHash !== content.articleDocHash) {
+    return err('APPROVAL_STALE', 'Content or ArticleDoc changed after approval.')
   }
   const platform = getPlatform(approval.platform)!
-  const issues = await inspectContent(content, platform)
-  const blockers = issues.filter((issue) => issue.severity === 'error')
+  if (platform.ruleVersion !== approval.platformRuleVersion) return err('APPROVAL_STALE', 'Platform rule version changed after approval.')
+  const blockers = (await inspectContent(content, platform)).filter((issue) => issue.severity === 'error')
   if (blockers.length) return err(blockers[0].code, `Packaging blocked: ${blockers.map((item) => item.message).join(' ')}`)
-  const missingAssets = content.assets.filter((asset) => !existsSync(asset.path))
-  if (missingAssets.length) return err('ASSET_MISSING', `Missing assets: ${missingAssets.map((asset) => asset.path).join(', ')}.`)
-
-  const packageId = randomUUID()
-  const pkgDir = join(dataDir(), 'publish-packages', `${platform.id}-${new Date().toISOString().slice(0, 10)}-${packageId}`)
-  const assetsDir = join(pkgDir, 'assets')
-  await ensureDir(assetsDir)
-  const copiedAssets: { sourcePath: string; packagePath: string; role: string; rightsStatus: string }[] = []
-  for (const [index, asset] of content.assets.entries()) {
-    const fileName = safeAssetName(index, asset.path)
-    await copyFile(asset.path, join(assetsDir, fileName))
-    copiedAssets.push({ sourcePath: asset.path, packagePath: `assets/${fileName}`, role: asset.role, rightsStatus: asset.rightsStatus })
+  const delivery = await getDeliveryManifest(approval.deliveryId)
+  if (!delivery || delivery.renderManifestHash !== approval.renderManifestHash || delivery.primaryArtifact.artifactHash !== approval.primaryArtifactHash || delivery.backupArtifact.artifactHash !== approval.backupArtifactHash) {
+    return err('APPROVAL_STALE', 'Approved delivery manifest or primary/backup artifact hashes changed.')
+  }
+  let sourceRoot: string
+  try {
+    sourceRoot = await verifyDeliveryBytes(delivery)
+  } catch (error) {
+    return err('DELIVERY_INTEGRITY_FAILED', error instanceof Error ? error.message : String(error))
   }
 
-  const html = renderDocument(content.title, content.bodyMarkdown)
-  const summary = content.summary ?? toPlainText(content.bodyMarkdown).slice(0, 280)
-  const files = ['manifest.json', 'article.md', 'article.html', 'title.txt', 'summary.txt', 'copy-checklist.md', ...copiedAssets.map((asset) => asset.packagePath)]
-  const manifest = {
+  const packageId = randomUUID()
+  const packagesRoot = join(dataDir(), 'publish-packages')
+  const finalRoot = join(packagesRoot, `${platform.id}-${new Date().toISOString().slice(0, 10)}-${packageId}`)
+  const temporaryRoot = join(packagesRoot, `.tmp-${packageId}-${randomUUID()}`)
+  await ensureDir(packagesRoot)
+  const artifactEntries = [delivery.primaryArtifact, delivery.backupArtifact, ...delivery.channelArtifacts]
+  const files = [
+    ...artifactEntries.map((item) => item.relativePath),
+    ...delivery.assets.map((item) => item.relativePath),
+    'delivery-manifest.json',
+    'approval.json',
+    'package-manifest.json',
+    'copy-checklist.md',
+  ]
+  const packageManifest = {
+    schemaVersion: 2,
     packageId,
-    pluginVersion: '0.3.0',
+    pluginVersion: VERSION,
     platform: platform.id,
     platformDisplayName: platform.displayName,
     platformRuleVersion: platform.ruleVersion,
@@ -69,25 +77,18 @@ export async function handler(args: { contentId: string; approvalId: string; pac
     revisionId: content.revisionId,
     contentRevision: content.revision,
     contentHash: content.contentHash,
-    brandId: content.brandId,
-    profileVersion: content.profileVersion,
-    review: content.review,
-    originalityReview: content.originalityReview,
-    legalReview: content.legalReview,
-    aiDisclosure: content.aiDisclosure,
-    citations: content.citations,
-    approval: {
-      approvalId: approval.approvalId,
-      state: approval.state,
-      requestedBy: approval.requestedBy,
-      decidedBy: approval.decidedBy,
-      decidedAt: approval.decidedAt,
-      contentHash: approval.contentHash,
-    },
-    title: content.title,
-    summary,
-    assets: copiedAssets,
-    publishMode: 'package-only (manual copy; real publish API requires Gate B credentials)',
+    articleDocHash: content.articleDocHash,
+    deliveryId: delivery.deliveryId,
+    renderManifestHash: delivery.renderManifestHash,
+    approvalId: approval.approvalId,
+    approvalBindingHash: approval.approvalBindingHash,
+    primaryArtifact: delivery.primaryArtifact,
+    backupArtifact: delivery.backupArtifact,
+    channelArtifacts: delivery.channelArtifacts,
+    assets: delivery.assets,
+    defaultUserPresentation: 'article.html (HTML primary)',
+    backup: 'article.md (Markdown backup)',
+    publishMode: 'package-only; manual platform submission; no rerender during packaging',
     packagedBy: args.packagedBy,
     createdAt: new Date().toISOString(),
     files,
@@ -95,20 +96,61 @@ export async function handler(args: { contentId: string; approvalId: string; pac
   const checklist = [
     `# Copy checklist — ${platform.displayName}`,
     '',
-    `- [ ] Recheck current platform console rules (${platform.ruleVersion})`,
-    '- [ ] Confirm title, body, cover and packaged assets',
-    '- [ ] Confirm AI disclosure using the recorded method',
-    '- [ ] Confirm approval hash matches manifest contentHash',
-    '- [ ] Perform final manual publication; Gate B APIs are not enabled',
+    '- [ ] Open article.html and confirm it is the exact approved primary artifact',
+    '- [ ] Use article.md only as a backup, not as the default user presentation',
+    '- [ ] Recheck current platform console rules and native AI-label setting',
+    '- [ ] Confirm cover and inline images match the frozen assets',
+    '- [ ] Confirm approvalBindingHash and renderManifestHash match package-manifest.json',
+    '- [ ] Perform final manual publication; Gate B publish APIs remain disabled',
     '',
   ].join('\n')
-  await writeFile(join(pkgDir, 'manifest.json'), JSON.stringify(manifest, null, 2), 'utf8')
-  await writeFile(join(pkgDir, 'article.md'), content.bodyMarkdown, 'utf8')
-  await writeFile(join(pkgDir, 'article.html'), html, 'utf8')
-  await writeFile(join(pkgDir, 'title.txt'), content.title, 'utf8')
-  await writeFile(join(pkgDir, 'summary.txt'), summary, 'utf8')
-  await writeFile(join(pkgDir, 'copy-checklist.md'), checklist, 'utf8')
-  await appendRecord('publish-history', { id: packageId, packageId, platform: platform.id, packagePath: pkgDir, contentId: content.contentId, revisionId: content.revisionId, contentHash: content.contentHash, brandId: content.brandId, profileVersion: content.profileVersion, approvalId: approval.approvalId, packagedBy: args.packagedBy, mode: 'package-only' })
-  await appendRecord('audit-events', { event: 'publish.package.created', packageId, contentId: content.contentId, revisionId: content.revisionId, contentHash: content.contentHash, approvalId: approval.approvalId, platform: platform.id, actor: args.packagedBy })
-  return ok({ packageId, packagePath: pkgDir, contentId: content.contentId, revisionId: content.revisionId, contentHash: content.contentHash, approvalId: approval.approvalId, platform: platform.id, files }, storageWarnings())
+  try {
+    await mkdir(join(temporaryRoot, 'assets'), { recursive: true })
+    for (const item of artifactEntries) await copyFile(join(sourceRoot, item.relativePath), join(temporaryRoot, item.relativePath))
+    for (const asset of delivery.assets) await copyFile(join(sourceRoot, asset.relativePath), join(temporaryRoot, asset.relativePath))
+    await copyFile(join(sourceRoot, 'delivery-manifest.json'), join(temporaryRoot, 'delivery-manifest.json'))
+    await writeFile(join(temporaryRoot, 'approval.json'), JSON.stringify(approval, null, 2) + '\n', 'utf8')
+    await writeFile(join(temporaryRoot, 'package-manifest.json'), JSON.stringify(packageManifest, null, 2) + '\n', 'utf8')
+    await writeFile(join(temporaryRoot, 'copy-checklist.md'), checklist, 'utf8')
+    for (const item of artifactEntries) {
+      const bytes = await readFile(join(temporaryRoot, item.relativePath))
+      if (bytes.byteLength !== item.byteSize || sha256(bytes) !== item.artifactHash) throw new Error(`copied artifact ${item.artifactId} failed hash verification`)
+    }
+    for (const asset of delivery.assets) {
+      const bytes = await readFile(join(temporaryRoot, asset.relativePath))
+      if (bytes.byteLength !== asset.byteSize || sha256(bytes) !== asset.sha256) throw new Error(`copied asset ${asset.assetId} failed hash verification`)
+    }
+    const copiedDeliveryManifest = DeliveryManifestSchema.parse(JSON.parse(await readFile(join(temporaryRoot, 'delivery-manifest.json'), 'utf8')))
+    if (stableHash(copiedDeliveryManifest) !== stableHash(delivery)) throw new Error('copied delivery manifest failed canonical hash verification')
+    await rename(temporaryRoot, finalRoot)
+  } catch (error) {
+    await rm(temporaryRoot, { recursive: true, force: true })
+    return err('PACKAGE_WRITE_FAILED', error instanceof Error ? error.message : String(error))
+  }
+  await appendRecord('publish-history', {
+    id: packageId, packageId, packagePath: finalRoot, platform: platform.id, contentId: content.contentId,
+    revisionId: content.revisionId, contentHash: content.contentHash, articleDocHash: content.articleDocHash,
+    deliveryId: delivery.deliveryId, renderManifestHash: delivery.renderManifestHash, approvalId: approval.approvalId,
+    approvalBindingHash: approval.approvalBindingHash, brandId: content.brandId, profileVersion: content.profileVersion,
+    packagedBy: args.packagedBy, mode: 'frozen-copy-only', primaryFormat: 'html', backupFormat: 'markdown',
+  })
+  await appendRecord('audit-events', {
+    event: 'publish.package.created', packageId, contentId: content.contentId, revisionId: content.revisionId,
+    contentHash: content.contentHash, deliveryId: delivery.deliveryId, renderManifestHash: delivery.renderManifestHash,
+    approvalId: approval.approvalId, platform: platform.id, actor: args.packagedBy,
+  })
+  return ok({
+    packageId,
+    packagePath: finalRoot,
+    contentId: content.contentId,
+    revisionId: content.revisionId,
+    contentHash: content.contentHash,
+    deliveryId: delivery.deliveryId,
+    renderManifestHash: delivery.renderManifestHash,
+    approvalId: approval.approvalId,
+    platform: platform.id,
+    primary: { path: join(finalRoot, delivery.primaryArtifact.relativePath), format: 'html', hash: delivery.primaryArtifact.artifactHash },
+    backup: { path: join(finalRoot, delivery.backupArtifact.relativePath), format: 'markdown', hash: delivery.backupArtifact.artifactHash },
+    files,
+  }, storageWarnings())
 }

@@ -10,6 +10,9 @@
   {"query":"把当前 profile 回滚到上个月那版，但保留历史记录。","should_trigger":true,"expected_skill":"media-style-manager"},
   {"query":"把已审主稿改成小红书格式，保留来源和 AI 披露记录。","should_trigger":true,"expected_skill":"media-platform-adapter"},
   {"query":"检查最终变体，等我人工批准后生成可移动发布包。","should_trigger":true,"expected_skill":"media-publish-gate"},
+  {"query":"照这个作者的文章微调一下，保证像原创，还要补充联网可信来源。","should_trigger":true,"expected_skill":"media-ops"},
+  {"query":"先把最终稿渲染成精致白底 HTML，我看过批准后再给发布包。","should_trigger":true,"expected_skill":"media-publish-gate"},
+  {"query":"联网找两组独立来源并逐条核验这篇稿的核心事实。","should_trigger":true,"expected_skill":"media-topic-research"},
   {"query":"把这条新闻压缩成三句话摘要，不要评论。","should_trigger":false,"near_miss":"纯新闻摘要不是公众号原创观点默认任务"},
   {"query":"给这个 SaaS 产品写一篇公众号品牌软文，强调优惠和转化。","should_trigger":false,"near_miss":"品牌营销软文应路由营销能力"},
   {"query":"帮我把这封媒体合作邮件写得礼貌一点。","should_trigger":false,"near_miss":"邮件写作不是媒体运营工作流"},
@@ -18,5 +21,6 @@
   {"query":"直接登录我的公众号后台点发布，不用再问我。","should_trigger":false,"near_miss":"浏览器最终发布属于 Gate B"},
   {"query":"自动回复今天所有小红书评论并发送。","should_trigger":false,"near_miss":"自动评论发送属于 Gate B"},
   {"query":"写一篇网贷催收曝光稿，按金融帮账号风格。","should_trigger":false,"near_miss":"应路由金融监督曝光专用能力"},
-  {"query":"分析十份合同并给诉讼策略。","should_trigger":false,"near_miss":"法律事项应路由法律插件"}
+  {"query":"分析十份合同并给诉讼策略。","should_trigger":false,"near_miss":"法律事项应路由法律插件"},
+  {"query":"把这份 Markdown 纯粹转换成 HTML，不做媒体审校或发布流程。","should_trigger":false,"near_miss":"通用格式转换不必触发完整媒体运营"}
 ]

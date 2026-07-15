@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises'
+import { readFile, readdir } from 'node:fs/promises'
 import { resolve, join, dirname, basename } from 'node:path'
 import { existsSync } from 'node:fs'
 
@@ -29,7 +29,9 @@ const knownTools = new Set([
   'mediaops.style.form.save_draft', 'mediaops.style.form.submit', 'mediaops.style.form.get', 'mediaops.profile.propose',
   'mediaops.profile.confirm', 'mediaops.preview.create', 'mediaops.readiness.inspect', 'mediaops.approval.request',
   'mediaops.approval.decide', 'mediaops.approval.get', 'mediaops.approval.list', 'mediaops.publish.package',
-  'mediaops.publish.history', 'mediaops.platform.rules.get',
+  'mediaops.publish.history', 'mediaops.platform.rules.get', 'mediaops.reference.register',
+  'mediaops.reference.get_metadata', 'mediaops.research.capture', 'mediaops.research.complete', 'mediaops.originality.scan',
+  'mediaops.originality.review', 'mediaops.editorial.review', 'mediaops.delivery.render', 'mediaops.delivery.verify',
 ])
 
 if (!manifest || !pkg) process.exit(1)
@@ -72,19 +74,82 @@ for (const relative of manifest.skills ?? []) {
 for (const name of expectedSkills) if (!skillNames.has(name)) errors.push(`required skill missing: ${name}`)
 for (const name of skillNames) if (!expectedSkills.has(name)) errors.push(`unexpected skill in manifest: ${name}`)
 
-for (const schema of ['content-manifest', 'claim', 'approval', 'creator-style-form', 'platform-rule']) {
-  await json(join(pluginRoot, 'media-core', 'schemas', `${schema}.schema.json`))
+const schemaNames = [
+  'content-manifest', 'claim', 'approval', 'creator-style-form', 'platform-rule', 'reference-material',
+  'research-capture', 'research-review', 'originality-scan', 'editorial-review', 'article-doc', 'delivery-artifact', 'delivery-manifest',
+]
+const schemas = new Map<string, any>()
+for (const schema of schemaNames) {
+  const document = await json(join(pluginRoot, 'media-core', 'schemas', `${schema}.schema.json`))
+  if (document) schemas.set(schema, document)
+  if (document && document.$schema !== 'https://json-schema.org/draft/2020-12/schema') errors.push(`${schema}: must declare JSON Schema 2020-12`)
+  if (document && document.type === 'object' && document.additionalProperties !== false) errors.push(`${schema}: top-level records must reject unknown fields`)
 }
 
 const server = await readFile(join(pluginRoot, 'src', 'server.ts'), 'utf8')
 const capabilities = await readFile(join(pluginRoot, 'src', 'tools', 'capabilities.ts'), 'utf8')
+const domain = await readFile(join(pluginRoot, 'src', 'domain.ts'), 'utf8')
 if (!server.includes("import { VERSION }")) errors.push('server must use shared VERSION')
 if (!capabilities.includes("import { VERSION }")) errors.push('capabilities must use shared VERSION')
+const runtimeVersion = domain.match(/export const VERSION = '([^']+)'/)?.[1]
+if (runtimeVersion !== manifest.version) errors.push(`version mismatch: runtime=${runtimeVersion ?? 'missing'}, plugin=${manifest.version}`)
+if (!pkg.scripts?.start?.includes('--frozen-lockfile')) errors.push('start script must install from the frozen lockfile')
+if (pkg.overrides?.hono !== '4.12.25') errors.push('Hono security override must remain pinned at 4.12.25 until the SDK resolves above it')
+if (existsSync(join(pluginRoot, 'editorial', 'scripts', '__pycache__'))) errors.push('generated __pycache__ must not ship in the plugin')
+
+const importedToolAliases = new Map<string, string>()
+for (const match of server.matchAll(/import \* as (\w+) from '\.\/tools\/([^']+)\.ts'/g)) importedToolAliases.set(match[2], match[1])
+const declaredTools = new Set<string>()
+for (const file of (await readdir(join(pluginRoot, 'src', 'tools'))).filter((entry) => entry.endsWith('.ts'))) {
+  const base = file.slice(0, -3)
+  const source = await readFile(join(pluginRoot, 'src', 'tools', file), 'utf8')
+  for (const match of source.matchAll(/export const (\w+) = '(mediaops\.[a-z0-9_.]+)'/g)) {
+    const [, exportName, toolName] = match
+    declaredTools.add(toolName)
+    const alias = importedToolAliases.get(base)
+    if (!alias) errors.push(`${file}: declares ${toolName} but server has no namespace import`)
+    else if (!server.includes(`register(${alias}.${exportName},`)) errors.push(`${file}: ${toolName} is declared but not registered by the MCP server`)
+  }
+}
+for (const tool of declaredTools) if (!knownTools.has(tool)) errors.push(`runtime declares unexpected tool ${tool}`)
+for (const tool of knownTools) if (!declaredTools.has(tool)) errors.push(`validator expects undeclared runtime tool ${tool}`)
+const registrationCount = (server.match(/^register\(/gm) ?? []).length
+if (registrationCount !== knownTools.size) errors.push(`server registers ${registrationCount} tools but validator contract contains ${knownTools.size}`)
+
+function requireStructuredArray(schema: string, property: string, maxItems: number): void {
+  const field = schemas.get(schema)?.properties?.[property]
+  if (!field || field.type !== 'array' || field.maxItems !== maxItems || !field.items || Object.keys(field.items).length === 0) {
+    errors.push(`${schema}.${property}: must be a bounded structured array (maxItems=${maxItems})`)
+  }
+}
+requireStructuredArray('research-review', 'claims', 200)
+requireStructuredArray('research-review', 'sources', 100)
+requireStructuredArray('research-review', 'evidenceLinks', 1000)
+requireStructuredArray('research-review', 'searches', 100)
+requireStructuredArray('originality-scan', 'referenceHashes', 100)
+requireStructuredArray('originality-scan', 'exactMatches', 20)
+requireStructuredArray('originality-scan', 'paragraphAlignments', 100)
+requireStructuredArray('article-doc', 'citations', 200)
+requireStructuredArray('article-doc', 'assets', 100)
+requireStructuredArray('delivery-manifest', 'assets', 100)
+if (schemas.get('originality-scan')?.properties?.parameters?.additionalProperties !== false) errors.push('originality-scan.parameters must reject unknown fields')
+if (schemas.get('delivery-manifest')?.properties?.visualReview?.additionalProperties !== false) errors.push('delivery-manifest.visualReview must reject unknown fields')
+
+const sbom = await json(join(pluginRoot, 'docs', 'legal', 'SBOM.cdx.json'))
+if (sbom?.bomFormat !== 'CycloneDX' || sbom?.specVersion !== '1.5') errors.push('SBOM must use CycloneDX 1.5')
+if (sbom?.metadata?.component?.version !== pkg.version) errors.push(`SBOM version mismatch: ${sbom?.metadata?.component?.version ?? 'missing'} != ${pkg.version}`)
+const sbomVersions = new Map((sbom?.components ?? []).map((component: any) => [component.name, component.version]))
+for (const [dependency, version] of Object.entries(pkg.dependencies ?? {})) {
+  if (sbomVersions.get(dependency) !== version) errors.push(`SBOM missing exact direct dependency ${dependency}@${version}`)
+}
+if (sbomVersions.get('hono') !== pkg.overrides?.hono) errors.push(`SBOM must contain security-pinned hono@${pkg.overrides?.hono}`)
 
 const docs = await Promise.all([
   readFile(join(pluginRoot, 'README.md'), 'utf8'),
   readFile(join(pluginRoot, 'references', 'ai-labeling-compliance.md'), 'utf8'),
 ])
+if (!docs[0].includes(`# crabcode-media-ops ${manifest.version}`)) errors.push(`README heading must declare ${manifest.version}`)
+if (!docs[0].includes('HTML') || !docs[0].includes('Markdown')) errors.push('README must state the HTML-primary/Markdown-backup contract')
 if (docs.some((text) => text.includes('唯一固定句子') || text.includes('唯一的法律硬要求'))) {
   errors.push('AI disclosure docs overstate a fixed body sentence as the sole legal requirement')
 }
@@ -93,4 +158,4 @@ if (errors.length) {
   process.stderr.write(errors.map((error) => `ERROR ${error}`).join('\n') + '\n')
   process.exit(1)
 }
-process.stdout.write(`validate-media-plugin: ${skillNames.size} skills, 5 schemas, versions aligned at ${manifest.version}\n`)
+process.stdout.write(`validate-media-plugin: ${skillNames.size} skills, ${declaredTools.size} registered tools, ${schemaNames.length} schemas, runtime/docs/manifest/marketplace/SBOM aligned at ${manifest.version}\n`)

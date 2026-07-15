@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crabcode.local/media/editorial-review.schema.json",
+  "title": "Independent editorial review",
+  "type": "object",
+  "required": ["reviewId", "contentId", "sourceRevisionId", "subjectHash", "originalityScanId", "factReview", "legalReview", "aiDisclosure", "completedBy", "completedAt", "reviewHash"],
+  "properties": {
+    "reviewId": { "type": "string", "format": "uuid" },
+    "contentId": { "type": "string", "format": "uuid" },
+    "sourceRevisionId": { "type": "string", "format": "uuid" },
+    "subjectHash": { "$ref": "#/$defs/sha256" },
+    "originalityScanId": { "type": "string", "format": "uuid" },
+    "factReview": { "type": "object", "required": ["status", "subjectHash", "researchId", "researchBundleHash", "completedBy", "completedAt", "claims", "waivers"], "properties": { "status": { "const": "completed" }, "subjectHash": { "$ref": "#/$defs/sha256" }, "researchId": { "type": "string", "format": "uuid" }, "researchBundleHash": { "$ref": "#/$defs/sha256" }, "completedBy": { "type": "string", "minLength": 1 }, "completedAt": { "type": "string", "format": "date-time" }, "claims": { "type": "array", "maxItems": 200, "items": { "$ref": "claim.schema.json" } }, "noVerifiableClaimsReason": { "type": "string", "minLength": 1, "maxLength": 1000 }, "waivers": { "type": "array", "maxItems": 200, "items": { "type": "object", "required": ["claimId", "by", "reason"], "properties": { "claimId": { "type": "string", "minLength": 1, "maxLength": 120 }, "by": { "type": "string", "minLength": 1, "maxLength": 300 }, "reason": { "type": "string", "minLength": 1, "maxLength": 1000 } }, "additionalProperties": false } } }, "additionalProperties": false },
+    "legalReview": { "type": "object", "required": ["status", "reviewedBy", "reviewedAt", "riskLevel", "notes"], "properties": { "status": { "enum": ["not_required", "completed", "required"] }, "reviewedBy": { "type": "string" }, "reviewedAt": { "type": "string", "format": "date-time" }, "riskLevel": { "enum": ["low", "medium", "high"] }, "notes": { "type": "array", "items": { "type": "string" } } }, "additionalProperties": false },
+    "aiDisclosure": { "type": "object", "required": ["aiAssisted", "methods"], "properties": { "aiAssisted": { "type": "boolean" }, "methods": { "type": "array", "items": { "enum": ["platform-native", "body-label", "file-metadata"] } }, "bodyLabelText": { "type": "string" }, "platformNativeConfirmed": { "type": "boolean" }, "fileMetadataConfirmed": { "type": "boolean" }, "confirmedBy": { "type": "string" }, "ruleVersion": { "type": "string" } }, "additionalProperties": false },
+    "completedBy": { "type": "string", "minLength": 1 },
+    "completedAt": { "type": "string", "format": "date-time" },
+    "reviewHash": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": { "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" } },
+  "additionalProperties": false
+}

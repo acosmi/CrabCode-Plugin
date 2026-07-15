@@ -18,7 +18,7 @@ describe('approval state machine', () => {
 
   test('supports approve then revoke and blocks revoked packages', async () => {
     const content = await createReviewedContent({ dir, brandId: 'approval-brand', profileVersion: version })
-    const requested = await requestHandler({ contentId: content.contentId, platform: 'wechat', summary: '待批', checklist: ['复核'], requestedBy: '运营' })
+    const requested = await requestHandler({ contentId: content.contentId, deliveryId: content.deliveryId, platform: 'wechat', summary: '待批', checklist: ['复核'], requestedBy: '运营' })
     const approvalId = (requested.data as any).approvalId
     expect((await decideHandler({ approvalId, decision: 'approved', decidedBy: '主编', reason: '通过' })).status).toBe('ok')
     expect((await decideHandler({ approvalId, decision: 'revoked', decidedBy: '主编', reason: '发现新风险' })).status).toBe('ok')
@@ -28,6 +28,14 @@ describe('approval state machine', () => {
 
   test('approval target platform must equal the stored content platform', async () => {
     const content = await createReviewedContent({ dir, brandId: 'approval-brand', profileVersion: version, platform: 'wechat' })
-    expect((await requestHandler({ contentId: content.contentId, platform: 'xhs', summary: '错平台', checklist: ['复核'], requestedBy: '运营' })).error?.code).toBe('PACKAGE_INPUT_MISMATCH')
+    expect((await requestHandler({ contentId: content.contentId, deliveryId: content.deliveryId, platform: 'xhs', summary: '错平台', checklist: ['复核'], requestedBy: '运营' })).error?.code).toBe('PACKAGE_INPUT_MISMATCH')
+  })
+
+  test('role separation cannot be bypassed with Unicode width, case or whitespace variants', async () => {
+    const content = await createReviewedContent({ dir, brandId: 'approval-brand', profileVersion: version })
+    const requested = await requestHandler({ contentId: content.contentId, deliveryId: content.deliveryId, platform: 'wechat', summary: '待批', checklist: ['复核'], requestedBy: 'Editor A' })
+    const approvalId = (requested.data as any).approvalId
+    const decision = await decideHandler({ approvalId, decision: 'approved', decidedBy: '  ｅＤＩＴＯＲ   a  ', reason: '尝试绕过' })
+    expect(decision.error?.code).toBe('ROLE_SEPARATION_REQUIRED')
   })
 })

@@ -16,6 +16,18 @@
 ## 本插件许可证
 - `crabcode-media-ops`：Apache-2.0，CrabCode。
 
+## 随插件分发的运行时依赖
+
+| 依赖 | 许可证 | 用途 |
+|---|---|---|
+| `@modelcontextprotocol/sdk` | MIT | MCP 服务协议与 stdio 传输。 |
+| `zod` | MIT | 运行时输入与存储记录校验。 |
+| `unified`、`remark-parse`、`remark-stringify`、`remark-gfm`、`remark-rehype` | MIT | Markdown 解析、规范化 ArticleDoc 与 HAST 转换。 |
+| `rehype-sanitize`、`rehype-stringify` | MIT | HAST 白名单净化与确定性 HTML 序列化。 |
+| `hono`（SDK 间接依赖，锁定 4.12.25） | MIT | SDK 间接 HTTP 运行时；通过 override 固定已修复版本。 |
+
+完整锁定组件见 `SBOM.cdx.json`（CycloneDX 1.5）；完整许可证文本仍以上游 LICENSE 为准。`bun run validate` 会阻断 SBOM 与 `bun.lock`、直接依赖或 Hono 安全固定版本漂移。
+
 ## 说明
 - "参考"指阅读公开文档/README/交互形态以获取设计灵感，**不等于复制源代码**。
 - 若后续需要直接集成上述任一项目的代码或上游服务（如 `xiaohongshu-mcp`），须先单独核验其许可证兼容性与合规要求，再行接入。

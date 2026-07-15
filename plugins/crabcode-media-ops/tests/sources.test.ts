@@ -7,16 +7,21 @@ import { buildSources, mapJsonFeedItems, type JsonFeedConfig } from '../src/sour
 describe('config-driven source registry', () => {
   let dir: string
   let prev: string | undefined
+  let prevAllowlist: string | undefined
 
   beforeEach(async () => {
     dir = await mkdtemp(join(tmpdir(), 'mediaops-sources-test-'))
     prev = process.env.MEDIAOPS_DATA_DIR
+    prevAllowlist = process.env.MEDIAOPS_FEED_HOST_ALLOWLIST
     process.env.MEDIAOPS_DATA_DIR = dir
+    process.env.MEDIAOPS_FEED_HOST_ALLOWLIST = 'example.com'
   })
 
   afterEach(async () => {
     if (prev === undefined) delete process.env.MEDIAOPS_DATA_DIR
     else process.env.MEDIAOPS_DATA_DIR = prev
+    if (prevAllowlist === undefined) delete process.env.MEDIAOPS_FEED_HOST_ALLOWLIST
+    else process.env.MEDIAOPS_FEED_HOST_ALLOWLIST = prevAllowlist
     await rm(dir, { recursive: true, force: true })
   })
 
@@ -64,6 +69,14 @@ describe('config-driven source registry', () => {
     const { sources, warnings } = buildSources()
     expect(sources['broken']).toBeUndefined()
     expect(warnings.some((w) => w.includes('broken'))).toBe(true)
+  })
+
+  test('custom feeds are disabled unless an HTTPS hostname is explicitly allowlisted', async () => {
+    process.env.MEDIAOPS_FEED_HOST_ALLOWLIST = ''
+    await writeFile(join(dir, 'sources.config.json'), JSON.stringify({ sources: [{ id: 'private', type: 'json-feed', url: 'http://127.0.0.1/feed', titlePath: 'title' }] }))
+    const { sources, warnings } = buildSources()
+    expect(sources.private).toBeUndefined()
+    expect(warnings.join(' ')).toContain('only HTTPS')
   })
 
   test('mapJsonFeedItems maps dot paths into TopicSignals', () => {

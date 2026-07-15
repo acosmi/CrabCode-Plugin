@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crabcode.local/media/delivery-artifact.schema.json",
+  "title": "Frozen delivery artifact",
+  "type": "object",
+  "required": ["artifactId", "role", "format", "mediaType", "relativePath", "artifactHash", "byteSize", "sourceContentHash", "renderProfile"],
+  "properties": {
+    "artifactId": { "type": "string", "format": "uuid" },
+    "role": { "enum": ["primary", "backup", "channel_variant"] },
+    "format": { "enum": ["html", "markdown"] },
+    "mediaType": { "type": "string", "minLength": 1 },
+    "relativePath": { "type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*:)[A-Za-z0-9._/-]+$" },
+    "artifactHash": { "$ref": "#/$defs/sha256" },
+    "byteSize": { "type": "integer", "minimum": 1 },
+    "sourceContentHash": { "$ref": "#/$defs/sha256" },
+    "renderProfile": { "type": "string", "minLength": 1 }
+  },
+  "$defs": { "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" } },
+  "additionalProperties": false
+}

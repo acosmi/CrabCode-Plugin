@@ -45,6 +45,15 @@ describe('versioned profiles', () => {
     expect(noConfirm.error?.code).toBe('INVALID_PROFILE')
     const unsafe = await saveHandler({ ...profile('x'), brand_id: '../escape' })
     expect(unsafe.error?.code).toBe('INVALID_PROFILE')
+    const rawStyle = await saveHandler({ ...profile('x'), style: { verbatimExcerpt: '第三方文章逐字内容' } } as any)
+    expect(rawStyle.error?.code).toBe('INVALID_PROFILE')
+  })
+
+  test('rejects profile-version path traversal and cross-brand reads', async () => {
+    const saved = await saveHandler(profile('品牌 A'))
+    expect(saved.status).toBe('ok')
+    expect((await getHandler({ brandId: 'tech-daily', version: '../../another-brand/current' })).error?.code).toBe('NOT_FOUND')
+    expect((await rollbackHandler({ brandId: 'tech-daily', targetVersion: '../../another-brand/current', confirmedBy: '负责人' })).error?.code).toBe('NOT_FOUND')
   })
 
   test('list returns only current version per brand', async () => {

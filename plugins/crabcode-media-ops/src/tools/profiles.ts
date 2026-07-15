@@ -3,9 +3,20 @@ import { existsSync } from 'node:fs'
 import { readFile, readdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { z } from 'zod'
-import { BrandIdSchema } from '../domain.ts'
+import { BrandIdSchema, ReferenceAllowedUseSchema, ReferenceRoleSchema, stableHash } from '../domain.ts'
 import { err, ok, type Envelope } from '../envelope.ts'
 import { appendRecord, dataDir, ensureDir, storageWarnings } from '../storage.ts'
+import { loadReferenceRecords } from './references.ts'
+
+const ProfileVersionSchema = z.string().regex(/^v-[0-9]{10,17}-[a-f0-9]{8}$/, 'profile version must be a generated immutable version id')
+const ProfileReferenceSchema = z.object({
+  referenceId: z.string().uuid(),
+  role: ReferenceRoleSchema,
+  rightsStatus: z.enum(['owned', 'licensed', 'public_domain', 'unknown']),
+  allowedUses: z.array(ReferenceAllowedUseSchema).min(1).max(5),
+  confidence: z.enum(['low', 'medium', 'high']).default('medium'),
+  date: z.string().max(50).optional(),
+}).strict()
 
 const profileShape = {
   brand_id: BrandIdSchema,
@@ -16,7 +27,7 @@ const profileShape = {
   columns: z.array(z.object({ name: z.string().min(1), cadence: z.string().optional() }).passthrough()),
   platforms: z.array(z.object({ platform: z.string().min(1), columns: z.array(z.string()).optional() }).passthrough()),
   banned_words: z.array(z.string()),
-  style_refs: z.array(z.record(z.unknown())).optional(),
+  style_refs: z.array(ProfileReferenceSchema).max(24).optional(),
   style: z.record(z.unknown()).optional(),
   compliance: z.object({ ai_label_text: z.string().min(1), avoid_domains: z.array(z.string()).optional() }).passthrough(),
 }
@@ -28,9 +39,21 @@ const ProfileInputSchema = z.object({
   sourceFormId: z.string().uuid().optional(),
 })
 
+const {
+  style: _internalStyleSchema,
+  style_refs: _internalStyleRefsSchema,
+  ...publicProfileShape
+} = profileShape
+
+const PublicProfileImportSchema = z.object({
+  ...publicProfileShape,
+  confirmedBy: z.string().min(1),
+  source: z.literal('manual-import').default('manual-import'),
+}).strict()
+
 const StoredProfileSchema = z.object({
   ...profileShape,
-  profile_version: z.string().min(1),
+  profile_version: ProfileVersionSchema,
   confirmedBy: z.string().min(1),
   confirmedAt: z.string().datetime(),
   source: z.enum(['confirmed-form', 'manual-import', 'rollback']),
@@ -57,15 +80,15 @@ function currentPath(brandId: string): string {
   return join(brandDir(brandId), 'current.json')
 }
 
-function versionPath(brandId: string, version: string): string {
+function versionPath(brandId: string, version: z.infer<typeof ProfileVersionSchema>): string {
   return join(versionsDir(brandId), `${version}.json`)
 }
 
-async function readProfile(path: string): Promise<BrandProfile | null> {
+async function readProfile(path: string, expectedBrandId: string): Promise<BrandProfile | null> {
   if (!existsSync(path)) return null
   try {
     const parsed = StoredProfileSchema.safeParse(JSON.parse(await readFile(path, 'utf8')))
-    return parsed.success ? parsed.data : null
+    return parsed.success && parsed.data.brand_id === expectedBrandId ? parsed.data : null
   } catch {
     return null
   }
@@ -73,7 +96,61 @@ async function readProfile(path: string): Promise<BrandProfile | null> {
 
 export async function loadProfile(brandId: string, version?: string): Promise<BrandProfile | null> {
   if (!BrandIdSchema.safeParse(brandId).success) return null
-  return readProfile(version ? versionPath(brandId, version) : currentPath(brandId))
+  if (version) {
+    const parsedVersion = ProfileVersionSchema.safeParse(version)
+    if (!parsedVersion.success) return null
+    return readProfile(versionPath(brandId, parsedVersion.data), brandId)
+  }
+  return readProfile(currentPath(brandId), brandId)
+}
+
+function profilePayloadProblem(input: unknown): string | null {
+  const forbiddenKeys = new Set(['rawText', 'fullText', 'articleText', 'sourceText', 'bodyMarkdown', 'fileRef'])
+  let totalCharacters = 0
+  const visit = (value: unknown, path: string): string | null => {
+    if (typeof value === 'string') {
+      totalCharacters += value.length
+      if (value.length > 2_000) return `${path} exceeds the 2000-character profile-field limit`
+      if (totalCharacters > 50_000) return 'profile exceeds the 50000-character aggregate limit'
+      return null
+    }
+    if (Array.isArray(value)) {
+      if (value.length > 200) return `${path} has too many items`
+      for (const [index, item] of value.entries()) {
+        const problem = visit(item, `${path}[${index}]`)
+        if (problem) return problem
+      }
+      return null
+    }
+    if (value && typeof value === 'object') {
+      for (const [key, item] of Object.entries(value as Record<string, unknown>)) {
+        if (forbiddenKeys.has(key)) return `${path ? `${path}.` : ''}${key} is forbidden; register source text in the protected reference collection`
+        const problem = visit(item, path ? `${path}.${key}` : key)
+        if (problem) return problem
+      }
+    }
+    return null
+  }
+  return visit(input, 'profile')
+}
+
+async function profileReferenceProblem(references: z.infer<typeof ProfileReferenceSchema>[]): Promise<string | null> {
+  if (!references.length) return null
+  let records
+  try {
+    records = await loadReferenceRecords(references.map((reference) => reference.referenceId))
+  } catch (error) {
+    return error instanceof Error ? error.message : String(error)
+  }
+  const byId = new Map(records.map(({ metadata }) => [metadata.referenceId, metadata]))
+  for (const reference of references) {
+    const metadata = byId.get(reference.referenceId)
+    if (!metadata || metadata.role !== reference.role || metadata.rightsStatus !== reference.rightsStatus || stableHash([...metadata.allowedUses].sort()) !== stableHash([...reference.allowedUses].sort())) {
+      return `REFERENCE_METADATA_MISMATCH:${reference.referenceId}`
+    }
+    if (!reference.allowedUses.includes('abstract_style_features')) return `REFERENCE_STYLE_USE_NOT_ALLOWED:${reference.referenceId}`
+  }
+  return null
 }
 
 export async function saveProfileVersion(
@@ -81,6 +158,10 @@ export async function saveProfileVersion(
   extra?: { rolledBackFrom?: string },
 ): Promise<BrandProfile> {
   const parsed = ProfileInputSchema.parse(input)
+  const payloadProblem = profilePayloadProblem(parsed)
+  if (payloadProblem) throw new Error(`PROFILE_REFERENCE_FIREWALL:${payloadProblem}`)
+  const referenceProblem = await profileReferenceProblem(parsed.style_refs ?? [])
+  if (referenceProblem) throw new Error(`PROFILE_REFERENCE_FIREWALL:${referenceProblem}`)
   const version = `v-${Date.now()}-${randomUUID().slice(0, 8)}`
   const profile: BrandProfile = StoredProfileSchema.parse({
     ...parsed,
@@ -104,12 +185,14 @@ export async function saveProfileVersion(
 
 export const saveName = 'mediaops.profile.save'
 export const saveDescription =
-  'Import and confirm a complete brand profile as a new immutable version. Never overwrites version history; confirmedBy is required.'
-export const saveInputSchema = ProfileInputSchema.shape
+  'Import and confirm core manual brand settings as a new immutable version. Free-form style/style_refs are rejected; style learning must use registered references and the form/propose/confirm workflow.'
+export const saveInputSchema = PublicProfileImportSchema.shape
 
-export async function saveHandler(args: BrandProfileInput): Promise<Envelope> {
-  const parsed = ProfileInputSchema.safeParse(args)
+export async function saveHandler(args: z.input<typeof PublicProfileImportSchema>): Promise<Envelope> {
+  const parsed = PublicProfileImportSchema.safeParse(args)
   if (!parsed.success) return err('INVALID_PROFILE', parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '))
+  const payloadProblem = profilePayloadProblem(parsed.data)
+  if (payloadProblem) return err('PROFILE_REFERENCE_FIREWALL', payloadProblem)
   const previous = await loadProfile(parsed.data.brand_id)
   const profile = await saveProfileVersion(parsed.data)
   return ok({ brandId: profile.brand_id, profileVersion: profile.profile_version, updated: Boolean(previous) }, storageWarnings())
@@ -117,7 +200,7 @@ export async function saveHandler(args: BrandProfileInput): Promise<Envelope> {
 
 export const getName = 'mediaops.profile.get'
 export const getDescription = 'Fetch the current or a named immutable brand profile version.'
-export const getInputSchema = { brandId: BrandIdSchema, version: z.string().optional() }
+export const getInputSchema = { brandId: BrandIdSchema, version: ProfileVersionSchema.optional() }
 
 export async function getHandler(args: { brandId: string; version?: string }): Promise<Envelope> {
   const profile = await loadProfile(args.brandId, args.version)
@@ -151,7 +234,7 @@ export async function historyHandler(args: { brandId: string }): Promise<Envelop
   const files = (await readdir(dir)).filter((file) => file.endsWith('.json'))
   const versions: BrandProfile[] = []
   for (const file of files) {
-    const profile = await readProfile(join(dir, file))
+    const profile = await readProfile(join(dir, file), args.brandId)
     if (profile) versions.push(profile)
   }
   versions.sort((a, b) => b.confirmedAt.localeCompare(a.confirmedAt))
@@ -160,7 +243,7 @@ export async function historyHandler(args: { brandId: string }): Promise<Envelop
 
 export const rollbackName = 'mediaops.profile.rollback'
 export const rollbackDescription = 'Confirm a rollback by copying a historical profile into a new immutable version.'
-export const rollbackInputSchema = { brandId: BrandIdSchema, targetVersion: z.string().min(1), confirmedBy: z.string().min(1) }
+export const rollbackInputSchema = { brandId: BrandIdSchema, targetVersion: ProfileVersionSchema, confirmedBy: z.string().min(1) }
 
 export async function rollbackHandler(args: { brandId: string; targetVersion: string; confirmedBy: string }): Promise<Envelope> {
   const target = await loadProfile(args.brandId, args.targetVersion)

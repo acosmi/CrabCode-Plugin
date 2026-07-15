@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { ok, type Envelope } from '../envelope.ts'
+import { actionRequired, ok, type Envelope } from '../envelope.ts'
 import { buildSources, type TopicSignal } from '../sources/index.ts'
 
 // ---- mediaops.trends.search -------------------------------------------------
@@ -33,13 +33,18 @@ export async function searchHandler(args: SearchArgs): Promise<Envelope> {
       warnings.push(`unknown source: ${id}`)
       continue
     }
-    const result = await source.fetch(args.query, limit)
-    signals.push(...result.signals)
-    warnings.push(...result.warnings)
+    try {
+      const result = await source.fetch(args.query, limit)
+      signals.push(...result.signals)
+      warnings.push(...result.warnings)
+    } catch (error) {
+      warnings.push(`${id}: ${error instanceof Error ? error.message : String(error)}`)
+    }
   }
 
   signals.sort((a, b) => b.hotScore - a.hotScore)
-  return ok({ count: signals.length, signals: signals.slice(0, limit) }, warnings)
+  const data = { count: signals.length, signals: signals.slice(0, limit) }
+  return signals.length ? ok(data, warnings) : actionRequired(data, [...warnings, 'No usable trend signals were retrieved; do not treat this as completed web research.'])
 }
 
 // ---- mediaops.trends.cluster ------------------------------------------------

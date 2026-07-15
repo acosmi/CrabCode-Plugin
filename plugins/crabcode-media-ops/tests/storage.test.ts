@@ -1,5 +1,5 @@
 import { test, expect, describe, beforeEach, afterEach } from 'bun:test'
-import { mkdtemp, rm } from 'node:fs/promises'
+import { mkdtemp, rm, appendFile, readFile, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -43,5 +43,35 @@ describe('storage append/list/get', () => {
   test('getRecord returns null for unknown id', async () => {
     const { getRecord } = await import('../src/storage.ts')
     expect(await getRecord('content', 'nope')).toBeNull()
+  })
+
+  test('fails closed on malformed JSONL instead of falling back to an older record', async () => {
+    const { appendRecord, listRecords, StorageCorruptionError } = await import('../src/storage.ts')
+    await appendRecord('approvals', { approvalId: 'first', state: 'approved' })
+    await appendFile(join(dir, 'approvals.jsonl'), '{malformed\n', 'utf8')
+    await expect(listRecords('approvals')).rejects.toBeInstanceOf(StorageCorruptionError)
+  })
+
+  test('detects record mutation and serializes concurrent appends', async () => {
+    const { appendRecord, listRecords, StorageCorruptionError } = await import('../src/storage.ts')
+    await Promise.all(Array.from({ length: 20 }, (_, index) => appendRecord('audit-events', { event: 'parallel', index })))
+    expect(await listRecords('audit-events')).toHaveLength(20)
+    const path = join(dir, 'audit-events.jsonl')
+    const lines = (await readFile(path, 'utf8')).trim().split('\n')
+    const first = JSON.parse(lines[0])
+    first.index = 999
+    lines[0] = JSON.stringify(first)
+    await writeFile(path, `${lines.join('\n')}\n`, 'utf8')
+    await expect(listRecords('audit-events')).rejects.toBeInstanceOf(StorageCorruptionError)
+  })
+
+  test('detects deletion of a complete tail record through the atomic head/count', async () => {
+    const { appendRecord, listRecords, StorageCorruptionError } = await import('../src/storage.ts')
+    await appendRecord('approvals', { approvalId: 'first', state: 'pending' })
+    await appendRecord('approvals', { approvalId: 'first', state: 'revoked' })
+    const path = join(dir, 'approvals.jsonl')
+    const lines = (await readFile(path, 'utf8')).trim().split('\n')
+    await writeFile(path, `${lines[0]}\n`, 'utf8')
+    await expect(listRecords('approvals')).rejects.toBeInstanceOf(StorageCorruptionError)
   })
 })

@@ -1,14 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://crabcode.local/media/claim.schema.json",
-  "title": "Media claim",
+  "title": "Reviewed media claim",
   "type": "object",
-  "required": ["id", "claim", "status"],
+  "required": ["id", "claim", "status", "evidenceLinkIds"],
   "properties": {
-    "id": { "type": "string", "minLength": 1 },
-    "claim": { "type": "string", "minLength": 1 },
+    "id": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "claim": { "type": "string", "minLength": 1, "maxLength": 2000 },
     "status": { "enum": ["verified", "doubtful", "unsourced"] },
-    "sourceUrl": { "type": "string", "format": "uri" }
+    "evidenceLinkIds": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
   },
+  "allOf": [{ "if": { "properties": { "status": { "const": "verified" } } }, "then": { "properties": { "evidenceLinkIds": { "minItems": 1 } } } }],
   "additionalProperties": false
 }

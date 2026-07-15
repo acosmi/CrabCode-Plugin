@@ -1,10 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://crabcode.local/media/content-manifest.schema.json",
-  "title": "Versioned media content manifest",
+  "title": "Media content manifest v2",
   "type": "object",
-  "required": ["contentId", "revisionId", "revision", "kind", "brandId", "profileVersion", "stage", "title", "bodyMarkdown", "contentHash", "savedBy", "createdAt"],
+  "required": ["schemaVersion", "contentId", "revisionId", "revision", "kind", "brandId", "profileVersion", "stage", "contentLanguage", "researchSubject", "referenceIds", "title", "bodyMarkdown", "citations", "assets", "articleDoc", "articleDocHash", "originalitySubjectHash", "contentHash", "savedBy", "createdAt"],
   "properties": {
+    "schemaVersion": { "const": 2 },
     "contentId": { "type": "string", "format": "uuid" },
     "revisionId": { "type": "string", "format": "uuid" },
     "revision": { "type": "integer", "minimum": 1 },
@@ -12,17 +13,37 @@
     "brandId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$" },
     "profileVersion": { "type": "string", "minLength": 1 },
     "stage": { "enum": ["intake", "researched", "drafted", "reviewed"] },
+    "parentIds": { "type": "array", "items": { "type": "string", "format": "uuid" } },
     "platform": { "enum": ["wechat", "xhs", "toutiao"] },
-    "title": { "type": "string", "minLength": 1 },
-    "bodyMarkdown": { "type": "string" },
-    "contentHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-    "review": { "type": "object" },
-    "originalityReview": { "type": "object" },
-    "legalReview": { "type": "object" },
-    "aiDisclosure": { "type": "object" },
-    "assets": { "type": "array" },
+    "contentLanguage": { "type": "string", "pattern": "^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$" },
+    "researchSubject": { "type": "string", "minLength": 1, "maxLength": 1000 },
+    "referenceIds": { "type": "array", "uniqueItems": true, "items": { "type": "string", "format": "uuid" } },
+    "researchId": { "type": "string", "format": "uuid", "readOnly": true },
+    "researchBundleHash": { "$ref": "#/$defs/sha256", "readOnly": true },
+    "originalityScanId": { "type": "string", "format": "uuid", "readOnly": true },
+    "editorialReviewId": { "type": "string", "format": "uuid", "readOnly": true },
+    "title": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "bodyMarkdown": { "type": "string", "maxLength": 2000000 },
+    "summary": { "type": "string", "maxLength": 2000 },
+    "citations": { "type": "array", "items": { "type": "object", "required": ["url", "title"], "properties": { "sourceId": { "type": "string", "format": "uuid" }, "url": { "type": "string", "pattern": "^https?://" }, "title": { "type": "string", "minLength": 1 }, "publisher": { "type": "string" }, "publishedAt": { "type": "string", "format": "date-time" }, "accessedAt": { "type": "string", "format": "date-time" } }, "additionalProperties": false } },
+    "assets": { "type": "array", "items": { "$ref": "#/$defs/asset" } },
+    "articleDoc": { "$ref": "article-doc.schema.json", "readOnly": true },
+    "articleDocHash": { "$ref": "#/$defs/sha256", "readOnly": true },
+    "originalitySubjectHash": { "$ref": "#/$defs/sha256", "readOnly": true },
+    "review": { "type": "object", "readOnly": true },
+    "legalReview": { "type": "object", "readOnly": true },
+    "aiDisclosure": { "type": "object", "readOnly": true },
+    "contentHash": { "$ref": "#/$defs/sha256", "readOnly": true },
     "savedBy": { "type": "string", "minLength": 1 },
-    "createdAt": { "type": "string", "format": "date-time" }
+    "createdAt": { "type": "string", "format": "date-time", "readOnly": true }
   },
-  "additionalProperties": true
+  "allOf": [
+    { "if": { "properties": { "stage": { "enum": ["researched", "drafted", "reviewed"] } } }, "then": { "required": ["researchId", "researchBundleHash"] } },
+    { "if": { "properties": { "stage": { "const": "reviewed" } } }, "then": { "required": ["originalityScanId", "editorialReviewId", "review", "legalReview", "aiDisclosure"] } }
+  ],
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "asset": { "type": "object", "required": ["assetId", "path", "role", "rightsStatus", "sha256", "byteSize", "mediaType", "registeredAt"], "properties": { "assetId": { "type": "string", "format": "uuid" }, "path": { "type": "string", "minLength": 1 }, "role": { "type": "string", "minLength": 1 }, "rightsStatus": { "enum": ["owned", "licensed", "public-domain", "pending"] }, "alt": { "type": "string", "minLength": 1 }, "caption": { "type": "string" }, "sourceUrl": { "type": "string", "pattern": "^https?://" }, "width": { "type": "integer", "minimum": 1 }, "height": { "type": "integer", "minimum": 1 }, "sha256": { "$ref": "#/$defs/sha256" }, "byteSize": { "type": "integer", "minimum": 1 }, "mediaType": { "enum": ["image/png", "image/jpeg", "image/gif", "image/webp"] }, "registeredAt": { "type": "string", "format": "date-time" } }, "additionalProperties": false }
+  },
+  "additionalProperties": false
 }

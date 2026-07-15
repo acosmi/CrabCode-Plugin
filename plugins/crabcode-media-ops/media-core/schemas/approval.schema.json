@@ -1,19 +1,36 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://crabcode.local/media/approval.schema.json",
-  "title": "Publish approval",
+  "title": "Artifact-bound publish approval v2",
   "type": "object",
-  "required": ["approvalId", "contentId", "revisionId", "contentHash", "platform", "state", "requestedBy"],
+  "required": ["schemaVersion", "approvalId", "contentId", "revisionId", "contentHash", "articleDocHash", "deliveryId", "renderManifestHash", "primaryArtifactHash", "backupArtifactHash", "channelArtifactHashes", "rendererVersion", "templateVersion", "stylePolicyVersion", "sanitizationPolicyVersion", "platformRuleVersion", "approvalBindingHash", "platform", "state", "summary", "checklist", "requestedBy"],
   "properties": {
+    "schemaVersion": { "const": 2 },
     "approvalId": { "type": "string", "format": "uuid" },
     "contentId": { "type": "string", "format": "uuid" },
     "revisionId": { "type": "string", "format": "uuid" },
-    "contentHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "contentHash": { "$ref": "#/$defs/sha256" },
+    "articleDocHash": { "$ref": "#/$defs/sha256" },
+    "deliveryId": { "type": "string", "format": "uuid" },
+    "renderManifestHash": { "$ref": "#/$defs/sha256" },
+    "primaryArtifactHash": { "$ref": "#/$defs/sha256" },
+    "backupArtifactHash": { "$ref": "#/$defs/sha256" },
+    "channelArtifactHashes": { "type": "array", "items": { "$ref": "#/$defs/sha256" } },
+    "rendererVersion": { "type": "string", "minLength": 1 },
+    "templateVersion": { "type": "string", "minLength": 1 },
+    "stylePolicyVersion": { "type": "string", "minLength": 1 },
+    "sanitizationPolicyVersion": { "type": "string", "minLength": 1 },
+    "platformRuleVersion": { "type": "string", "minLength": 1 },
+    "approvalBindingHash": { "$ref": "#/$defs/sha256" },
     "platform": { "enum": ["wechat", "xhs", "toutiao"] },
     "state": { "enum": ["pending", "approved", "rejected", "revoked"] },
+    "summary": { "type": "string", "minLength": 1 },
+    "checklist": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
     "requestedBy": { "type": "string", "minLength": 1 },
     "decidedBy": { "type": "string", "minLength": 1 },
-    "reason": { "type": "string", "minLength": 1 }
+    "reason": { "type": "string", "minLength": 1 },
+    "decidedAt": { "type": "string", "format": "date-time" }
   },
-  "additionalProperties": true
+  "$defs": { "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" } },
+  "additionalProperties": false
 }

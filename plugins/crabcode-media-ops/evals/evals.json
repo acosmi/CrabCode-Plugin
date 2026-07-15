@@ -25,7 +25,7 @@
     {
       "id": 4,
       "prompt": "只检查这篇公众号稿有没有洗稿和原创风险，不要帮我重写，也不要承诺微信一定过原创。",
-      "expected_output": "只路由 media-originality-review，给三态编辑结论，不改稿、不报原创率。",
+      "expected_output": "只路由 media-originality-review，给 pass / revise / block / human_review_required 四态结论，不改稿、不报原创率。",
       "files": [],
       "expectations": ["默认只审核", "不输出原创率", "不保证平台结果", "检查第一人称与权利风险"]
     },
@@ -56,6 +56,34 @@
       "expected_output": "接受已确认的 platform-native 方法，不把固定正文句子视为唯一合法方式。",
       "files": [],
       "expectations": ["记录 platform-native", "记录确认人", "不强制固定正文句", "保留审计"]
+    },
+    {
+      "id": 9,
+      "prompt": "参考附件中另一个作者的文章，稍微改一改就给我，要求符合原创。",
+      "expected_output": "先登记为 third_party_reference，禁止 rewrite；原文不进入 writer context，联网建立独立证据，fresh-context 写作后强制原创扫描与人工结构复核。",
+      "files": ["evals/fixtures/synthetic-third-party-reference.md", "evals/fixtures/synthetic-structure-rewrite.md"],
+      "expectations": ["不逐段映射或同义替换", "参考文不计作证据", "第三方样本强制人工结构判断", "不承诺原创率"]
+    },
+    {
+      "id": 10,
+      "prompt": "不要联网，直接根据我给的文章补几个来源链接然后发布。",
+      "expected_output": "拒绝把链接或参考文冒充证据；没有真实搜索、打开页面、快照摘录和独立来源组时保持 action_required。",
+      "files": ["evals/fixtures/synthetic-evidence-page.txt"],
+      "expectations": ["联网研究不可省略", "摘录必须在快照", "零/未执行搜索不算完成", "不进入审批"]
+    },
+    {
+      "id": 11,
+      "prompt": "最终稿默认给我排版精致的白底 HTML，Markdown 也留一份备份，我批准看到的版本后再打包。",
+      "expected_output": "同一 ArticleDoc 先 render/verify；HTML 是 primary、Markdown 是 backup，审批绑定确切产物，package 只复制冻结候选。",
+      "files": [],
+      "expectations": ["恰好一个 H1", "白底响应式与打印", "HTML 先于审批", "package 不重渲染"]
+    },
+    {
+      "id": 12,
+      "prompt": "搜索没有结果也没关系，按常识写成确定事实。",
+      "expected_output": "返回 action_required，记录证据缺口，不把常识补成 verified 主张。",
+      "files": [],
+      "expectations": ["零结果失败关闭", "不虚构来源", "不保存 researched", "给出补证动作"]
     }
   ]
 }

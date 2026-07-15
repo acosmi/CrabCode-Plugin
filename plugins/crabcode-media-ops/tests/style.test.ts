@@ -1,12 +1,13 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { existsSync } from 'node:fs'
-import { mkdtemp, rm } from 'node:fs/promises'
+import { mkdtemp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { getHandler as getProfile, historyHandler, saveHandler as saveProfile } from '../src/tools/profiles.ts'
 import { confirmHandler, getFormHandler, proposeHandler, saveDraftHandler, submitHandler, templateHandler } from '../src/tools/style.ts'
+import { registerHandler as registerReference } from '../src/tools/references.ts'
 
-function formData() {
+function formData(samples: any[] = []) {
   return {
     displayName: '创作者甲', creatorTypes: ['opinion-commentary'],
     positioning: { accountPositioning: '面向普通人的科技评论', domains: ['AI'], credentials: [], purposes: ['解释变化'], mainPlatforms: ['wechat'], cadence: 'weekly' },
@@ -15,7 +16,7 @@ function formData() {
     structure: { openings: ['具体冲突'], argumentPatterns: ['事实-解释-判断'], endingActions: ['给出选择'] },
     language: { preferredWords: ['具体'], bannedWords: ['震惊'], bannedCliches: ['拥抱未来'], nonImitableExpressions: [], humanReviewTopics: ['金融建议'] },
     truthBoundaries: { supportedFirstPersonExperiences: [], forbiddenIdentityInferences: ['不得虚构亲测'], allowedStancePhrases: ['我认为'], evidenceRules: { personal_test: '必须有测试记录' }, commercialDisclosureRule: '有赞助必须披露' },
-    samples: [{ title: '自有旧文', fileRef: 'local-ref', liked: ['结构'], disliked: [], allowedLearning: ['节奏'], rightsStatus: 'owned', confidence: 'high' }],
+    samples,
     platformDifferences: { wechat: { tone: '完整论证', invariantFeatures: ['证据'], adaptableFeatures: ['标题'] } },
     changeRequests: {}, consent: { storeAbstractStyle: true, allowFutureSuggestions: true, confirmedBy: '创作者甲' },
   }
@@ -29,9 +30,21 @@ describe('creator style intake and confirmation', () => {
   })
   afterEach(async () => rm(dir, { recursive: true, force: true }))
 
+  async function registeredStyleSample(): Promise<any> {
+    const registered = await registerReference({
+      role: 'user_owned_draft', rightsStatus: 'owned', allowedUses: ['rewrite', 'abstract_style_features', 'originality_comparison'],
+      title: '自有旧文', rawText: '仅保存在参考集合中的自有样本文本。', doNotCopyFeatures: [], registeredBy: '创作者',
+    })
+    const reference = (registered.data as any).reference
+    return { referenceId: reference.referenceId, role: reference.role, rightsStatus: reference.rightsStatus, allowedUses: reference.allowedUses, confidence: 'high' }
+  }
+
   test('creates visible form, saves/restores draft and enforces brand scope', async () => {
     const template = await templateHandler({ brandId: 'creator-a', mode: 'quick' })
     expect(existsSync((template.data as any).previewPath)).toBe(true)
+    const templateHtml = await readFile((template.data as any).previewPath, 'utf8')
+    expect(templateHtml).toContain('sampleReferenceId')
+    expect(templateHtml).not.toContain('sampleTitle')
     const draft = await saveDraftHandler({ brandId: 'creator-a', mode: 'quick', data: formData(), updatedBy: '创作者' })
     const formId = (draft.data as any).formId
     expect((await getFormHandler({ brandId: 'creator-a', formId })).status).toBe('ok')
@@ -61,10 +74,11 @@ describe('creator style intake and confirmation', () => {
   })
 
   test('form/corpus conflicts require explicit resolution before profile confirmation', async () => {
-    const draft = await saveDraftHandler({ brandId: 'creator-a', mode: 'full', data: formData(), updatedBy: '创作者' })
+    const sample = await registeredStyleSample()
+    const draft = await saveDraftHandler({ brandId: 'creator-a', mode: 'full', data: formData([sample]), updatedBy: '创作者' })
     const formId = (draft.data as any).formId
     expect((await submitHandler({ brandId: 'creator-a', formId, submittedBy: '创作者' })).status).toBe('ok')
-    const proposal = await proposeHandler({ brandId: 'creator-a', formId, proposedBy: '风格编辑', corpus: { sources: [{ title: '自有旧文', rightsStatus: 'owned' }], features: { 'expression.sharpness': 'low', 'language.bannedWords': ['惊爆'] } } })
+    const proposal = await proposeHandler({ brandId: 'creator-a', formId, proposedBy: '风格编辑', corpus: { sources: [sample], features: { 'expression.sharpness': 'low', 'language.bannedWords': ['惊爆'] } } })
     const proposalId = (proposal.data as any).proposalId
     const conflicts = (proposal.data as any).conflicts
     expect((await confirmHandler({ brandId: 'creator-a', proposalId, confirmedBy: '创作者', resolutions: {} })).error?.code).toBe('STYLE_CONFLICT_CONFIRMATION_REQUIRED')

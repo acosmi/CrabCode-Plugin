@@ -1542,19 +1542,19 @@
     {
       "name": "crabcode-media-ops",
       "source": "./plugins/crabcode-media-ops",
-      "version": "0.3.1",
+      "version": "0.4.0-rc1",
       "displayName": "CrabCode 新媒体运营",
-      "shortDescription": "研究、公众号原创观点、创作者风格表单、审校、多平台适配与哈希绑定审批发布",
-      "longDescription": "面向媒体与自媒体团队的可审计工作流：可信来源研究、公众号原创观点、快速/完整/增量创作者风格表单、事实与原创复核、多平台适配、AI 披露留痕，以及内容哈希绑定的人工审批与本地发布包。",
+      "shortDescription": "参考隔离、联网可信来源、原创审校与精排白底 HTML 交付",
+      "longDescription": "面向媒体与自媒体团队的可审计工作流：第三方参考原文隔离、可核验联网研究、公众号独立观点、工具生成的原创与编辑复核、快速/完整/增量风格表单、多平台适配、精排白底 HTML 主交付、Markdown 备份，以及绑定内容/渲染/产物字节的人工审批与冻结发布包。",
       "defaultPrompt": [
-        "帮我发现这个领域的内容选题",
-        "把这篇内容适配成小红书风格",
+        "参考这篇文章但不要洗稿，联网核验后独立创作",
+        "把这篇内容适配成小红书风格并生成白底 HTML 预览",
         "通过快速表单建立我的创作者风格"
       ],
       "brandColor": "#8957e5",
       "composerIcon": "./assets/icon.png",
       "logo": "./assets/icon.png",
-      "description": "Governed media operations with original-opinion writing, creator-style intake, review gates, versioned profiles and hash-bound publish approval.",
+      "description": "Governed media operations with clean-room references, verifiable research, originality gates, refined white HTML delivery and artifact-bound approval.",
       "category": "media-ops",
       "tags": [
         "media-ops",

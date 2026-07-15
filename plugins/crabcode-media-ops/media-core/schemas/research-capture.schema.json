@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crabcode.local/media/research-capture.schema.json",
+  "title": "Server-generated research source capture",
+  "type": "object",
+  "required": ["captureId", "requestedUrl", "finalUrl", "httpStatus", "contentType", "snapshotText", "snapshotHash", "contentHash", "byteSize", "capturedAt", "capturedBy", "captureHash"],
+  "properties": {
+    "captureId": { "type": "string", "format": "uuid" },
+    "requestedUrl": { "type": "string", "pattern": "^https?://" },
+    "finalUrl": { "type": "string", "pattern": "^https?://" },
+    "httpStatus": { "type": "integer", "minimum": 200, "maximum": 299 },
+    "contentType": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "snapshotText": { "type": "string", "minLength": 1, "maxLength": 2000000 },
+    "snapshotHash": { "$ref": "#/$defs/sha256" },
+    "contentHash": { "$ref": "#/$defs/sha256" },
+    "byteSize": { "type": "integer", "minimum": 1, "maximum": 2000000 },
+    "capturedAt": { "type": "string", "format": "date-time" },
+    "capturedBy": { "type": "string", "minLength": 1 },
+    "captureHash": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": { "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" } },
+  "additionalProperties": false
+}

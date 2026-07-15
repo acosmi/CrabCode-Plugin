@@ -1,6 +1,6 @@
 ---
 description: 评论分类 + 回复建议（建议模式）— 批量时派 comment-operator；真评论发送属 Gate B 暂不可用
-argument-hint: [来源/文件/粘贴的评论] [--platform wechat|xiaohongshu|toutiao] [--brand 品牌id]
+argument-hint: "[来源/文件/粘贴的评论] [--platform wechat|xiaohongshu|toutiao] [--brand 品牌id]"
 allowed-tools: [Read, Glob, Grep, Bash, Task]
 ---
 

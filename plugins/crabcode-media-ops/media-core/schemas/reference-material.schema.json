@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crabcode.local/media/reference-material.schema.json",
+  "title": "Classified reference material",
+  "type": "object",
+  "required": ["referenceId", "role", "rightsStatus", "allowedUses", "title", "contentHash", "eligibleAsEvidence", "doNotCopyFeatures", "registeredAt", "registeredBy"],
+  "properties": {
+    "referenceId": { "type": "string", "format": "uuid" },
+    "role": { "enum": ["user_owned_draft", "authorized_sample", "third_party_reference", "factual_source"] },
+    "rightsStatus": { "enum": ["owned", "licensed", "public_domain", "unknown"] },
+    "allowedUses": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["rewrite", "fact_leads", "abstract_style_features", "attributed_quotation", "originality_comparison"] } },
+    "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+    "url": { "type": "string", "pattern": "^https?://" },
+    "contentHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "eligibleAsEvidence": { "const": false },
+    "doNotCopyFeatures": { "type": "array", "maxItems": 24, "items": { "type": "string", "minLength": 1 } },
+    "registeredAt": { "type": "string", "format": "date-time" },
+    "registeredBy": { "type": "string", "minLength": 1 }
+  },
+  "allOf": [{ "if": { "properties": { "role": { "const": "third_party_reference" } } }, "then": { "properties": { "allowedUses": { "not": { "contains": { "const": "rewrite" } } }, "doNotCopyFeatures": { "minItems": 1 } } } }],
+  "additionalProperties": false
+}
