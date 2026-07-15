@@ -6,9 +6,10 @@ import { basename, join, resolve } from 'node:path'
 const root = resolve(import.meta.dir, '..')
 const EXPECTED_WORKFLOW_SKILLS = 316
 const EXPECTED_INVOCATION_SET_SHA256 = '8fdfcd6fdd39d7fa952c6d0f554ed675429597869cac28f9239269588228ab33'
-// Updated for the audited crabcopyright-cn v0.3.0 workflow-content migration;
-// the 316 invocation identities remain unchanged and are pinned independently.
-const EXPECTED_MODEL_CONTENT_SHA256 = '832c879eff1367a3b4ab2656e30c2dd81434e010bb17229cfef7d90c04ed122f'
+// Updated for the audited crabcopyright-cn v0.3.0 workflow-content migration
+// and the CrabFin workbook capability-routing correction; the 316 invocation
+// identities remain unchanged and are pinned independently.
+const EXPECTED_MODEL_CONTENT_SHA256 = 'da69c588a97718e75d5e9dee4f5bd500e96c00b3aa26533fb47b212dbc3a103c'
 const HAN = /[\u3400-\u9fff]/u
 
 function sha256(value: string): string {

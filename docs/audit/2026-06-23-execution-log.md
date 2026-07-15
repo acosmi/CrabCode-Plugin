@@ -2246,3 +2246,126 @@ $ git diff --check fea30c131^ fea30c131
 - 它不是 CrabAccount 运行所必需的 runtime 改动，而是通用 CLI validator 的兼容修复；不合并时 CrabAccount 仍可加载，但旧 validator 会假失败。
 - 不把该提交升级宣称为路径安全根因彻底修复；M1/L1/L2 应作为独立后续审计输入。
 - 截至该次审计结束，下游分支保持 `codex/crabaccount-validator-optional-hooks`，提交仍为 `fea30c131`；未合并 main、未推送、未改全局安装态。
+
+## 2026-07-15：CrabFin-CN `audit-xls` refs warning 根因修复
+
+### 隔离、技能使用与基线
+
+- 主工作树 `/Users/fushihua/Desktop/CrabCode-Plugin` 当时位于 `codex/media-ops-integrity-html`，存在 media-ops 未提交改动；未读取、覆盖、暂存或删除这些改动。
+- 从已完成审计提交 `6c332011d8e649eedc585f9ffb68ef2d3eb72ab6` 建立隔离工作树 `/Users/fushihua/Desktop/CrabCode-Plugin-wt-crabfin-routing` 和任务分支 `codex/crabfin-audit-xls-routing` 后才修改文件。
+- 本次属于既有技能改进，按 `skill-creator` 核对名称保持、能力依赖、真实降级和验证。其完整多智能体 A/B 基准用于主观或大范围技能迭代；本次是确定性的单路由缺口，且用户要求避免过度工程，因此没有生成大规模评测工作区，而以现有引用校验单测、315 技能正文防漂移哈希和全仓门禁验证。未派 subagent。
+
+基线真实输出：
+
+```text
+$ git worktree add -b codex/crabfin-audit-xls-routing /Users/fushihua/Desktop/CrabCode-Plugin-wt-crabfin-routing 6c332011d8e649eedc585f9ffb68ef2d3eb72ab6
+Preparing worktree (new branch 'codex/crabfin-audit-xls-routing')
+HEAD is now at 6c33201 docs: audit CrabCode optional hooks validator
+
+$ bun run lint:refs
+$ bun run scripts/validate-references.ts
+WARNING plugins/crabfin-cn/fin-core/skills/audit-xls/SKILL.md: 正文命中「办公文档产出/电子表格」关键词(excel、电子表格)但无路由引导——请引用 `crabcode-office-suite:crabcode-spreadsheets` 路由段,或添加 <!-- capability-route: office-spreadsheets=none(理由) --> 显式豁免
+lint:refs — 0 error(s), 1 warning(s)
+```
+
+### 第一性根因、影响面与架构裁决
+
+`git blame` 与 `git show 20a68b1` 证明，提交 `20a68b11418a4bcc471b61e2ad5638c6020bf7a8` 在本地化技能卡时给 `audit-xls` 新增了 `short-description: 检查电子表格…`；注册表的 `office-spreadsheets` 关键词包含 `excel/电子表格/xlsx`，但该技能正文没有同步增加 provider 全限定名。根因是**本地化元数据与既有能力路由合同不同步**，不是 CrabAccount、CrabCode runtime 或 Git refs 故障。
+
+影响面仅为 `plugins/crabfin-cn/fin-core/skills/audit-xls/SKILL.md` 的模型执行引导和仓库 `lint:refs` 输出。警告不阻断构建，但真实风险是模型只拿到审计清单，未被告知如何读取工作簿，可能把文件元数据或不完整抽取误报为公式级审计。
+
+架构裁决：
+
+1. 不用 `office-spreadsheets=none(...)` 豁免；该技能确实处理真实工作簿，豁免会隐藏根因。
+2. 不给 `crabfin-cn` manifest 增加 `dependencies`。用户直接粘贴公式时仍可做有限审计，而强依赖缺失会让整个 54 技能伞形插件降级；正文的可选路由符合 `docs/capability-routing.md` 分层语义。
+3. 不改 CrabCode 源码、marketplace、能力注册表或 provider 名称。`crabcode-office-suite:crabcode-spreadsheets` 已在注册表登记为 available，实体技能与 manifest 声明均存在。
+4. 邻接审计发现办公套件内置 `summarize()` 当前只返回格式和字节数，`recalculate()` 仍明确为 `NOT_IMPLEMENTED`；因此不能把“成功调用 provider”直接等同于“已完成审计”。本次在需求技能中明确：源文件只读、元数据不算审计证据、只报告实际可读范围，并披露宏/外链/缓存值/加密/截断等限制。实现完整 Excel 引擎适配器会扩大到另一个插件、依赖和运行时，不是消除本 warning 的必要条件，未顺手扩建。
+
+### 实施内容与复发条件
+
+在 `audit-xls/SKILL.md` 增加 `Spreadsheet capability routing`：
+
+- `.xlsx/.xlsm` 真实工作簿调用 `crabcode-office-suite:crabcode-spreadsheets`；
+- 原文件只读，不保存、不重算、不修改；
+- 文件类型/字节数等 metadata 不得冒充工作簿审计；
+- `Unknown skill` 时引导 `/plugin` 安装或启用办公套件，安装前只能审计用户直接粘贴的公式/值；
+- CSV/TSV 只支持值检查，不能证明公式、样式、隐藏内容或链接。
+
+同时更新 `tests/workflow-skill-presentation-completeness.test.ts` 的模型正文聚合哈希，确认这是对 315 个工作流技能中一个技能的有意正文变更；调用身份哈希和技能数量未变。没有新增重复的字符串单测：引用校验已有“provider 引用可消除 warning”的机制单测，具体生产文件由全仓 `lint:refs` 扫描，正文整体另有聚合哈希防止未审计漂移。
+
+复发条件：删除或拼错全限定名会重新触发引用告警或死链错误；把只读/完整性边界删掉会改变聚合哈希并使防漂移测试失败。若办公套件未安装，或底层引擎只能返回 metadata，仍不能完成真实单元格审计——这是明确降级条件，不是被掩盖的成功路径。
+
+### 首轮失败、恢复与三次规则
+
+首次全量门禁出现两个不同问题，均只失败一次：
+
+```text
+$ bun run typecheck
+$ tsc --noEmit
+error TS2688: Cannot find type definition file for 'bun-types'.
+```
+
+隔离工作树没有 `node_modules`，锁文件已声明 `bun-types`；按锁文件安装后恢复：
+
+```text
+$ bun install --frozen-lockfile
++ @types/bun@1.3.14
++ typescript@5.9.3
+5 packages installed [22.00ms]
+
+$ bun run typecheck
+$ tsc --noEmit
+[exit 0]
+```
+
+正文防漂移测试首次正确拦截预期变化：
+
+```text
+Expected: 95aedfcb1b63d12437277394ddc4aef1caf54c2b19359069a1068689c0f63c2c
+Received: b3d1cab6eb06f871324f73a45af0df1016b89f232ff432435f25190067c7fa39
+75 pass
+1 fail
+```
+
+将期望值更新为审计后的新哈希后，定向测试 `1 pass / 0 fail / 1299 expect`。没有任何同一问题连续失败三次。
+
+### 最终门禁真实输出
+
+```text
+$ bun run lint:refs
+$ bun run scripts/validate-references.ts
+[exit 0；零 warning]
+
+$ bun test ./tests/references.test.ts
+10 pass
+0 fail
+13 expect() calls
+
+$ bun run validate
+$ bun run scripts/validate-all.ts
+validate-all: all checks passed
+
+$ bun run typecheck
+$ tsc --noEmit
+[exit 0]
+
+$ bun test ./tests/
+76 pass
+0 fail
+1480 expect() calls
+Ran 76 tests across 9 files. [5.34s]
+
+$ bun run build
+Bundled 18 modules in 2ms
+cli.js  32.0 KB (entry point)
+
+$ git diff --check
+[无输出]
+```
+
+### 敌意复核结论
+
+- **根因**：修复的是缺失 provider 路由及其真实性边界，不是用豁免消音。
+- **回归**：未改变技能调用身份、manifest、marketplace、注册表、依赖或 CrabCode；原始工作簿增加只读保护，未扩大写入面。
+- **范围**：两处产品/测试改动加本日志，完整 Excel 引擎适配作为邻接缺口明示但未过度扩建。
+- **交付（截至该次审计结束）**：分支独立，未合并 main、未删除分支、未回滚、未 force-push、未 push。

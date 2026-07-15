@@ -9,6 +9,12 @@ license: Apache-2.0. See docs/legal/THIRD_PARTY_NOTICES.md for source attributio
 
 Audit formulas and data for accuracy and mistakes. Scope determines depth — from quick formula checks on a selection up to full financial-model integrity audits.
 
+## Spreadsheet capability routing
+
+- For a real `.xlsx` or `.xlsm` workbook, invoke `crabcode-office-suite:crabcode-spreadsheets` to inspect sheets, cells, formulas, cached values, styles, hidden content, and links. Open the source read-only; this skill reports findings and must not save, recalculate, or otherwise mutate the original workbook.
+- Metadata alone (for example, file type and byte length) is not evidence that a workbook was audited. Continue only for the sheets and ranges whose formulas and values were actually readable, and state any unsupported macros, external links, stale cached values, password protection, truncation, or skipped content in the report.
+- If the provider returns `Unknown skill`, guide the user to install or enable `crabcode-office-suite` through `/plugin` and retry. Until then, audit only formulas or values the user pasted directly; do not claim a cell-, sheet-, or model-level audit. CSV/TSV exports permit value checks but cannot prove workbook formulas, styles, hidden content, or links.
+
 ## Step 1: Determine scope
 
 If the user already gave a scope, use it. Otherwise **ask them**:
