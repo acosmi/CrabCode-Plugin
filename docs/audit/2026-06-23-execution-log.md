@@ -1366,3 +1366,60 @@ validate-media-plugin: 9 skills, 38 registered tools, 14 schemas, runtime/docs/m
 4. `gh pr create` 或 merge `task/media-ops-0.4.0-qa-release-20260715` → 目标分支（由用户选）  
 5. 合并后打 tag / 发布说明引用 `docs/releases/2026-07-15-v0.4.0.md`
 
+
+#### HEAD 证明（提交后）
+
+```text
+$ git rev-parse --abbrev-ref HEAD
+task/media-ops-0.4.0-qa-release-20260715
+$ git rev-parse HEAD
+3530823ef84b7843a48f8ff9c6387296e4dca611
+$ git log --oneline -5
+3530823 feat(media-ops): release 0.4.0 with QA fixture split and hardened Playwright lifecycle
+ac26d4a feat(media-ops): enforce original research and HTML delivery
+3afa5ae docs: close CrabAccount execution audit
+f8e1ca6 feat: add CrabAccount workflow plugin
+b58e7b2 feat(workflows): localize all official skill cards
+$ git status
+On branch task/media-ops-0.4.0-qa-release-20260715
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   docs/audit/2026-06-23-execution-log.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+$ git show HEAD:plugins/crabcode-media-ops/package.json | head -5
+{
+  "name": "crabcode-media-ops-mcp",
+  "version": "0.4.0",
+  "license": "Apache-2.0",
+  "type": "module",
+$ git show HEAD:plugins/crabcode-media-ops/src/domain.ts | head -5
+import { createHash } from 'node:crypto'
+import { z } from 'zod'
+
+export const VERSION = '0.4.0'
+export const SCHEMA_VERSION = 2 as const
+$ git show HEAD:plugins/crabcode-media-ops/tests/helpers.ts | grep -n deliveryMode | head -5
+77: * deliveryMode:
+96:  deliveryMode?: 'none' | 'render-only' | 'verified'
+98:  const deliveryMode = args.deliveryMode ?? 'render-only'
+240:  if (deliveryMode === 'none') {
+247:  if (deliveryMode === 'render-only') {
+$ git diff main...HEAD --stat | tail -15
+ .../plugin-dev/skills/agent-development/SKILL.md   |    3 +-
+ .../plugin-dev/skills/command-development/SKILL.md |    3 +-
+ .../plugin-dev/skills/hook-development/SKILL.md    |    3 +-
+ plugins/plugin-dev/skills/mcp-integration/SKILL.md |    3 +-
+ plugins/plugin-dev/skills/plugin-settings/SKILL.md |    3 +-
+ .../plugin-dev/skills/plugin-structure/SKILL.md    |    3 +-
+ .../plugin-dev/skills/skill-development/SKILL.md   |    3 +-
+ scripts/validate-all.ts                            |   11 +
+ src/policy/presentationValidator.ts                |  461 ++
+ tests/crabaccount/client.test.ts                   |  357 ++
+ tests/crabaccount/fixtures/fake-curl.sh            |  102 +
+ tests/crabaccount/fixtures/import-batch.json       |   66 +
+ tests/validators/presentation.test.ts              |  210 +
+ ...orkflow-skill-presentation-completeness.test.ts |   88 +
+ 505 files changed, 24739 insertions(+), 1356 deletions(-)
+```
