@@ -1423,3 +1423,37 @@ $ git diff main...HEAD --stat | tail -15
  ...orkflow-skill-presentation-completeness.test.ts |   88 +
  505 files changed, 24739 insertions(+), 1356 deletions(-)
 ```
+
+### 2026-07-16 合并 main、推送发版与分支清理
+
+用户授权：安全避免冲突的合并并推送发版；推送完成后清理已合并分支。
+
+操作（全部 `--ff-only`，无 force-push）：
+
+```text
+$ git fetch origin
+# origin/main 是 HEAD 祖先 → 可快进
+
+$ git checkout main
+$ git merge --ff-only origin/main
+# 52f75ed..b58e7b2 Fast-forward
+
+$ git merge --ff-only task/media-ops-0.4.0-qa-release-20260715
+# b58e7b2..69414da Fast-forward
+# main = 69414da
+
+$ git tag -a media-ops-v0.4.0 -m "crabcode-media-ops 0.4.0 ..."
+$ git push origin main
+# b58e7b2..69414da  main -> main
+
+$ git push origin media-ops-v0.4.0
+# * [new tag] media-ops-v0.4.0 -> media-ops-v0.4.0
+
+$ git branch -d task/media-ops-0.4.0-qa-release-20260715   # was 69414da
+$ git branch -d codex/media-ops-0.4.0-release-hardening    # was ac26d4a
+$ git branch -d codex/media-ops-integrity-html             # was ac26d4a
+```
+
+终态：`main` 与 `origin/main` 同为 `69414da`；标签 `media-ops-v0.4.0` 已推送。  
+未删：其他未合并任务分支、带 worktree 的分支、远程非本轮分支。  
+冲突：无（全程快进）。
