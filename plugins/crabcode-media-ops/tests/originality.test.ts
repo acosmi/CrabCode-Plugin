@@ -18,11 +18,11 @@ describe('version-bound originality evidence', () => {
   })
   afterEach(async () => rm(dir, { recursive: true, force: true }))
 
-  async function drafted(referenceText: string | string[], draftText: string, allowQuotation = false): Promise<string> {
+  async function drafted(referenceText: string | string[], draftText: string, allowQuotation = false, role: 'third_party_reference' | 'factual_source' = 'third_party_reference'): Promise<string> {
     const referenceIds: string[] = []
     for (const [index, rawText] of (Array.isArray(referenceText) ? referenceText : [referenceText]).entries()) {
       const registered = await registerHandler({
-        role: 'third_party_reference', rightsStatus: 'unknown',
+        role, rightsStatus: 'unknown',
         allowedUses: ['fact_leads', 'abstract_style_features', 'originality_comparison', ...(allowQuotation ? ['attributed_quotation' as const] : [])],
         title: `外部作者文章 ${index + 1}`, url: `https://author${index + 1}.example.com/post`, rawText,
         doNotCopyFeatures: ['论证顺序', '段落映射', '标志性表达'], registeredBy: '运营',
@@ -33,13 +33,13 @@ describe('version-bound originality evidence', () => {
     const intake = await saveHandler({ ...base, stage: 'intake', bodyMarkdown: '', savedBy: '选题员' })
     const contentId = (intake.data as any).contentId
     const now = new Date().toISOString()
-    const officialCaptureId = await createTestResearchCapture({ url: 'https://official.example.org/a', snapshotText: '独立资料一' })
+    const officialCaptureId = await createTestResearchCapture({ url: 'https://official.example.gov.cn/a', snapshotText: '独立资料一' })
     const newsCaptureId = await createTestResearchCapture({ url: 'https://news.example.net/b', snapshotText: '独立资料二' })
     const research = await completeResearch({
       contentId, claims: [], evidenceLinks: [],
       sources: [
-        { sourceKey: 'official', captureId: officialCaptureId, title: '官方资料', publisher: '官方机构', sourceTier: 'authoritative', isPrimary: true },
-        { sourceKey: 'news', captureId: newsCaptureId, title: '独立报道', publisher: '新闻机构', sourceTier: 'professional', isPrimary: false },
+        { sourceKey: 'official', captureId: officialCaptureId, title: '官方资料', publisher: '官方机构', assessment: { publisherType: 'government', sourceFunction: 'original_record', originRelationship: 'original', basisExcerpt: '独立资料一', classificationRationale: '该测试页面模拟主管机关直接发布的原始记录，按一手来源归类。' } },
+        { sourceKey: 'news', captureId: newsCaptureId, title: '独立报道', publisher: '新闻机构', assessment: { publisherType: 'professional_media', sourceFunction: 'independent_reporting', originRelationship: 'original', basisExcerpt: '独立资料二', classificationRationale: '该测试页面模拟专业媒体自行采写的报道，按独立专业报道归类。' } },
       ],
       searches: [{ query: '原创风险测试', executedAt: now, resultCount: 2, tool: 'web-search' }], counterEvidenceSourceKeys: [], unresolvedGaps: [],
       noVerifiableClaimsReason: '本测试仅比较表达独立性', conclusionStrength: 'normal', completedBy: '研究员',
@@ -72,6 +72,39 @@ describe('version-bound originality evidence', () => {
       structureIndependent: true, argumentIndependent: true, attributedQuotations: [],
     })
     expect(review.status).toBe('ok')
+  })
+
+  test('a caller cannot label expressive reference text as a factual source to skip human review', async () => {
+    const contentId = await drafted(
+      '先描述普通人的困境。再解释工具如何改变门槛。最后得出技术应服务人的结论。',
+      '开头呈现大众遇到的阻碍。中段分析新方法怎样降低难度。结尾主张创新最终应当增益个体。',
+      false,
+      'factual_source',
+    )
+    const scan = await scanHandler({ contentId, createdBy: '扫描员' })
+    expect((scan.data as any).decision).toBe('human_review_required')
+  })
+
+  test('a changes-required human decision is terminal for that scan', async () => {
+    const contentId = await drafted(
+      '先讨论工具门槛，再讨论普通人的行动空间，最后形成一项价值判断。',
+      '文章从生活障碍切入，随后分析新方法带来的选择，结尾提出独立观点。',
+    )
+    const scan = await scanHandler({ contentId, createdBy: '扫描员' })
+    expect((scan.data as any).decision).toBe('human_review_required')
+    const scanId = (scan.data as any).scanId
+    const changes = await reviewHandler({
+      scanId, decision: 'changes_required', reviewedBy: '独立主编',
+      rationale: '人工复核认为论证推进仍然过于接近参考样本，需要形成新修订后重新扫描。',
+      structureIndependent: false, argumentIndependent: false, attributedQuotations: [],
+    })
+    expect(changes.status).toBe('action_required')
+    const attemptedFlip = await reviewHandler({
+      scanId, decision: 'pass', reviewedBy: '另一主编',
+      rationale: '试图在相同扫描记录上翻转已经终结的人工结论，系统必须拒绝。',
+      structureIndependent: true, argumentIndependent: true, attributedQuotations: [],
+    })
+    expect(attemptedFlip.error?.code).toBe('ORIGINALITY_REVIEW_FINAL')
   })
 
   test('aggregates copied coverage across multiple references instead of evaluating each source in isolation', async () => {

@@ -7,13 +7,15 @@ import {
   EditorialReviewRecordSchema,
   LegalReviewSchema,
   ReviewSchema,
+  StatementCoverageSchema,
   namedActorKey,
   namedActorsEqual,
   stableHash,
   type EditorialReviewRecord,
 } from '../domain.ts'
-import { appendRecord, getRecord, storageWarnings } from '../storage.ts'
-import { bodyPlainText } from '../rendering/article-doc.ts'
+import { extractVerifiableStatements, factualCompatibility } from '../factual-integrity.ts'
+import { appendRecordsAtomically, getRecord, storageWarnings } from '../storage.ts'
+import { bodyPlainText, visibleArticleBodyText } from '../rendering/article-doc.ts'
 import { getLatestContent } from './content.ts'
 import { getOriginalityScan, originalityScanPasses } from './originality.ts'
 import { getResearchReview } from './research.ts'
@@ -22,6 +24,7 @@ const completeSchema = z.object({
   contentId: z.string().uuid(),
   originalityScanId: z.string().uuid(),
   claims: z.array(ClaimSchema).max(200),
+  statementCoverage: z.array(StatementCoverageSchema).max(1000),
   noVerifiableClaimsReason: z.string().min(1).max(1000).optional(),
   waivers: z.array(z.object({ claimId: z.string().min(1).max(120), by: z.string().min(1).max(300), reason: z.string().min(1).max(1000) })).max(200).default([]),
   legalReview: LegalReviewSchema,
@@ -31,8 +34,10 @@ const completeSchema = z.object({
 
 export const name = 'mediaops.editorial.review'
 export const description =
-  'Record independent fact, legal-risk and AI-disclosure review for one drafted revision after originality evidence passes. Verified claims must cite supporting links from its bound research bundle.'
+  'Record independent fact, legal-risk and AI-disclosure review for one drafted revision after originality evidence passes. Verified claims must cite supporting links from its bound research bundle; action_required returns the server-generated statement IDs needed for a retry.'
 export const inputSchema = completeSchema.shape
+
+const INFERENCE_MARKER_PATTERN = /(?:我认为|我们认为|在我看来|本文判断|作者判断|这意味着|由此可见|可以推断|可能|或许|may|might|suggests?|in my view|we believe)/i
 
 function reviewHashPayload(review: Omit<EditorialReviewRecord, 'reviewHash'>): unknown {
   return {
@@ -47,25 +52,6 @@ function reviewHashPayload(review: Omit<EditorialReviewRecord, 'reviewHash'>): u
     completedBy: review.completedBy,
     completedAt: review.completedAt,
   }
-}
-
-function claimSignals(content: { title: string; summary?: string; articleDoc: any }): string[] {
-  const text = [
-    content.title,
-    content.summary,
-    bodyPlainText(content.articleDoc),
-    ...content.articleDoc.assets.flatMap((asset: any) => [asset.alt, asset.caption]),
-  ].filter(Boolean).join('\n')
-  const matches = new Set<string>()
-  for (const pattern of [
-    /\b(?:19|20)\d{2}年?/g,
-    /\d+(?:\.\d+)?%/g,
-    /\d+(?:\.\d+)?(?:万|亿|万元|亿元|万人|倍|家|项)/g,
-    /全球第一|全国第一|行业第一|同比增长|收入增长|营收|违法|违规|获批|正式发布|官方宣布/g,
-  ]) {
-    for (const match of text.matchAll(pattern)) matches.add(match[0])
-  }
-  return [...matches]
 }
 
 export async function handler(args: z.input<typeof completeSchema>): Promise<Envelope> {
@@ -91,8 +77,6 @@ export async function handler(args: z.input<typeof completeSchema>): Promise<Env
 
   const problems: string[] = []
   const researchClaims = new Map(research.claims.map((claim) => [claim.id, claim]))
-  const uncoveredSignals = claimSignals(content).filter((signal) => !research.claims.some((claim) => claim.claim.includes(signal)))
-  if (uncoveredSignals.length) problems.push(`article contains verifiable claim signals absent from the research ledger: ${uncoveredSignals.join(', ')}`)
   const reviewedClaims = new Map<string, z.infer<typeof ClaimSchema>>()
   for (const claim of input.claims) {
     if (reviewedClaims.has(claim.id)) problems.push(`duplicate reviewed claim ${claim.id}`)
@@ -120,20 +104,78 @@ export async function handler(args: z.input<typeof completeSchema>): Promise<Env
   if (research.claims.length === 0 && !input.noVerifiableClaimsReason?.trim()) problems.push('noVerifiableClaimsReason is required for an empty claim ledger')
   if (research.claims.length > 0 && input.noVerifiableClaimsReason) problems.push('noVerifiableClaimsReason cannot replace a non-empty claim ledger')
 
+  const statements = extractVerifiableStatements({
+    title: content.title,
+    ...(content.summary ? { summary: content.summary } : {}),
+    bodyText: bodyPlainText(content.articleDoc),
+  })
+  const statementLedgerHash = stableHash(statements)
+  const statementById = new Map(statements.map((statement) => [statement.statementId, statement]))
+  const coverageById = new Map<string, z.infer<typeof StatementCoverageSchema>>()
+  for (const coverage of input.statementCoverage) {
+    if (coverageById.has(coverage.statementId)) problems.push(`duplicate statement coverage ${coverage.statementId}`)
+    coverageById.set(coverage.statementId, coverage)
+    const statement = statementById.get(coverage.statementId)
+    if (!statement) {
+      problems.push(`statement coverage ${coverage.statementId} does not bind to a current article statement`)
+      continue
+    }
+    const mappedClaims = coverage.claimIds.map((claimId) => reviewedClaims.get(claimId))
+    const missingClaimIds = coverage.claimIds.filter((_, index) => !mappedClaims[index])
+    if (missingClaimIds.length) problems.push(`statement ${coverage.statementId} maps unknown fact-review claims: ${missingClaimIds.join(', ')}`)
+    const nonVerified = mappedClaims.filter((claim) => claim && claim.status !== 'verified')
+    if (nonVerified.length) problems.push(`statement ${coverage.statementId} maps claims that are not verified`)
+    const verifiedMappedClaims = mappedClaims.filter((claim): claim is z.infer<typeof ClaimSchema> => claim !== undefined && claim.status === 'verified')
+    const strongSignals = statement.signals.some((signal) => signal.startsWith('number:') || signal.startsWith('predicate:'))
+    if ((coverage.classification === 'opinion' || coverage.classification === 'non_claim') && strongSignals) {
+      problems.push(`statement ${coverage.statementId} contains factual signals and cannot be classified as ${coverage.classification}`)
+    }
+    if (coverage.classification === 'verified_fact') {
+      const candidates = verifiedMappedClaims.map((claim) => ({ claim, mismatches: factualCompatibility(statement.text, claim.claim) }))
+      if (!candidates.some(({ mismatches }) => mismatches.length === 0)) {
+        const detail = candidates.map(({ claim, mismatches }) => `${claim.id}[${mismatches.join(', ')}]`).join('; ') || 'no verified mapped claim'
+        problems.push(`statement ${coverage.statementId} is not independently compatible with any one mapped research claim: ${detail}`)
+      }
+    }
+    if (coverage.classification === 'author_inference') {
+      if (!coverage.inferenceMarker || !statement.text.includes(coverage.inferenceMarker) || !INFERENCE_MARKER_PATTERN.test(coverage.inferenceMarker)) {
+        problems.push(`statement ${coverage.statementId} needs an exact visible inference marker such as “本文判断” or “可能”`)
+      }
+    }
+  }
+  for (const statement of statements) {
+    if (!coverageById.has(statement.statementId)) problems.push(`verifiable article statement is absent from the fact ledger: ${statement.text}`)
+  }
+
   const legal = input.legalReview
   if (!namedActorsEqual(legal.reviewedBy, input.completedBy)) problems.push('legalReview.reviewedBy must match the accountable editorial reviewer')
   if (legal.status === 'required' || (legal.riskLevel === 'high' && legal.status !== 'completed')) problems.push('specialist legal review remains required')
   const disclosure = input.aiDisclosure
   if (disclosure.aiAssisted) {
     if (!disclosure.confirmedBy || disclosure.methods.length === 0) problems.push('AI-assisted content needs a named, confirmed disclosure method')
-    const confirmed = disclosure.methods.some((method) => {
-      if (method === 'body-label') return Boolean(disclosure.bodyLabelText && content.bodyMarkdown.includes(disclosure.bodyLabelText))
-      if (method === 'platform-native') return disclosure.platformNativeConfirmed === true
-      return disclosure.fileMetadataConfirmed === true
-    })
-    if (!confirmed) problems.push('no recorded AI disclosure method is actually confirmed for this draft')
+    if (disclosure.confirmedBy && !namedActorsEqual(disclosure.confirmedBy, input.completedBy)) problems.push('aiDisclosure.confirmedBy must match the accountable editorial reviewer')
+    for (const method of disclosure.methods) {
+      if (method === 'body-label' && (!disclosure.bodyLabelText || !visibleArticleBodyText(content.articleDoc).includes(disclosure.bodyLabelText))) {
+        problems.push('body-label disclosure must occur verbatim in visible parsed article-body text')
+      }
+      if (method === 'platform-native' && disclosure.platformNativeConfirmed !== true) problems.push('platform-native disclosure is not confirmed')
+      if (method === 'file-metadata' && disclosure.fileMetadataConfirmed !== true) problems.push('file-metadata disclosure is not confirmed')
+    }
+    if (disclosure.bodyLabelText && !disclosure.methods.includes('body-label')) {
+      problems.push('bodyLabelText is forbidden unless body-label is a declared and reviewed disclosure method')
+    }
+  } else if (disclosure.methods.length || disclosure.bodyLabelText || disclosure.platformNativeConfirmed || disclosure.fileMetadataConfirmed) {
+    problems.push('non-AI-assisted content must not carry AI disclosure methods or injected label text')
   }
-  if (problems.length) return actionRequired({ contentId: content.contentId, revisionId: content.revisionId, problems }, storageWarnings())
+  if (problems.length) {
+    return actionRequired({
+      contentId: content.contentId,
+      revisionId: content.revisionId,
+      statementLedgerHash,
+      statements,
+      problems,
+    }, storageWarnings())
+  }
 
   const completedAt = new Date().toISOString()
   const factReview = ReviewSchema.parse({
@@ -144,6 +186,9 @@ export async function handler(args: z.input<typeof completeSchema>): Promise<Env
     completedBy: input.completedBy,
     completedAt,
     claims: input.claims,
+    statementLedgerHash,
+    statements,
+    statementCoverage: input.statementCoverage,
     ...(input.noVerifiableClaimsReason ? { noVerifiableClaimsReason: input.noVerifiableClaimsReason } : {}),
     waivers: input.waivers,
   })
@@ -162,17 +207,19 @@ export async function handler(args: z.input<typeof completeSchema>): Promise<Env
   }
   const reviewHash = stableHash(reviewHashPayload(withoutHash))
   const review = EditorialReviewRecordSchema.parse({ ...withoutHash, reviewHash })
-  await appendRecord('editorial-reviews', { id: reviewId, ...review })
-  await appendRecord('audit-events', {
-    event: 'editorial-review.completed',
-    reviewId,
-    contentId: content.contentId,
-    revisionId: content.revisionId,
-    subjectHash: content.originalitySubjectHash,
-    originalityScanId: scan.scanId,
-    actor: input.completedBy,
-  })
-  return ok({ reviewId, contentId: content.contentId, revisionId: content.revisionId, subjectHash: content.originalitySubjectHash, reviewHash }, storageWarnings())
+  await appendRecordsAtomically([
+    { collection: 'editorial-reviews', record: { id: reviewId, ...review } },
+    { collection: 'audit-events', record: {
+      event: 'editorial-review.completed',
+      reviewId,
+      contentId: content.contentId,
+      revisionId: content.revisionId,
+      subjectHash: content.originalitySubjectHash,
+      originalityScanId: scan.scanId,
+      actor: input.completedBy,
+    } },
+  ])
+  return ok({ reviewId, contentId: content.contentId, revisionId: content.revisionId, subjectHash: content.originalitySubjectHash, statementLedgerHash, reviewHash }, storageWarnings())
 }
 
 export async function getEditorialReview(reviewId: string): Promise<EditorialReviewRecord | null> {

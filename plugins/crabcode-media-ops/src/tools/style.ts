@@ -2,10 +2,20 @@ import { randomUUID } from 'node:crypto'
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { z } from 'zod'
-import { BrandIdSchema, ReferenceAllowedUseSchema, ReferenceRoleSchema, stableHash } from '../domain.ts'
+import { BrandIdSchema, ReferenceAllowedUseSchema, ReferenceRoleSchema, namedActorsEqual, stableHash } from '../domain.ts'
 import { err, ok, type Envelope } from '../envelope.ts'
-import { appendRecord, dataDir, ensureDir, listRecords, storageWarnings, type StoredRecord } from '../storage.ts'
-import { loadProfile, saveProfileVersion, type BrandProfileInput } from './profiles.ts'
+import {
+  appendRecordsAtomically,
+  dataDir,
+  ensureDir,
+  getEntityVersion,
+  listRecords,
+  StorageConflictError,
+  storageWarnings,
+  type AtomicAppend,
+  type StoredRecord,
+} from '../storage.ts'
+import { loadProfile, profileStorageWarnings, saveProfileVersion, type BrandProfileInput } from './profiles.ts'
 import { loadReferenceRecords } from './references.ts'
 
 export const CREATOR_TYPES = [
@@ -327,7 +337,21 @@ export async function saveDraftHandler(args: { brandId: string; formId?: string;
   if (previous && previous.mode !== args.mode) return err('FORM_MODE_MISMATCH', `Form ${formId} was created in ${previous.mode} mode.`)
   const payloadProblem = validateDraftPayload(args.data)
   if (payloadProblem) return err('STYLE_REFERENCE_FIREWALL', payloadProblem)
-  await appendRecord('style-forms', { formId, brandId: args.brandId, mode: args.mode, state: 'draft', data: args.data, updatedBy: args.updatedBy })
+  const entityKey = `${args.brandId}:${formId}`
+  const expectedEntityVersion = await getEntityVersion('style-forms', entityKey)
+  try {
+    await appendRecordsAtomically([
+      {
+        collection: 'style-forms',
+        record: { formId, brandId: args.brandId, mode: args.mode, state: 'draft', data: args.data, updatedBy: args.updatedBy },
+        guard: { entityKey, expectedEntityVersion },
+      },
+      { collection: 'audit-events', record: { event: 'style.form.draft.saved', brandId: args.brandId, formId, actor: args.updatedBy } },
+    ])
+  } catch (error) {
+    if (error instanceof StorageConflictError) return err('STYLE_FORM_CONFLICT', 'Another process changed this form; reload it before saving.')
+    throw error
+  }
   return ok({ formId, brandId: args.brandId, mode: args.mode, state: 'draft' }, storageWarnings())
 }
 
@@ -344,7 +368,21 @@ export async function submitHandler(args: { brandId: string; formId: string; sub
   const referenceProblem = await validateReferenceSamples(validation.data.samples)
   if (referenceProblem) return err('STYLE_REFERENCE_FIREWALL', referenceProblem)
   const submittedAt = new Date().toISOString()
-  await appendRecord('style-forms', { formId: form.formId, brandId: form.brandId, mode: form.mode, state: 'submitted', data: validation.data, updatedBy: args.submittedBy, submittedAt })
+  const entityKey = `${form.brandId}:${form.formId}`
+  const expectedEntityVersion = await getEntityVersion('style-forms', entityKey)
+  try {
+    await appendRecordsAtomically([
+      {
+        collection: 'style-forms',
+        record: { formId: form.formId, brandId: form.brandId, mode: form.mode, state: 'submitted', data: validation.data, updatedBy: args.submittedBy, submittedAt },
+        guard: { entityKey, expectedEntityVersion },
+      },
+      { collection: 'audit-events', record: { event: 'style.form.submitted', brandId: form.brandId, formId: form.formId, actor: args.submittedBy } },
+    ])
+  } catch (error) {
+    if (error instanceof StorageConflictError) return err('STYLE_FORM_CONFLICT', 'Another process changed this form; reload it before submitting.')
+    throw error
+  }
   return ok({ formId: form.formId, brandId: form.brandId, state: 'submitted', submittedAt }, storageWarnings())
 }
 
@@ -421,7 +459,20 @@ export async function proposeHandler(args: { brandId: string; formId: string; co
     .filter(([field, observed]) => field in preferences && stableHash(preferences[field]) !== stableHash(observed))
     .map(([field, observed]) => ({ id: stableHash([field, observed]).slice(0, 16), field, formValue: preferences[field], corpusValue: observed }))
   const proposalId = randomUUID()
-  await appendRecord('profile-proposals', { proposalId, brandId: args.brandId, formId: args.formId, state: 'pending', formData: data, corpus, conflicts, proposedBy: args.proposedBy })
+  const entityKey = `${args.brandId}:${proposalId}`
+  try {
+    await appendRecordsAtomically([
+      {
+        collection: 'profile-proposals',
+        record: { proposalId, brandId: args.brandId, formId: args.formId, state: 'pending', formData: data, corpus, conflicts, proposedBy: args.proposedBy },
+        guard: { entityKey, expectedEntityVersion: null },
+      },
+      { collection: 'audit-events', record: { event: 'profile.proposal.created', brandId: args.brandId, proposalId, formId: args.formId, actor: args.proposedBy } },
+    ])
+  } catch (error) {
+    if (error instanceof StorageConflictError) return err('PROFILE_PROPOSAL_CONFLICT', 'The generated proposal identifier was concurrently claimed; retry proposal creation.')
+    throw error
+  }
   return ok({ proposalId, brandId: args.brandId, formId: args.formId, conflicts, requiresConfirmation: true }, storageWarnings())
 }
 
@@ -436,6 +487,9 @@ export const confirmInputSchema = { brandId: BrandIdSchema, proposalId: z.string
 export async function confirmHandler(args: { brandId: string; proposalId: string; confirmedBy: string; resolutions: Record<string, 'form' | 'corpus'> }): Promise<Envelope> {
   const proposal = await getProposal(args.brandId, args.proposalId)
   if (!proposal || proposal.state !== 'pending') return err('PROPOSAL_NOT_PENDING', 'A pending proposal in the same brand scope is required.')
+  if (typeof proposal.proposedBy !== 'string' || namedActorsEqual(proposal.proposedBy, args.confirmedBy)) {
+    return err('ROLE_SEPARATION_REQUIRED', 'The profile confirmer must be a different accountable principal from the proposal author.')
+  }
   const unresolved = (proposal.conflicts as any[]).filter((conflict) => !args.resolutions[conflict.id])
   if (unresolved.length) return err('STYLE_CONFLICT_CONFIRMATION_REQUIRED', `Resolve conflicts: ${unresolved.map((item) => item.id).join(', ')}.`)
   const data = StyleFormDataSchema.parse(proposal.formData)
@@ -463,19 +517,58 @@ export async function confirmHandler(args: { brandId: string; proposalId: string
     source: 'confirmed-form',
     sourceFormId: proposal.formId,
   }
-  const profile = await saveProfileVersion(profileInput)
-  await appendRecord('profile-proposals', { proposalId: args.proposalId, brandId: args.brandId, formId: proposal.formId, state: 'confirmed', profileVersion: profile.profile_version, confirmedBy: args.confirmedBy, resolutions: args.resolutions })
   const allBrandForms = await listRecords('style-forms', { brandId: args.brandId })
   const currentByForm = new Map<string, StoredForm>()
   for (const event of allBrandForms) currentByForm.set(String(event.formId), event as StoredForm)
-  for (const previous of currentByForm.values()) {
-    if (previous.formId !== proposal.formId && previous.state === 'confirmed') {
-      await appendRecord('style-forms', { formId: previous.formId, brandId: previous.brandId, mode: previous.mode, state: 'superseded', data: previous.data, updatedBy: args.confirmedBy, supersededByProfileVersion: profile.profile_version })
+  const form = currentByForm.get(String(proposal.formId))
+  if (!form || form.state !== 'submitted') return err('FORM_NOT_SUBMITTED', 'The proposal source form is no longer submitted; create a new proposal.')
+  const proposalEntityKey = `${args.brandId}:${args.proposalId}`
+  const proposalEntityVersion = await getEntityVersion('profile-proposals', proposalEntityKey)
+  const formVersions = new Map<string, number | null>()
+  for (const current of currentByForm.values()) {
+    if (current.formId === proposal.formId || current.state === 'confirmed') {
+      formVersions.set(current.formId, await getEntityVersion('style-forms', `${current.brandId}:${current.formId}`))
     }
   }
-  const form = await getLatestForm(args.brandId, proposal.formId)
-  if (form) await appendRecord('style-forms', { formId: form.formId, brandId: form.brandId, mode: form.mode, state: 'confirmed', data: form.data, updatedBy: args.confirmedBy, profileVersion: profile.profile_version })
-  return ok({ brandId: args.brandId, profileVersion: profile.profile_version, proposalId: args.proposalId, formId: proposal.formId }, storageWarnings())
+  try {
+    const profile = await saveProfileVersion(profileInput, undefined, {
+      additionalEntries: (confirmedProfile) => {
+        const entries: AtomicAppend[] = [
+          {
+            collection: 'profile-proposals',
+            record: { proposalId: args.proposalId, brandId: args.brandId, formId: proposal.formId, state: 'confirmed', profileVersion: confirmedProfile.profile_version, confirmedBy: args.confirmedBy, resolutions: args.resolutions },
+            guard: { entityKey: proposalEntityKey, expectedEntityVersion: proposalEntityVersion },
+          },
+          { collection: 'audit-events', record: { event: 'profile.proposal.confirmed', brandId: args.brandId, proposalId: args.proposalId, formId: proposal.formId, profileVersion: confirmedProfile.profile_version, actor: args.confirmedBy } },
+        ]
+        for (const previous of currentByForm.values()) {
+          if (previous.formId !== proposal.formId && previous.state === 'confirmed') {
+            entries.push(
+              {
+                collection: 'style-forms',
+                record: { formId: previous.formId, brandId: previous.brandId, mode: previous.mode, state: 'superseded', data: previous.data, updatedBy: args.confirmedBy, supersededByProfileVersion: confirmedProfile.profile_version },
+                guard: { entityKey: `${previous.brandId}:${previous.formId}`, expectedEntityVersion: formVersions.get(previous.formId) ?? null },
+              },
+              { collection: 'audit-events', record: { event: 'style.form.superseded', brandId: previous.brandId, formId: previous.formId, profileVersion: confirmedProfile.profile_version, actor: args.confirmedBy } },
+            )
+          }
+        }
+        entries.push(
+          {
+            collection: 'style-forms',
+            record: { formId: form.formId, brandId: form.brandId, mode: form.mode, state: 'confirmed', data: form.data, updatedBy: args.confirmedBy, profileVersion: confirmedProfile.profile_version },
+            guard: { entityKey: `${form.brandId}:${form.formId}`, expectedEntityVersion: formVersions.get(form.formId) ?? null },
+          },
+          { collection: 'audit-events', record: { event: 'style.form.confirmed', brandId: form.brandId, formId: form.formId, profileVersion: confirmedProfile.profile_version, actor: args.confirmedBy } },
+        )
+        return entries
+      },
+    })
+    return ok({ brandId: args.brandId, profileVersion: profile.profile_version, proposalId: args.proposalId, formId: proposal.formId }, profileStorageWarnings())
+  } catch (error) {
+    if (error instanceof StorageConflictError) return err('PROFILE_CONFIRM_CONFLICT', 'The proposal, form, or brand profile changed concurrently; reload the workflow before confirming.')
+    throw error
+  }
 }
 
 export function styleFormSchema(): object {

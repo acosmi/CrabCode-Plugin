@@ -3,7 +3,7 @@
   "$id": "https://crabcode.local/media/research-capture.schema.json",
   "title": "Server-generated research source capture",
   "type": "object",
-  "required": ["captureId", "requestedUrl", "finalUrl", "httpStatus", "contentType", "snapshotText", "snapshotHash", "contentHash", "byteSize", "capturedAt", "capturedBy", "captureHash"],
+  "required": ["captureId", "requestedUrl", "finalUrl", "httpStatus", "contentType", "snapshotText", "snapshotHash", "contentHash", "byteSize", "connectedAddress", "resolvedAddresses", "capturedAt", "capturedBy", "captureHash"],
   "properties": {
     "captureId": { "type": "string", "format": "uuid" },
     "requestedUrl": { "type": "string", "pattern": "^https?://" },
@@ -14,6 +14,8 @@
     "snapshotHash": { "$ref": "#/$defs/sha256" },
     "contentHash": { "$ref": "#/$defs/sha256" },
     "byteSize": { "type": "integer", "minimum": 1, "maximum": 2000000 },
+    "connectedAddress": { "type": "string", "anyOf": [{ "format": "ipv4" }, { "format": "ipv6" }] },
+    "resolvedAddresses": { "type": "array", "minItems": 1, "maxItems": 32, "items": { "type": "string", "anyOf": [{ "format": "ipv4" }, { "format": "ipv6" }] } },
     "capturedAt": { "type": "string", "format": "date-time" },
     "capturedBy": { "type": "string", "minLength": 1 },
     "captureHash": { "$ref": "#/$defs/sha256" }

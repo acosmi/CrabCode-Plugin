@@ -1,11 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://crabcode.local/media/approval.schema.json",
-  "title": "Artifact-bound publish approval v2",
+  "title": "Authenticated artifact-bound publish approval v3",
   "type": "object",
-  "required": ["schemaVersion", "approvalId", "contentId", "revisionId", "contentHash", "articleDocHash", "deliveryId", "renderManifestHash", "primaryArtifactHash", "backupArtifactHash", "channelArtifactHashes", "rendererVersion", "templateVersion", "stylePolicyVersion", "sanitizationPolicyVersion", "platformRuleVersion", "approvalBindingHash", "platform", "state", "summary", "checklist", "requestedBy"],
+  "required": ["schemaVersion", "transitionVersion", "approvalId", "contentId", "revisionId", "contentHash", "articleDocHash", "deliveryId", "renderManifestHash", "primaryArtifactHash", "backupArtifactHash", "channelArtifactHashes", "rendererVersion", "templateVersion", "stylePolicyVersion", "sanitizationPolicyVersion", "platformRuleVersion", "approvalBindingHash", "platform", "state", "summary", "checklist", "requestedBy", "requestedIdentity"],
   "properties": {
-    "schemaVersion": { "const": 2 },
+    "schemaVersion": { "const": 3 },
+    "transitionVersion": { "type": "integer", "minimum": 1 },
     "approvalId": { "type": "string", "format": "uuid" },
     "contentId": { "type": "string", "format": "uuid" },
     "revisionId": { "type": "string", "format": "uuid" },
@@ -27,10 +28,38 @@
     "summary": { "type": "string", "minLength": 1 },
     "checklist": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
     "requestedBy": { "type": "string", "minLength": 1 },
+    "requestedIdentity": { "$ref": "#/$defs/identity" },
     "decidedBy": { "type": "string", "minLength": 1 },
+    "decidedIdentity": { "$ref": "#/$defs/identity" },
     "reason": { "type": "string", "minLength": 1 },
-    "decidedAt": { "type": "string", "format": "date-time" }
+    "decidedAt": { "type": "string", "format": "date-time" },
+    "packageId": { "type": "string", "format": "uuid" },
+    "packagedBy": { "type": "string", "minLength": 1 },
+    "packagedIdentity": { "$ref": "#/$defs/identity" },
+    "packagedAt": { "type": "string", "format": "date-time" }
   },
-  "$defs": { "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" } },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "identity": { "type": "object", "required": ["principalId", "issuer", "assurance"], "properties": { "principalId": { "type": "string", "minLength": 1 }, "issuer": { "type": "string", "minLength": 1 }, "assurance": { "enum": ["mcp_oauth", "host_principal"] } }, "additionalProperties": false }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "state": { "const": "pending" } }, "required": ["state"] },
+      "then": { "not": { "anyOf": [
+        { "required": ["decidedBy"] }, { "required": ["decidedIdentity"] }, { "required": ["reason"] }, { "required": ["decidedAt"] },
+        { "required": ["packageId"] }, { "required": ["packagedBy"] }, { "required": ["packagedIdentity"] }, { "required": ["packagedAt"] }
+      ] } },
+      "else": { "required": ["decidedBy", "decidedIdentity", "reason", "decidedAt"] }
+    },
+    {
+      "if": { "anyOf": [
+        { "required": ["packageId"] }, { "required": ["packagedBy"] }, { "required": ["packagedIdentity"] }, { "required": ["packagedAt"] }
+      ] },
+      "then": {
+        "required": ["packageId", "packagedBy", "packagedIdentity", "packagedAt"],
+        "properties": { "state": { "const": "approved" } }
+      }
+    }
+  ],
   "additionalProperties": false
 }

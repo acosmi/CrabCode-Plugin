@@ -2,8 +2,17 @@ import { randomUUID } from 'node:crypto'
 import { z } from 'zod'
 import { err, ok, type Envelope } from '../envelope.ts'
 import { Sha256Schema, namedActorsEqual, stableHash } from '../domain.ts'
+import type { TrustedPrincipal } from '../identity.ts'
 import { getPlatform } from '../platforms/registry.ts'
-import { appendRecord, listRecords, storageWarnings, type StoredRecord } from '../storage.ts'
+import {
+  appendRecordsAtomically,
+  listRecords,
+  StorageConflictError,
+  StorageLeaseError,
+  storageWarnings,
+  type AtomicAppend,
+  type StoredRecord,
+} from '../storage.ts'
 import { getLatestContent } from './content.ts'
 import { getDeliveryManifest, getLatestVerifiedDelivery, verifyDeliveryBytes } from './delivery.ts'
 import { inspectContent } from './readiness.ts'
@@ -11,7 +20,8 @@ import { inspectContent } from './readiness.ts'
 export type ApprovalState = 'pending' | 'approved' | 'rejected' | 'revoked'
 
 const approvalSchema = z.object({
-  schemaVersion: z.literal(2),
+  schemaVersion: z.literal(3),
+  transitionVersion: z.number().int().positive(),
   approvalId: z.string().uuid(),
   contentId: z.string().uuid(),
   revisionId: z.string().uuid(),
@@ -33,12 +43,58 @@ const approvalSchema = z.object({
   summary: z.string().min(1),
   checklist: z.array(z.string().min(1)).min(1),
   requestedBy: z.string().min(1),
+  requestedIdentity: z.object({
+    principalId: z.string().min(1),
+    issuer: z.string().min(1),
+    assurance: z.enum(['mcp_oauth', 'host_principal']),
+  }).strict(),
   decidedBy: z.string().min(1).optional(),
+  decidedIdentity: z.object({
+    principalId: z.string().min(1),
+    issuer: z.string().min(1),
+    assurance: z.enum(['mcp_oauth', 'host_principal']),
+  }).strict().optional(),
   reason: z.string().min(1).optional(),
   decidedAt: z.string().datetime().optional(),
+  packageId: z.string().uuid().optional(),
+  packagedBy: z.string().min(1).optional(),
+  packagedIdentity: z.object({
+    principalId: z.string().min(1),
+    issuer: z.string().min(1),
+    assurance: z.enum(['mcp_oauth', 'host_principal']),
+  }).strict().optional(),
+  packagedAt: z.string().datetime().optional(),
+}).strict().superRefine((value, ctx) => {
+  const decisionFields = [value.decidedBy, value.decidedIdentity, value.reason, value.decidedAt]
+  const packageFields = [value.packageId, value.packagedBy, value.packagedIdentity, value.packagedAt]
+  const hasAllDecisionFields = decisionFields.every((field) => field !== undefined)
+  const hasAnyDecisionField = decisionFields.some((field) => field !== undefined)
+  const hasAllPackageFields = packageFields.every((field) => field !== undefined)
+  const hasAnyPackageField = packageFields.some((field) => field !== undefined)
+  if (value.state === 'pending' ? hasAnyDecisionField : !hasAllDecisionFields) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['state'], message: 'pending approvals must omit decision fields; terminal decisions require all decision fields' })
+  }
+  if (hasAnyPackageField && (!hasAllPackageFields || value.state !== 'approved')) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['packageId'], message: 'package fields must appear as a complete group on an approved record' })
+  }
+  if ((value.state === 'pending' || value.state === 'rejected' || value.state === 'revoked') && hasAnyPackageField) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['packageId'], message: `${value.state} approvals cannot carry package fields` })
+  }
 })
 
 export type ApprovalRecord = StoredRecord & z.infer<typeof approvalSchema>
+
+function approvalData(record: unknown): z.infer<typeof approvalSchema> {
+  if (!record || typeof record !== 'object' || Array.isArray(record)) throw new Error('INVALID_STORED_APPROVAL:not an object')
+  const {
+    id: _storedId,
+    createdAt: _storedCreatedAt,
+    previousRecordHash: _storedPreviousRecordHash,
+    recordHash: _storedRecordHash,
+    ...data
+  } = record as StoredRecord
+  return approvalSchema.parse(data)
+}
 
 function bindingPayload(record: Pick<z.infer<typeof approvalSchema>,
   'contentId' | 'revisionId' | 'contentHash' | 'articleDocHash' | 'deliveryId' | 'renderManifestHash' |
@@ -64,10 +120,14 @@ function bindingPayload(record: Pick<z.infer<typeof approvalSchema>,
 }
 
 function parseApproval(record: unknown): ApprovalRecord {
-  const parsed = approvalSchema.safeParse(record)
-  if (!parsed.success) throw new Error(`INVALID_STORED_APPROVAL:${parsed.error.message}`)
-  if (stableHash(bindingPayload(parsed.data)) !== parsed.data.approvalBindingHash) throw new Error(`APPROVAL_BINDING_HASH_MISMATCH:${parsed.data.approvalId}`)
-  return record as ApprovalRecord
+  let parsed: z.infer<typeof approvalSchema>
+  try {
+    parsed = approvalData(record)
+  } catch (error) {
+    throw new Error(`INVALID_STORED_APPROVAL:${error instanceof Error ? error.message : String(error)}`)
+  }
+  if (stableHash(bindingPayload(parsed)) !== parsed.approvalBindingHash) throw new Error(`APPROVAL_BINDING_HASH_MISMATCH:${parsed.approvalId}`)
+  return { ...(record as StoredRecord), ...parsed } as ApprovalRecord
 }
 
 export async function getApproval(approvalId: string): Promise<ApprovalRecord | null> {
@@ -76,8 +136,48 @@ export async function getApproval(approvalId: string): Promise<ApprovalRecord | 
   return parseApproval(records[records.length - 1])
 }
 
+export function projectApprovalPackaged(
+  current: ApprovalRecord,
+  packageId: string,
+  principal: TrustedPrincipal,
+  packagedAt: string,
+): z.infer<typeof approvalSchema> {
+  return approvalSchema.parse({
+    ...approvalData(current),
+    transitionVersion: current.transitionVersion + 1,
+    packageId,
+    packagedBy: principal.actorKey,
+    packagedIdentity: identityRecord(principal),
+    packagedAt,
+  })
+}
+
+export async function markApprovalPackaged(
+  approvalId: string,
+  expectedTransitionVersion: number,
+  packageId: string,
+  principal: TrustedPrincipal,
+  options: { packagedAt: string; additionalEntries?: AtomicAppend[] },
+): Promise<{ transitionVersion: number; approval: z.infer<typeof approvalSchema> }> {
+  const current = await getApproval(approvalId)
+  if (!current || current.state !== 'approved' || current.transitionVersion !== expectedTransitionVersion || current.packageId) {
+    throw new StorageConflictError(`approval ${approvalId} changed before its package transition could be committed`)
+  }
+  const transitionVersion = current.transitionVersion + 1
+  const record = projectApprovalPackaged(current, packageId, principal, options.packagedAt)
+  await appendRecordsAtomically([
+    { collection: 'approvals', record: { id: randomUUID(), ...record }, guard: {
+      entityKey: approvalId,
+      expectedEntityVersion: expectedTransitionVersion,
+      entityVersion: transitionVersion,
+    } },
+    ...(options.additionalEntries ?? []),
+  ])
+  return { transitionVersion, approval: record }
+}
+
 export const requestName = 'mediaops.approval.request'
-export const requestDescription = 'Request named human approval for one exact verified HTML/Markdown delivery manifest and all content/render/artifact hashes.'
+export const requestDescription = 'Request authenticated-principal approval for one exact verified HTML/Markdown delivery manifest and all content/render/artifact hashes.'
 export const requestInputSchema = {
   contentId: z.string().uuid(),
   deliveryId: z.string().uuid(),
@@ -87,7 +187,16 @@ export const requestInputSchema = {
   requestedBy: z.string().min(1),
 }
 
-export async function requestHandler(args: { contentId: string; deliveryId: string; platform: 'wechat' | 'xhs' | 'toutiao'; summary: string; checklist: string[]; requestedBy: string }): Promise<Envelope> {
+function identityRecord(principal: TrustedPrincipal): { principalId: string; issuer: string; assurance: TrustedPrincipal['assurance'] } {
+  return { principalId: principal.principalId, issuer: principal.issuer, assurance: principal.assurance }
+}
+
+export async function requestHandler(
+  args: { contentId: string; deliveryId: string; platform: 'wechat' | 'xhs' | 'toutiao'; summary: string; checklist: string[]; requestedBy: string },
+  principal?: TrustedPrincipal,
+): Promise<Envelope> {
+  if (!principal) return err('AUTHENTICATION_REQUIRED', 'Approval requests require a trusted principal; requestedBy is not identity.')
+  const requestedBy = principal.actorKey
   const content = await getLatestContent(args.contentId)
   if (!content) return err('NOT_FOUND', `No content ${args.contentId}.`)
   if (content.platform !== args.platform) return err('PACKAGE_INPUT_MISMATCH', `Content targets ${content.platform ?? 'no platform'}, not ${args.platform}.`)
@@ -125,17 +234,33 @@ export async function requestHandler(args: { contentId: string; deliveryId: stri
     platform: args.platform,
   }
   const record = approvalSchema.parse({
-    schemaVersion: 2,
+    schemaVersion: 3,
+    transitionVersion: 1,
     approvalId,
     ...binding,
     approvalBindingHash: stableHash(bindingPayload(binding)),
     state: 'pending',
     summary: args.summary,
     checklist: args.checklist,
-    requestedBy: args.requestedBy,
+    requestedBy,
+    requestedIdentity: identityRecord(principal),
   })
-  await appendRecord('approvals', { id: approvalId, ...record })
-  await appendRecord('audit-events', { event: 'approval.requested', approvalId, ...binding, approvalBindingHash: record.approvalBindingHash, actor: args.requestedBy })
+  try {
+    await appendRecordsAtomically([
+      { collection: 'approvals', record: { id: approvalId, ...record }, guard: {
+        entityKey: approvalId,
+        expectedEntityVersion: null,
+        entityVersion: 1,
+      } },
+      { collection: 'audit-events', record: {
+        event: 'approval.requested', approvalId, ...binding, approvalBindingHash: record.approvalBindingHash,
+        actor: requestedBy, actorAssurance: principal.assurance,
+      } },
+    ])
+  } catch (error) {
+    if (error instanceof StorageConflictError) return err('APPROVAL_CONFLICT', 'The approval was concurrently created; retry the request.')
+    throw error
+  }
   return ok({
     approvalId,
     state: 'pending',
@@ -148,7 +273,7 @@ export async function requestHandler(args: { contentId: string; deliveryId: stri
 }
 
 export const decideName = 'mediaops.approval.decide'
-export const decideDescription = 'Approve, reject or revoke an exact pending delivery binding. Approval rechecks content, platform rules, delivery manifest and every frozen byte.'
+export const decideDescription = 'Approve or reject an exact pending delivery binding, or revoke an approved binding before packaging. Approval rechecks content, platform rules, delivery manifest and every frozen byte.'
 export const decideInputSchema = {
   approvalId: z.string().uuid(),
   decision: z.enum(['approved', 'rejected', 'revoked']),
@@ -156,15 +281,21 @@ export const decideInputSchema = {
   reason: z.string().min(1),
 }
 
-export async function decideHandler(args: { approvalId: string; decision: 'approved' | 'rejected' | 'revoked'; decidedBy: string; reason: string }): Promise<Envelope> {
+export async function decideHandler(
+  args: { approvalId: string; decision: 'approved' | 'rejected' | 'revoked'; decidedBy: string; reason: string },
+  principal?: TrustedPrincipal,
+): Promise<Envelope> {
+  if (!principal) return err('AUTHENTICATION_REQUIRED', 'Approval decisions require a trusted principal; decidedBy is not identity.')
+  const decidedBy = principal.actorKey
   const current = await getApproval(args.approvalId)
   if (!current) return err('NOT_FOUND', `No approval ${args.approvalId}.`)
+  if (current.packageId || current.packagedAt) return err('INVALID_APPROVAL_TRANSITION', 'A committed package is terminal because exported bytes cannot be recalled; create a new revision and approval for any withdrawal or correction.')
   if (args.decision === 'revoked') {
     if (current.state !== 'approved') return err('INVALID_APPROVAL_TRANSITION', `Only approved records can be revoked; current state is ${current.state}.`)
   } else if (current.state !== 'pending') {
     return err('INVALID_APPROVAL_TRANSITION', `Only pending records can be approved or rejected; current state is ${current.state}.`)
   }
-  if (args.decision === 'approved' && namedActorsEqual(args.decidedBy, current.requestedBy)) return err('ROLE_SEPARATION_REQUIRED', 'The approval decider must differ from the requester.')
+  if (args.decision === 'approved' && namedActorsEqual(decidedBy, current.requestedBy)) return err('ROLE_SEPARATION_REQUIRED', 'The approval decider must differ from the requester.')
   if (args.decision === 'approved') {
     const content = await getLatestContent(current.contentId)
     if (!content || !('schemaVersion' in content) || content.schemaVersion !== 2 || content.contentHash !== current.contentHash || content.revisionId !== current.revisionId || content.articleDocHash !== current.articleDocHash) {
@@ -185,21 +316,49 @@ export async function decideHandler(args: { approvalId: string; decision: 'appro
     }
   }
   const decidedAt = new Date().toISOString()
-  await appendRecord('approvals', { ...current, id: randomUUID(), createdAt: decidedAt, state: args.decision, decidedBy: args.decidedBy, reason: args.reason, decidedAt })
-  await appendRecord('audit-events', { event: `approval.${args.decision}`, approvalId: args.approvalId, contentId: current.contentId, revisionId: current.revisionId, contentHash: current.contentHash, deliveryId: current.deliveryId, renderManifestHash: current.renderManifestHash, actor: args.decidedBy, reason: args.reason })
-  return ok({ approvalId: args.approvalId, state: args.decision, decidedBy: args.decidedBy, decidedAt }, storageWarnings())
+  const transitionVersion = current.transitionVersion + 1
+  try {
+    await appendRecordsAtomically([
+      { collection: 'approvals', record: {
+        ...approvalData(current),
+        id: randomUUID(),
+        createdAt: decidedAt,
+        transitionVersion,
+        state: args.decision,
+        decidedBy,
+        decidedIdentity: identityRecord(principal),
+        reason: args.reason,
+        decidedAt,
+      }, guard: {
+        entityKey: args.approvalId,
+        expectedEntityVersion: current.transitionVersion,
+        entityVersion: transitionVersion,
+        requireNoLease: true,
+      } },
+      { collection: 'audit-events', record: {
+        event: `approval.${args.decision}`, approvalId: args.approvalId, contentId: current.contentId,
+        revisionId: current.revisionId, contentHash: current.contentHash, deliveryId: current.deliveryId,
+        renderManifestHash: current.renderManifestHash, actor: decidedBy, actorAssurance: principal.assurance, reason: args.reason,
+      } },
+    ])
+  } catch (error) {
+    if (error instanceof StorageLeaseError) return err('APPROVAL_BUSY', 'Packaging holds this approval lease; retry after packaging finishes or the lease expires.')
+    if (error instanceof StorageConflictError) return err('APPROVAL_CONFLICT', 'Another process changed this approval; reload it before deciding.')
+    throw error
+  }
+  return ok({ approvalId: args.approvalId, state: args.decision, decidedBy, decidedAt, transitionVersion }, storageWarnings())
 }
 
 export const getName = 'mediaops.approval.get'
-export const getDescription = 'Get the current validated state of one v2 approval.'
+export const getDescription = 'Get the current validated state of one authenticated v3 approval.'
 export const getInputSchema = { approvalId: z.string().uuid() }
 export async function getHandler(args: { approvalId: string }): Promise<Envelope> {
   const record = await getApproval(args.approvalId)
-  return record ? ok(record, storageWarnings()) : err('NOT_FOUND', `No approval ${args.approvalId}.`)
+  return record ? ok(approvalData(record), storageWarnings()) : err('NOT_FOUND', `No approval ${args.approvalId}.`)
 }
 
 export const listName = 'mediaops.approval.list'
-export const listDescription = 'List current validated v2 approval states, optionally scoped by contentId or state.'
+export const listDescription = 'List current validated authenticated v3 approval states, optionally scoped by contentId or state.'
 export const listInputSchema = { contentId: z.string().uuid().optional(), state: z.enum(['pending', 'approved', 'rejected', 'revoked']).optional() }
 export async function listHandler(args: { contentId?: string; state?: ApprovalState } = {}): Promise<Envelope> {
   const events = await listRecords('approvals')
@@ -208,6 +367,8 @@ export async function listHandler(args: { contentId?: string; state?: ApprovalSt
     const parsed = parseApproval(event)
     current.set(parsed.approvalId, parsed)
   }
-  const approvals = [...current.values()].filter((item) => (!args.contentId || item.contentId === args.contentId) && (!args.state || item.state === args.state))
+  const approvals = [...current.values()]
+    .filter((item) => (!args.contentId || item.contentId === args.contentId) && (!args.state || item.state === args.state))
+    .map(approvalData)
   return ok({ count: approvals.length, approvals }, storageWarnings())
 }

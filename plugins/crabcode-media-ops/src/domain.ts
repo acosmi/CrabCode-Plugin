@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
 
-export const VERSION = '0.4.0-rc1'
+export const VERSION = '0.4.0'
 export const SCHEMA_VERSION = 2 as const
 
 const Sha256Schema = z.string().regex(/^[a-f0-9]{64}$/)
@@ -101,12 +101,41 @@ export const ResearchCaptureSchema = z.object({
   snapshotHash: Sha256Schema,
   contentHash: Sha256Schema,
   byteSize: z.number().int().positive().max(2_000_000),
+  connectedAddress: z.string().ip(),
+  resolvedAddresses: z.array(z.string().ip()).min(1).max(32),
   capturedAt: z.string().datetime(),
   capturedBy: z.string().trim().min(1).max(300),
   captureHash: Sha256Schema,
 })
 
 export type ResearchCapture = z.infer<typeof ResearchCaptureSchema>
+
+export const SourceAssessmentSchema = z.object({
+  publisherType: z.enum([
+    'government',
+    'court',
+    'standards_body',
+    'academic',
+    'company',
+    'professional_media',
+    'industry_organization',
+    'individual',
+    'unknown',
+  ]),
+  sourceFunction: z.enum([
+    'original_record',
+    'first_party_statement',
+    'official_interpretation',
+    'independent_reporting',
+    'professional_analysis',
+    'context',
+  ]),
+  originRelationship: z.enum(['original', 'syndicated', 'unknown']),
+  basisExcerpt: z.string().min(1).max(1500),
+  classificationRationale: z.string().min(20).max(2000),
+  assessedBy: z.string().trim().min(1).max(300),
+  assessedAt: z.string().datetime(),
+}).strict()
 
 export const EvidenceSourceSchema = z.object({
   sourceId: z.string().uuid(),
@@ -121,12 +150,58 @@ export const EvidenceSourceSchema = z.object({
   accessedAt: z.string().datetime(),
   sourceTier: z.enum(['primary', 'authoritative', 'professional', 'context']),
   isPrimary: z.boolean(),
+  publisherIdentityMethod: z.enum(['recognized-institutional-domain', 'configured-trusted-host', 'unverified']),
+  publisherIdentityRule: z.string().min(1).max(253).optional(),
+  trustedHostConfigurationHash: Sha256Schema.optional(),
+  assessment: SourceAssessmentSchema,
   independenceGroup: z.string().min(1).max(200),
   retrievalStatus: z.literal('retrieved'),
   snapshotRef: z.string().max(1000).optional(),
   snapshotHash: Sha256Schema,
   contentHash: Sha256Schema,
   rightsOrTerms: z.string().max(1000).optional(),
+}).strict().superRefine((value, ctx) => {
+  const strongIdentity = value.publisherIdentityMethod !== 'unverified'
+  if (value.isPrimary !== (value.sourceTier === 'primary')) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['isPrimary'], message: 'isPrimary must be true exactly when sourceTier is primary' })
+  }
+  if ((value.sourceTier === 'primary' || value.sourceTier === 'authoritative') && !strongIdentity) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['publisherIdentityMethod'], message: `${value.sourceTier} sources require verified publisher-host identity` })
+  }
+  const functionByTier: Record<typeof value.sourceTier, ReadonlySet<typeof value.assessment.sourceFunction>> = {
+    primary: new Set(['original_record', 'first_party_statement']),
+    authoritative: new Set(['official_interpretation']),
+    professional: new Set(['independent_reporting', 'professional_analysis']),
+    context: new Set(['original_record', 'first_party_statement', 'official_interpretation', 'independent_reporting', 'professional_analysis', 'context']),
+  }
+  if (!functionByTier[value.sourceTier].has(value.assessment.sourceFunction)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['sourceTier'], message: `sourceTier ${value.sourceTier} is incompatible with sourceFunction ${value.assessment.sourceFunction}` })
+  }
+  if (value.sourceTier !== 'context' && value.assessment.originRelationship !== 'original') {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['assessment', 'originRelationship'], message: 'non-context source tiers require an original source relationship' })
+  }
+  let finalHost = ''
+  try {
+    finalHost = new URL(value.finalUrl).hostname.toLowerCase().replace(/\.$/, '')
+  } catch {
+    // SafeHttpUrlSchema reports the URL issue separately.
+  }
+  const ruleMatches = (rule: string): boolean => value.publisherIdentityMethod === 'configured-trusted-host'
+    ? (rule.startsWith('*.') ? finalHost.endsWith(rule.slice(1)) && finalHost !== rule.slice(2) : finalHost === rule)
+    : finalHost === rule || finalHost.endsWith(`.${rule}`)
+  if (value.publisherIdentityMethod === 'unverified') {
+    if (value.publisherIdentityRule || value.trustedHostConfigurationHash) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['publisherIdentityRule'], message: 'unverified publisher identity must not carry a trust rule or configuration hash' })
+    }
+  } else if (!value.publisherIdentityRule || !ruleMatches(value.publisherIdentityRule)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['publisherIdentityRule'], message: 'verified publisher identity requires the exact matching host rule' })
+  }
+  if (value.publisherIdentityMethod === 'configured-trusted-host' && !value.trustedHostConfigurationHash) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['trustedHostConfigurationHash'], message: 'configured host trust requires a configuration hash' })
+  }
+  if (value.publisherIdentityMethod !== 'configured-trusted-host' && value.trustedHostConfigurationHash) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['trustedHostConfigurationHash'], message: 'configuration hash is only valid for configured host trust' })
+  }
 })
 
 export const ResearchClaimSchema = z.object({
@@ -186,6 +261,36 @@ export const ClaimSchema = z.object({
   evidenceLinkIds: z.array(z.string().min(1)).default([]),
 })
 
+export const VerifiableStatementSchema = z.object({
+  statementId: Sha256Schema,
+  location: z.enum(['title', 'summary', 'body']),
+  ordinal: z.number().int().nonnegative(),
+  text: z.string().min(1).max(5000),
+  signals: z.array(z.string().min(1).max(200)).min(1).max(50),
+})
+
+export const StatementCoverageSchema = z.object({
+  statementId: Sha256Schema,
+  classification: z.enum(['verified_fact', 'author_inference', 'opinion', 'non_claim']),
+  claimIds: z.array(z.string().min(1).max(120)).max(20),
+  directionConfirmed: z.literal(true).optional(),
+  rationale: z.string().min(20).max(2000),
+  inferenceMarker: z.string().min(1).max(120).optional(),
+}).strict().superRefine((value, ctx) => {
+  if (value.classification === 'verified_fact' || value.classification === 'author_inference') {
+    if (value.claimIds.length === 0) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['claimIds'], message: `${value.classification} requires at least one verified research claim` })
+    if (value.directionConfirmed !== true) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['directionConfirmed'], message: `${value.classification} requires directionConfirmed=true` })
+  } else if (value.claimIds.length > 0 || value.directionConfirmed !== undefined) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['claimIds'], message: `${value.classification} must not claim factual evidence coverage` })
+  }
+  if (value.classification === 'author_inference' && !value.inferenceMarker) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['inferenceMarker'], message: 'author_inference requires the exact visible inference marker' })
+  }
+  if (value.classification !== 'author_inference' && value.inferenceMarker !== undefined) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['inferenceMarker'], message: 'inferenceMarker is only valid for author_inference' })
+  }
+})
+
 export const ReviewSchema = z.object({
   status: z.literal('completed'),
   subjectHash: Sha256Schema,
@@ -194,6 +299,9 @@ export const ReviewSchema = z.object({
   completedBy: z.string().trim().min(1).max(300),
   completedAt: z.string().datetime(),
   claims: z.array(ClaimSchema).max(200),
+  statementLedgerHash: Sha256Schema,
+  statements: z.array(VerifiableStatementSchema).max(1000),
+  statementCoverage: z.array(StatementCoverageSchema).max(1000),
   noVerifiableClaimsReason: z.string().min(1).optional(),
   waivers: z
     .array(
@@ -217,12 +325,32 @@ export const LegalReviewSchema = z.object({
 
 export const AiDisclosureSchema = z.object({
   aiAssisted: z.boolean(),
-  methods: z.array(z.enum(['platform-native', 'body-label', 'file-metadata'])).default([]),
+  methods: z.array(z.enum(['platform-native', 'body-label', 'file-metadata'])).max(3).default([]),
   bodyLabelText: z.string().min(1).max(500).optional(),
   platformNativeConfirmed: z.boolean().optional(),
   fileMetadataConfirmed: z.boolean().optional(),
   confirmedBy: z.string().trim().min(1).max(300).optional(),
   ruleVersion: z.string().min(1).optional(),
+}).strict().superRefine((value, ctx) => {
+  if (new Set(value.methods).size !== value.methods.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['methods'], message: 'AI disclosure methods must be unique' })
+  }
+  if (value.aiAssisted) {
+    if (!value.methods.length || !value.confirmedBy) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['methods'], message: 'AI-assisted content requires at least one confirmed disclosure method' })
+  } else if (value.methods.length || value.bodyLabelText || value.platformNativeConfirmed !== undefined || value.fileMetadataConfirmed !== undefined || value.confirmedBy || value.ruleVersion) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['aiAssisted'], message: 'non-AI-assisted content must not carry disclosure fields' })
+  }
+  if (value.methods.includes('body-label') && !value.bodyLabelText) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['bodyLabelText'], message: 'bodyLabelText is required when body-label is declared' })
+  } else if (!value.methods.includes('body-label') && value.bodyLabelText) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['bodyLabelText'], message: 'bodyLabelText is forbidden unless body-label is declared' })
+  }
+  if (value.methods.includes('platform-native') ? value.platformNativeConfirmed !== true : value.platformNativeConfirmed !== undefined) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['platformNativeConfirmed'], message: 'platformNativeConfirmed=true is required exactly when platform-native is declared' })
+  }
+  if (value.methods.includes('file-metadata') ? value.fileMetadataConfirmed !== true : value.fileMetadataConfirmed !== undefined) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['fileMetadataConfirmed'], message: 'fileMetadataConfirmed=true is required exactly when file-metadata is declared' })
+  }
 })
 
 export const AssetInputSchema = z.object({
@@ -494,6 +622,30 @@ export const DeliveryArtifactSchema = z.object({
 
 export type DeliveryArtifact = z.infer<typeof DeliveryArtifactSchema>
 
+const DeliveryQaArtifactSchema = z.object({
+  relativePath: z.string().min(1),
+  mediaType: z.string().min(1),
+  byteSize: z.number().int().positive(),
+  sha256: Sha256Schema,
+})
+
+const DeliveryQaEvidenceSchema = z.object({
+  schemaVersion: z.literal('mediaops-delivery-qa-evidence@1'),
+  status: z.literal('passed'),
+  htmlSha256: Sha256Schema,
+  tools: z.object({
+    java: z.string().nullable(),
+    vnuPackage: z.string().min(1),
+    vnuRuntime: z.string().nullable(),
+    playwright: z.string().min(1),
+    chromium: z.string().nullable(),
+    axe: z.string().min(1),
+  }).strict(),
+  checks: z.array(z.object({ id: z.string().min(1), status: z.literal('passed'), detail: z.string().min(1) })).min(1),
+  artifacts: z.array(DeliveryQaArtifactSchema).min(3),
+  completedAt: z.string().datetime(),
+})
+
 export const DeliveryManifestSchema = z.object({
   deliveryId: z.string().uuid(),
   contentId: z.string().uuid(),
@@ -517,6 +669,7 @@ export const DeliveryManifestSchema = z.object({
   accessibilityStatus: z.enum(['passed', 'failed', 'manual_required']),
   visualReviewStatus: z.enum(['pending', 'passed', 'failed']),
   checks: z.array(z.object({ id: z.string().min(1), status: z.enum(['passed', 'failed']), detail: z.string().min(1) })),
+  qaEvidence: DeliveryQaEvidenceSchema.optional(),
   visualReview: z.object({
     reviewedBy: z.string().trim().min(1).max(300),
     reviewedAt: z.string().datetime(),
@@ -533,6 +686,73 @@ export const DeliveryManifestSchema = z.object({
 })
 
 export type DeliveryManifest = z.infer<typeof DeliveryManifestSchema>
+
+const PackageRelativePathSchema = z.string().min(1).refine((value) =>
+  /^[A-Za-z0-9._/-]+$/.test(value) && !value.startsWith('/') && !value.includes(':') && value.split('/').every((part) => part && part !== '.' && part !== '..'),
+  'package path must be a safe relative POSIX path',
+)
+
+const PackageIdentitySchema = z.object({
+  principalId: z.string().min(1),
+  issuer: z.string().min(1),
+  assurance: z.enum(['mcp_oauth', 'host_principal']),
+}).strict()
+
+export const PackageManifestSchema = z.object({
+  schemaVersion: z.literal(4),
+  packageId: z.string().uuid(),
+  pluginVersion: z.string().min(1),
+  platform: z.enum(['wechat', 'xhs', 'toutiao']),
+  platformDisplayName: z.string().min(1),
+  platformRuleVersion: z.string().min(1),
+  contentId: z.string().uuid(),
+  revisionId: z.string().uuid(),
+  contentRevision: z.number().int().positive(),
+  contentHash: Sha256Schema,
+  articleDocHash: Sha256Schema,
+  deliveryId: z.string().uuid(),
+  renderManifestHash: Sha256Schema,
+  approvalId: z.string().uuid(),
+  approvedTransitionVersion: z.number().int().positive(),
+  packageCommitTransitionVersion: z.number().int().positive(),
+  approvalBindingHash: Sha256Schema,
+  primaryArtifact: DeliveryArtifactSchema,
+  backupArtifact: DeliveryArtifactSchema,
+  channelArtifacts: z.array(DeliveryArtifactSchema),
+  assets: z.array(z.object({
+    assetId: z.string().uuid(),
+    relativePath: PackageRelativePathSchema,
+    sha256: Sha256Schema,
+    byteSize: z.number().int().positive(),
+    mediaType: z.string().min(1),
+  }).strict()).max(100),
+  qaEvidence: DeliveryQaEvidenceSchema.optional(),
+  defaultUserPresentation: z.literal('article.html (HTML primary)'),
+  backup: z.literal('article.md (Markdown backup)'),
+  publishMode: z.literal('package-only; manual platform submission; no rerender during packaging'),
+  packagedBy: z.string().min(1),
+  packagedIdentity: PackageIdentitySchema,
+  createdAt: z.string().datetime(),
+  files: z.array(PackageRelativePathSchema).min(4).max(1000),
+}).strict().superRefine((value, ctx) => {
+  if (value.primaryArtifact.role !== 'primary' || value.primaryArtifact.format !== 'html') {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['primaryArtifact'], message: 'primary artifact must be HTML with role=primary' })
+  }
+  if (value.backupArtifact.role !== 'backup' || value.backupArtifact.format !== 'markdown') {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['backupArtifact'], message: 'backup artifact must be Markdown with role=backup' })
+  }
+  if (value.channelArtifacts.some((artifact) => artifact.role !== 'channel_variant')) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['channelArtifacts'], message: 'channel artifacts must use role=channel_variant' })
+  }
+  if (value.packageCommitTransitionVersion !== value.approvedTransitionVersion + 1) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['packageCommitTransitionVersion'], message: 'package commit transition must immediately follow the approved transition' })
+  }
+  if (new Set(value.files).size !== value.files.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['files'], message: 'package file inventory must not contain duplicates' })
+  }
+})
+
+export type PackageManifest = z.infer<typeof PackageManifestSchema>
 
 function canonicalize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(canonicalize)

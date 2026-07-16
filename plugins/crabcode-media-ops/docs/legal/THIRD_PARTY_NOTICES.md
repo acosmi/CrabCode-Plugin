@@ -26,6 +26,16 @@
 | `rehype-sanitize`、`rehype-stringify` | MIT | HAST 白名单净化与确定性 HTML 序列化。 |
 | `hono`（SDK 间接依赖，锁定 4.12.25） | MIT | SDK 间接 HTTP 运行时；通过 override 固定已修复版本。 |
 
+## 自动化 QA 运行时依赖
+
+| 依赖 | 锁定版本 | 许可证 | 用途 |
+|---|---:|---|---|
+| `@playwright/test`（含 `playwright`、`playwright-core`） | 1.61.1 | Apache-2.0 | 固定 Chromium 浏览器执行响应式、白底、文本压力、截图与打印回归。 |
+| `@axe-core/playwright`（含 `axe-core`） | 4.12.1 | MPL-2.0 | 对实际浏览器页面执行可访问性检查并记录违规节点。 |
+| `vnu-jar` | 26.7.15 | MIT | 随包提供 Nu Html Checker JAR，由 Java 17+ 直接执行 HTML 校验。 |
+
+Playwright 下载的 Chromium/Chrome for Testing 浏览器二进制不嵌入本插件源码包；其自身及所含第三方组件适用各自随附许可与 notices。QA 报告会记录实际 Chromium 版本，CI 不回退到系统浏览器。
+
 完整锁定组件见 `SBOM.cdx.json`（CycloneDX 1.5）；完整许可证文本仍以上游 LICENSE 为准。`bun run validate` 会阻断 SBOM 与 `bun.lock`、直接依赖或 Hono 安全固定版本漂移。
 
 ## 说明

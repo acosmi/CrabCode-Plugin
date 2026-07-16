@@ -16,7 +16,7 @@ describe('traceable previews', () => {
 
   test('renders only from stored content and returns revision/hash', async () => {
     const version = await createProfile('preview-brand')
-    const content = await createReviewedContent({ dir, brandId: 'preview-brand', profileVersion: version })
+    const content = await createReviewedContent({ dir, brandId: 'preview-brand', profileVersion: version, deliveryMode: 'verified' })
     const env = await handler({ contentId: content.contentId, platform: 'wechat' })
     expect(env.status).toBe('ok')
     expect((env.data as any).revisionId).toBe(content.revisionId)

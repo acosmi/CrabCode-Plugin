@@ -18,7 +18,15 @@ import {
   type ContentManifestV2,
 } from '../domain.ts'
 import { buildArticleDoc, editorialSubjectHash, ArticleDocError } from '../rendering/article-doc.ts'
-import { appendRecord, dataDir, getRecord, listRecords, storageWarnings } from '../storage.ts'
+import {
+  appendRecordsAtomically,
+  dataDir,
+  getRecord,
+  listRecords,
+  StorageConflictError,
+  StorageLeaseError,
+  storageWarnings,
+} from '../storage.ts'
 import { getEditorialReview } from './editorial-review.ts'
 import { getOriginalityScan, originalityScanPasses } from './originality.ts'
 import { loadReferenceRecords } from './references.ts'
@@ -315,19 +323,36 @@ async function saveHandlerUnlocked(args: SaveArgs): Promise<Envelope> {
   }
   const contentHash = computeContentHash(withoutHash)
   const manifest = ContentManifestV2Schema.parse({ ...withoutHash, revisionId, revision, contentHash, createdAt })
-  await appendRecord('content', { id: revisionId, ...manifest })
-  await appendRecord('audit-events', {
-    event: 'content.revision.saved',
-    schemaVersion: SCHEMA_VERSION,
-    contentId,
-    revisionId,
-    revision,
-    stage: input.stage,
-    contentHash,
-    articleDocHash: article.articleDocHash,
-    brandId: input.brandId,
-    actor: input.savedBy,
-  })
+  try {
+    await appendRecordsAtomically([
+      { collection: 'content', record: { id: revisionId, ...manifest }, guard: {
+        entityKey: contentId,
+        expectedEntityVersion: prior?.revision ?? null,
+        entityVersion: revision,
+        requireNoLease: true,
+      } },
+      { collection: 'audit-events', record: {
+        event: 'content.revision.saved',
+        schemaVersion: SCHEMA_VERSION,
+        contentId,
+        revisionId,
+        revision,
+        stage: input.stage,
+        contentHash,
+        articleDocHash: article.articleDocHash,
+        brandId: input.brandId,
+        actor: input.savedBy,
+      } },
+    ])
+  } catch (error) {
+    if (error instanceof StorageLeaseError) {
+      return err('CONTENT_BUSY', 'Packaging holds this content lease; retry after packaging finishes or the lease expires.')
+    }
+    if (error instanceof StorageConflictError) {
+      return err('REVISION_CONFLICT', 'Another process saved this content while the revision was being prepared; reload the latest revision and retry.')
+    }
+    throw error
+  }
   return ok({ contentId, revisionId, revision, stage: input.stage, contentHash, articleDocHash: article.articleDocHash }, storageWarnings())
 }
 

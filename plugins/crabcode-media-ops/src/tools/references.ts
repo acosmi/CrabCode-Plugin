@@ -9,7 +9,7 @@ import {
   stableHash,
   type ReferenceMaterial,
 } from '../domain.ts'
-import { appendRecord, getRecord, listRecords, storageWarnings } from '../storage.ts'
+import { appendRecordsAtomically, getRecord, listRecords, storageWarnings } from '../storage.ts'
 
 const registerSchema = z.object({
   role: ReferenceRoleSchema,
@@ -58,14 +58,16 @@ export async function registerHandler(args: z.input<typeof registerSchema>): Pro
     const rightsIssue = metadata.error.issues.some((issue) => issue.path.includes('rightsStatus'))
     return err(rightsIssue ? 'REFERENCE_RIGHTS_REQUIRED' : 'REFERENCE_USAGE_NOT_ALLOWED', metadata.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`).join('; '))
   }
-  await appendRecord('references', { id: referenceId, ...metadata.data, rawText })
-  await appendRecord('audit-events', {
-    event: 'reference.registered',
-    referenceId,
-    role: metadata.data.role,
-    contentHash: metadata.data.contentHash,
-    actor: input.registeredBy,
-  })
+  await appendRecordsAtomically([
+    { collection: 'references', record: { id: referenceId, ...metadata.data, rawText } },
+    { collection: 'audit-events', record: {
+      event: 'reference.registered',
+      referenceId,
+      role: metadata.data.role,
+      contentHash: metadata.data.contentHash,
+      actor: input.registeredBy,
+    } },
+  ])
   return ok({ reference: metadata.data, rawTextStored: true, writerPayloadContainsRawText: false }, storageWarnings())
 }
 

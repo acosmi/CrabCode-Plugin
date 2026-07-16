@@ -2,6 +2,7 @@ import { ok, type Envelope } from '../envelope.ts'
 import { PLATFORMS } from '../platforms/registry.ts'
 import { buildSources } from '../sources/index.ts'
 import { VERSION } from '../domain.ts'
+import type { TrustedPrincipal } from '../identity.ts'
 import { RENDER_CONTRACT } from '../rendering/renderer.ts'
 
 export const name = 'mediaops.capabilities'
@@ -10,7 +11,7 @@ export const description =
 
 export const inputSchema = {}
 
-export async function handler(): Promise<Envelope> {
+export async function handler(_args: Record<string, never> = {}, principal?: TrustedPrincipal): Promise<Envelope> {
   const registry = buildSources()
   return ok({
     version: VERSION,
@@ -31,18 +32,27 @@ export async function handler(): Promise<Envelope> {
       strictStageProgression: ['intake', 'researched', 'drafted', 'reviewed'],
       protectedReferenceRegistry: true,
       serverGeneratedEvidenceCapture: true,
+      hashVerifiedResearchBundleRecovery: 'mediaops.research.get',
       searchExecutionEvidence: 'caller-recorded; captured pages are server-generated',
-      sourceIndependenceChecks: ['distinct-final-host', 'declared-origin-publisher', 'same-page-dedup', 'exact-snapshot-dedup'],
+      sourceIndependenceChecks: ['organization-host', 'accountable-publisher', 'same-page-dedup', 'exact-snapshot-dedup', 'near-duplicate-clustering'],
+      sourceClassifications: 'derived from accountable snapshot-bound assessments; direct sourceTier/isPrimary input is rejected',
       factCheckRequired: true,
+      deterministicArticleStatementLedger: true,
       originalityReviewRequired: true,
       deterministicOriginalityEvidence: true,
-      roleSeparatedNamedAttestations: true,
-      authenticatedActorIdentity: false,
+      authenticatedRoleSeparatedAttestations: true,
+      authenticatedActorIdentity: Boolean(principal),
+      actorIdentityAssurance: principal?.assurance ?? 'required',
+      actorPrincipalId: principal?.principalId,
+      actorRoles: principal?.roles ?? [],
       defaultDeliveryFormat: 'html',
       backupFormat: 'markdown',
       deliveryCandidateFreeze: true,
       deliveryByteVerification: true,
-      automaticBrowserVisualVerification: false,
+      automaticBrowserVisualVerification: true,
+      automaticHtmlValidation: 'Nu Html Checker 26.7.15',
+      automaticAccessibilityVerification: 'axe-core 4.12.1 automated rules plus manual review',
+      fixedBrowserEvidence: 'Playwright 1.61.1 / Chromium 149.0.7827.55',
       namedVisualReviewAttestation: true,
       renderContract: RENDER_CONTRACT,
       approvalStateMachine: true,

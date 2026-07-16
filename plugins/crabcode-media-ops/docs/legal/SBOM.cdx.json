@@ -6,9 +6,9 @@
     "component": {
       "type": "application",
       "name": "crabcode-media-ops-mcp",
-      "version": "0.4.0-rc1",
-      "bom-ref": "pkg:npm/crabcode-media-ops-mcp@0.4.0-rc1",
-      "purl": "pkg:npm/crabcode-media-ops-mcp@0.4.0-rc1",
+      "version": "0.4.0",
+      "bom-ref": "pkg:npm/crabcode-media-ops-mcp@0.4.0",
+      "purl": "pkg:npm/crabcode-media-ops-mcp@0.4.0",
       "licenses": [
         {
           "expression": "Apache-2.0"
@@ -27,6 +27,30 @@
     ]
   },
   "components": [
+    {
+      "type": "library",
+      "name": "@axe-core/playwright",
+      "version": "4.12.1",
+      "bom-ref": "pkg:npm/%40axe-core/playwright@4.12.1",
+      "purl": "pkg:npm/%40axe-core/playwright@4.12.1",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "acc77bc6b8a9b6a2a93fec39dbae62e07764bf65f991bbbaba2062fc1d88eee7f786279104cdea0c27da28fb717e261bda62977c5fb22ce0c9c08c7e26fd460f"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "@axe-core/playwright"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "direct-runtime"
+        }
+      ]
+    },
     {
       "type": "library",
       "name": "@hono/node-server",
@@ -72,6 +96,30 @@
         {
           "name": "crabcode:bun-lock-key",
           "value": "@modelcontextprotocol/sdk"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "direct-runtime"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "@playwright/test",
+      "version": "1.61.1",
+      "bom-ref": "pkg:npm/%40playwright/test@1.61.1",
+      "purl": "pkg:npm/%40playwright/test@1.61.1",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "f272afebed112522fd144e2360e1065e73de33f1e0d76a99a66ab3663461dea33463b737cf59ab3937c52e276cef6443418561f56a4b11f47959da4d5f87e48a"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "@playwright/test"
         },
         {
           "name": "crabcode:dependency-kind",
@@ -331,6 +379,29 @@
         {
           "name": "crabcode:bun-lock-key",
           "value": "ajv-formats"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "axe-core",
+      "version": "4.12.1",
+      "bom-ref": "pkg:npm/axe-core@4.12.1",
+      "purl": "pkg:npm/axe-core@4.12.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "b3b8867f919a54cc441b410d37dc7ec53afb1856426f564fff5b804d4a4210ad97efc9c30774706ed142a3da4601ff6bbbe570a10e3ae0391a2c4791334f3024"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "axe-core"
         },
         {
           "name": "crabcode:dependency-kind",
@@ -938,6 +1009,29 @@
     },
     {
       "type": "library",
+      "name": "entities",
+      "version": "6.0.1",
+      "bom-ref": "pkg:npm/entities@6.0.1",
+      "purl": "pkg:npm/entities@6.0.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "68df7b357585e805814da85f54e22b07f352864ce2e47ec5f6bd6cf660f77038f82a8e5fdaa86156860c89b5c5ec694bbde6ff0f68a859acbc97123ded57a7de"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "entities"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "es-define-property",
       "version": "1.0.1",
       "bom-ref": "pkg:npm/es-define-property@1.0.1",
@@ -1306,6 +1400,29 @@
     },
     {
       "type": "library",
+      "name": "fsevents",
+      "version": "2.3.2",
+      "bom-ref": "pkg:npm/fsevents@2.3.2",
+      "purl": "pkg:npm/fsevents@2.3.2",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "c62a8c411e3101e1d3b81f6e5a6f9f1517083a02813223813fe7978b24fb8ec8150aad5b915ca0b74d28012a3007b11db6938769a3e02adf35d8ff5a6fe0c328"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "fsevents"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "function-bind",
       "version": "1.1.2",
       "bom-ref": "pkg:npm/function-bind@1.1.2",
@@ -1444,6 +1561,98 @@
     },
     {
       "type": "library",
+      "name": "hast-util-from-html",
+      "version": "2.0.3",
+      "bom-ref": "pkg:npm/hast-util-from-html@2.0.3",
+      "purl": "pkg:npm/hast-util-from-html@2.0.3",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "0944911d7c8a8f31e8bfcc8ab108c6384957cbfdc42a9c97e7a10b9e41c7df8bc3570d4dd57490d59700bd3c803ed1aa2d3b8a3ffbb133e68b9123ea17f12d33"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "hast-util-from-html"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "hast-util-from-parse5",
+      "version": "8.0.3",
+      "bom-ref": "pkg:npm/hast-util-from-parse5@8.0.3",
+      "purl": "pkg:npm/hast-util-from-parse5@8.0.3",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "de4c4456410ab74cef719de1091608f2baab830b6520e14c5a46dc9400af8e50f0f0b8bd4b6864fdde75388d27aff808a5d30735ea7080e2aa67fb32d02969ca"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "hast-util-from-parse5"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "hast-util-is-element",
+      "version": "3.0.0",
+      "bom-ref": "pkg:npm/hast-util-is-element@3.0.0",
+      "purl": "pkg:npm/hast-util-is-element@3.0.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "55a97d9a7bf6216a4b6cd3ea73fa547a6f9aec8a63d9a1da702c2035f4e22b4bc92a5d0b17ee016b8fafd683c71697f76cb626adeab4fe5dc6b9df52e4e1f8da"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "hast-util-is-element"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "hast-util-parse-selector",
+      "version": "4.0.0",
+      "bom-ref": "pkg:npm/hast-util-parse-selector@4.0.0",
+      "purl": "pkg:npm/hast-util-parse-selector@4.0.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "c2440291262838609128444559cc4c54c39c604d8ad4068d2d4f035d2f5aaf19cb3941166ce5ca5e2254373129a99dc938aa6785ade3905aee9848d59620deec"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "hast-util-parse-selector"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "hast-util-sanitize",
       "version": "5.0.2",
       "bom-ref": "pkg:npm/hast-util-sanitize@5.0.2",
@@ -1490,6 +1699,30 @@
     },
     {
       "type": "library",
+      "name": "hast-util-to-text",
+      "version": "4.0.2",
+      "bom-ref": "pkg:npm/hast-util-to-text@4.0.2",
+      "purl": "pkg:npm/hast-util-to-text@4.0.2",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "28aeb2fc137c95b6aaeb9e23ec9801c9d7afef0b8d31c203e7896445abf53f409a1357b8ecfef601658f8862974c9536ef5a2863372f4c09ff66dd11127bdcec"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "hast-util-to-text"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "direct-runtime"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "hast-util-whitespace",
       "version": "3.0.0",
       "bom-ref": "pkg:npm/hast-util-whitespace@3.0.0",
@@ -1504,6 +1737,29 @@
         {
           "name": "crabcode:bun-lock-key",
           "value": "hast-util-whitespace"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "hastscript",
+      "version": "9.0.1",
+      "bom-ref": "pkg:npm/hastscript@9.0.1",
+      "purl": "pkg:npm/hastscript@9.0.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "83b75ff6b3055ff48f8b7e2dc860b25014444282a46a9c1d63f4f4e109fd4c359f1e1018b78fc8d203158abccae70133794a888c407e2d70bfca96fb02a9e8e7"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "hastscript"
         },
         {
           "name": "crabcode:dependency-kind",
@@ -3036,6 +3292,29 @@
     },
     {
       "type": "library",
+      "name": "parse5",
+      "version": "7.3.0",
+      "bom-ref": "pkg:npm/parse5@7.3.0",
+      "purl": "pkg:npm/parse5@7.3.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "2089ef53b7da6e5df8aa68bd818f17395c61632332b87db150da5bdaaf3f63eef9e762a57a3911beabc3d7d9cca145bfb901866ea36903a4ee7eee452f905983"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "parse5"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "parseurl",
       "version": "1.3.3",
       "bom-ref": "pkg:npm/parseurl@1.3.3",
@@ -3119,6 +3398,52 @@
         {
           "name": "crabcode:bun-lock-key",
           "value": "pkce-challenge"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "playwright",
+      "version": "1.61.1",
+      "bom-ref": "pkg:npm/playwright@1.61.1",
+      "purl": "pkg:npm/playwright@1.61.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "0d69d8e68dd86cb58ae06a2fb80570a6a2fed55c0635d506ad1afefbc8fc3ed410cef01565420c8ca43dd1f63af3db042592416d9570d6b5da38a4938ad9333d"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "playwright"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "playwright-core",
+      "version": "1.61.1",
+      "bom-ref": "pkg:npm/playwright-core@1.61.1",
+      "purl": "pkg:npm/playwright-core@1.61.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "87b425b7a9b8444a76e6abc876f6c3b55983e0ba955dfa51c61391bfd2f48f3113334e69e1fb8f27774acae4974310d26d79e64bbf470208bde7cf65192a4b92"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "playwright-core"
         },
         {
           "name": "crabcode:dependency-kind",
@@ -3238,6 +3563,30 @@
         {
           "name": "crabcode:dependency-kind",
           "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "rehype-parse",
+      "version": "9.0.1",
+      "bom-ref": "pkg:npm/rehype-parse@9.0.1",
+      "purl": "pkg:npm/rehype-parse@9.0.1",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "92c0b3083d0581f87bb6b3c3c6bdab4b295bc2af626039129fc4c20e6109e3d9631140710d50b3087bfb40dcd939f3836a75f8f9b590e1666a2c245660b7e16a"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "rehype-parse"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "direct-runtime"
         }
       ]
     },
@@ -3935,6 +4284,29 @@
     },
     {
       "type": "library",
+      "name": "unist-util-find-after",
+      "version": "5.0.0",
+      "bom-ref": "pkg:npm/unist-util-find-after@5.0.0",
+      "purl": "pkg:npm/unist-util-find-after@5.0.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "6a641ad04a769ba844da0ef602e81422d8dbb8cf17f1c1909c5a07934a467eb15e4fd199873379496f2746c88628aec089fe02ac008f10d900e8ffcbc3a7c719"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "unist-util-find-after"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "unist-util-is",
       "version": "6.0.1",
       "bom-ref": "pkg:npm/unist-util-is@6.0.1",
@@ -4119,6 +4491,29 @@
     },
     {
       "type": "library",
+      "name": "vfile-location",
+      "version": "5.0.3",
+      "bom-ref": "pkg:npm/vfile-location@5.0.3",
+      "purl": "pkg:npm/vfile-location@5.0.3",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "e725ef583120a9e8988817b595bc5817b50c0089bf21ca29c4c1eb3100eade7bca7233ca22166495428bf8013b27bb80a48e24c1edac9ec2be788e944e3f441e"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "vfile-location"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "vfile-message",
       "version": "4.0.3",
       "bom-ref": "pkg:npm/vfile-message@4.0.3",
@@ -4133,6 +4528,53 @@
         {
           "name": "crabcode:bun-lock-key",
           "value": "vfile-message"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "vnu-jar",
+      "version": "26.7.15",
+      "bom-ref": "pkg:npm/vnu-jar@26.7.15",
+      "purl": "pkg:npm/vnu-jar@26.7.15",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "9602af141061cd7f44da526212539635099ec70d6f6540b528f2336e3e4596b7ba100773f8fc728203beff8d0223cdf85d4fe70b9b31b7a1eabe1084595ccf8e"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "vnu-jar"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "direct-runtime"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "web-namespaces",
+      "version": "2.0.1",
+      "bom-ref": "pkg:npm/web-namespaces@2.0.1",
+      "purl": "pkg:npm/web-namespaces@2.0.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "6caaf50e488d6b692b4bbab136d76bb47026cee6061502e2435dd3b28aec753e942d390f2cabaee7e1ac1690e583a2458d44f05f60f284c3c6d9b7bcb8faeab1"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "web-namespaces"
         },
         {
           "name": "crabcode:dependency-kind",
@@ -4264,10 +4706,12 @@
   ],
   "dependencies": [
     {
-      "ref": "pkg:npm/crabcode-media-ops-mcp@0.4.0-rc1",
+      "ref": "pkg:npm/crabcode-media-ops-mcp@0.4.0",
       "dependsOn": [
+        "pkg:npm/%40axe-core/playwright@4.12.1",
         "pkg:npm/%40hono/node-server@1.19.14",
         "pkg:npm/%40modelcontextprotocol/sdk@1.29.0",
+        "pkg:npm/%40playwright/test@1.61.1",
         "pkg:npm/%40types/bun@1.3.14",
         "pkg:npm/%40types/debug@4.1.13",
         "pkg:npm/%40types/hast@3.0.5",
@@ -4279,6 +4723,7 @@
         "pkg:npm/accepts@2.0.0",
         "pkg:npm/ajv-formats@3.0.1",
         "pkg:npm/ajv@8.20.0",
+        "pkg:npm/axe-core@4.12.1",
         "pkg:npm/bail@2.0.2",
         "pkg:npm/body-parser@2.2.2",
         "pkg:npm/bun-types@1.3.14",
@@ -4305,6 +4750,7 @@
         "pkg:npm/dunder-proto@1.0.1",
         "pkg:npm/ee-first@1.1.1",
         "pkg:npm/encodeurl@2.0.0",
+        "pkg:npm/entities@6.0.1",
         "pkg:npm/es-define-property@1.0.1",
         "pkg:npm/es-errors@1.3.0",
         "pkg:npm/es-object-atoms@1.1.2",
@@ -4321,15 +4767,22 @@
         "pkg:npm/finalhandler@2.1.1",
         "pkg:npm/forwarded@0.2.0",
         "pkg:npm/fresh@2.0.0",
+        "pkg:npm/fsevents@2.3.2",
         "pkg:npm/function-bind@1.1.2",
         "pkg:npm/get-intrinsic@1.3.0",
         "pkg:npm/get-proto@1.0.1",
         "pkg:npm/gopd@1.2.0",
         "pkg:npm/has-symbols@1.1.0",
         "pkg:npm/hasown@2.0.4",
+        "pkg:npm/hast-util-from-html@2.0.3",
+        "pkg:npm/hast-util-from-parse5@8.0.3",
+        "pkg:npm/hast-util-is-element@3.0.0",
+        "pkg:npm/hast-util-parse-selector@4.0.0",
         "pkg:npm/hast-util-sanitize@5.0.2",
         "pkg:npm/hast-util-to-html@9.0.5",
+        "pkg:npm/hast-util-to-text@4.0.2",
         "pkg:npm/hast-util-whitespace@3.0.0",
+        "pkg:npm/hastscript@9.0.1",
         "pkg:npm/hono@4.12.25",
         "pkg:npm/html-void-elements@3.0.0",
         "pkg:npm/http-errors@2.0.1",
@@ -4396,15 +4849,19 @@
         "pkg:npm/object-inspect@1.13.4",
         "pkg:npm/on-finished@2.4.1",
         "pkg:npm/once@1.4.0",
+        "pkg:npm/parse5@7.3.0",
         "pkg:npm/parseurl@1.3.3",
         "pkg:npm/path-key@3.1.1",
         "pkg:npm/path-to-regexp@8.4.2",
         "pkg:npm/pkce-challenge@5.0.1",
+        "pkg:npm/playwright-core@1.61.1",
+        "pkg:npm/playwright@1.61.1",
         "pkg:npm/property-information@7.2.0",
         "pkg:npm/proxy-addr@2.0.7",
         "pkg:npm/qs@6.15.2",
         "pkg:npm/range-parser@1.2.1",
         "pkg:npm/raw-body@3.0.2",
+        "pkg:npm/rehype-parse@9.0.1",
         "pkg:npm/rehype-sanitize@6.0.0",
         "pkg:npm/rehype-stringify@10.0.1",
         "pkg:npm/remark-gfm@4.0.1",
@@ -4433,6 +4890,7 @@
         "pkg:npm/typescript@5.9.3",
         "pkg:npm/undici-types@7.24.6",
         "pkg:npm/unified@11.0.5",
+        "pkg:npm/unist-util-find-after@5.0.0",
         "pkg:npm/unist-util-is@6.0.1",
         "pkg:npm/unist-util-position@5.0.0",
         "pkg:npm/unist-util-stringify-position@4.0.0",
@@ -4440,8 +4898,11 @@
         "pkg:npm/unist-util-visit@5.1.0",
         "pkg:npm/unpipe@1.0.0",
         "pkg:npm/vary@1.1.2",
+        "pkg:npm/vfile-location@5.0.3",
         "pkg:npm/vfile-message@4.0.3",
         "pkg:npm/vfile@6.0.3",
+        "pkg:npm/vnu-jar@26.7.15",
+        "pkg:npm/web-namespaces@2.0.1",
         "pkg:npm/which@2.0.2",
         "pkg:npm/wrappy@1.0.2",
         "pkg:npm/zod-to-json-schema@3.25.2",

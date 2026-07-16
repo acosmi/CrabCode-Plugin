@@ -1,11 +1,11 @@
 import { randomUUID } from 'node:crypto'
 import { existsSync } from 'node:fs'
-import { readFile, readdir, writeFile } from 'node:fs/promises'
+import { readFile, readdir, rename, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { z } from 'zod'
 import { BrandIdSchema, ReferenceAllowedUseSchema, ReferenceRoleSchema, stableHash } from '../domain.ts'
 import { err, ok, type Envelope } from '../envelope.ts'
-import { appendRecord, dataDir, ensureDir, storageWarnings } from '../storage.ts'
+import { appendRecordsAtomically, dataDir, ensureDir, getEntityVersion, listRecords, storageWarnings, type AtomicAppend, type StoredRecord } from '../storage.ts'
 import { loadReferenceRecords } from './references.ts'
 
 const ProfileVersionSchema = z.string().regex(/^v-[0-9]{10,17}-[a-f0-9]{8}$/, 'profile version must be a generated immutable version id')
@@ -84,6 +84,13 @@ function versionPath(brandId: string, version: z.infer<typeof ProfileVersionSche
   return join(versionsDir(brandId), `${version}.json`)
 }
 
+const materializationWarnings = new Map<string, string>()
+
+export function profileStorageWarnings(): string[] {
+  const warning = materializationWarnings.get(dataDir())
+  return [...storageWarnings(), ...(warning ? [warning] : [])]
+}
+
 async function readProfile(path: string, expectedBrandId: string): Promise<BrandProfile | null> {
   if (!existsSync(path)) return null
   try {
@@ -94,12 +101,56 @@ async function readProfile(path: string, expectedBrandId: string): Promise<Brand
   }
 }
 
+function parseProfileRecord(record: StoredRecord): BrandProfile {
+  const parsed = StoredProfileSchema.safeParse(record)
+  if (!parsed.success) throw new Error(`INVALID_STORED_PROFILE:${parsed.error.message}`)
+  return parsed.data
+}
+
+async function databaseProfiles(brandId?: string): Promise<BrandProfile[]> {
+  const records = await listRecords('profiles', brandId ? { brand_id: brandId } : undefined)
+  return records.map(parseProfileRecord)
+}
+
+async function writeDerivedProfile(path: string, serialized: string): Promise<void> {
+  const temporary = `${path}.tmp-${randomUUID()}`
+  await writeFile(temporary, serialized, 'utf8')
+  await rename(temporary, path)
+}
+
+async function materializeProfile(profile: BrandProfile): Promise<void> {
+  await ensureDir(versionsDir(profile.brand_id))
+  const serialized = JSON.stringify(profile, null, 2) + '\n'
+  await writeDerivedProfile(versionPath(profile.brand_id, profile.profile_version), serialized)
+  await writeDerivedProfile(currentPath(profile.brand_id), serialized)
+}
+
+async function materializeProfileBestEffort(profile: BrandProfile): Promise<void> {
+  try {
+    await materializeProfile(profile)
+    materializationWarnings.delete(dataDir())
+  } catch (error) {
+    materializationWarnings.set(dataDir(), `SQLite contains the authoritative profile, but JSON profile export is pending: ${error instanceof Error ? error.message : String(error)}`)
+  }
+}
+
 export async function loadProfile(brandId: string, version?: string): Promise<BrandProfile | null> {
   if (!BrandIdSchema.safeParse(brandId).success) return null
+  const stored = await databaseProfiles(brandId)
   if (version) {
     const parsedVersion = ProfileVersionSchema.safeParse(version)
     if (!parsedVersion.success) return null
+    const databaseProfile = stored.find((profile) => profile.profile_version === parsedVersion.data)
+    if (databaseProfile) {
+      await materializeProfileBestEffort(databaseProfile)
+      return databaseProfile
+    }
     return readProfile(versionPath(brandId, parsedVersion.data), brandId)
+  }
+  if (stored.length) {
+    const current = stored[stored.length - 1]
+    await materializeProfileBestEffort(current)
+    return current
   }
   return readProfile(currentPath(brandId), brandId)
 }
@@ -156,6 +207,7 @@ async function profileReferenceProblem(references: z.infer<typeof ProfileReferen
 export async function saveProfileVersion(
   input: BrandProfileInput,
   extra?: { rolledBackFrom?: string },
+  options?: { additionalEntries?: AtomicAppend[] | ((profile: BrandProfile) => AtomicAppend[]) },
 ): Promise<BrandProfile> {
   const parsed = ProfileInputSchema.parse(input)
   const payloadProblem = profilePayloadProblem(parsed)
@@ -169,17 +221,26 @@ export async function saveProfileVersion(
     confirmedAt: new Date().toISOString(),
     ...(extra?.rolledBackFrom ? { rolledBackFrom: extra.rolledBackFrom } : {}),
   })
-  await ensureDir(versionsDir(profile.brand_id))
-  const serialized = JSON.stringify(profile, null, 2) + '\n'
-  await writeFile(versionPath(profile.brand_id, version), serialized, 'utf8')
-  await writeFile(currentPath(profile.brand_id), serialized, 'utf8')
-  await appendRecord('audit-events', {
-    event: 'profile.version.confirmed',
-    brandId: profile.brand_id,
-    profileVersion: version,
-    actor: profile.confirmedBy,
-    source: profile.source,
-  })
+  const expectedEntityVersion = await getEntityVersion('profiles', profile.brand_id)
+  const additionalEntries = typeof options?.additionalEntries === 'function'
+    ? options.additionalEntries(profile)
+    : (options?.additionalEntries ?? [])
+  await appendRecordsAtomically([
+    { collection: 'profiles', record: { id: version, ...profile }, guard: {
+      entityKey: profile.brand_id,
+      expectedEntityVersion,
+      entityVersion: (expectedEntityVersion ?? 0) + 1,
+    } },
+    { collection: 'audit-events', record: {
+      event: 'profile.version.confirmed',
+      brandId: profile.brand_id,
+      profileVersion: version,
+      actor: profile.confirmedBy,
+      source: profile.source,
+    } },
+    ...additionalEntries,
+  ])
+  await materializeProfileBestEffort(profile)
   return profile
 }
 
@@ -195,7 +256,7 @@ export async function saveHandler(args: z.input<typeof PublicProfileImportSchema
   if (payloadProblem) return err('PROFILE_REFERENCE_FIREWALL', payloadProblem)
   const previous = await loadProfile(parsed.data.brand_id)
   const profile = await saveProfileVersion(parsed.data)
-  return ok({ brandId: profile.brand_id, profileVersion: profile.profile_version, updated: Boolean(previous) }, storageWarnings())
+  return ok({ brandId: profile.brand_id, profileVersion: profile.profile_version, updated: Boolean(previous) }, profileStorageWarnings())
 }
 
 export const getName = 'mediaops.profile.get'
@@ -204,8 +265,8 @@ export const getInputSchema = { brandId: BrandIdSchema, version: ProfileVersionS
 
 export async function getHandler(args: { brandId: string; version?: string }): Promise<Envelope> {
   const profile = await loadProfile(args.brandId, args.version)
-  if (!profile) return err('NOT_FOUND', `No profile ${args.brandId}${args.version ? `@${args.version}` : ''}.`, storageWarnings())
-  return ok(profile, storageWarnings())
+  if (!profile) return err('NOT_FOUND', `No profile ${args.brandId}${args.version ? `@${args.version}` : ''}.`, profileStorageWarnings())
+  return ok(profile, profileStorageWarnings())
 }
 
 export const listName = 'mediaops.profile.list'
@@ -213,15 +274,18 @@ export const listDescription = 'List current brand profiles without crossing bra
 export const listInputSchema = {}
 
 export async function listHandler(): Promise<Envelope> {
-  if (!existsSync(profilesDir())) return ok({ count: 0, profiles: [] }, storageWarnings())
-  const entries = await readdir(profilesDir(), { withFileTypes: true })
-  const profiles: { brandId: string; name: string; profileVersion: string }[] = []
-  for (const entry of entries) {
-    if (!entry.isDirectory()) continue
-    const profile = await loadProfile(entry.name)
-    if (profile) profiles.push({ brandId: profile.brand_id, name: profile.name, profileVersion: profile.profile_version })
+  const currentByBrand = new Map<string, BrandProfile>()
+  for (const profile of await databaseProfiles()) currentByBrand.set(profile.brand_id, profile)
+  if (existsSync(profilesDir())) {
+    const entries = await readdir(profilesDir(), { withFileTypes: true })
+    for (const entry of entries) {
+      if (!entry.isDirectory() || currentByBrand.has(entry.name)) continue
+      const profile = await readProfile(currentPath(entry.name), entry.name)
+      if (profile) currentByBrand.set(profile.brand_id, profile)
+    }
   }
-  return ok({ count: profiles.length, profiles }, storageWarnings())
+  const profiles = [...currentByBrand.values()].map((profile) => ({ brandId: profile.brand_id, name: profile.name, profileVersion: profile.profile_version }))
+  return ok({ count: profiles.length, profiles }, profileStorageWarnings())
 }
 
 export const historyName = 'mediaops.profile.history'
@@ -229,16 +293,18 @@ export const historyDescription = 'List immutable profile versions for one brand
 export const historyInputSchema = { brandId: BrandIdSchema }
 
 export async function historyHandler(args: { brandId: string }): Promise<Envelope> {
+  const byVersion = new Map((await databaseProfiles(args.brandId)).map((profile) => [profile.profile_version, profile]))
   const dir = versionsDir(args.brandId)
-  if (!existsSync(dir)) return ok({ brandId: args.brandId, count: 0, versions: [] }, storageWarnings())
-  const files = (await readdir(dir)).filter((file) => file.endsWith('.json'))
-  const versions: BrandProfile[] = []
-  for (const file of files) {
-    const profile = await readProfile(join(dir, file), args.brandId)
-    if (profile) versions.push(profile)
+  if (existsSync(dir)) {
+    const files = (await readdir(dir)).filter((file) => file.endsWith('.json'))
+    for (const file of files) {
+      const profile = await readProfile(join(dir, file), args.brandId)
+      if (profile && !byVersion.has(profile.profile_version)) byVersion.set(profile.profile_version, profile)
+    }
   }
+  const versions = [...byVersion.values()]
   versions.sort((a, b) => b.confirmedAt.localeCompare(a.confirmedAt))
-  return ok({ brandId: args.brandId, count: versions.length, versions }, storageWarnings())
+  return ok({ brandId: args.brandId, count: versions.length, versions }, profileStorageWarnings())
 }
 
 export const rollbackName = 'mediaops.profile.rollback'
@@ -253,5 +319,5 @@ export async function rollbackHandler(args: { brandId: string; targetVersion: st
     { ...base, confirmedBy: args.confirmedBy, source: 'rollback' },
     { rolledBackFrom: args.targetVersion },
   )
-  return ok({ brandId: args.brandId, profileVersion: profile.profile_version, rolledBackFrom: args.targetVersion }, storageWarnings())
+  return ok({ brandId: args.brandId, profileVersion: profile.profile_version, rolledBackFrom: args.targetVersion }, profileStorageWarnings())
 }

@@ -10,6 +10,6 @@
     "status": { "enum": ["verified", "doubtful", "unsourced"] },
     "evidenceLinkIds": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
   },
-  "allOf": [{ "if": { "properties": { "status": { "const": "verified" } } }, "then": { "properties": { "evidenceLinkIds": { "minItems": 1 } } } }],
+  "allOf": [{ "if": { "properties": { "status": { "const": "verified" } }, "required": ["status"] }, "then": { "properties": { "evidenceLinkIds": { "type": "array", "minItems": 1 } } } }],
   "additionalProperties": false
 }

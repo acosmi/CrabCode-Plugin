@@ -1,20 +1,31 @@
 {
   "name": "crabcode-media-ops-mcp",
-  "version": "0.4.0-rc1",
+  "version": "0.4.0",
   "license": "Apache-2.0",
   "type": "module",
   "bin": "./src/server.ts",
   "scripts": {
     "start": "bun install --frozen-lockfile --no-summary && bun src/server.ts",
-    "typecheck": "tsc --noEmit",
-    "test": "bun test",
-    "build": "bun build src/server.ts --outdir dist --target bun --format esm",
+    "typecheck": "tsc --noEmit && bun run typecheck:qa-cli",
+    "typecheck:qa-cli": "tsc --noEmit --allowImportingTsExtensions --exactOptionalPropertyTypes false --lib ES2022,DOM --module ESNext --moduleResolution Bundler --noFallthroughCasesInSwitch --noImplicitOverride --skipLibCheck --strict --target ES2022 --types bun-types scripts/render-release-fixture.ts scripts/check-installed.ts playwright.config.ts",
+    "test": "MEDIAOPS_QA_MODE=static bun test --timeout 60000 --max-concurrency 8 $(find tests -maxdepth 1 -name '*.test.ts' ! -name '*.qa.test.ts' | sort)",
+    "test:qa": "MEDIAOPS_QA_MODE=full bun test --timeout 180000 --max-concurrency 1 tests/delivery.qa.test.ts",
+    "test:all": "bun run test && bun run test:qa && bun run qa:release",
+    "build": "bun build src/server.ts --outdir dist --target bun --format esm --external @playwright/test --external @axe-core/playwright --external playwright --external playwright-core --external vnu-jar",
     "sbom": "bun run scripts/generate-sbom.ts",
     "sbom:check": "bun run scripts/generate-sbom.ts --check",
-    "validate": "bun run sbom:check && bun run scripts/validate-media-plugin.ts"
+    "validate": "bun run sbom:check && bun run scripts/validate-media-plugin.ts",
+    "qa:fixture": "bun run scripts/render-release-fixture.ts",
+    "qa:browser": "playwright test --workers=1 --retries=0 --forbid-only --fail-on-flaky-tests --update-snapshots=none",
+    "qa:release": "bun run qa:fixture && bun run qa:browser",
+    "qa:installed": "bun run scripts/check-installed.ts"
   },
   "dependencies": {
+    "@axe-core/playwright": "4.12.1",
     "@modelcontextprotocol/sdk": "1.29.0",
+    "@playwright/test": "1.61.1",
+    "hast-util-to-text": "4.0.2",
+    "rehype-parse": "9.0.1",
     "rehype-sanitize": "6.0.0",
     "rehype-stringify": "10.0.1",
     "remark-gfm": "4.0.1",
@@ -22,6 +33,7 @@
     "remark-rehype": "11.1.2",
     "remark-stringify": "11.0.0",
     "unified": "11.0.5",
+    "vnu-jar": "26.7.15",
     "zod": "3.25.76"
   },
   "devDependencies": {

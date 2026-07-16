@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crabcode.local/media/package-manifest.schema.json",
+  "title": "Committed manual publish package manifest v4",
+  "type": "object",
+  "required": [
+    "schemaVersion", "packageId", "pluginVersion", "platform", "platformDisplayName", "platformRuleVersion",
+    "contentId", "revisionId", "contentRevision", "contentHash", "articleDocHash", "deliveryId", "renderManifestHash",
+    "approvalId", "approvedTransitionVersion", "packageCommitTransitionVersion", "approvalBindingHash",
+    "primaryArtifact", "backupArtifact", "channelArtifacts", "assets", "defaultUserPresentation", "backup",
+    "publishMode", "packagedBy", "packagedIdentity", "createdAt", "files"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 4 },
+    "packageId": { "type": "string", "format": "uuid" },
+    "pluginVersion": { "type": "string", "minLength": 1 },
+    "platform": { "enum": ["wechat", "xhs", "toutiao"] },
+    "platformDisplayName": { "type": "string", "minLength": 1 },
+    "platformRuleVersion": { "type": "string", "minLength": 1 },
+    "contentId": { "type": "string", "format": "uuid" },
+    "revisionId": { "type": "string", "format": "uuid" },
+    "contentRevision": { "type": "integer", "minimum": 1 },
+    "contentHash": { "$ref": "#/$defs/sha256" },
+    "articleDocHash": { "$ref": "#/$defs/sha256" },
+    "deliveryId": { "type": "string", "format": "uuid" },
+    "renderManifestHash": { "$ref": "#/$defs/sha256" },
+    "approvalId": { "type": "string", "format": "uuid" },
+    "approvedTransitionVersion": { "type": "integer", "minimum": 1 },
+    "packageCommitTransitionVersion": { "type": "integer", "minimum": 2 },
+    "approvalBindingHash": { "$ref": "#/$defs/sha256" },
+    "primaryArtifact": {
+      "allOf": [
+        { "$ref": "delivery-artifact.schema.json" },
+        { "type": "object", "properties": { "role": { "const": "primary" }, "format": { "const": "html" } } }
+      ]
+    },
+    "backupArtifact": {
+      "allOf": [
+        { "$ref": "delivery-artifact.schema.json" },
+        { "type": "object", "properties": { "role": { "const": "backup" }, "format": { "const": "markdown" } } }
+      ]
+    },
+    "channelArtifacts": {
+      "type": "array",
+      "items": {
+        "allOf": [
+          { "$ref": "delivery-artifact.schema.json" },
+          { "type": "object", "properties": { "role": { "const": "channel_variant" } } }
+        ]
+      }
+    },
+    "assets": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/asset" } },
+    "qaEvidence": { "$ref": "#/$defs/qaEvidence" },
+    "defaultUserPresentation": { "const": "article.html (HTML primary)" },
+    "backup": { "const": "article.md (Markdown backup)" },
+    "publishMode": { "const": "package-only; manual platform submission; no rerender during packaging" },
+    "packagedBy": { "type": "string", "minLength": 1 },
+    "packagedIdentity": { "$ref": "#/$defs/identity" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "files": { "type": "array", "minItems": 4, "maxItems": 1000, "uniqueItems": true, "items": { "$ref": "#/$defs/relativePath" } }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "relativePath": { "type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\)(?!.*:)[A-Za-z0-9._/-]+$" },
+    "identity": { "type": "object", "required": ["principalId", "issuer", "assurance"], "properties": { "principalId": { "type": "string", "minLength": 1 }, "issuer": { "type": "string", "minLength": 1 }, "assurance": { "enum": ["mcp_oauth", "host_principal"] } }, "additionalProperties": false },
+    "asset": { "type": "object", "required": ["assetId", "relativePath", "sha256", "byteSize", "mediaType"], "properties": { "assetId": { "type": "string", "format": "uuid" }, "relativePath": { "$ref": "#/$defs/relativePath" }, "sha256": { "$ref": "#/$defs/sha256" }, "byteSize": { "type": "integer", "minimum": 1 }, "mediaType": { "type": "string", "minLength": 1 } }, "additionalProperties": false },
+    "qaArtifact": { "type": "object", "required": ["relativePath", "mediaType", "byteSize", "sha256"], "properties": { "relativePath": { "$ref": "#/$defs/relativePath" }, "mediaType": { "type": "string", "minLength": 1 }, "byteSize": { "type": "integer", "minimum": 1 }, "sha256": { "$ref": "#/$defs/sha256" } }, "additionalProperties": false },
+    "qaEvidence": { "type": "object", "required": ["schemaVersion", "status", "htmlSha256", "tools", "checks", "artifacts", "completedAt"], "properties": { "schemaVersion": { "const": "mediaops-delivery-qa-evidence@1" }, "status": { "const": "passed" }, "htmlSha256": { "$ref": "#/$defs/sha256" }, "tools": { "type": "object", "required": ["java", "vnuPackage", "vnuRuntime", "playwright", "chromium", "axe"], "properties": { "java": { "type": ["string", "null"] }, "vnuPackage": { "type": "string", "minLength": 1 }, "vnuRuntime": { "type": ["string", "null"] }, "playwright": { "type": "string", "minLength": 1 }, "chromium": { "type": ["string", "null"] }, "axe": { "type": "string", "minLength": 1 } }, "additionalProperties": false }, "checks": { "type": "array", "minItems": 1, "items": { "type": "object", "required": ["id", "status", "detail"], "properties": { "id": { "type": "string", "minLength": 1 }, "status": { "const": "passed" }, "detail": { "type": "string", "minLength": 1 } }, "additionalProperties": false } }, "artifacts": { "type": "array", "minItems": 3, "items": { "$ref": "#/$defs/qaArtifact" } }, "completedAt": { "type": "string", "format": "date-time" } }, "additionalProperties": false }
+  },
+  "additionalProperties": false
+}

@@ -18,7 +18,7 @@ describe('complete Media Gate', () => {
   afterEach(async () => rm(dir, { recursive: true, force: true }))
 
   test('passes only a fully evidenced and delivery-verified revision', async () => {
-    const content = await createReviewedContent({ dir, brandId: 'tech-daily', profileVersion: version })
+    const content = await createReviewedContent({ deliveryMode: 'verified', dir, brandId: 'tech-daily', profileVersion: version })
     const env = await handler({ contentId: content.contentId })
     expect(env.status).toBe('ok')
     expect((env.data as any).ready).toBe(true)
@@ -36,12 +36,12 @@ describe('complete Media Gate', () => {
   })
 
   test('confirmed platform-native disclosure is valid without fixed body sentence', async () => {
-    const content = await createReviewedContent({ dir, brandId: 'tech-daily', profileVersion: version, body: '纯正文', disclosure: { aiAssisted: true, methods: ['platform-native'], platformNativeConfirmed: true, confirmedBy: '运营者' } })
+    const content = await createReviewedContent({ deliveryMode: 'verified', dir, brandId: 'tech-daily', profileVersion: version, body: '纯正文', disclosure: { aiAssisted: true, methods: ['platform-native'], platformNativeConfirmed: true, confirmedBy: '事实核查员' } })
     expect((await handler({ contentId: content.contentId })).status).toBe('ok')
   })
 
   test('stale platform rules are detected with an internal deterministic audit clock', async () => {
-    const fixture = await createReviewedContent({ dir, brandId: 'tech-daily', profileVersion: version })
+    const fixture = await createReviewedContent({ deliveryMode: 'verified', dir, brandId: 'tech-daily', profileVersion: version })
     const content = await getLatestContent(fixture.contentId)
     const issues = await inspectContent(content!, getPlatform('wechat')!, new Date('2030-01-01T00:00:00.000Z'))
     expect(issues.some((issue) => issue.code === 'PLATFORM_RULES_STALE')).toBe(true)

@@ -10,13 +10,82 @@
     "sourceRevisionId": { "type": "string", "format": "uuid" },
     "subjectHash": { "$ref": "#/$defs/sha256" },
     "originalityScanId": { "type": "string", "format": "uuid" },
-    "factReview": { "type": "object", "required": ["status", "subjectHash", "researchId", "researchBundleHash", "completedBy", "completedAt", "claims", "waivers"], "properties": { "status": { "const": "completed" }, "subjectHash": { "$ref": "#/$defs/sha256" }, "researchId": { "type": "string", "format": "uuid" }, "researchBundleHash": { "$ref": "#/$defs/sha256" }, "completedBy": { "type": "string", "minLength": 1 }, "completedAt": { "type": "string", "format": "date-time" }, "claims": { "type": "array", "maxItems": 200, "items": { "$ref": "claim.schema.json" } }, "noVerifiableClaimsReason": { "type": "string", "minLength": 1, "maxLength": 1000 }, "waivers": { "type": "array", "maxItems": 200, "items": { "type": "object", "required": ["claimId", "by", "reason"], "properties": { "claimId": { "type": "string", "minLength": 1, "maxLength": 120 }, "by": { "type": "string", "minLength": 1, "maxLength": 300 }, "reason": { "type": "string", "minLength": 1, "maxLength": 1000 } }, "additionalProperties": false } } }, "additionalProperties": false },
+    "factReview": {
+      "type": "object",
+      "required": ["status", "subjectHash", "researchId", "researchBundleHash", "completedBy", "completedAt", "claims", "statementLedgerHash", "statements", "statementCoverage", "waivers"],
+      "properties": {
+        "status": { "const": "completed" },
+        "subjectHash": { "$ref": "#/$defs/sha256" },
+        "researchId": { "type": "string", "format": "uuid" },
+        "researchBundleHash": { "$ref": "#/$defs/sha256" },
+        "completedBy": { "type": "string", "minLength": 1 },
+        "completedAt": { "type": "string", "format": "date-time" },
+        "claims": { "type": "array", "maxItems": 200, "items": { "$ref": "claim.schema.json" } },
+        "statementLedgerHash": { "$ref": "#/$defs/sha256" },
+        "statements": { "type": "array", "maxItems": 1000, "items": { "$ref": "#/$defs/verifiableStatement" } },
+        "statementCoverage": { "type": "array", "maxItems": 1000, "items": { "$ref": "#/$defs/statementCoverage" } },
+        "noVerifiableClaimsReason": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "waivers": { "type": "array", "maxItems": 200, "items": { "type": "object", "required": ["claimId", "by", "reason"], "properties": { "claimId": { "type": "string", "minLength": 1, "maxLength": 120 }, "by": { "type": "string", "minLength": 1, "maxLength": 300 }, "reason": { "type": "string", "minLength": 1, "maxLength": 1000 } }, "additionalProperties": false } }
+      },
+      "additionalProperties": false
+    },
     "legalReview": { "type": "object", "required": ["status", "reviewedBy", "reviewedAt", "riskLevel", "notes"], "properties": { "status": { "enum": ["not_required", "completed", "required"] }, "reviewedBy": { "type": "string" }, "reviewedAt": { "type": "string", "format": "date-time" }, "riskLevel": { "enum": ["low", "medium", "high"] }, "notes": { "type": "array", "items": { "type": "string" } } }, "additionalProperties": false },
-    "aiDisclosure": { "type": "object", "required": ["aiAssisted", "methods"], "properties": { "aiAssisted": { "type": "boolean" }, "methods": { "type": "array", "items": { "enum": ["platform-native", "body-label", "file-metadata"] } }, "bodyLabelText": { "type": "string" }, "platformNativeConfirmed": { "type": "boolean" }, "fileMetadataConfirmed": { "type": "boolean" }, "confirmedBy": { "type": "string" }, "ruleVersion": { "type": "string" } }, "additionalProperties": false },
+    "aiDisclosure": {
+      "type": "object",
+      "required": ["aiAssisted", "methods"],
+      "properties": {
+        "aiAssisted": { "type": "boolean" },
+        "methods": { "type": "array", "maxItems": 3, "uniqueItems": true, "items": { "enum": ["platform-native", "body-label", "file-metadata"] } },
+        "bodyLabelText": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "platformNativeConfirmed": { "type": "boolean" },
+        "fileMetadataConfirmed": { "type": "boolean" },
+        "confirmedBy": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "ruleVersion": { "type": "string", "minLength": 1 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "aiAssisted": { "const": true } }, "required": ["aiAssisted"] },
+          "then": { "required": ["confirmedBy"], "properties": { "methods": { "type": "array", "minItems": 1 } } },
+          "else": { "properties": { "methods": { "type": "array", "maxItems": 0 } }, "not": { "anyOf": [{ "required": ["bodyLabelText"] }, { "required": ["platformNativeConfirmed"] }, { "required": ["fileMetadataConfirmed"] }, { "required": ["confirmedBy"] }, { "required": ["ruleVersion"] }] } }
+        },
+        { "if": { "properties": { "methods": { "contains": { "const": "body-label" } } }, "required": ["methods"] }, "then": { "required": ["bodyLabelText"] }, "else": { "not": { "required": ["bodyLabelText"] } } },
+        { "if": { "properties": { "methods": { "contains": { "const": "platform-native" } } }, "required": ["methods"] }, "then": { "required": ["platformNativeConfirmed"], "properties": { "platformNativeConfirmed": { "const": true } } }, "else": { "not": { "required": ["platformNativeConfirmed"] } } },
+        { "if": { "properties": { "methods": { "contains": { "const": "file-metadata" } } }, "required": ["methods"] }, "then": { "required": ["fileMetadataConfirmed"], "properties": { "fileMetadataConfirmed": { "const": true } } }, "else": { "not": { "required": ["fileMetadataConfirmed"] } } }
+      ],
+      "additionalProperties": false
+    },
     "completedBy": { "type": "string", "minLength": 1 },
     "completedAt": { "type": "string", "format": "date-time" },
     "reviewHash": { "$ref": "#/$defs/sha256" }
   },
-  "$defs": { "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" } },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "verifiableStatement": { "type": "object", "required": ["statementId", "location", "ordinal", "text", "signals"], "properties": { "statementId": { "$ref": "#/$defs/sha256" }, "location": { "enum": ["title", "summary", "body"] }, "ordinal": { "type": "integer", "minimum": 0 }, "text": { "type": "string", "minLength": 1, "maxLength": 5000 }, "signals": { "type": "array", "minItems": 1, "maxItems": 50, "items": { "type": "string", "minLength": 1, "maxLength": 200 } } }, "additionalProperties": false },
+    "statementCoverage": {
+      "type": "object",
+      "required": ["statementId", "classification", "claimIds", "rationale"],
+      "properties": {
+        "statementId": { "$ref": "#/$defs/sha256" },
+        "classification": { "enum": ["verified_fact", "author_inference", "opinion", "non_claim"] },
+        "claimIds": { "type": "array", "maxItems": 20, "items": { "type": "string", "minLength": 1, "maxLength": 120 } },
+        "directionConfirmed": { "const": true },
+        "rationale": { "type": "string", "minLength": 20, "maxLength": 2000 },
+        "inferenceMarker": { "type": "string", "minLength": 1, "maxLength": 120 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "classification": { "enum": ["verified_fact", "author_inference"] } }, "required": ["classification"] },
+          "then": { "required": ["directionConfirmed"], "properties": { "claimIds": { "type": "array", "minItems": 1 } } },
+          "else": { "properties": { "claimIds": { "type": "array", "maxItems": 0 } }, "not": { "required": ["directionConfirmed"] } }
+        },
+        {
+          "if": { "properties": { "classification": { "const": "author_inference" } }, "required": ["classification"] },
+          "then": { "required": ["inferenceMarker"] },
+          "else": { "not": { "required": ["inferenceMarker"] } }
+        }
+      ],
+      "additionalProperties": false
+    }
+  },
   "additionalProperties": false
 }

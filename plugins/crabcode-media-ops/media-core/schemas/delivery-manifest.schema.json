@@ -27,6 +27,7 @@
     "accessibilityStatus": { "enum": ["passed", "failed", "manual_required"] },
     "visualReviewStatus": { "enum": ["pending", "passed", "failed"] },
     "checks": { "type": "array", "items": { "type": "object", "required": ["id", "status", "detail"], "properties": { "id": { "type": "string", "minLength": 1 }, "status": { "enum": ["passed", "failed"] }, "detail": { "type": "string", "minLength": 1 } }, "additionalProperties": false } },
+    "qaEvidence": { "$ref": "#/$defs/qaEvidence" },
     "visualReview": { "type": "object", "required": ["reviewedBy", "reviewedAt", "viewports", "printChecked", "notes"], "properties": { "reviewedBy": { "type": "string", "minLength": 1 }, "reviewedAt": { "type": "string", "format": "date-time" }, "viewports": { "type": "array", "minItems": 3, "items": { "type": "object", "required": ["width", "height", "noHorizontalOverflow", "whiteBackground", "readable"], "properties": { "width": { "type": "integer", "minimum": 1 }, "height": { "type": "integer", "minimum": 1 }, "noHorizontalOverflow": { "type": "boolean" }, "whiteBackground": { "type": "boolean" }, "readable": { "type": "boolean" } }, "additionalProperties": false } }, "printChecked": { "type": "boolean" }, "notes": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 1000 } } }, "additionalProperties": false },
     "verifiedBy": { "type": "string" },
     "verifiedAt": { "type": "string", "format": "date-time" },
@@ -35,6 +36,48 @@
     "generatedBy": { "type": "string" },
     "artifactRoot": { "type": "string", "minLength": 1 }
   },
-  "$defs": { "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" } },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "qaArtifact": { "type": "object", "required": ["relativePath", "mediaType", "byteSize", "sha256"], "properties": { "relativePath": { "type": "string", "minLength": 1 }, "mediaType": { "type": "string", "minLength": 1 }, "byteSize": { "type": "integer", "minimum": 1 }, "sha256": { "$ref": "#/$defs/sha256" } }, "additionalProperties": false },
+    "qaEvidence": {
+      "type": "object",
+      "required": ["schemaVersion", "status", "htmlSha256", "tools", "checks", "artifacts", "completedAt"],
+      "properties": {
+        "schemaVersion": { "const": "mediaops-delivery-qa-evidence@1" },
+        "status": { "const": "passed" },
+        "htmlSha256": { "$ref": "#/$defs/sha256" },
+        "tools": {
+          "type": "object",
+          "required": ["java", "vnuPackage", "vnuRuntime", "playwright", "chromium", "axe"],
+          "properties": {
+            "java": { "type": ["string", "null"] },
+            "vnuPackage": { "type": "string", "minLength": 1 },
+            "vnuRuntime": { "type": ["string", "null"] },
+            "playwright": { "type": "string", "minLength": 1 },
+            "chromium": { "type": ["string", "null"] },
+            "axe": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": false
+        },
+        "checks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "status", "detail"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "status": { "const": "passed" },
+              "detail": { "type": "string", "minLength": 1 }
+            },
+            "additionalProperties": false
+          }
+        },
+        "artifacts": { "type": "array", "minItems": 3, "items": { "$ref": "#/$defs/qaArtifact" } },
+        "completedAt": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    }
+  },
   "additionalProperties": false
 }

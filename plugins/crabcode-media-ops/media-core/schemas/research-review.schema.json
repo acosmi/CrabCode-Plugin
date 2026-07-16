@@ -11,7 +11,48 @@
     "subjectHash": { "$ref": "#/$defs/sha256" },
     "claimSetHash": { "$ref": "#/$defs/sha256" },
     "claims": { "type": "array", "maxItems": 200, "items": { "type": "object", "required": ["id", "claim", "core", "temporallySensitive", "controversial"], "properties": { "id": { "type": "string", "minLength": 1, "maxLength": 120 }, "claim": { "type": "string", "minLength": 1, "maxLength": 2000 }, "core": { "type": "boolean" }, "temporallySensitive": { "type": "boolean" }, "controversial": { "type": "boolean" } }, "additionalProperties": false } },
-    "sources": { "type": "array", "maxItems": 100, "items": { "type": "object", "required": ["sourceId", "canonicalUrl", "finalUrl", "httpStatus", "contentType", "title", "publisher", "accessedAt", "sourceTier", "isPrimary", "independenceGroup", "retrievalStatus", "snapshotHash", "contentHash"], "properties": { "sourceId": { "type": "string", "format": "uuid" }, "canonicalUrl": { "type": "string", "pattern": "^https?://" }, "finalUrl": { "type": "string", "pattern": "^https?://" }, "httpStatus": { "type": "integer", "minimum": 200, "maximum": 299 }, "contentType": { "type": "string", "minLength": 1, "maxLength": 200 }, "title": { "type": "string", "minLength": 1, "maxLength": 500 }, "creator": { "type": "string", "maxLength": 300 }, "publisher": { "type": "string", "minLength": 1, "maxLength": 300 }, "publishedAt": { "type": "string", "format": "date-time" }, "accessedAt": { "type": "string", "format": "date-time" }, "sourceTier": { "enum": ["primary", "authoritative", "professional", "context"] }, "isPrimary": { "type": "boolean" }, "independenceGroup": { "type": "string", "minLength": 1, "maxLength": 200 }, "retrievalStatus": { "const": "retrieved" }, "snapshotRef": { "type": "string", "maxLength": 1000 }, "snapshotHash": { "$ref": "#/$defs/sha256" }, "contentHash": { "$ref": "#/$defs/sha256" }, "rightsOrTerms": { "type": "string", "maxLength": 1000 } }, "additionalProperties": false } },
+    "sources": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": ["sourceId", "canonicalUrl", "finalUrl", "httpStatus", "contentType", "title", "publisher", "accessedAt", "sourceTier", "isPrimary", "publisherIdentityMethod", "assessment", "independenceGroup", "retrievalStatus", "snapshotHash", "contentHash"],
+        "properties": {
+          "sourceId": { "type": "string", "format": "uuid" },
+          "canonicalUrl": { "type": "string", "pattern": "^https?://" },
+          "finalUrl": { "type": "string", "pattern": "^https?://" },
+          "httpStatus": { "type": "integer", "minimum": 200, "maximum": 299 },
+          "contentType": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "title": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "creator": { "type": "string", "maxLength": 300 },
+          "publisher": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "publishedAt": { "type": "string", "format": "date-time" },
+          "accessedAt": { "type": "string", "format": "date-time" },
+          "sourceTier": { "enum": ["primary", "authoritative", "professional", "context"] },
+          "isPrimary": { "type": "boolean" },
+          "publisherIdentityMethod": { "enum": ["recognized-institutional-domain", "configured-trusted-host", "unverified"] },
+          "publisherIdentityRule": { "type": "string", "minLength": 1, "maxLength": 253 },
+          "trustedHostConfigurationHash": { "$ref": "#/$defs/sha256" },
+          "assessment": { "$ref": "#/$defs/sourceAssessment" },
+          "independenceGroup": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "retrievalStatus": { "const": "retrieved" },
+          "snapshotRef": { "type": "string", "maxLength": 1000 },
+          "snapshotHash": { "$ref": "#/$defs/sha256" },
+          "contentHash": { "$ref": "#/$defs/sha256" },
+          "rightsOrTerms": { "type": "string", "maxLength": 1000 }
+        },
+        "allOf": [
+          { "if": { "properties": { "sourceTier": { "const": "primary" } }, "required": ["sourceTier"] }, "then": { "properties": { "isPrimary": { "const": true }, "publisherIdentityMethod": { "enum": ["recognized-institutional-domain", "configured-trusted-host"] }, "assessment": { "properties": { "sourceFunction": { "enum": ["original_record", "first_party_statement"] }, "originRelationship": { "const": "original" } } } }, "required": ["publisherIdentityRule"] } },
+          { "if": { "properties": { "sourceTier": { "const": "authoritative" } }, "required": ["sourceTier"] }, "then": { "properties": { "isPrimary": { "const": false }, "publisherIdentityMethod": { "enum": ["recognized-institutional-domain", "configured-trusted-host"] }, "assessment": { "properties": { "sourceFunction": { "const": "official_interpretation" }, "originRelationship": { "const": "original" } } } }, "required": ["publisherIdentityRule"] } },
+          { "if": { "properties": { "sourceTier": { "const": "professional" } }, "required": ["sourceTier"] }, "then": { "properties": { "isPrimary": { "const": false }, "assessment": { "properties": { "sourceFunction": { "enum": ["independent_reporting", "professional_analysis"] }, "originRelationship": { "const": "original" } } } } } },
+          { "if": { "properties": { "sourceTier": { "const": "context" } }, "required": ["sourceTier"] }, "then": { "properties": { "isPrimary": { "const": false } } } },
+          { "if": { "properties": { "publisherIdentityMethod": { "const": "configured-trusted-host" } }, "required": ["publisherIdentityMethod"] }, "then": { "required": ["publisherIdentityRule", "trustedHostConfigurationHash"] } },
+          { "if": { "properties": { "publisherIdentityMethod": { "const": "recognized-institutional-domain" } }, "required": ["publisherIdentityMethod"] }, "then": { "required": ["publisherIdentityRule"], "not": { "required": ["trustedHostConfigurationHash"] } } },
+          { "if": { "properties": { "publisherIdentityMethod": { "const": "unverified" } }, "required": ["publisherIdentityMethod"] }, "then": { "not": { "anyOf": [{ "required": ["publisherIdentityRule"] }, { "required": ["trustedHostConfigurationHash"] }] } } }
+        ],
+        "additionalProperties": false
+      }
+    },
     "evidenceLinks": { "type": "array", "maxItems": 1000, "items": { "type": "object", "required": ["claimId", "sourceId", "relation", "supportType", "locator", "supportingExcerpt", "sourceInterpretation", "limitations", "checkedAt"], "properties": { "claimId": { "type": "string", "minLength": 1, "maxLength": 120 }, "sourceId": { "type": "string", "format": "uuid" }, "relation": { "enum": ["supports", "contradicts", "contextualizes"] }, "supportType": { "enum": ["direct", "partial", "contextual"] }, "locator": { "type": "string", "minLength": 1, "maxLength": 500 }, "supportingExcerpt": { "type": "string", "minLength": 1, "maxLength": 1500 }, "sourceInterpretation": { "type": "string", "minLength": 1, "maxLength": 1500 }, "limitations": { "type": "string", "minLength": 1, "maxLength": 1000 }, "checkedAt": { "type": "string", "format": "date-time" } }, "additionalProperties": false } },
     "searches": { "type": "array", "minItems": 1, "maxItems": 100, "items": { "type": "object", "required": ["query", "executedAt", "resultCount", "tool"], "properties": { "query": { "type": "string", "minLength": 1, "maxLength": 500 }, "executedAt": { "type": "string", "format": "date-time" }, "resultCount": { "type": "integer", "minimum": 0 }, "tool": { "enum": ["web-search", "web-fetch", "official-api"] } }, "additionalProperties": false } },
     "counterEvidenceSourceIds": { "type": "array", "maxItems": 100, "items": { "type": "string", "format": "uuid" } },
@@ -24,6 +65,9 @@
     "completedBy": { "type": "string" },
     "completedAt": { "type": "string", "format": "date-time" }
   },
-  "$defs": { "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" } },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "sourceAssessment": { "type": "object", "required": ["publisherType", "sourceFunction", "originRelationship", "basisExcerpt", "classificationRationale", "assessedBy", "assessedAt"], "properties": { "publisherType": { "enum": ["government", "court", "standards_body", "academic", "company", "professional_media", "industry_organization", "individual", "unknown"] }, "sourceFunction": { "enum": ["original_record", "first_party_statement", "official_interpretation", "independent_reporting", "professional_analysis", "context"] }, "originRelationship": { "enum": ["original", "syndicated", "unknown"] }, "basisExcerpt": { "type": "string", "minLength": 1, "maxLength": 1500 }, "classificationRationale": { "type": "string", "minLength": 20, "maxLength": 2000 }, "assessedBy": { "type": "string", "minLength": 1, "maxLength": 300 }, "assessedAt": { "type": "string", "format": "date-time" } }, "additionalProperties": false }
+  },
   "additionalProperties": false
 }

@@ -107,4 +107,31 @@ describe('creator style intake and confirmation', () => {
     const inc = await saveDraftHandler({ brandId: 'creator-a', mode: 'incremental', data: formData(), updatedBy: '创作者' })
     expect((await submitHandler({ brandId: 'creator-a', formId: (inc.data as any).formId, submittedBy: '创作者' })).error?.code).toBe('INVALID_STYLE_FORM')
   })
+
+  test('the proposal author cannot confirm the same profile change even with both roles', async () => {
+    const draft = await saveDraftHandler({ brandId: 'creator-a', mode: 'quick', data: formData(), updatedBy: '创作者' })
+    const formId = (draft.data as any).formId
+    await submitHandler({ brandId: 'creator-a', formId, submittedBy: '创作者' })
+    const proposal = await proposeHandler({ brandId: 'creator-a', formId, proposedBy: '同一负责人' })
+    const confirmed = await confirmHandler({ brandId: 'creator-a', proposalId: (proposal.data as any).proposalId, confirmedBy: '  同一负责人  ', resolutions: {} })
+    expect(confirmed.error?.code).toBe('ROLE_SEPARATION_REQUIRED')
+  })
+
+  test('commits only one terminal profile when the same proposal is confirmed concurrently', async () => {
+    const draft = await saveDraftHandler({ brandId: 'creator-a', mode: 'quick', data: formData(), updatedBy: '创作者' })
+    const formId = (draft.data as any).formId
+    await submitHandler({ brandId: 'creator-a', formId, submittedBy: '创作者' })
+    const proposal = await proposeHandler({ brandId: 'creator-a', formId, proposedBy: '风格编辑' })
+    const proposalId = (proposal.data as any).proposalId
+    const results = await Promise.all([
+      confirmHandler({ brandId: 'creator-a', proposalId, confirmedBy: '创作者甲', resolutions: {} }),
+      confirmHandler({ brandId: 'creator-a', proposalId, confirmedBy: '创作者乙', resolutions: {} }),
+    ])
+    expect(results.filter((result) => result.status === 'ok')).toHaveLength(1)
+    expect(results.filter((result) => result.status === 'error')).toHaveLength(1)
+    const failureCode = results.find((result) => result.status === 'error')?.error?.code ?? ''
+    expect(['PROFILE_CONFIRM_CONFLICT', 'PROPOSAL_NOT_PENDING']).toContain(failureCode)
+    expect((await historyHandler({ brandId: 'creator-a' })).data).toMatchObject({ count: 1 })
+    expect((await getFormHandler({ brandId: 'creator-a', formId })).data).toMatchObject({ state: 'confirmed' })
+  })
 })

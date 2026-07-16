@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { z } from 'zod'
 import { actionRequired, err, ok, type Envelope } from '../envelope.ts'
 import { OriginalityScanSchema, OriginalityHumanReviewSchema, namedActorsEqual, stableHash, type OriginalityScan } from '../domain.ts'
-import { appendRecord, listRecords, storageWarnings } from '../storage.ts'
+import { appendRecordsAtomically, listRecords, StorageConflictError, storageWarnings } from '../storage.ts'
 import { getLatestContent } from './content.ts'
 import { loadReferenceRecords } from './references.ts'
 
@@ -258,7 +258,9 @@ export async function scanHandler(args: z.input<typeof scanSchema>): Promise<Env
     content.title,
     content.summary,
     content.bodyMarkdown,
+    ...content.articleDoc.citations.flatMap((citation) => [citation.title, citation.publisher, citation.publishedAt?.slice(0, 10)]),
     ...content.articleDoc.assets.flatMap((asset) => [asset.alt, asset.caption]),
+    ...content.articleDoc.disclosures,
   ].filter((value): value is string => Boolean(value)).join('\n\n')
   const referenceById = new Map(references.map((reference) => [reference.metadata.referenceId, reference]))
   for (const quotation of parsed.data.quotations) {
@@ -328,7 +330,10 @@ export async function scanHandler(args: z.input<typeof scanSchema>): Promise<Env
   }
   draftCoverage = normalizedDraft.length ? globalDraftCovered.reduce((sum, value) => sum + value, 0) / normalizedDraft.length : 0
 
-  const thirdPartyReview = references.some(({ metadata }) => ['third_party_reference', 'authorized_sample'].includes(metadata.role))
+  // Reference roles and rights are caller classifications, not proof that an
+  // expressive source is safe to imitate. Every bound reference therefore
+  // requires a separate semantic/structural human review.
+  const thirdPartyReview = references.length > 0
   let decision: OriginalityScan['decision'] = 'low_risk'
   if (longestNormalizedMatch >= 40 || draftCoverage >= 0.2) decision = 'blocked'
   else if (longestNormalizedMatch >= 16 || draftCoverage >= 0.08 || paragraphAlignments.some((alignment) => alignment.similarity >= 0.8)) decision = 'changes_required'
@@ -364,16 +369,22 @@ export async function scanHandler(args: z.input<typeof scanSchema>): Promise<Env
   }
   const scanHash = stableHash(scanHashPayload(withoutHash))
   const scan = OriginalityScanSchema.parse({ ...withoutHash, scanHash })
-  await appendRecord('originality-scans', { id: scanId, ...scan })
-  await appendRecord('audit-events', {
-    event: 'originality.scanned',
-    scanId,
-    contentId: content.contentId,
-    revisionId: content.revisionId,
-    subjectHash: content.originalitySubjectHash,
-    decision,
-    actor: parsed.data.createdBy,
-  })
+  await appendRecordsAtomically([
+    { collection: 'originality-scans', record: { id: scanId, ...scan }, guard: {
+      entityKey: scanId,
+      expectedEntityVersion: null,
+      entityVersion: 1,
+    } },
+    { collection: 'audit-events', record: {
+      event: 'originality.scanned',
+      scanId,
+      contentId: content.contentId,
+      revisionId: content.revisionId,
+      subjectHash: content.originalitySubjectHash,
+      decision,
+      actor: parsed.data.createdBy,
+    } },
+  ])
   const data = { scanId, decision, reviewRequired, subjectHash: scan.subjectHash, longestNormalizedMatch, draftCoverage, referenceCoverage, outlineSimilarity, semanticFlags }
   return decision === 'low_risk' ? ok(data, storageWarnings()) : actionRequired(data, storageWarnings())
 }
@@ -397,6 +408,7 @@ export async function reviewHandler(args: z.input<typeof reviewSchema>): Promise
   if (!parsed.success) return err('INVALID_ORIGINALITY_REVIEW', parsed.error.message)
   const scan = await getOriginalityScan(parsed.data.scanId)
   if (!scan) return err('NOT_FOUND', `No originality scan ${parsed.data.scanId}.`)
+  if (scan.humanReview) return err('ORIGINALITY_REVIEW_FINAL', `Scan ${scan.scanId} already has terminal human decision ${scan.humanReview.decision}; create a new draft and scan.`)
   if (scan.decision !== 'human_review_required') return err('ORIGINALITY_DECISION_NOT_REVIEWABLE', `Scan decision ${scan.decision} requires a new draft and scan, not an override.`)
   const content = await getLatestContent(scan.contentId)
   if (!content || !('schemaVersion' in content) || content.schemaVersion !== 2 || content.originalitySubjectHash !== scan.subjectHash) {
@@ -412,14 +424,25 @@ export async function reviewHandler(args: z.input<typeof reviewSchema>): Promise
   const withoutHash: Omit<OriginalityScan, 'scanHash'> = { ...scan, humanReview }
   const scanHash = stableHash(scanHashPayload(withoutHash))
   const updated = OriginalityScanSchema.parse({ ...withoutHash, scanHash })
-  await appendRecord('originality-scans', { id: randomUUID(), ...updated })
-  await appendRecord('audit-events', {
-    event: `originality.review.${humanReview.decision}`,
-    scanId: scan.scanId,
-    contentId: scan.contentId,
-    subjectHash: scan.subjectHash,
-    actor: humanReview.reviewedBy,
-  })
+  try {
+    await appendRecordsAtomically([
+      { collection: 'originality-scans', record: { id: randomUUID(), ...updated }, guard: {
+        entityKey: scan.scanId,
+        expectedEntityVersion: 1,
+        entityVersion: 2,
+      } },
+      { collection: 'audit-events', record: {
+        event: `originality.review.${humanReview.decision}`,
+        scanId: scan.scanId,
+        contentId: scan.contentId,
+        subjectHash: scan.subjectHash,
+        actor: humanReview.reviewedBy,
+      } },
+    ])
+  } catch (error) {
+    if (error instanceof StorageConflictError) return err('ORIGINALITY_REVIEW_CONFLICT', 'Another reviewer finalized this scan; reload it before continuing.')
+    throw error
+  }
   return humanReview.decision === 'pass' ? ok({ scanId: scan.scanId, decision: humanReview.decision, scanHash }, storageWarnings()) : actionRequired({ scanId: scan.scanId, decision: humanReview.decision, scanHash }, storageWarnings())
 }
 

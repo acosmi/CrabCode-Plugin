@@ -143,9 +143,8 @@ export function buildArticleDoc(args: {
   const assets = args.assets ?? []
   const body = cleanNode(parsed, assets)
   const disclosures: string[] = []
-  if (args.aiDisclosure?.aiAssisted) {
-    if (args.aiDisclosure.bodyLabelText) disclosures.push(args.aiDisclosure.bodyLabelText)
-    else disclosures.push('本文在创作或编辑过程中使用了 AI 辅助，并已由具名人员复核。')
+  if (args.aiDisclosure?.aiAssisted && args.aiDisclosure.methods.includes('body-label') && args.aiDisclosure.bodyLabelText) {
+    disclosures.push(args.aiDisclosure.bodyLabelText)
   }
   const normalizedTitle = args.title.normalize('NFC').replace(/\r\n?/g, '\n').trim()
   if (!normalizedTitle || /[\n\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(normalizedTitle)) {
@@ -246,12 +245,32 @@ export function markdownFromArticleDoc(doc: ArticleDoc, assetMap: Map<string, st
 }
 
 export function bodyPlainText(doc: ArticleDoc): string {
-  const values: string[] = []
+  const values = [visibleArticleBodyText(doc)]
   const visit = (node: ArticleNode): void => {
-    if (node.value) values.push(node.value)
     if (node.alt) values.push(node.alt)
     node.children?.forEach(visit)
   }
   visit(doc.body)
-  return values.join(' ').replace(/\s+/g, ' ').trim()
+  for (const citation of doc.citations) {
+    values.push(citation.title)
+    if (citation.publisher) values.push(citation.publisher)
+    if (citation.publishedAt) values.push(citation.publishedAt.slice(0, 10))
+  }
+  for (const asset of doc.assets) {
+    if (asset.alt) values.push(asset.alt)
+    if (asset.caption) values.push(asset.caption)
+  }
+  values.push(...doc.disclosures)
+  return [...new Set(values.map((value) => value.replace(/\s+/g, ' ').trim()).filter(Boolean))].join('\n')
+}
+
+/** Text nodes that are actually painted as article body copy (not link URLs/titles, metadata or image alt text). */
+export function visibleArticleBodyText(doc: ArticleDoc): string {
+  const values: string[] = []
+  const visit = (node: ArticleNode): void => {
+    if (node.value) values.push(node.value)
+    node.children?.forEach(visit)
+  }
+  visit(doc.body)
+  return values.map((value) => value.replace(/\s+/g, ' ').trim()).filter(Boolean).join('\n')
 }

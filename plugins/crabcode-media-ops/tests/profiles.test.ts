@@ -1,8 +1,10 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
-import { mkdtemp, rm } from 'node:fs/promises'
+import { existsSync } from 'node:fs'
+import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { getHandler, historyHandler, listHandler, rollbackHandler, saveHandler } from '../src/tools/profiles.ts'
+import { listRecords } from '../src/storage.ts'
 
 describe('versioned profiles', () => {
   let dir: string
@@ -61,5 +63,12 @@ describe('versioned profiles', () => {
     await saveHandler(profile('二'))
     const list = await listHandler()
     expect((list.data as any).count).toBe(1)
+  })
+
+  test('fails closed before committing or materializing a profile when its audit transaction cannot be verified', async () => {
+    await writeFile(join(dir, 'audit-events.jsonl'), '{malformed\n', 'utf8')
+    await expect(saveHandler(profile('不得落盘'))).rejects.toThrow('malformed JSON')
+    expect(await listRecords('profiles')).toHaveLength(0)
+    expect(existsSync(join(dir, 'profiles', 'tech-daily', 'current.json'))).toBe(false)
   })
 })

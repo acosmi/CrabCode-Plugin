@@ -1,6 +1,8 @@
 node_modules/
 coverage/
 dist/
+test-results/
+.playwright-cli/
 yuanma/
 bangong/
 docs/2026-05-18-crabcode-setup-plugin-ts-rebrand-implementation-plan.md

@@ -21,7 +21,11 @@
       "then": {
         "properties": {
           "data": {
-            "required": ["displayName", "creatorTypes", "positioning", "audience", "expression", "structure", "language", "truthBoundaries", "samples", "platformDifferences", "consent"]
+            "required": ["displayName", "creatorTypes", "positioning", "audience", "expression", "structure", "language", "truthBoundaries", "samples", "platformDifferences", "consent"],
+            "properties": {
+              "displayName": {}, "creatorTypes": {}, "positioning": {}, "audience": {}, "expression": {},
+              "structure": {}, "language": {}, "truthBoundaries": {}, "samples": {}, "platformDifferences": {}, "consent": {}
+            }
           }
         }
       }

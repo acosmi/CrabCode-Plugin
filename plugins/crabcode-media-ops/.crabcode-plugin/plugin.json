@@ -1,6 +1,6 @@
 {
   "name": "crabcode-media-ops",
-  "version": "0.4.0-rc1",
+  "version": "0.4.0",
   "description": "Governed media operations for CrabCode: clean-room references, verifiable research, originality review, refined white HTML delivery, hash-bound approval, and frozen local publish packages.",
   "author": {
     "name": "CrabCode"

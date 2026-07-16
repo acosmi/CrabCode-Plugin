@@ -34,7 +34,8 @@ import * as history from './tools/history.ts'
 import * as style from './tools/style.ts'
 import * as platformRules from './tools/platform-rules.ts'
 import { VERSION } from './domain.ts'
-import { StorageCorruptionError } from './storage.ts'
+import { IdentityError, authorizeToolCall, type ToolRequestContext, type TrustedPrincipal } from './identity.ts'
+import { StorageConflictError, StorageCorruptionError, StorageLeaseError } from './storage.ts'
 
 const server = new McpServer({ name: 'mediaops', version: VERSION })
 
@@ -43,18 +44,21 @@ function register(
   name: string,
   description: string,
   inputSchema: Record<string, unknown>,
-  handler: (args: any) => Promise<Envelope>,
+  handler: (args: any, principal?: TrustedPrincipal) => Promise<Envelope>,
 ): void {
   server.registerTool(
     name,
     { description, inputSchema: inputSchema as any },
-    async (args: any) => {
+    async (args: any, extra: ToolRequestContext) => {
       try {
-        const env = await handler(args ?? {})
+        const authorized = authorizeToolCall(name, args ?? {}, extra)
+        const env = await handler(authorized.args, authorized.principal ?? undefined)
         return toToolResult(env)
       } catch (e) {
         const message = e instanceof Error ? e.message : String(e)
-        const code = e instanceof StorageCorruptionError ? e.code : 'INTERNAL_ERROR'
+        const code = e instanceof StorageCorruptionError || e instanceof StorageConflictError || e instanceof StorageLeaseError || e instanceof IdentityError
+          ? e.code
+          : 'INTERNAL_ERROR'
         return toToolResult({ success: false, status: 'error', error: { code, message } })
       }
     },
@@ -76,6 +80,7 @@ register(references.registerName, references.registerDescription, references.reg
 register(references.getName, references.getDescription, references.getInputSchema, references.getHandler)
 register(researchCapture.name, researchCapture.description, researchCapture.inputSchema, researchCapture.handler)
 register(research.name, research.description, research.inputSchema, research.handler)
+register(research.getName, research.getDescription, research.getInputSchema, research.getHandler)
 register(originality.scanName, originality.scanDescription, originality.scanInputSchema, originality.scanHandler)
 register(originality.reviewName, originality.reviewDescription, originality.reviewInputSchema, originality.reviewHandler)
 register(editorialReview.name, editorialReview.description, editorialReview.inputSchema, editorialReview.handler)

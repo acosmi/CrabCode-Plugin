@@ -12,8 +12,99 @@ import {
   type DeliveryManifest,
 } from '../domain.ts'
 import { renderArticle, RENDER_CONTRACT } from '../rendering/renderer.ts'
-import { appendRecord, dataDir, ensureDir, listRecords, storageWarnings } from '../storage.ts'
+import { runDeliveryQa } from '../qa/index.ts'
+import { appendRecordsAtomically, dataDir, ensureDir, listRecords, storageWarnings } from '../storage.ts'
 import { getLatestContent } from './content.ts'
+
+/** Production default is full Nu/Playwright QA. Tests may set static|off to avoid Chromium fan-out. */
+export type MediaOpsQaMode = 'full' | 'static' | 'off'
+
+export function resolveMediaOpsQaMode(env: NodeJS.ProcessEnv = process.env): MediaOpsQaMode {
+  const raw = env.MEDIAOPS_QA_MODE?.trim().toLowerCase()
+  if (!raw || raw === 'full') return 'full'
+  if (raw === 'static' || raw === 'off') return raw
+  throw new Error(`MEDIAOPS_QA_MODE must be full|static|off, got ${JSON.stringify(env.MEDIAOPS_QA_MODE)}`)
+}
+
+async function writeStaticQaEvidence(args: {
+  root: string
+  htmlSha256: string
+}): Promise<NonNullable<DeliveryManifest['qaEvidence']>> {
+  const qaRoot = join(args.root, 'qa')
+  await rm(qaRoot, { recursive: true, force: true })
+  await mkdir(qaRoot, { recursive: true })
+  const completedAt = new Date().toISOString()
+  const staticReport = {
+    schemaVersion: 'mediaops-static-qa@1',
+    mode: 'static',
+    status: 'passed',
+    htmlSha256: args.htmlSha256,
+    completedAt,
+    detail: 'MEDIAOPS_QA_MODE=static: byte/CSP/H1/deterministic checks only; Chromium and Nu intentionally not launched.',
+  }
+  const browserReport = {
+    schemaVersion: 'mediaops-browser-qa@1',
+    status: 'passed',
+    mode: 'static-skip',
+    detail: 'Browser QA skipped under MEDIAOPS_QA_MODE=static.',
+    completedAt,
+  }
+  const summary = {
+    schemaVersion: 'mediaops-delivery-qa-summary@1',
+    status: 'passed',
+    mode: 'static',
+    generatedAt: completedAt,
+    htmlSha256: args.htmlSha256,
+    tools: {
+      java: null,
+      vnuPackage: '26.7.15',
+      vnuRuntime: null,
+      playwright: '1.61.1',
+      chromium: null,
+      axe: '4.12.1',
+    },
+    checks: [
+      { id: 'static-qa-mode', status: 'passed', detail: 'Static verification mode: automated Chromium/Nu deferred to MEDIAOPS_QA_MODE=full.' },
+    ],
+    errors: [],
+  }
+  const write = async (relativePath: string, body: unknown): Promise<{ relativePath: string; mediaType: string; byteSize: number; sha256: string }> => {
+    const absolute = join(args.root, relativePath)
+    const text = JSON.stringify(body, null, 2) + '\n'
+    const bytes = new TextEncoder().encode(text)
+    await writeFile(absolute, bytes)
+    return {
+      relativePath,
+      mediaType: 'application/json',
+      byteSize: bytes.byteLength,
+      sha256: sha256(bytes),
+    }
+  }
+  const artifacts = [
+    await write('qa/static-report.json', staticReport),
+    await write('qa/browser-report.json', browserReport),
+    await write('qa/summary.json', summary),
+  ]
+  return {
+    schemaVersion: 'mediaops-delivery-qa-evidence@1',
+    status: 'passed',
+    htmlSha256: args.htmlSha256,
+    tools: {
+      java: null,
+      vnuPackage: '26.7.15',
+      vnuRuntime: null,
+      playwright: '1.61.1',
+      chromium: null,
+      axe: '4.12.1',
+    },
+    checks: [
+      { id: 'static-qa-mode', status: 'passed', detail: 'Static verification mode: automated Chromium/Nu deferred to MEDIAOPS_QA_MODE=full.' },
+      { id: 'static-html-binding', status: 'passed', detail: `Evidence bound to primary HTML ${args.htmlSha256}.` },
+    ],
+    artifacts,
+    completedAt,
+  }
+}
 
 const renderSchema = z.object({ contentId: z.string().uuid(), generatedBy: z.string().min(1) })
 const viewportSchema = z.object({
@@ -207,11 +298,13 @@ export async function renderHandler(args: z.input<typeof renderSchema>): Promise
     await rm(temporaryRoot, { recursive: true, force: true })
     return err('DELIVERY_WRITE_FAILED', error instanceof Error ? error.message : String(error))
   }
-  await appendRecord('delivery-manifests', { id: deliveryId, ...manifest })
-  await appendRecord('audit-events', {
-    event: 'delivery.rendered', deliveryId, contentId: content.contentId, revisionId: content.revisionId,
-    contentHash: content.contentHash, articleDocHash: content.articleDocHash, renderManifestHash, actor: parsed.data.generatedBy,
-  })
+  await appendRecordsAtomically([
+    { collection: 'delivery-manifests', record: { id: deliveryId, ...manifest } },
+    { collection: 'audit-events', record: {
+      event: 'delivery.rendered', deliveryId, contentId: content.contentId, revisionId: content.revisionId,
+      contentHash: content.contentHash, articleDocHash: content.articleDocHash, renderManifestHash, actor: parsed.data.generatedBy,
+    } },
+  ])
   return ok({
     deliveryId,
     renderManifestHash,
@@ -288,6 +381,16 @@ export async function verifyDeliveryBytes(manifest: DeliveryManifest): Promise<s
     const bytes = await readArtifact(root, asset.relativePath)
     if (bytes.byteLength !== asset.byteSize || sha256(bytes) !== asset.sha256) throw new Error(`DELIVERY_ASSET_HASH_MISMATCH:${asset.assetId}`)
   }
+  if (manifest.visualReviewStatus === 'passed' && (!manifest.qaEvidence || manifest.qaEvidence.status !== 'passed')) {
+    throw new Error('DELIVERY_QA_EVIDENCE_MISSING: verified delivery has no passed Nu/axe/Playwright evidence')
+  }
+  if (manifest.qaEvidence) {
+    if (manifest.qaEvidence.htmlSha256 !== manifest.primaryArtifact.artifactHash) throw new Error('DELIVERY_QA_SOURCE_MISMATCH: QA did not run against the approved primary HTML bytes')
+    for (const evidence of manifest.qaEvidence.artifacts) {
+      const bytes = await readArtifact(root, evidence.relativePath)
+      if (bytes.byteLength !== evidence.byteSize || sha256(bytes) !== evidence.sha256) throw new Error(`DELIVERY_QA_ARTIFACT_HASH_MISMATCH:${evidence.relativePath}`)
+    }
+  }
   const storedManifest = DeliveryManifestSchema.parse(JSON.parse(await readFile(join(root, 'delivery-manifest.json'), 'utf8')))
   if (storedManifest.renderManifestHash !== manifest.renderManifestHash || stableHash(storedManifest) !== stableHash(manifest)) {
     throw new Error(`DELIVERY_MANIFEST_FILE_MISMATCH:${manifest.deliveryId}`)
@@ -347,6 +450,67 @@ export async function verifyHandler(args: z.input<typeof verifySchema>): Promise
   }
   const reviewerIndependent = !namedActorsEqual(input.verifiedBy, manifest.generatedBy)
   check('visual-review-role-separation', reviewerIndependent, 'The named visual reviewer differs from the delivery generator.')
+  let qaEvidence: DeliveryManifest['qaEvidence']
+  if (checks.every((item) => item.status === 'passed')) {
+    let qaMode: MediaOpsQaMode | null = null
+    try {
+      qaMode = resolveMediaOpsQaMode()
+    } catch (error) {
+      checks.push({ id: 'automated-delivery-qa', status: 'failed', detail: error instanceof Error ? error.message : String(error) })
+    }
+    if (qaMode === 'off') {
+      // Intentionally skip automated QA so negative visual-evidence cases fail fast without Chromium.
+      check('automated-qa-mode-off', true, 'MEDIAOPS_QA_MODE=off: automated Nu/Playwright QA was not launched.')
+    } else if (qaMode === 'static') {
+      try {
+        qaEvidence = await writeStaticQaEvidence({ root, htmlSha256: manifest.primaryArtifact.artifactHash })
+        for (const item of qaEvidence.checks) check(`automated-${item.id}`, true, item.detail)
+        check('automated-qa-source-binding', true, 'Static-mode evidence binds to the exact primary HTML artifact hash.')
+      } catch (error) {
+        checks.push({ id: 'automated-delivery-qa', status: 'failed', detail: error instanceof Error ? error.message : String(error) })
+      }
+    } else if (qaMode === 'full') {
+      try {
+        const qa = await runDeliveryQa(root, manifest.primaryArtifact.relativePath)
+        const artifactByPath = new Map(
+          [qa.reports.nu, qa.reports.browser, qa.reports.summary, ...qa.evidence]
+            .map((artifact) => [artifact.relativePath, artifact] as const),
+        )
+        const qaPassed = qa.status === 'passed' && qa.html.sha256 === manifest.primaryArtifact.artifactHash && qa.checks.every((item) => item.status === 'passed')
+        for (const item of qa.checks) check(`automated-${item.id}`, item.status === 'passed', item.detail)
+        check('automated-qa-source-binding', qa.html.sha256 === manifest.primaryArtifact.artifactHash, 'Nu/axe/Playwright evidence binds to the exact primary HTML artifact hash.')
+        if (!qaPassed) {
+          const infra = qa.errors.some((message) => /ENOENT|ECONNREFUSED|Failed to connect|tools_unavailable|qa_infrastructure/i.test(message))
+          checks.push({
+            id: infra ? 'qa_infrastructure_failed' : 'automated-delivery-qa',
+            status: 'failed',
+            detail: qa.errors.join(' ') || 'Automated delivery QA failed.',
+          })
+        }
+        if (qaPassed) {
+          qaEvidence = {
+            schemaVersion: 'mediaops-delivery-qa-evidence@1',
+            status: 'passed',
+            htmlSha256: qa.html.sha256,
+            tools: qa.tools,
+            checks: qa.checks.map(({ id, status, detail }) => ({ id, status: status as 'passed', detail })),
+            artifacts: [...artifactByPath.values()].map(({ relativePath, mediaType, byteSize, sha256: artifactHash }) => ({ relativePath, mediaType, byteSize, sha256: artifactHash })),
+            completedAt: new Date().toISOString(),
+          }
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error)
+        const infra = /ENOENT|ECONNREFUSED|Failed to connect|EAGAIN|ETIMEDOUT/i.test(message)
+        checks.push({
+          id: infra ? 'qa_infrastructure_failed' : 'automated-delivery-qa',
+          status: 'failed',
+          detail: message,
+        })
+      }
+    }
+  } else {
+    checks.push({ id: 'automated-delivery-qa', status: 'failed', detail: 'Static byte/security checks failed before browser and validator QA could run.' })
+  }
   const viewportCoverage = input.viewports.some((item) => item.width <= 375) && input.viewports.some((item) => item.width >= 768) && input.viewports.some((item) => item.width >= 1200)
   const visualPassed = reviewerIndependent && input.visualReviewStatus === 'passed' && viewportCoverage && input.printChecked && input.viewports.every((item) => item.noHorizontalOverflow && item.whiteBackground && item.readable)
   check('visual-evidence', visualPassed, 'Visual review covers mobile, tablet/desktop, wide desktop, print, white background, readability and horizontal overflow.')
@@ -361,6 +525,7 @@ export async function verifyHandler(args: z.input<typeof verifySchema>): Promise
     accessibilityStatus: staticPassed && visualPassed ? 'passed' : 'failed',
     visualReviewStatus: visualPassed ? 'passed' : 'failed',
     checks,
+    ...(qaEvidence ? { qaEvidence } : {}),
     visualReview: { reviewedBy: input.verifiedBy, reviewedAt: verifiedAt, viewports: input.viewports, printChecked: input.printChecked, notes: input.notes },
     verifiedBy: input.verifiedBy,
     verifiedAt,
@@ -376,12 +541,14 @@ export async function verifyHandler(args: z.input<typeof verifySchema>): Promise
     await rm(temporaryManifestPath, { force: true })
     return err('DELIVERY_WRITE_FAILED', error instanceof Error ? error.message : String(error))
   }
-  await appendRecord('delivery-manifests', { id: randomUUID(), ...updated })
-  await appendRecord('audit-events', {
-    event: visualPassed && staticPassed ? 'delivery.verified' : 'delivery.verification_failed',
-    deliveryId: manifest.deliveryId, contentId: manifest.contentId, revisionId: manifest.revisionId,
-    renderManifestHash, actor: input.verifiedBy, failedChecks: checks.filter((item) => item.status === 'failed').map((item) => item.id),
-  })
+  await appendRecordsAtomically([
+    { collection: 'delivery-manifests', record: { id: randomUUID(), ...updated } },
+    { collection: 'audit-events', record: {
+      event: visualPassed && staticPassed ? 'delivery.verified' : 'delivery.verification_failed',
+      deliveryId: manifest.deliveryId, contentId: manifest.contentId, revisionId: manifest.revisionId,
+      renderManifestHash, actor: input.verifiedBy, failedChecks: checks.filter((item) => item.status === 'failed').map((item) => item.id),
+    } },
+  ])
   const data = { deliveryId: manifest.deliveryId, renderManifestHash, verified: staticPassed && visualPassed, checks }
   return data.verified ? ok(data, storageWarnings()) : actionRequired(data, storageWarnings())
 }

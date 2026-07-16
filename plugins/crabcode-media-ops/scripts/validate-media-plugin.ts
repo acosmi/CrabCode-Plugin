@@ -30,7 +30,7 @@ const knownTools = new Set([
   'mediaops.profile.confirm', 'mediaops.preview.create', 'mediaops.readiness.inspect', 'mediaops.approval.request',
   'mediaops.approval.decide', 'mediaops.approval.get', 'mediaops.approval.list', 'mediaops.publish.package',
   'mediaops.publish.history', 'mediaops.platform.rules.get', 'mediaops.reference.register',
-  'mediaops.reference.get_metadata', 'mediaops.research.capture', 'mediaops.research.complete', 'mediaops.originality.scan',
+  'mediaops.reference.get_metadata', 'mediaops.research.capture', 'mediaops.research.complete', 'mediaops.research.get', 'mediaops.originality.scan',
   'mediaops.originality.review', 'mediaops.editorial.review', 'mediaops.delivery.render', 'mediaops.delivery.verify',
 ])
 
@@ -76,7 +76,7 @@ for (const name of skillNames) if (!expectedSkills.has(name)) errors.push(`unexp
 
 const schemaNames = [
   'content-manifest', 'claim', 'approval', 'creator-style-form', 'platform-rule', 'reference-material',
-  'research-capture', 'research-review', 'originality-scan', 'editorial-review', 'article-doc', 'delivery-artifact', 'delivery-manifest',
+  'research-capture', 'research-review', 'originality-scan', 'editorial-review', 'article-doc', 'delivery-artifact', 'delivery-manifest', 'package-manifest',
 ]
 const schemas = new Map<string, any>()
 for (const schema of schemaNames) {
