@@ -1,0 +1,54 @@
+:root {
+  color-scheme: light;
+
+  --color-canvas: #fff;
+  --color-surface: #fff;
+  --color-navigation: #f5f7fa;
+  --color-subtle: #f8fafc;
+  --color-text: #0f172a;
+  --color-text-muted: #475569;
+  --color-border: #e2e8f0;
+  --color-control-border: #8795a8;
+  --color-primary: #1769e0;
+  --color-focus: #1769e0;
+  --color-success: #15803d;
+  --color-warning: #b45309;
+  --color-danger: #b42318;
+  --color-primary-subtle: #eff6ff;
+  --color-success-subtle: #f0fdf4;
+  --color-warning-subtle: #fffbeb;
+  --color-danger-subtle: #fef2f2;
+
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-48: 48px;
+
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --radius-full: 999px;
+
+  --control-height: 40px;
+  --control-compact: 32px;
+  --touch-min: 40px;
+  --layout-sidebar: 240px;
+  --layout-inspector: 400px;
+  --layout-article: 704px;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --type-display-size: 32px;
+  --type-display-line-height: 40px;
+  --type-page-title-size: 24px;
+  --type-page-title-line-height: 32px;
+  --type-section-size: 18px;
+  --type-section-line-height: 28px;
+  --type-body-size: 14px;
+  --type-body-line-height: 22px;
+  --type-small-size: 12px;
+  --type-small-line-height: 18px;
+  --type-article-body-size: 17px;
+  --type-article-body-line-height: 30px;
+}

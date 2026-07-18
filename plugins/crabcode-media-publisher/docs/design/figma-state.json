@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "crabpublish-figma-state@1",
+  "runId": "dsb-crabpublish-hub-apple-white-20260718",
+  "figmaFile": {
+    "key": "oOtG8Etm4wGVhGfrkU2GBy",
+    "url": "https://www.figma.com/design/oOtG8Etm4wGVhGfrkU2GBy",
+    "name": "CrabPublish Hub UI · Apple White"
+  },
+  "completed": {
+    "phase0Discovery": true,
+    "collections": [
+      { "name": "Primitives", "id": "VariableCollectionId:3:2" },
+      { "name": "Semantic Colors", "id": "VariableCollectionId:3:3" },
+      { "name": "Dimensions", "id": "VariableCollectionId:3:4" },
+      { "name": "Typography", "id": "VariableCollectionId:3:5" }
+    ],
+    "variables": {
+      "total": 58,
+      "groups": [
+        { "name": "color primitives", "count": 14, "idRange": "VariableID:5:2..VariableID:5:15" },
+        { "name": "semantic colors", "count": 15, "idRange": "VariableID:6:2..VariableID:7:8" },
+        { "name": "dimensions", "count": 16, "idRange": "VariableID:8:2..VariableID:8:17" },
+        { "name": "typography", "count": 13, "idRange": "VariableID:9:2..VariableID:9:14" }
+      ]
+    },
+    "textStyles": [
+      "UI/Display",
+      "UI/Page Title",
+      "UI/Section",
+      "UI/Body",
+      "UI/Small",
+      "UI/Label",
+      "Article/H1",
+      "Article/H2",
+      "Article/H3",
+      "Article/Body"
+    ]
+  },
+  "pending": [
+    "effect styles",
+    "local components",
+    "eight high-fidelity screen frames",
+    "post-creation validation and screenshots"
+  ],
+  "deviations": [
+    {
+      "id": "CODE-SOFT-SURFACE-REFINEMENT-PENDING-FIGMA-SYNC",
+      "decision": "The executable UI now uses a soft-surface hierarchy: light-gray navigation and borderless cards against a white workspace, with a 3:1 control border retained only where form regions must remain identifiable. The code tokens and screenshot baselines are authoritative until the existing Figma file can be synchronized.",
+      "evidence": "User-directed visual refinement on 2026-07-18 added color.navigation and color.controlBorder, removed nonessential card/capsule/table/navigation strokes, and retained only necessary form boundaries.",
+      "recurrence": "Figma MCP Starter quota remains unavailable, so the code refinement cannot yet be written back to the design file."
+    },
+    {
+      "id": "FIGMA-LIBRARY-IMPORT-PERMISSION",
+      "decision": "Use an independently maintained local Hub design system instead of claiming imported macOS 27 components.",
+      "evidence": "Not permitted to upsert from the discovered library under the current Starter/View seat.",
+      "recurrence": "The seat remains Starter/View without permission to import the library."
+    },
+    {
+      "id": "FIGMA-MCP-STARTER-LIMIT",
+      "decision": "Stop all further Figma calls and continue the code implementation without pretending screens were written to Figma.",
+      "evidence": "Figma MCP reported that the Starter plan tool-call limit had been reached while creating effect styles.",
+      "recurrence": "The Starter quota has not refreshed or the plan has not been upgraded."
+    }
+  ],
+  "resumeFrom": "First synchronize the code's soft-surface refinement plus color.navigation and color.controlBorder tokens, then create effect styles, local components and eight screen frames in the existing file; do not create a duplicate file."
+}
