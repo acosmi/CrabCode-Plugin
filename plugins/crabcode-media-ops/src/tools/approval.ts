@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { z } from 'zod'
 import { err, ok, type Envelope } from '../envelope.ts'
-import { Sha256Schema, namedActorsEqual, stableHash } from '../domain.ts'
+import { PrincipalAssuranceSchema, Sha256Schema, namedActorsEqual, stableHash } from '../domain.ts'
 import type { TrustedPrincipal } from '../identity.ts'
 import { getPlatform } from '../platforms/registry.ts'
 import {
@@ -46,13 +46,13 @@ const approvalSchema = z.object({
   requestedIdentity: z.object({
     principalId: z.string().min(1),
     issuer: z.string().min(1),
-    assurance: z.enum(['mcp_oauth', 'host_principal']),
+    assurance: PrincipalAssuranceSchema,
   }).strict(),
   decidedBy: z.string().min(1).optional(),
   decidedIdentity: z.object({
     principalId: z.string().min(1),
     issuer: z.string().min(1),
-    assurance: z.enum(['mcp_oauth', 'host_principal']),
+    assurance: PrincipalAssuranceSchema,
   }).strict().optional(),
   reason: z.string().min(1).optional(),
   decidedAt: z.string().datetime().optional(),
@@ -61,7 +61,7 @@ const approvalSchema = z.object({
   packagedIdentity: z.object({
     principalId: z.string().min(1),
     issuer: z.string().min(1),
-    assurance: z.enum(['mcp_oauth', 'host_principal']),
+    assurance: PrincipalAssuranceSchema,
   }).strict().optional(),
   packagedAt: z.string().datetime().optional(),
 }).strict().superRefine((value, ctx) => {

@@ -4,7 +4,7 @@ import { copyFile, lstat, mkdir, open, readFile, readdir, rename, rm, writeFile 
 import { dirname, join } from 'node:path'
 import { z } from 'zod'
 import { actionRequired, blocked, err, ok, type Envelope } from '../envelope.ts'
-import { DeliveryManifestSchema, PackageManifestSchema, VERSION, stableHash, type PackageManifest } from '../domain.ts'
+import { DeliveryManifestSchema, PackageManifestSchema, PrincipalAssuranceSchema, VERSION, stableHash, type PackageManifest } from '../domain.ts'
 import type { TrustedPrincipal } from '../identity.ts'
 import { getPlatform } from '../platforms/registry.ts'
 import {
@@ -64,7 +64,7 @@ const packageOperationSchema = z.object({
   packagedIdentity: z.object({
     principalId: z.string().min(1),
     issuer: z.string().min(1),
-    assurance: z.enum(['mcp_oauth', 'host_principal']),
+    assurance: PrincipalAssuranceSchema,
   }).strict(),
   preparedAt: z.string().datetime(),
   committedAt: z.string().datetime().optional(),

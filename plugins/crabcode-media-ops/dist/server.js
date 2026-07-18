@@ -10622,7 +10622,7 @@ function assertStoredContentHash(content) {
     throw new Error(`CONTENT_HASH_MISMATCH:${content.contentId}:${content.revisionId}`);
   }
 }
-var VERSION = "0.4.0", SCHEMA_VERSION = 2, Sha256Schema, SafeHttpUrlSchema, BrandIdSchema, ReferenceRoleSchema, ReferenceAllowedUseSchema, ReferenceMaterialSchema, ResearchCaptureSchema, SourceAssessmentSchema, EvidenceSourceSchema, ResearchClaimSchema, ClaimEvidenceLinkSchema, ResearchSearchLogSchema, ResearchReviewSchema, ClaimSchema, VerifiableStatementSchema, StatementCoverageSchema, ReviewSchema, LegalReviewSchema, AiDisclosureSchema, AssetInputSchema, AssetSchema, ArticleNodeTypeSchema, ArticleNodeSchema, CitationSchema, ArticleDocSchema, OriginalityHumanReviewSchema, OriginalityScanSchema, EditorialReviewRecordSchema, BaseContentSchema, ContentManifestV2Schema, LegacyClaimSchema, LegacyReviewSchema, LegacyOriginalityReviewSchema, ContentManifestV1Schema, ContentManifestSchema, DeliveryArtifactSchema, DeliveryQaArtifactSchema, DeliveryQaEvidenceSchema, DeliveryManifestSchema, PackageRelativePathSchema, PackageIdentitySchema, PackageManifestSchema;
+var VERSION = "0.4.0", SCHEMA_VERSION = 2, Sha256Schema, SafeHttpUrlSchema, BrandIdSchema, ReferenceRoleSchema, ReferenceAllowedUseSchema, ReferenceMaterialSchema, ResearchCaptureSchema, SourceAssessmentSchema, EvidenceSourceSchema, ResearchClaimSchema, ClaimEvidenceLinkSchema, ResearchSearchLogSchema, ResearchReviewSchema, ClaimSchema, VerifiableStatementSchema, StatementCoverageSchema, ReviewSchema, LegalReviewSchema, AiDisclosureSchema, AssetInputSchema, AssetSchema, ArticleNodeTypeSchema, ArticleNodeSchema, CitationSchema, ArticleDocSchema, OriginalityHumanReviewSchema, OriginalityScanSchema, EditorialReviewRecordSchema, BaseContentSchema, ContentManifestV2Schema, LegacyClaimSchema, LegacyReviewSchema, LegacyOriginalityReviewSchema, ContentManifestV1Schema, ContentManifestSchema, DeliveryArtifactSchema, DeliveryQaArtifactSchema, DeliveryQaEvidenceSchema, DeliveryManifestSchema, PackageRelativePathSchema, PrincipalAssuranceSchema, PackageIdentitySchema, PackageManifestSchema;
 var init_domain = __esm(() => {
   init_zod();
   Sha256Schema = exports_external.string().regex(/^[a-f0-9]{64}$/);
@@ -11186,10 +11186,11 @@ var init_domain = __esm(() => {
     artifactRoot: exports_external.string().min(1)
   });
   PackageRelativePathSchema = exports_external.string().min(1).refine((value) => /^[A-Za-z0-9._/-]+$/.test(value) && !value.startsWith("/") && !value.includes(":") && value.split("/").every((part) => part && part !== "." && part !== ".."), "package path must be a safe relative POSIX path");
+  PrincipalAssuranceSchema = exports_external.enum(["mcp_oauth", "host_principal", "local_editorial", "service_account"]);
   PackageIdentitySchema = exports_external.object({
     principalId: exports_external.string().min(1),
     issuer: exports_external.string().min(1),
-    assurance: exports_external.enum(["mcp_oauth", "host_principal"])
+    assurance: PrincipalAssuranceSchema
   }).strict();
   PackageManifestSchema = exports_external.object({
     schemaVersion: exports_external.literal(4),
@@ -49921,6 +49922,7 @@ var STAGES = ["intake", "researched", "drafted", "reviewed"];
 var saveSchema = exports_external.object({
   contentId: exports_external.string().uuid().optional(),
   expectedRevision: exports_external.number().int().positive().optional(),
+  serviceImport: exports_external.boolean().optional(),
   kind: exports_external.enum(["brief", "draft", "variant"]),
   brandId: BrandIdSchema,
   profileVersion: exports_external.string().min(1),
@@ -49941,7 +49943,7 @@ var saveSchema = exports_external.object({
   savedBy: exports_external.string().min(1)
 });
 var saveName = "mediaops.content.save";
-var saveDescription = "Create one immutable schema-v2 content revision. The first revision must be intake and each later revision may stay at its stage or advance by one evidence-backed stage; review conclusions cannot be self-reported here.";
+var saveDescription = "Create one immutable schema-v2 content revision. The first revision must be intake and each later revision may stay at its stage or advance by one evidence-backed stage; review conclusions cannot be self-reported here. In local-editorial mode, serviceImport:true asks the server-owned service actor to register a mechanical intake import.";
 var saveInputSchema = saveSchema.shape;
 var contentSaveQueue = Promise.resolve();
 async function withContentSaveLock(work) {
@@ -51404,13 +51406,13 @@ var approvalSchema = exports_external.object({
   requestedIdentity: exports_external.object({
     principalId: exports_external.string().min(1),
     issuer: exports_external.string().min(1),
-    assurance: exports_external.enum(["mcp_oauth", "host_principal"])
+    assurance: PrincipalAssuranceSchema
   }).strict(),
   decidedBy: exports_external.string().min(1).optional(),
   decidedIdentity: exports_external.object({
     principalId: exports_external.string().min(1),
     issuer: exports_external.string().min(1),
-    assurance: exports_external.enum(["mcp_oauth", "host_principal"])
+    assurance: PrincipalAssuranceSchema
   }).strict().optional(),
   reason: exports_external.string().min(1).optional(),
   decidedAt: exports_external.string().datetime().optional(),
@@ -51419,7 +51421,7 @@ var approvalSchema = exports_external.object({
   packagedIdentity: exports_external.object({
     principalId: exports_external.string().min(1),
     issuer: exports_external.string().min(1),
-    assurance: exports_external.enum(["mcp_oauth", "host_principal"])
+    assurance: PrincipalAssuranceSchema
   }).strict().optional(),
   packagedAt: exports_external.string().datetime().optional()
 }).strict().superRefine((value, ctx) => {
@@ -51767,7 +51769,7 @@ var packageOperationSchema = exports_external.object({
   packagedIdentity: exports_external.object({
     principalId: exports_external.string().min(1),
     issuer: exports_external.string().min(1),
-    assurance: exports_external.enum(["mcp_oauth", "host_principal"])
+    assurance: PrincipalAssuranceSchema
   }).strict(),
   preparedAt: exports_external.string().datetime(),
   committedAt: exports_external.string().datetime().optional(),
@@ -53043,6 +53045,16 @@ class IdentityError extends Error {
     this.code = code4;
   }
 }
+var SERVICE_ACTOR_TOOLS = new Set(["mediaops.originality.scan", "mediaops.delivery.render"]);
+var SERVICE_IMPORT_TOOL = "mediaops.content.save";
+var SERVICE_ACTOR = Object.freeze({
+  principalId: "service",
+  actorKey: "mediaops-server:service",
+  displayName: "MediaOps \u670D\u52A1\u6267\u884C\u4F53\uFF08\u786E\u5B9A\u6027\u673A\u5668\u64CD\u4F5C\uFF09",
+  issuer: "mediaops-server",
+  roles: ["originality_scanner", "renderer", "author"],
+  assurance: "service_account"
+});
 var POLICIES = {
   "mediaops.content.save": { role: "author", actorFields: ["savedBy"] },
   "mediaops.reference.register": { role: "reference_curator", actorFields: ["registeredBy"] },
@@ -53098,20 +53110,28 @@ function principalFromMcp(context) {
     assurance: "mcp_oauth"
   };
 }
+function configuredIdentityMode() {
+  const mode = process.env.MEDIAOPS_IDENTITY_MODE;
+  return mode === "host-principal" || mode === "local-editorial" ? mode : null;
+}
 function principalFromHost() {
-  if (process.env.MEDIAOPS_IDENTITY_MODE !== "host-principal")
+  const mode = configuredIdentityMode();
+  if (!mode)
     return null;
   const principalId = cleanIdentifier(process.env.MEDIAOPS_TRUSTED_PRINCIPAL_ID, "MEDIAOPS_TRUSTED_PRINCIPAL_ID");
   const issuer = cleanIdentifier(process.env.MEDIAOPS_TRUSTED_PRINCIPAL_ISSUER, "MEDIAOPS_TRUSTED_PRINCIPAL_ISSUER");
   const displayName = (process.env.MEDIAOPS_TRUSTED_PRINCIPAL_NAME?.normalize("NFKC").trim() || principalId).slice(0, 300);
   const roles = normalizeRoles([process.env.MEDIAOPS_TRUSTED_PRINCIPAL_ROLES ?? ""]);
+  if (roles.includes("*") || roles.includes("mediaops:*")) {
+    throw new IdentityError("AUTHENTICATION_REQUIRED", "Wildcard roles are rejected for host/local configured principals; grant explicit mediaops roles instead.");
+  }
   return {
     principalId,
     actorKey: `${issuer}:${principalId}`.slice(0, 300),
     displayName,
     issuer,
     roles,
-    assurance: "host_principal"
+    assurance: mode === "local-editorial" ? "local_editorial" : "host_principal"
   };
 }
 function resolveTrustedPrincipal(context) {
@@ -53145,19 +53165,43 @@ function authorizeToolCall(toolName, rawArgs, context) {
   const policy = POLICIES[toolName];
   if (!policy)
     return { args: rawArgs, principal: resolveTrustedPrincipal(context) };
-  const principal = resolveTrustedPrincipal(context);
+  const args = rawArgs && typeof rawArgs === "object" && !Array.isArray(rawArgs) ? { ...rawArgs } : {};
+  const serviceImportRequested = args.serviceImport === true;
+  delete args.serviceImport;
+  const localEditorial = !context?.authInfo && configuredIdentityMode() === "local-editorial";
+  let principal;
+  if (localEditorial && (SERVICE_ACTOR_TOOLS.has(toolName) || toolName === SERVICE_IMPORT_TOOL && serviceImportRequested)) {
+    const human = resolveTrustedPrincipal(context);
+    if (!human) {
+      throw new IdentityError("AUTHENTICATION_REQUIRED", "local-editorial mode requires the trusted local principal to be configured before service-actor operations run.");
+    }
+    if (toolName === SERVICE_IMPORT_TOOL && args.stage !== "intake") {
+      throw new IdentityError("AUTHORIZATION_DENIED", "The service actor may only register mechanical intake imports; later stages need the accountable human principal.");
+    }
+    principal = SERVICE_ACTOR;
+  } else {
+    if (serviceImportRequested) {
+      throw new IdentityError("AUTHORIZATION_DENIED", "serviceImport is only available for mediaops.content.save intake registration in MEDIAOPS_IDENTITY_MODE=local-editorial.");
+    }
+    principal = resolveTrustedPrincipal(context);
+  }
   if (!principal) {
     throw new IdentityError("AUTHENTICATION_REQUIRED", `${toolName} requires an MCP-authenticated subject or an explicitly configured host principal; caller-supplied names are not accepted as identity.`);
   }
   if (!hasRole(principal, policy.role)) {
     throw new IdentityError("AUTHORIZATION_DENIED", `${principal.actorKey} lacks required role ${policy.role} for ${toolName}.`);
   }
-  const args = rawArgs && typeof rawArgs === "object" && !Array.isArray(rawArgs) ? { ...rawArgs } : {};
   for (const field of policy.actorFields)
     args[field] = principal.actorKey;
   bindNestedAccountability(toolName, args, principal.actorKey);
   return { args, principal };
 }
+var SECOND_HUMAN_GATES = Object.freeze([
+  "mediaops.originality.review",
+  "mediaops.editorial.review",
+  "mediaops.approval.decide",
+  "mediaops.profile.confirm"
+]);
 
 // src/server.ts
 var server = new McpServer({ name: "mediaops", version: VERSION });
