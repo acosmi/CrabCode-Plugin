@@ -6,6 +6,8 @@ allowed-tools: [Read, Glob, Grep, Bash, Task]
 
 # /media-publish
 
+先按 `media-core/PRACTICE.md`《运行前预检》执行完整 preflight（含 `mediaops.doctor` 依赖检查）；失败按停止码停止，未真实执行的门禁一律记 `GATE_NOT_EXECUTED`，报告中的已完成阶段必须逐项附权威 ID/哈希。
+
 按 `media-publish-gate` 执行：
 
 1. 对 reviewed revision 调用 `mediaops.delivery.render`，生成白底 HTML 主产物、Markdown 备份和平台档案。

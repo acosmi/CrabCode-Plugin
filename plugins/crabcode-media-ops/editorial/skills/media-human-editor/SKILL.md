@@ -9,7 +9,7 @@ description: 对已有媒体稿进行去 AI 味、结构压缩、语言自然化
 
 # 人工感编辑
 
-先读取 `../../../media-core/PRACTICE.md` 与 `../../PRACTICE.md`。
+先读取 `../../../media-core/PRACTICE.md` 与 `../../PRACTICE.md`。涉及保存 revision 或触发扫描前，先按《运行前预检》确认 `mediaops.capabilities` 可用；预检失败按停止码停止，编辑稿只能标注未治理草稿。
 
 - 删除空泛总起、重复结论、伪金句、连续排比和没有信息量的转折。
 - 保留可核验主张与引用，不把存疑内容润色成确定事实。

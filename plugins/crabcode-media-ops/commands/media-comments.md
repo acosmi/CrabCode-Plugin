@@ -14,7 +14,7 @@ allowed-tools: [Read, Glob, Grep, Bash, Task]
 
 ### 1. 取评论与 profile
 - 评论来源可为用户粘贴、本地文件或导出文本。无平台拉取真 API（Gate B），本阶段以用户提供的数据为准。
-- 调 `mediaops.profile.get` 取品牌 profile——回复口吻以 profile 的 `voice` 为准，禁用词同样适用于回复文案。
+- 调 `mediaops.profile.get` 取品牌 profile——回复口吻以 profile 的 `voice` 为准，禁用词同样适用于回复文案。调用前先按 `media-core/PRACTICE.md`《运行前预检》确认服务可用；`MCP_INACTIVE` 等停止码出现时如实告知，可在无 profile 约束下继续建议模式，但需标注未读取 profile。
 
 ### 2. 分类（comment-operator 或主 agent）
 - 按以下维度归类：表扬/认同、提问/求助、批评/投诉、纠错/质疑事实、垃圾/引流、敏感/法律风险。
