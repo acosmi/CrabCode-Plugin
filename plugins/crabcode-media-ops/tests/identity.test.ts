@@ -67,6 +67,17 @@ describe('trusted MCP/host identity binding', () => {
     expect(() => authorizeToolCall('mediaops.publish.package', { packagedBy: 'spoofed' }, oauthContext(['author']))).toThrow('lacks required role publisher')
   })
 
+  test('serviceImport is rejected outside local-editorial mode', () => {
+    try {
+      authorizeToolCall('mediaops.content.save', { serviceImport: true, stage: 'intake' }, oauthContext(['author']))
+      throw new Error('expected serviceImport to be rejected for OAuth subjects')
+    } catch (error) {
+      expect(error).toBeInstanceOf(IdentityError)
+      expect((error as IdentityError).code).toBe('AUTHORIZATION_DENIED')
+      expect((error as IdentityError).message).toContain('local-editorial')
+    }
+  })
+
   test('stdio server fails closed without identity and exposes configured host principal', async () => {
     const dataDir = await mkdtemp(join(tmpdir(), 'mediaops-identity-mcp-'))
     temporaryDirectories.push(dataDir)
@@ -107,6 +118,72 @@ describe('trusted MCP/host identity binding', () => {
       expect(content.data.savedBy).toBe('crabcode-host:desktop-user')
     } finally {
       await authenticated.client.close()
+    }
+  })
+
+  test('local-editorial mode routes deterministic machine work to the service actor and rejects wildcards', async () => {
+    const dataDir = await mkdtemp(join(tmpdir(), 'mediaops-local-editorial-'))
+    temporaryDirectories.push(dataDir)
+    const baseEnv = Object.fromEntries(Object.entries(process.env).filter((entry): entry is [string, string] => typeof entry[1] === 'string'))
+    delete baseEnv.MEDIAOPS_IDENTITY_MODE
+    delete baseEnv.MEDIAOPS_TRUSTED_PRINCIPAL_ID
+    delete baseEnv.MEDIAOPS_TRUSTED_PRINCIPAL_ISSUER
+    delete baseEnv.MEDIAOPS_TRUSTED_PRINCIPAL_ROLES
+
+    // Human holds author/fact_checker but deliberately NOT originality_scanner:
+    // a scan succeeding past authorization proves the service actor executed it.
+    const local = await stdioClient({
+      ...baseEnv,
+      MEDIAOPS_DATA_DIR: dataDir,
+      MEDIAOPS_IDENTITY_MODE: 'local-editorial',
+      MEDIAOPS_TRUSTED_PRINCIPAL_ID: 'solo-editor',
+      MEDIAOPS_TRUSTED_PRINCIPAL_ISSUER: 'crabcode-host',
+      MEDIAOPS_TRUSTED_PRINCIPAL_ROLES: 'author,fact_checker',
+    })
+    try {
+      const capability = parseToolResult(await local.client.callTool({ name: 'mediaops.capabilities', arguments: {} }))
+      expect(capability.data.governedCapabilities.actorIdentityAssurance).toBe('local_editorial')
+
+      const imported = parseToolResult(await local.client.callTool({
+        name: 'mediaops.content.save',
+        arguments: { serviceImport: true, kind: 'brief', brandId: 'local-brand', profileVersion: 'v1', stage: 'intake', title: '本地导入', researchSubject: '本地导入', bodyMarkdown: '正文', savedBy: 'spoofed' },
+      }))
+      expect(imported.status).toBe('ok')
+      const importedContent = parseToolResult(await local.client.callTool({ name: 'mediaops.content.get', arguments: { contentId: imported.data.contentId } }))
+      expect(importedContent.data.savedBy).toBe('mediaops-server:service')
+
+      const laterStage = parseToolResult(await local.client.callTool({
+        name: 'mediaops.content.save',
+        arguments: { serviceImport: true, contentId: imported.data.contentId, kind: 'brief', brandId: 'local-brand', profileVersion: 'v1', stage: 'researched', title: '本地导入', researchSubject: '本地导入', bodyMarkdown: '正文', savedBy: 'spoofed' },
+      }))
+      expect(laterStage.error?.code).toBe('AUTHORIZATION_DENIED')
+
+      const scan = parseToolResult(await local.client.callTool({
+        name: 'mediaops.originality.scan',
+        arguments: { contentId: '00000000-0000-4000-8000-0000000000aa', createdBy: 'spoofed' },
+      }))
+      expect(scan.error?.code).toBe('NOT_FOUND')
+    } finally {
+      await local.client.close()
+    }
+
+    const wildcard = await stdioClient({
+      ...baseEnv,
+      MEDIAOPS_DATA_DIR: dataDir,
+      MEDIAOPS_IDENTITY_MODE: 'local-editorial',
+      MEDIAOPS_TRUSTED_PRINCIPAL_ID: 'solo-editor',
+      MEDIAOPS_TRUSTED_PRINCIPAL_ISSUER: 'crabcode-host',
+      MEDIAOPS_TRUSTED_PRINCIPAL_ROLES: '*',
+    })
+    try {
+      const rejected = parseToolResult(await wildcard.client.callTool({
+        name: 'mediaops.content.save',
+        arguments: { kind: 'brief', brandId: 'local-brand', profileVersion: 'v1', stage: 'intake', title: '通配拒绝', researchSubject: '通配拒绝', bodyMarkdown: '', savedBy: 'spoofed' },
+      }))
+      expect(rejected.error?.code).toBe('AUTHENTICATION_REQUIRED')
+      expect(rejected.error?.message).toContain('Wildcard')
+    } finally {
+      await wildcard.client.close()
     }
   })
 })

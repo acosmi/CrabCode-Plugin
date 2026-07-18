@@ -40,7 +40,7 @@
   },
   "$defs": {
     "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-    "identity": { "type": "object", "required": ["principalId", "issuer", "assurance"], "properties": { "principalId": { "type": "string", "minLength": 1 }, "issuer": { "type": "string", "minLength": 1 }, "assurance": { "enum": ["mcp_oauth", "host_principal"] } }, "additionalProperties": false }
+    "identity": { "type": "object", "required": ["principalId", "issuer", "assurance"], "properties": { "principalId": { "type": "string", "minLength": 1 }, "issuer": { "type": "string", "minLength": 1 }, "assurance": { "enum": ["mcp_oauth", "host_principal", "local_editorial", "service_account"] } }, "additionalProperties": false }
   },
   "allOf": [
     {

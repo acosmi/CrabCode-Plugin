@@ -16,6 +16,7 @@
     "lint:layout": "bun run scripts/validate-layout.ts",
     "lint:tool-scope": "bun run scripts/lint-tool-scope.ts",
     "lint:refs": "bun run scripts/validate-references.ts",
+    "lint:mcp-contract": "bun run scripts/validate-mcp-contract.ts",
     "validate": "bun run scripts/validate-all.ts",
     "test": "bun test ./tests/",
     "typecheck": "tsc --noEmit"

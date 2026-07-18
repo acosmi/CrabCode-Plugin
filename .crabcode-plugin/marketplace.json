@@ -1542,7 +1542,7 @@
     {
       "name": "crabcode-media-ops",
       "source": "./plugins/crabcode-media-ops",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "displayName": "CrabCode 新媒体运营",
       "shortDescription": "参考隔离、联网可信来源、原创审校与精排白底 HTML 交付",
       "longDescription": "面向媒体与自媒体团队的可审计工作流：第三方参考原文隔离、可核验联网研究、公众号独立观点、工具生成的原创与编辑复核、快速/完整/增量风格表单、多平台适配、精排白底 HTML 主交付、Markdown 备份，以及绑定内容/渲染/产物字节的人工审批与冻结发布包。",
@@ -2422,7 +2422,7 @@
     {
       "name": "crabcode-html-video",
       "source": "./plugins/crabcode-html-video",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "displayName": "HTML 视频渲染",
       "shortDescription": "HTML→视频：content-graph 分镜 + 逐帧 HTML + 确定性渲染 sidecar",
       "longDescription": "按 content-graph 生成分镜，逐帧产出可 seek 的 HTML，经用户确认后由 MCP sidecar 调用渲染 worker 合成为 MP4。Sidecar 不调模型、不持 key。",

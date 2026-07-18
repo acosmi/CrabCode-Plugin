@@ -34,5 +34,11 @@
     "terms": ["opus"],
     "reason": "物种学名 Xenopus tropicalis(热带爪蟾)含 opus 子串,纯假阳性",
     "tracking": "永久豁免(生物物种名,无需跟进)"
+  },
+  {
+    "file": "docs/releases/2026-07-15-v0.4.0.md",
+    "terms": ["codex"],
+    "reason": "0.4.0 发布留痕引用真实历史分支名 codex/media-ops-0.4.0-release-hardening,属溯源事实而非品牌宣称;2026-07-18 前置审计核实该违规在基线 20fb9a5 已存在(非本批引入)",
+    "tracking": "历史发布文档溯源豁免;若统一规范要求脱敏历史分支名,改写后删除本条"
   }
 ]

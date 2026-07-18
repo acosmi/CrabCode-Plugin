@@ -38,6 +38,10 @@ const STAGES = ['intake', 'researched', 'drafted', 'reviewed'] as const
 const saveSchema = z.object({
   contentId: z.string().uuid().optional(),
   expectedRevision: z.number().int().positive().optional(),
+  // local-editorial only: ask the server-owned service actor to register a
+  // mechanical intake import. Consumed and stripped by the identity layer;
+  // it never reaches the stored manifest.
+  serviceImport: z.boolean().optional(),
   kind: z.enum(['brief', 'draft', 'variant']),
   brandId: BrandIdSchema,
   profileVersion: z.string().min(1),
@@ -60,7 +64,7 @@ const saveSchema = z.object({
 
 export const saveName = 'mediaops.content.save'
 export const saveDescription =
-  'Create one immutable schema-v2 content revision. The first revision must be intake and each later revision may stay at its stage or advance by one evidence-backed stage; review conclusions cannot be self-reported here.'
+  'Create one immutable schema-v2 content revision. The first revision must be intake and each later revision may stay at its stage or advance by one evidence-backed stage; review conclusions cannot be self-reported here. In local-editorial mode, serviceImport:true asks the server-owned service actor to register a mechanical intake import.'
 export const saveInputSchema = saveSchema.shape
 
 type SaveArgs = z.input<typeof saveSchema>

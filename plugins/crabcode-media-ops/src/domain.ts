@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
 
-export const VERSION = '0.4.0'
+export const VERSION = '0.4.1'
 export const SCHEMA_VERSION = 2 as const
 
 const Sha256Schema = z.string().regex(/^[a-f0-9]{64}$/)
@@ -692,10 +692,14 @@ const PackageRelativePathSchema = z.string().min(1).refine((value) =>
   'package path must be a safe relative POSIX path',
 )
 
+// Additive widening for 0.4.1 identity modes: old records stay valid and a
+// 0.4.0 rollback fails closed on new-mode records instead of faking gates.
+export const PrincipalAssuranceSchema = z.enum(['mcp_oauth', 'host_principal', 'local_editorial', 'service_account'])
+
 const PackageIdentitySchema = z.object({
   principalId: z.string().min(1),
   issuer: z.string().min(1),
-  assurance: z.enum(['mcp_oauth', 'host_principal']),
+  assurance: PrincipalAssuranceSchema,
 }).strict()
 
 export const PackageManifestSchema = z.object({

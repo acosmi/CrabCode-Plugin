@@ -1,4 +1,4 @@
-export type PrincipalAssurance = 'mcp_oauth' | 'host_principal'
+export type PrincipalAssurance = 'mcp_oauth' | 'host_principal' | 'local_editorial' | 'service_account'
 
 export type TrustedPrincipal = {
   principalId: string
@@ -32,6 +32,26 @@ export class IdentityError extends Error {
     this.code = code
   }
 }
+
+/**
+ * Deterministic machine operations that the server-owned service actor performs
+ * in local-editorial mode (audit §7.5): originality scanning and delivery
+ * rendering are pure computation over stored records, so attributing them to a
+ * service identity keeps the single trusted human as the accountable author
+ * without faking a second person. Human-judgment attestations (research
+ * completion, reviews, approvals, profile confirmation) are never service work.
+ */
+const SERVICE_ACTOR_TOOLS = new Set(['mediaops.originality.scan', 'mediaops.delivery.render'])
+const SERVICE_IMPORT_TOOL = 'mediaops.content.save'
+
+const SERVICE_ACTOR: TrustedPrincipal = Object.freeze({
+  principalId: 'service',
+  actorKey: 'mediaops-server:service',
+  displayName: 'MediaOps 服务执行体（确定性机器操作）',
+  issuer: 'mediaops-server',
+  roles: ['originality_scanner', 'renderer', 'author'],
+  assurance: 'service_account',
+})
 
 const POLICIES: Record<string, ToolIdentityPolicy> = {
   'mediaops.content.save': { role: 'author', actorFields: ['savedBy'] },
@@ -92,19 +112,30 @@ function principalFromMcp(context?: ToolRequestContext): TrustedPrincipal | null
   }
 }
 
+function configuredIdentityMode(): 'host-principal' | 'local-editorial' | null {
+  const mode = process.env.MEDIAOPS_IDENTITY_MODE
+  return mode === 'host-principal' || mode === 'local-editorial' ? mode : null
+}
+
 function principalFromHost(): TrustedPrincipal | null {
-  if (process.env.MEDIAOPS_IDENTITY_MODE !== 'host-principal') return null
+  const mode = configuredIdentityMode()
+  if (!mode) return null
   const principalId = cleanIdentifier(process.env.MEDIAOPS_TRUSTED_PRINCIPAL_ID, 'MEDIAOPS_TRUSTED_PRINCIPAL_ID')
   const issuer = cleanIdentifier(process.env.MEDIAOPS_TRUSTED_PRINCIPAL_ISSUER, 'MEDIAOPS_TRUSTED_PRINCIPAL_ISSUER')
   const displayName = (process.env.MEDIAOPS_TRUSTED_PRINCIPAL_NAME?.normalize('NFKC').trim() || principalId).slice(0, 300)
   const roles = normalizeRoles([process.env.MEDIAOPS_TRUSTED_PRINCIPAL_ROLES ?? ''])
+  // Statically configured principals must enumerate their roles: a wildcard
+  // grant would silently defeat every separation-of-duties check (audit §8.3).
+  if (roles.includes('*') || roles.includes('mediaops:*')) {
+    throw new IdentityError('AUTHENTICATION_REQUIRED', 'Wildcard roles are rejected for host/local configured principals; grant explicit mediaops roles instead.')
+  }
   return {
     principalId,
     actorKey: `${issuer}:${principalId}`.slice(0, 300),
     displayName,
     issuer,
     roles,
-    assurance: 'host_principal',
+    assurance: mode === 'local-editorial' ? 'local_editorial' : 'host_principal',
   }
 }
 
@@ -146,7 +177,30 @@ export function authorizeToolCall(
 ): { args: unknown; principal: TrustedPrincipal | null } {
   const policy = POLICIES[toolName]
   if (!policy) return { args: rawArgs, principal: resolveTrustedPrincipal(context) }
-  const principal = resolveTrustedPrincipal(context)
+  const args = rawArgs && typeof rawArgs === 'object' && !Array.isArray(rawArgs)
+    ? { ...(rawArgs as Record<string, unknown>) }
+    : {}
+  const serviceImportRequested = args.serviceImport === true
+  delete args.serviceImport
+  // OAuth subjects always take precedence; local-editorial routing only applies
+  // to the env-configured single-human mode without a per-call trusted subject.
+  const localEditorial = !context?.authInfo && configuredIdentityMode() === 'local-editorial'
+  let principal: TrustedPrincipal | null
+  if (localEditorial && (SERVICE_ACTOR_TOOLS.has(toolName) || (toolName === SERVICE_IMPORT_TOOL && serviceImportRequested))) {
+    const human = resolveTrustedPrincipal(context)
+    if (!human) {
+      throw new IdentityError('AUTHENTICATION_REQUIRED', 'local-editorial mode requires the trusted local principal to be configured before service-actor operations run.')
+    }
+    if (toolName === SERVICE_IMPORT_TOOL && args.stage !== 'intake') {
+      throw new IdentityError('AUTHORIZATION_DENIED', 'The service actor may only register mechanical intake imports; later stages need the accountable human principal.')
+    }
+    principal = SERVICE_ACTOR
+  } else {
+    if (serviceImportRequested) {
+      throw new IdentityError('AUTHORIZATION_DENIED', 'serviceImport is only available for mediaops.content.save intake registration in MEDIAOPS_IDENTITY_MODE=local-editorial.')
+    }
+    principal = resolveTrustedPrincipal(context)
+  }
   if (!principal) {
     throw new IdentityError(
       'AUTHENTICATION_REQUIRED',
@@ -156,25 +210,66 @@ export function authorizeToolCall(
   if (!hasRole(principal, policy.role)) {
     throw new IdentityError('AUTHORIZATION_DENIED', `${principal.actorKey} lacks required role ${policy.role} for ${toolName}.`)
   }
-  const args = rawArgs && typeof rawArgs === 'object' && !Array.isArray(rawArgs)
-    ? { ...(rawArgs as Record<string, unknown>) }
-    : {}
   for (const field of policy.actorFields) args[field] = principal.actorKey
   bindNestedAccountability(toolName, args, principal.actorKey)
   return { args, principal }
 }
 
-export function identityCapability(context?: ToolRequestContext): {
-  mode: 'mcp_oauth' | 'host_principal' | 'required'
+/** Tools whose separation-of-duties check needs a second real human while the single local principal holds every human role. */
+const SECOND_HUMAN_GATES = Object.freeze([
+  'mediaops.originality.review',
+  'mediaops.editorial.review',
+  'mediaops.approval.decide',
+  'mediaops.profile.confirm',
+])
+
+export type IdentityDescription = {
+  mode: 'team_governed' | 'local_editorial' | 'host_principal' | 'required'
+  assurance: PrincipalAssurance | 'required'
   authenticated: boolean
   principalId?: string
   roles: string[]
-} {
-  const principal = resolveTrustedPrincipal(context)
-  return principal ? {
-    mode: principal.assurance,
+  serviceActor?: { actorKey: string; tools: string[]; intakeImport: string }
+  secondHumanGates?: readonly string[]
+}
+
+/** Describe an already-resolved principal (shared by capabilities and doctor). */
+export function describePrincipal(principal: TrustedPrincipal | null | undefined): IdentityDescription {
+  if (!principal) return { mode: 'required', assurance: 'required', authenticated: false, roles: [] }
+  const base = {
+    assurance: principal.assurance,
     authenticated: true,
     principalId: principal.principalId,
     roles: principal.roles,
-  } : { mode: 'required', authenticated: false, roles: [] }
+  }
+  if (principal.assurance === 'local_editorial') {
+    return {
+      mode: 'local_editorial',
+      ...base,
+      serviceActor: { actorKey: SERVICE_ACTOR.actorKey, tools: [...SERVICE_ACTOR_TOOLS], intakeImport: `${SERVICE_IMPORT_TOOL} + serviceImport:true (stage=intake)` },
+      secondHumanGates: SECOND_HUMAN_GATES,
+    }
+  }
+  return { mode: principal.assurance === 'mcp_oauth' ? 'team_governed' : 'host_principal', ...base }
+}
+
+export function identityCapability(context?: ToolRequestContext): IdentityDescription {
+  return describePrincipal(resolveTrustedPrincipal(context))
+}
+
+/** Role each governed pipeline tool demands, for readiness reporting. */
+export function toolRolePolicies(): Array<{ tool: string; role: string }> {
+  return Object.entries(POLICIES).map(([tool, policy]) => ({ tool, role: policy.role }))
+}
+
+export function serviceActorCovers(toolName: string): boolean {
+  return SERVICE_ACTOR_TOOLS.has(toolName)
+}
+
+export function isSecondHumanGate(toolName: string): boolean {
+  return SECOND_HUMAN_GATES.includes(toolName)
+}
+
+export function principalHasRole(principal: TrustedPrincipal, role: string): boolean {
+  return hasRole(principal, role)
 }

@@ -2,8 +2,19 @@ import { ok, type Envelope } from '../envelope.ts'
 import { PLATFORMS } from '../platforms/registry.ts'
 import { buildSources } from '../sources/index.ts'
 import { VERSION } from '../domain.ts'
-import type { TrustedPrincipal } from '../identity.ts'
+import { describePrincipal, type TrustedPrincipal } from '../identity.ts'
 import { RENDER_CONTRACT } from '../rendering/renderer.ts'
+
+/** Stop codes every media-ops orchestration must honor (PRACTICE preflight contract). */
+const STOP_CODES = Object.freeze([
+  'MCP_INACTIVE',
+  'MCP_START_FAILED',
+  'MCP_TOOL_UNDISCOVERABLE',
+  'AUTHENTICATION_REQUIRED',
+  'ROLE_REQUIRED',
+  'DEPENDENCY_NOT_READY',
+  'GATE_NOT_EXECUTED',
+])
 
 export const name = 'mediaops.capabilities'
 export const description =
@@ -13,9 +24,13 @@ export const inputSchema = {}
 
 export async function handler(_args: Record<string, never> = {}, principal?: TrustedPrincipal): Promise<Envelope> {
   const registry = buildSources()
+  const identity = describePrincipal(principal ?? null)
   return ok({
     version: VERSION,
     phase: 'gate-a (governed editorial workflow + hard publish gate)',
+    identity,
+    stopCodes: STOP_CODES,
+    preflight: 'Call this tool first, check identity.mode/roles, then mediaops.doctor for stage readiness and heavy-QA dependency probes before orchestrating.',
     enabledPlatforms: PLATFORMS.map((p) => ({
       id: p.id,
       displayName: p.displayName,

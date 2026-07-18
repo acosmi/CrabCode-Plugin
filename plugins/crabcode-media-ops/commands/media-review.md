@@ -6,6 +6,8 @@ allowed-tools: [Read, Glob, Grep, Bash, Task]
 
 # /media-review
 
+先按 `media-core/PRACTICE.md`《运行前预检》执行 preflight；失败按停止码停止，任何手工比对只标 diagnostic，复核结论一律记 `GATE_NOT_EXECUTED`，不得声称已扫描/已复核。
+
 1. 读取最新 content manifest 和对应 profileVersion。
 2. 由独立核查角色生成 claims；verified 必须引用已打开快照中的 evidenceLinkId。先以空/不完整 `statementCoverage` 调用 `mediaops.editorial.review`，从 action_required data 取得服务端对全部可见句生成的 `statementLedgerHash` 与 statements/statementId；逐项分为 `verified_fact`、`author_inference`、`opinion`、`non_claim`。前两类映射 verified claimIds 并确认方向，推论还需正文显式标记；后两类不得携带事实字段。四类都写明理由后对同一 revision 重试。不得仿造 statementId，空列表/noVerifiableClaimsReason 也不能替代正文事实。
 3. 按 `media-human-editor` 编辑最终 drafted revision，但不读取第三方原文、不把存疑项润色成事实。

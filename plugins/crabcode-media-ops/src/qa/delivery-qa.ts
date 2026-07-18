@@ -1,5 +1,23 @@
-import AxeBuilder from '@axe-core/playwright'
-import { chromium, type Browser, type Page } from '@playwright/test'
+import type { Browser, Page } from '@playwright/test'
+
+// Playwright/axe are heavy optional delivery-QA dependencies. They must load
+// lazily at QA execution time so the self-contained dist/server.js can complete
+// MCP initialize/tools/list without them installed (audit §7.6).
+async function loadChromium(): Promise<typeof import('@playwright/test')['chromium']> {
+  try {
+    return (await import('@playwright/test')).chromium
+  } catch (error) {
+    throw new Error(`qa_infrastructure_failed: DEPENDENCY_NOT_READY @playwright/test is not installed in this distribution (${errorMessage(error)})`)
+  }
+}
+
+async function loadAxeBuilder(): Promise<typeof import('@axe-core/playwright')['default']> {
+  try {
+    return (await import('@axe-core/playwright')).default
+  } catch (error) {
+    throw new Error(`qa_infrastructure_failed: DEPENDENCY_NOT_READY @axe-core/playwright is not installed in this distribution (${errorMessage(error)})`)
+  }
+}
 import { spawn } from 'node:child_process'
 import { createServer, type Server } from 'node:http'
 import { createRequire } from 'node:module'
@@ -22,7 +40,7 @@ let sharedBrowserLaunch: Promise<Browser> | null = null
 let sharedBrowserExecutable: string | undefined
 
 function isInfraErrorMessage(message: string): boolean {
-  return /ENOENT|ECONNREFUSED|EAGAIN|ETIMEDOUT|Failed to connect|browserType\.launch|Target closed|Protocol error/i.test(message)
+  return /ENOENT|ECONNREFUSED|EAGAIN|ETIMEDOUT|Failed to connect|browserType\.launch|Target closed|Protocol error|Cannot find (?:package|module)|DEPENDENCY_NOT_READY/i.test(message)
 }
 
 async function acquireCrossProcessLock(): Promise<() => Promise<void>> {
@@ -64,11 +82,11 @@ async function getSharedBrowser(executablePath: string | undefined): Promise<{ b
   if (!sharedBrowserLaunch) {
     const launchStarted = Date.now()
     sharedBrowserExecutable = executablePath
-    sharedBrowserLaunch = chromium.launch({
+    sharedBrowserLaunch = loadChromium().then((chromium) => chromium.launch({
       headless: true,
       timeout: BROWSER_LAUNCH_TIMEOUT_MS,
       ...(executablePath ? { executablePath } : {}),
-    }).then((browser) => {
+    })).then((browser) => {
       sharedBrowser = browser
       return browser
     }).catch((error) => {
@@ -572,7 +590,7 @@ async function runBrowserQa(args: {
       axe: args.axeVersion,
       chromium: null,
       requiredChromium: REQUIRED_CHROMIUM_VERSION,
-      executablePath: process.env.MEDIAOPS_QA_CHROMIUM_EXECUTABLE?.trim() || chromium.executablePath(),
+      executablePath: process.env.MEDIAOPS_QA_CHROMIUM_EXECUTABLE?.trim() || '',
     },
     timing: {
       queueWaitMs: args.queueWaitMs,
@@ -596,6 +614,8 @@ async function runBrowserQa(args: {
   let server: ArtifactServer | null = null
   try {
     const executablePath = process.env.MEDIAOPS_QA_CHROMIUM_EXECUTABLE?.trim() || undefined
+    if (!reportData.tools.executablePath) reportData.tools.executablePath = (await loadChromium()).executablePath()
+    const AxeBuilder = await loadAxeBuilder()
     const { browser, launchMs } = await getSharedBrowser(executablePath)
     reportData.timing.browserLaunchMs = launchMs
     reportData.tools.chromium = browser.version()
