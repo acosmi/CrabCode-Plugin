@@ -223,7 +223,7 @@ const SECOND_HUMAN_GATES = Object.freeze([
   'mediaops.profile.confirm',
 ])
 
-export function identityCapability(context?: ToolRequestContext): {
+export type IdentityDescription = {
   mode: 'team_governed' | 'local_editorial' | 'host_principal' | 'required'
   assurance: PrincipalAssurance | 'required'
   authenticated: boolean
@@ -231,8 +231,10 @@ export function identityCapability(context?: ToolRequestContext): {
   roles: string[]
   serviceActor?: { actorKey: string; tools: string[]; intakeImport: string }
   secondHumanGates?: readonly string[]
-} {
-  const principal = resolveTrustedPrincipal(context)
+}
+
+/** Describe an already-resolved principal (shared by capabilities and doctor). */
+export function describePrincipal(principal: TrustedPrincipal | null | undefined): IdentityDescription {
   if (!principal) return { mode: 'required', assurance: 'required', authenticated: false, roles: [] }
   const base = {
     assurance: principal.assurance,
@@ -249,4 +251,25 @@ export function identityCapability(context?: ToolRequestContext): {
     }
   }
   return { mode: principal.assurance === 'mcp_oauth' ? 'team_governed' : 'host_principal', ...base }
+}
+
+export function identityCapability(context?: ToolRequestContext): IdentityDescription {
+  return describePrincipal(resolveTrustedPrincipal(context))
+}
+
+/** Role each governed pipeline tool demands, for readiness reporting. */
+export function toolRolePolicies(): Array<{ tool: string; role: string }> {
+  return Object.entries(POLICIES).map(([tool, policy]) => ({ tool, role: policy.role }))
+}
+
+export function serviceActorCovers(toolName: string): boolean {
+  return SERVICE_ACTOR_TOOLS.has(toolName)
+}
+
+export function isSecondHumanGate(toolName: string): boolean {
+  return SECOND_HUMAN_GATES.includes(toolName)
+}
+
+export function principalHasRole(principal: TrustedPrincipal, role: string): boolean {
+  return hasRole(principal, role)
 }

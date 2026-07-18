@@ -1,6 +1,16 @@
-# crabcode-media-ops 0.4.0
+# crabcode-media-ops 0.4.1
 
 可审计的新媒体运营插件：参考材料防火墙、联网可信来源研究、独立原创风险复核、创作者风格管理、精排白底 HTML 交付、可信身份约束的审批，以及冻结发布包。
+
+## 0.4.1 变更（MCP 可用性修复）
+
+- **生命周期声明**：manifest 增加 `requiredMcpServers: ["mediaops"]`，CrabCode ≥1.0.16 安装后自动激活本地 sidecar；用户显式 disable 始终优先。旧宿主上退化为 inactive，不崩溃。
+- **自包含发行物**：`.mcp.json` 直接执行入库的 `dist/server.js`（`bun --no-env-file`），启动不再执行任何安装步骤，离线冷启动实测亚秒到 2 秒完成 initialize/tools/list。Playwright/axe/vnu 为交付 QA 的惰性可选依赖，缺失时基础 MCP 全量可用、`delivery.verify` full 模式返回 `DEPENDENCY_NOT_READY`（static 模式始终可用）。`bun run check:distribution` 校验发行物新鲜度并做清洁目录冷启动 smoke。
+- **身份模式**：`mcp_oauth`（team-governed，多真人主体）之外新增 `MEDIAOPS_IDENTITY_MODE=local-editorial`——单一可信本地用户（`local_editorial` 低保证），确定性机器操作（`originality.scan`、`delivery.render`、`content.save` 的 `serviceImport:true` 机械 intake 导入）由 `mediaops-server:service`（`service_account`）执行；`originality.review`、`editorial.review`、`approval.decide`、`profile.confirm` 等第二真人门禁保持 pending，绝不伪造多人治理。env 配置角色出现 `*` 通配将被直接拒绝。
+- **运行前预检**：`media-core/PRACTICE.md` 定义统一 preflight 与停止码（`MCP_INACTIVE`/`MCP_START_FAILED`/`MCP_TOOL_UNDISCOVERABLE`/`AUTHENTICATION_REQUIRED`/`ROLE_REQUIRED`/`DEPENDENCY_NOT_READY`/`GATE_NOT_EXECUTED`）；`mediaops.capabilities` 报告身份模式与停止码清单，`mediaops.doctor` 报告发行物、重依赖探测与逐工具阶段 readiness。报告中显示已完成的阶段必须附服务端权威 ID/哈希。
+- **编排边界**：子代理只返回结构化数据，全部 `mediaops.*` 状态调用由主线程执行并由 validator 强制（agents 文档不得直接引用 mediaops 工具）。
+- **文件稿导入链**：本地 Markdown 经 `content.save`(intake) → `reference.register` → `research.capture/complete` → drafted → `originality.scan(contentId)` 进入治理；扫描不接受文件路径。
+- 存储 schema 不变（SQLite 结构与 `SCHEMA_VERSION=2` 均未动）；assurance 枚举为加法扩宽，0.4.0 回退对新身份模式记录 fail-closed，不会把未完成门禁显示为完成。
 
 ## 0.4 核心能力
 

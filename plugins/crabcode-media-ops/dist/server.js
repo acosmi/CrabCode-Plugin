@@ -10622,7 +10622,7 @@ function assertStoredContentHash(content) {
     throw new Error(`CONTENT_HASH_MISMATCH:${content.contentId}:${content.revisionId}`);
   }
 }
-var VERSION = "0.4.0", SCHEMA_VERSION = 2, Sha256Schema, SafeHttpUrlSchema, BrandIdSchema, ReferenceRoleSchema, ReferenceAllowedUseSchema, ReferenceMaterialSchema, ResearchCaptureSchema, SourceAssessmentSchema, EvidenceSourceSchema, ResearchClaimSchema, ClaimEvidenceLinkSchema, ResearchSearchLogSchema, ResearchReviewSchema, ClaimSchema, VerifiableStatementSchema, StatementCoverageSchema, ReviewSchema, LegalReviewSchema, AiDisclosureSchema, AssetInputSchema, AssetSchema, ArticleNodeTypeSchema, ArticleNodeSchema, CitationSchema, ArticleDocSchema, OriginalityHumanReviewSchema, OriginalityScanSchema, EditorialReviewRecordSchema, BaseContentSchema, ContentManifestV2Schema, LegacyClaimSchema, LegacyReviewSchema, LegacyOriginalityReviewSchema, ContentManifestV1Schema, ContentManifestSchema, DeliveryArtifactSchema, DeliveryQaArtifactSchema, DeliveryQaEvidenceSchema, DeliveryManifestSchema, PackageRelativePathSchema, PrincipalAssuranceSchema, PackageIdentitySchema, PackageManifestSchema;
+var VERSION = "0.4.1", SCHEMA_VERSION = 2, Sha256Schema, SafeHttpUrlSchema, BrandIdSchema, ReferenceRoleSchema, ReferenceAllowedUseSchema, ReferenceMaterialSchema, ResearchCaptureSchema, SourceAssessmentSchema, EvidenceSourceSchema, ResearchClaimSchema, ClaimEvidenceLinkSchema, ResearchSearchLogSchema, ResearchReviewSchema, ClaimSchema, VerifiableStatementSchema, StatementCoverageSchema, ReviewSchema, LegalReviewSchema, AiDisclosureSchema, AssetInputSchema, AssetSchema, ArticleNodeTypeSchema, ArticleNodeSchema, CitationSchema, ArticleDocSchema, OriginalityHumanReviewSchema, OriginalityScanSchema, EditorialReviewRecordSchema, BaseContentSchema, ContentManifestV2Schema, LegacyClaimSchema, LegacyReviewSchema, LegacyOriginalityReviewSchema, ContentManifestV1Schema, ContentManifestSchema, DeliveryArtifactSchema, DeliveryQaArtifactSchema, DeliveryQaEvidenceSchema, DeliveryManifestSchema, PackageRelativePathSchema, PrincipalAssuranceSchema, PackageIdentitySchema, PackageManifestSchema;
 var init_domain = __esm(() => {
   init_zod();
   Sha256Schema = exports_external.string().regex(/^[a-f0-9]{64}$/);
@@ -28545,7 +28545,7 @@ var init_renderer = __esm(() => {
 
 // src/qa/artifacts.ts
 import { createHash as createHash6 } from "crypto";
-import { readFile as readFile2, writeFile as writeFile2 } from "fs/promises";
+import { readFile as readFile3, writeFile as writeFile2 } from "fs/promises";
 import { extname, relative as relative2, resolve as resolve2, sep } from "path";
 function sha256Bytes(bytes) {
   return createHash6("sha256").update(bytes).digest("hex");
@@ -28561,7 +28561,7 @@ async function artifactRef(artifactRoot, path2) {
   if (!relativePath || relativePath === ".." || relativePath.startsWith(`..${sep}`) || relativePath.startsWith(sep)) {
     throw new Error(`QA artifact path escapes artifactRoot: ${absolutePath}`);
   }
-  const bytes = await readFile2(absolutePath);
+  const bytes = await readFile3(absolutePath);
   return {
     relativePath: relativePath.split(sep).join("/"),
     absolutePath,
@@ -28585,7 +28585,7 @@ var init_artifacts = __esm(() => {
 import { spawn } from "child_process";
 import { createServer } from "http";
 import { createRequire } from "module";
-import { mkdir as mkdir2, readFile as readFile3, realpath as realpath2, rm, stat, unlink as unlink2, writeFile as writeFile3 } from "fs/promises";
+import { mkdir as mkdir2, readFile as readFile4, realpath as realpath2, rm, stat, unlink as unlink2, writeFile as writeFile3 } from "fs/promises";
 import { tmpdir as tmpdir2 } from "os";
 import { dirname, extname as extname2, isAbsolute as isAbsolute2, join as join5, relative as relative3, resolve as resolve3, sep as sep2 } from "path";
 async function loadChromium() {
@@ -28619,7 +28619,7 @@ ${Date.now()}
       };
     } catch {
       try {
-        const raw2 = await readFile3(CROSS_PROCESS_LOCK_PATH, "utf8");
+        const raw2 = await readFile4(CROSS_PROCESS_LOCK_PATH, "utf8");
         const stamped = Number(raw2.split(`
 `)[1] ?? "");
         if (Number.isFinite(stamped) && Date.now() - stamped > CROSS_PROCESS_LOCK_STALE_MS) {
@@ -28714,7 +28714,7 @@ async function resolvePackageJson(packageName) {
     while (true) {
       const candidate = join5(current, "package.json");
       try {
-        const parsed = JSON.parse(await readFile3(candidate, "utf8"));
+        const parsed = JSON.parse(await readFile4(candidate, "utf8"));
         if (parsed.name === packageName)
           return candidate;
       } catch {}
@@ -28728,7 +28728,7 @@ async function resolvePackageJson(packageName) {
 }
 async function packageVersion(packageName) {
   const packageJsonPath = await resolvePackageJson(packageName);
-  const parsed = JSON.parse(await readFile3(packageJsonPath, "utf8"));
+  const parsed = JSON.parse(await readFile4(packageJsonPath, "utf8"));
   if (typeof parsed.version !== "string" || !parsed.version)
     throw new Error(`${packageName} has no readable package version.`);
   return parsed.version;
@@ -28933,7 +28933,7 @@ async function startArtifactServer(artifactRoot) {
         response.writeHead(404).end("Not found");
         return;
       }
-      const bytes = request.method === "HEAD" ? null : await readFile3(actualPath);
+      const bytes = request.method === "HEAD" ? null : await readFile4(actualPath);
       response.writeHead(200, {
         "Content-Type": contentType(actualPath),
         "Content-Length": String((await stat(actualPath)).size),
@@ -29228,7 +29228,7 @@ async function runBrowserQa(args) {
         for (const format of ["A4", "Letter"]) {
           const pdfPath = join5(printRoot, `article-${format.toLowerCase()}.pdf`);
           await page.pdf({ path: pdfPath, format, printBackground: true, preferCSSPageSize: false });
-          const bytes = await readFile3(pdfPath);
+          const bytes = await readFile4(pdfPath);
           const pdf = await artifactRef(args.artifactRoot, pdfPath);
           reportData.evidence.push(pdf);
           const inspection = inspectPdf(bytes, format);
@@ -39318,15 +39318,228 @@ function buildSources() {
 
 // src/tools/capabilities.ts
 init_domain();
+
+// src/identity.ts
+class IdentityError extends Error {
+  code;
+  constructor(code, message) {
+    super(message);
+    this.name = "IdentityError";
+    this.code = code;
+  }
+}
+var SERVICE_ACTOR_TOOLS = new Set(["mediaops.originality.scan", "mediaops.delivery.render"]);
+var SERVICE_IMPORT_TOOL = "mediaops.content.save";
+var SERVICE_ACTOR = Object.freeze({
+  principalId: "service",
+  actorKey: "mediaops-server:service",
+  displayName: "MediaOps \u670D\u52A1\u6267\u884C\u4F53\uFF08\u786E\u5B9A\u6027\u673A\u5668\u64CD\u4F5C\uFF09",
+  issuer: "mediaops-server",
+  roles: ["originality_scanner", "renderer", "author"],
+  assurance: "service_account"
+});
+var POLICIES = {
+  "mediaops.content.save": { role: "author", actorFields: ["savedBy"] },
+  "mediaops.reference.register": { role: "reference_curator", actorFields: ["registeredBy"] },
+  "mediaops.research.capture": { role: "researcher", actorFields: ["capturedBy"] },
+  "mediaops.research.complete": { role: "fact_checker", actorFields: ["completedBy"] },
+  "mediaops.originality.scan": { role: "originality_scanner", actorFields: ["createdBy"] },
+  "mediaops.originality.review": { role: "originality_reviewer", actorFields: ["reviewedBy"] },
+  "mediaops.editorial.review": { role: "editorial_reviewer", actorFields: ["completedBy"] },
+  "mediaops.delivery.render": { role: "renderer", actorFields: ["generatedBy"] },
+  "mediaops.delivery.verify": { role: "delivery_reviewer", actorFields: ["verifiedBy"] },
+  "mediaops.profile.save": { role: "profile_editor", actorFields: ["confirmedBy"] },
+  "mediaops.profile.rollback": { role: "profile_editor", actorFields: ["confirmedBy"] },
+  "mediaops.style.form.template": { role: "profile_editor", actorFields: [] },
+  "mediaops.style.form.save_draft": { role: "profile_editor", actorFields: ["updatedBy"] },
+  "mediaops.style.form.submit": { role: "profile_editor", actorFields: ["submittedBy"] },
+  "mediaops.profile.propose": { role: "profile_editor", actorFields: ["proposedBy"] },
+  "mediaops.profile.confirm": { role: "profile_approver", actorFields: ["confirmedBy"] },
+  "mediaops.approval.request": { role: "approval_requester", actorFields: ["requestedBy"] },
+  "mediaops.approval.decide": { role: "approver", actorFields: ["decidedBy"] },
+  "mediaops.publish.package": { role: "publisher", actorFields: ["packagedBy"] }
+};
+function cleanIdentifier(value, label) {
+  if (typeof value !== "string")
+    throw new IdentityError("AUTHENTICATION_REQUIRED", `${label} is missing from the trusted identity context.`);
+  const cleaned = value.normalize("NFKC").trim();
+  if (!cleaned || cleaned.length > 180 || /[\u0000-\u001f\u007f]/u.test(cleaned)) {
+    throw new IdentityError("AUTHENTICATION_REQUIRED", `${label} is invalid in the trusted identity context.`);
+  }
+  return cleaned;
+}
+function normalizeRoles(values) {
+  return [...new Set(values.flatMap((value) => typeof value === "string" ? value.split(",") : []).map((value) => value.normalize("NFKC").trim().toLowerCase()).filter(Boolean))];
+}
+function principalFromMcp(context) {
+  const auth = context?.authInfo;
+  if (!auth)
+    return null;
+  if (auth.expiresAt !== undefined && (!Number.isFinite(auth.expiresAt) || auth.expiresAt <= Date.now() / 1000)) {
+    throw new IdentityError("AUTHENTICATION_REQUIRED", "The MCP access token is expired or has an invalid expiry.");
+  }
+  const extra = auth.extra ?? {};
+  const principalId = cleanIdentifier(extra.sub ?? extra.subject, "authInfo.extra.sub");
+  const issuer = cleanIdentifier(extra.iss ?? extra.issuer ?? "mcp-oauth", "authInfo issuer");
+  const displayName = typeof extra.name === "string" && extra.name.trim() ? extra.name.normalize("NFKC").trim() : principalId;
+  const extraRoles = Array.isArray(extra.roles) ? extra.roles : [];
+  const roles = normalizeRoles([...auth.scopes ?? [], ...extraRoles]);
+  return {
+    principalId,
+    actorKey: `${issuer}:${principalId}`.slice(0, 300),
+    displayName: displayName.slice(0, 300),
+    issuer,
+    roles,
+    assurance: "mcp_oauth"
+  };
+}
+function configuredIdentityMode() {
+  const mode = process.env.MEDIAOPS_IDENTITY_MODE;
+  return mode === "host-principal" || mode === "local-editorial" ? mode : null;
+}
+function principalFromHost() {
+  const mode = configuredIdentityMode();
+  if (!mode)
+    return null;
+  const principalId = cleanIdentifier(process.env.MEDIAOPS_TRUSTED_PRINCIPAL_ID, "MEDIAOPS_TRUSTED_PRINCIPAL_ID");
+  const issuer = cleanIdentifier(process.env.MEDIAOPS_TRUSTED_PRINCIPAL_ISSUER, "MEDIAOPS_TRUSTED_PRINCIPAL_ISSUER");
+  const displayName = (process.env.MEDIAOPS_TRUSTED_PRINCIPAL_NAME?.normalize("NFKC").trim() || principalId).slice(0, 300);
+  const roles = normalizeRoles([process.env.MEDIAOPS_TRUSTED_PRINCIPAL_ROLES ?? ""]);
+  if (roles.includes("*") || roles.includes("mediaops:*")) {
+    throw new IdentityError("AUTHENTICATION_REQUIRED", "Wildcard roles are rejected for host/local configured principals; grant explicit mediaops roles instead.");
+  }
+  return {
+    principalId,
+    actorKey: `${issuer}:${principalId}`.slice(0, 300),
+    displayName,
+    issuer,
+    roles,
+    assurance: mode === "local-editorial" ? "local_editorial" : "host_principal"
+  };
+}
+function resolveTrustedPrincipal(context) {
+  return principalFromMcp(context) ?? principalFromHost();
+}
+function hasRole(principal, role) {
+  const accepted = new Set([
+    "*",
+    role,
+    `mediaops:${role}`,
+    "mediaops:*"
+  ]);
+  return principal.roles.some((item) => accepted.has(item));
+}
+function bindNestedAccountability(toolName, args, actorKey) {
+  if (toolName !== "mediaops.editorial.review")
+    return;
+  const legal = args.legalReview;
+  if (legal && typeof legal === "object" && !Array.isArray(legal)) {
+    args.legalReview = { ...legal, reviewedBy: actorKey };
+  }
+  const disclosure = args.aiDisclosure;
+  if (disclosure && typeof disclosure === "object" && !Array.isArray(disclosure)) {
+    args.aiDisclosure = { ...disclosure, confirmedBy: actorKey };
+  }
+  if (Array.isArray(args.waivers)) {
+    args.waivers = args.waivers.map((waiver) => waiver && typeof waiver === "object" && !Array.isArray(waiver) ? { ...waiver, by: actorKey } : waiver);
+  }
+}
+function authorizeToolCall(toolName, rawArgs, context) {
+  const policy = POLICIES[toolName];
+  if (!policy)
+    return { args: rawArgs, principal: resolveTrustedPrincipal(context) };
+  const args = rawArgs && typeof rawArgs === "object" && !Array.isArray(rawArgs) ? { ...rawArgs } : {};
+  const serviceImportRequested = args.serviceImport === true;
+  delete args.serviceImport;
+  const localEditorial = !context?.authInfo && configuredIdentityMode() === "local-editorial";
+  let principal;
+  if (localEditorial && (SERVICE_ACTOR_TOOLS.has(toolName) || toolName === SERVICE_IMPORT_TOOL && serviceImportRequested)) {
+    const human = resolveTrustedPrincipal(context);
+    if (!human) {
+      throw new IdentityError("AUTHENTICATION_REQUIRED", "local-editorial mode requires the trusted local principal to be configured before service-actor operations run.");
+    }
+    if (toolName === SERVICE_IMPORT_TOOL && args.stage !== "intake") {
+      throw new IdentityError("AUTHORIZATION_DENIED", "The service actor may only register mechanical intake imports; later stages need the accountable human principal.");
+    }
+    principal = SERVICE_ACTOR;
+  } else {
+    if (serviceImportRequested) {
+      throw new IdentityError("AUTHORIZATION_DENIED", "serviceImport is only available for mediaops.content.save intake registration in MEDIAOPS_IDENTITY_MODE=local-editorial.");
+    }
+    principal = resolveTrustedPrincipal(context);
+  }
+  if (!principal) {
+    throw new IdentityError("AUTHENTICATION_REQUIRED", `${toolName} requires an MCP-authenticated subject or an explicitly configured host principal; caller-supplied names are not accepted as identity.`);
+  }
+  if (!hasRole(principal, policy.role)) {
+    throw new IdentityError("AUTHORIZATION_DENIED", `${principal.actorKey} lacks required role ${policy.role} for ${toolName}.`);
+  }
+  for (const field of policy.actorFields)
+    args[field] = principal.actorKey;
+  bindNestedAccountability(toolName, args, principal.actorKey);
+  return { args, principal };
+}
+var SECOND_HUMAN_GATES = Object.freeze([
+  "mediaops.originality.review",
+  "mediaops.editorial.review",
+  "mediaops.approval.decide",
+  "mediaops.profile.confirm"
+]);
+function describePrincipal(principal) {
+  if (!principal)
+    return { mode: "required", assurance: "required", authenticated: false, roles: [] };
+  const base = {
+    assurance: principal.assurance,
+    authenticated: true,
+    principalId: principal.principalId,
+    roles: principal.roles
+  };
+  if (principal.assurance === "local_editorial") {
+    return {
+      mode: "local_editorial",
+      ...base,
+      serviceActor: { actorKey: SERVICE_ACTOR.actorKey, tools: [...SERVICE_ACTOR_TOOLS], intakeImport: `${SERVICE_IMPORT_TOOL} + serviceImport:true (stage=intake)` },
+      secondHumanGates: SECOND_HUMAN_GATES
+    };
+  }
+  return { mode: principal.assurance === "mcp_oauth" ? "team_governed" : "host_principal", ...base };
+}
+function toolRolePolicies() {
+  return Object.entries(POLICIES).map(([tool, policy]) => ({ tool, role: policy.role }));
+}
+function serviceActorCovers(toolName) {
+  return SERVICE_ACTOR_TOOLS.has(toolName);
+}
+function isSecondHumanGate(toolName) {
+  return SECOND_HUMAN_GATES.includes(toolName);
+}
+function principalHasRole(principal, role) {
+  return hasRole(principal, role);
+}
+
+// src/tools/capabilities.ts
 init_renderer();
+var STOP_CODES = Object.freeze([
+  "MCP_INACTIVE",
+  "MCP_START_FAILED",
+  "MCP_TOOL_UNDISCOVERABLE",
+  "AUTHENTICATION_REQUIRED",
+  "ROLE_REQUIRED",
+  "DEPENDENCY_NOT_READY",
+  "GATE_NOT_EXECUTED"
+]);
 var name = "mediaops.capabilities";
 var description = "Report what this media-ops server can do: enabled platforms, available trend sources, and which dangerous capabilities are disabled.";
 var inputSchema = {};
 async function handler(_args = {}, principal) {
   const registry2 = buildSources();
+  const identity = describePrincipal(principal ?? null);
   return ok({
     version: VERSION,
     phase: "gate-a (governed editorial workflow + hard publish gate)",
+    identity,
+    stopCodes: STOP_CODES,
+    preflight: "Call this tool first, check identity.mode/roles, then mediaops.doctor for stage readiness and heavy-QA dependency probes before orchestrating.",
     enabledPlatforms: PLATFORMS.map((p2) => ({
       id: p2.id,
       displayName: p2.displayName,
@@ -39376,12 +39589,24 @@ async function handler(_args = {}, principal) {
 }
 
 // src/tools/doctor.ts
-import { writeFile, unlink } from "fs/promises";
+init_domain();
+import { existsSync as existsSync3 } from "fs";
+import { writeFile, unlink, readFile } from "fs/promises";
 import { join as join4 } from "path";
+import { fileURLToPath as fileURLToPath2 } from "url";
 var name2 = "mediaops.doctor";
-var description2 = "Read-only diagnostics: data directory writability, per-platform credential readiness, and runtime info. Reports honestly; nothing is faked.";
+var description2 = "Read-only diagnostics: runtime/distribution info, data directory writability, identity readiness, heavy delivery-QA dependency probes, per-stage callability with blocking stop codes, and per-platform credential readiness. Reports honestly; nothing is faked.";
 var inputSchema2 = {};
-async function handler2() {
+async function probePackage(specifier) {
+  try {
+    const resolved = import.meta.resolve(`${specifier}/package.json`);
+    const parsed = JSON.parse(await readFile(fileURLToPath2(resolved), "utf8"));
+    return { installed: true, version: typeof parsed.version === "string" ? parsed.version : null };
+  } catch (error2) {
+    return { installed: false, version: null, detail: error2 instanceof Error ? error2.message.slice(0, 200) : String(error2) };
+  }
+}
+async function handler2(_args = {}, principal) {
   const warnings = [];
   const { dir, usedFallback } = resolveDataDir();
   let dataDirWritable = false;
@@ -39397,6 +39622,57 @@ async function handler2() {
   if (usedFallback) {
     warnings.push("MEDIAOPS_DATA_DIR not set; using a temporary fallback directory (non-durable).");
   }
+  const entryPath = fileURLToPath2(import.meta.url);
+  const runningFromDistribution = /[\\/]dist[\\/]server\.js$/.test(entryPath);
+  const distributionPresent = runningFromDistribution || existsSync3(join4(entryPath, "..", "..", "..", "dist", "server.js"));
+  const [playwright, axe, vnu] = await Promise.all([
+    probePackage("@playwright/test"),
+    probePackage("@axe-core/playwright"),
+    probePackage("vnu-jar")
+  ]);
+  const javaOnPath = Boolean(Bun.which("java"));
+  const fullQaReady = playwright.installed && axe.installed && vnu.installed && javaOnPath;
+  const qaReadiness = {
+    staticMode: "always available (MEDIAOPS_QA_MODE=static): byte/security checks with static evidence",
+    fullMode: fullQaReady ? "ready: Nu + Playwright/Chromium + axe automated QA can run" : "DEPENDENCY_NOT_READY: install @playwright/test, @axe-core/playwright, vnu-jar and a Java runtime to run full delivery QA",
+    dependencies: {
+      "@playwright/test": playwright,
+      "@axe-core/playwright": axe,
+      "vnu-jar": vnu,
+      java: { installed: javaOnPath, version: null, detail: javaOnPath ? undefined : "no `java` on PATH (required by the Nu HTML checker)" }
+    }
+  };
+  const identity = describePrincipal(principal ?? null);
+  const stages = toolRolePolicies().map(({ tool, role }) => {
+    const serviceCovered = identity.mode === "local_editorial" && serviceActorCovers(tool);
+    const secondHuman = identity.mode === "local_editorial" && isSecondHumanGate(tool);
+    const heavyQa = tool === "mediaops.delivery.verify";
+    let readiness;
+    let blockedBy;
+    let hint;
+    if (!identity.authenticated) {
+      readiness = "blocked";
+      blockedBy = "AUTHENTICATION_REQUIRED";
+      hint = "Configure MCP OAuth (team-governed) or MEDIAOPS_IDENTITY_MODE=host-principal/local-editorial with MEDIAOPS_TRUSTED_PRINCIPAL_* env.";
+    } else if (serviceCovered) {
+      readiness = "service_actor";
+      hint = "Deterministic machine operation: executes as mediaops-server:service with service_account assurance.";
+    } else if (secondHuman) {
+      readiness = "pending_second_human";
+      blockedBy = "ROLE_SEPARATION_REQUIRED";
+      hint = "local-editorial keeps this gate pending until a second real principal (team-governed) decides; do not impersonate one.";
+    } else if (principal && !principalHasRole(principal, role)) {
+      readiness = "blocked";
+      blockedBy = "ROLE_REQUIRED";
+      hint = `Grant role ${role} to the trusted principal.`;
+    } else if (heavyQa && !fullQaReady) {
+      readiness = "callable_static_qa";
+      hint = "Full browser/validator QA is DEPENDENCY_NOT_READY; static-mode evidence remains available.";
+    } else {
+      readiness = "callable";
+    }
+    return { tool, role, readiness, ...blockedBy ? { blockedBy } : {}, ...hint ? { hint } : {} };
+  });
   const platforms = PLATFORMS.map((p2) => ({
     id: p2.id,
     displayName: p2.displayName,
@@ -39406,14 +39682,21 @@ async function handler2() {
   }));
   return ok({
     runtime: {
+      serverVersion: VERSION,
       bunVersion: typeof Bun !== "undefined" ? Bun.version : "unknown",
-      platform: process.platform
+      platform: process.platform,
+      entryPath,
+      runningFromDistribution,
+      distributionPresent
     },
     dataDir: {
       path: dir,
       usedFallback,
       writable: dataDirWritable
     },
+    identity,
+    qaReadiness,
+    stages,
     platforms,
     summary: "Gate A: deterministic I/O only. No platform credentials configured; real publish APIs are disabled."
   }, warnings);
@@ -39552,7 +39835,7 @@ async function clusterHandler(args) {
 // src/tools/content.ts
 init_zod();
 import { createHash as createHash5, randomUUID as randomUUID7 } from "crypto";
-import { lstat, readFile, realpath } from "fs/promises";
+import { lstat, readFile as readFile2, realpath } from "fs/promises";
 import { isAbsolute, relative, resolve } from "path";
 init_domain();
 init_article_doc();
@@ -50029,7 +50312,7 @@ async function freezeAssetMetadata(input) {
   if (!insideRoot(candidate, root5)) {
     throw new ArticleDocError("ASSET_OUTSIDE_ALLOWED_ROOT", `${input.path} resolves outside MEDIAOPS_ASSET_ROOT (${root5}).`);
   }
-  const bytes = await readFile(candidate);
+  const bytes = await readFile2(candidate);
   if (bytes.length === 0 || bytes.length > MAX_ASSET_BYTES) {
     throw new ArticleDocError("ASSET_INVALID", `${input.path} must contain 1 to ${MAX_ASSET_BYTES} bytes.`);
   }
@@ -50292,7 +50575,7 @@ async function listHandler(args) {
 // src/tools/delivery.ts
 init_zod();
 import { createHash as createHash7, randomUUID as randomUUID8 } from "crypto";
-import { copyFile, lstat as lstat2, mkdir as mkdir4, readFile as readFile4, realpath as realpath3, rename, rm as rm2, writeFile as writeFile5 } from "fs/promises";
+import { copyFile, lstat as lstat2, mkdir as mkdir4, readFile as readFile5, realpath as realpath3, rename, rm as rm2, writeFile as writeFile5 } from "fs/promises";
 import { basename, isAbsolute as isAbsolute3, join as join7, relative as relative4, resolve as resolve5 } from "path";
 init_domain();
 init_renderer();
@@ -50428,7 +50711,7 @@ function insideRoot2(candidate, root5) {
 }
 async function pluginLockHash() {
   const root5 = resolve5(process.env.CRABCODE_PLUGIN_ROOT?.trim() || process.cwd());
-  const bytes = await readFile4(join7(root5, "bun.lock"));
+  const bytes = await readFile5(join7(root5, "bun.lock"));
   return sha256(bytes);
 }
 function artifact(args) {
@@ -50453,7 +50736,7 @@ async function verifiedAssetBytes(content3) {
     const stat2 = await lstat2(asset.path);
     if (!stat2.isFile() || stat2.isSymbolicLink())
       throw new Error(`ASSET_INVALID:${asset.assetId}`);
-    const bytes = await readFile4(asset.path);
+    const bytes = await readFile5(asset.path);
     if (bytes.byteLength !== asset.byteSize || sha256(bytes) !== asset.sha256)
       throw new Error(`ASSET_HASH_MISMATCH:${asset.assetId}`);
     out.push({ asset, bytes, relativePath: `assets/${safeAssetName(index2, asset.path)}` });
@@ -50610,7 +50893,7 @@ async function readArtifact(root5, relativePath) {
   const stat2 = await lstat2(path2);
   if (!stat2.isFile() || stat2.isSymbolicLink())
     throw new Error(`DELIVERY_PATH_INVALID:${relativePath}`);
-  return readFile4(path2);
+  return readFile5(path2);
 }
 async function verifyDeliveryBytes(manifest) {
   const currentDependencyLockHash = await pluginLockHash();
@@ -50659,7 +50942,7 @@ async function verifyDeliveryBytes(manifest) {
         throw new Error(`DELIVERY_QA_ARTIFACT_HASH_MISMATCH:${evidence.relativePath}`);
     }
   }
-  const storedManifest = DeliveryManifestSchema.parse(JSON.parse(await readFile4(join7(root5, "delivery-manifest.json"), "utf8")));
+  const storedManifest = DeliveryManifestSchema.parse(JSON.parse(await readFile5(join7(root5, "delivery-manifest.json"), "utf8")));
   if (storedManifest.renderManifestHash !== manifest.renderManifestHash || stableHash(storedManifest) !== stableHash(manifest)) {
     throw new Error(`DELIVERY_MANIFEST_FILE_MISMATCH:${manifest.deliveryId}`);
   }
@@ -50832,8 +51115,8 @@ async function verifyHandler(args) {
 init_zod();
 init_domain();
 import { randomUUID as randomUUID9 } from "crypto";
-import { existsSync as existsSync3 } from "fs";
-import { readFile as readFile5, readdir, rename as rename2, writeFile as writeFile6 } from "fs/promises";
+import { existsSync as existsSync4 } from "fs";
+import { readFile as readFile6, readdir, rename as rename2, writeFile as writeFile6 } from "fs/promises";
 import { join as join8 } from "path";
 var ProfileVersionSchema = exports_external.string().regex(/^v-[0-9]{10,17}-[a-f0-9]{8}$/, "profile version must be a generated immutable version id");
 var ProfileReferenceSchema = exports_external.object({
@@ -50903,10 +51186,10 @@ function profileStorageWarnings() {
   return [...storageWarnings(), ...warning ? [warning] : []];
 }
 async function readProfile(path2, expectedBrandId) {
-  if (!existsSync3(path2))
+  if (!existsSync4(path2))
     return null;
   try {
-    const parsed = StoredProfileSchema.safeParse(JSON.parse(await readFile5(path2, "utf8")));
+    const parsed = StoredProfileSchema.safeParse(JSON.parse(await readFile6(path2, "utf8")));
     return parsed.success && parsed.data.brand_id === expectedBrandId ? parsed.data : null;
   } catch {
     return null;
@@ -51084,7 +51367,7 @@ async function listHandler2() {
   const currentByBrand = new Map;
   for (const profile of await databaseProfiles())
     currentByBrand.set(profile.brand_id, profile);
-  if (existsSync3(profilesDir())) {
+  if (existsSync4(profilesDir())) {
     const entries = await readdir(profilesDir(), { withFileTypes: true });
     for (const entry of entries) {
       if (!entry.isDirectory() || currentByBrand.has(entry.name))
@@ -51103,7 +51386,7 @@ var historyInputSchema = { brandId: BrandIdSchema };
 async function historyHandler(args) {
   const byVersion = new Map((await databaseProfiles(args.brandId)).map((profile) => [profile.profile_version, profile]));
   const dir = versionsDir(args.brandId);
-  if (existsSync3(dir)) {
+  if (existsSync4(dir)) {
     const files = (await readdir(dir)).filter((file) => file.endsWith(".json"));
     for (const file of files) {
       const profile = await readProfile(join8(dir, file), args.brandId);
@@ -51728,8 +52011,8 @@ async function listHandler3(args = {}) {
 // src/tools/package.ts
 init_zod();
 import { createHash as createHash8, randomUUID as randomUUID11 } from "crypto";
-import { existsSync as existsSync4 } from "fs";
-import { copyFile as copyFile2, lstat as lstat3, mkdir as mkdir5, open, readFile as readFile6, readdir as readdir2, rename as rename3, rm as rm3, writeFile as writeFile7 } from "fs/promises";
+import { existsSync as existsSync5 } from "fs";
+import { copyFile as copyFile2, lstat as lstat3, mkdir as mkdir5, open, readFile as readFile7, readdir as readdir2, rename as rename3, rm as rm3, writeFile as writeFile7 } from "fs/promises";
 import { dirname as dirname2, join as join10 } from "path";
 init_domain();
 var name9 = "mediaops.publish.package";
@@ -51963,7 +52246,7 @@ function buildPackageDocuments(args) {
   return { files, packageManifest, approvalSnapshot, checklist: copyChecklist(args.platform.displayName) };
 }
 async function verifyPackageRoot(root5, delivery, operation, allowPendingMarker) {
-  const packageManifest = PackageManifestSchema.parse(JSON.parse(await readFile6(join10(root5, "package-manifest.json"), "utf8")));
+  const packageManifest = PackageManifestSchema.parse(JSON.parse(await readFile7(join10(root5, "package-manifest.json"), "utf8")));
   if (stableHash(packageManifest) !== operation.packageManifestHash)
     throw new Error("package manifest does not match the prepared operation binding");
   if (!Array.isArray(packageManifest.files) || packageManifest.files.some((file) => typeof file !== "string" || !safeRelativePath(file))) {
@@ -51973,27 +52256,27 @@ async function verifyPackageRoot(root5, delivery, operation, allowPendingMarker)
   const tree = await walkTree(root5);
   if (stableHash(tree.files) !== stableHash(expectedFiles))
     throw new Error("package filesystem inventory differs from the bound manifest");
-  const approvalSnapshot = JSON.parse(await readFile6(join10(root5, "approval.json"), "utf8"));
+  const approvalSnapshot = JSON.parse(await readFile7(join10(root5, "approval.json"), "utf8"));
   if (stableHash(approvalSnapshot) !== operation.approvalSnapshotHash)
     throw new Error("package approval snapshot differs from the prepared operation binding");
-  const checklist = await readFile6(join10(root5, "copy-checklist.md"), "utf8");
+  const checklist = await readFile7(join10(root5, "copy-checklist.md"), "utf8");
   if (stableHash(checklist) !== operation.copyChecklistHash)
     throw new Error("package copy checklist differs from the prepared operation binding");
-  const copiedDeliveryManifest = DeliveryManifestSchema.parse(JSON.parse(await readFile6(join10(root5, "delivery-manifest.json"), "utf8")));
+  const copiedDeliveryManifest = DeliveryManifestSchema.parse(JSON.parse(await readFile7(join10(root5, "delivery-manifest.json"), "utf8")));
   if (stableHash(copiedDeliveryManifest) !== stableHash(delivery))
     throw new Error("copied delivery manifest failed canonical hash verification");
   for (const item of [delivery.primaryArtifact, delivery.backupArtifact, ...delivery.channelArtifacts]) {
-    const bytes = await readFile6(join10(root5, item.relativePath));
+    const bytes = await readFile7(join10(root5, item.relativePath));
     if (bytes.byteLength !== item.byteSize || sha2562(bytes) !== item.artifactHash)
       throw new Error(`copied artifact ${item.artifactId} failed hash verification`);
   }
   for (const asset of delivery.assets) {
-    const bytes = await readFile6(join10(root5, asset.relativePath));
+    const bytes = await readFile7(join10(root5, asset.relativePath));
     if (bytes.byteLength !== asset.byteSize || sha2562(bytes) !== asset.sha256)
       throw new Error(`copied asset ${asset.assetId} failed hash verification`);
   }
   for (const qaArtifact of delivery.qaEvidence?.artifacts ?? []) {
-    const bytes = await readFile6(join10(root5, qaArtifact.relativePath));
+    const bytes = await readFile7(join10(root5, qaArtifact.relativePath));
     if (bytes.byteLength !== qaArtifact.byteSize || sha2562(bytes) !== qaArtifact.sha256)
       throw new Error(`copied QA artifact ${qaArtifact.relativePath} failed hash verification`);
   }
@@ -52001,7 +52284,7 @@ async function verifyPackageRoot(root5, delivery, operation, allowPendingMarker)
 }
 async function finalizeCommittedPackage(root5, delivery, operation) {
   const markerPath = join10(root5, PENDING_MARKER);
-  if (existsSync4(markerPath)) {
+  if (existsSync5(markerPath)) {
     await verifyPackageRoot(root5, delivery, operation, true);
     await rm3(markerPath);
     await syncPath(root5);
@@ -52121,7 +52404,7 @@ async function handler9(args, principal) {
       return err("PACKAGE_STATE_CORRUPT", "Committed package delivery metadata is missing.");
     try {
       await finalizeCommittedPackage(existingOperation.finalRoot, delivery, existingOperation);
-      const manifest = PackageManifestSchema.parse(JSON.parse(await readFile6(join10(existingOperation.finalRoot, "package-manifest.json"), "utf8")));
+      const manifest = PackageManifestSchema.parse(JSON.parse(await readFile7(join10(existingOperation.finalRoot, "package-manifest.json"), "utf8")));
       return packageResponse(existingOperation, delivery, approval.transitionVersion, manifest.files, "idempotent");
     } catch (error2) {
       return err("PACKAGE_INTEGRITY_FAILED", error2 instanceof Error ? error2.message : String(error2));
@@ -52292,7 +52575,7 @@ async function handler9(args, principal) {
     }
     await ensureDir(dirname2(operation.finalRoot));
     let finalVerified = false;
-    if (existsSync4(operation.finalRoot)) {
+    if (existsSync5(operation.finalRoot)) {
       try {
         await verifyPackageRoot(operation.finalRoot, delivery, operation, true);
         finalVerified = true;
@@ -53035,175 +53318,6 @@ async function handler11(args) {
 
 // src/server.ts
 init_domain();
-
-// src/identity.ts
-class IdentityError extends Error {
-  code;
-  constructor(code4, message) {
-    super(message);
-    this.name = "IdentityError";
-    this.code = code4;
-  }
-}
-var SERVICE_ACTOR_TOOLS = new Set(["mediaops.originality.scan", "mediaops.delivery.render"]);
-var SERVICE_IMPORT_TOOL = "mediaops.content.save";
-var SERVICE_ACTOR = Object.freeze({
-  principalId: "service",
-  actorKey: "mediaops-server:service",
-  displayName: "MediaOps \u670D\u52A1\u6267\u884C\u4F53\uFF08\u786E\u5B9A\u6027\u673A\u5668\u64CD\u4F5C\uFF09",
-  issuer: "mediaops-server",
-  roles: ["originality_scanner", "renderer", "author"],
-  assurance: "service_account"
-});
-var POLICIES = {
-  "mediaops.content.save": { role: "author", actorFields: ["savedBy"] },
-  "mediaops.reference.register": { role: "reference_curator", actorFields: ["registeredBy"] },
-  "mediaops.research.capture": { role: "researcher", actorFields: ["capturedBy"] },
-  "mediaops.research.complete": { role: "fact_checker", actorFields: ["completedBy"] },
-  "mediaops.originality.scan": { role: "originality_scanner", actorFields: ["createdBy"] },
-  "mediaops.originality.review": { role: "originality_reviewer", actorFields: ["reviewedBy"] },
-  "mediaops.editorial.review": { role: "editorial_reviewer", actorFields: ["completedBy"] },
-  "mediaops.delivery.render": { role: "renderer", actorFields: ["generatedBy"] },
-  "mediaops.delivery.verify": { role: "delivery_reviewer", actorFields: ["verifiedBy"] },
-  "mediaops.profile.save": { role: "profile_editor", actorFields: ["confirmedBy"] },
-  "mediaops.profile.rollback": { role: "profile_editor", actorFields: ["confirmedBy"] },
-  "mediaops.style.form.template": { role: "profile_editor", actorFields: [] },
-  "mediaops.style.form.save_draft": { role: "profile_editor", actorFields: ["updatedBy"] },
-  "mediaops.style.form.submit": { role: "profile_editor", actorFields: ["submittedBy"] },
-  "mediaops.profile.propose": { role: "profile_editor", actorFields: ["proposedBy"] },
-  "mediaops.profile.confirm": { role: "profile_approver", actorFields: ["confirmedBy"] },
-  "mediaops.approval.request": { role: "approval_requester", actorFields: ["requestedBy"] },
-  "mediaops.approval.decide": { role: "approver", actorFields: ["decidedBy"] },
-  "mediaops.publish.package": { role: "publisher", actorFields: ["packagedBy"] }
-};
-function cleanIdentifier(value, label) {
-  if (typeof value !== "string")
-    throw new IdentityError("AUTHENTICATION_REQUIRED", `${label} is missing from the trusted identity context.`);
-  const cleaned = value.normalize("NFKC").trim();
-  if (!cleaned || cleaned.length > 180 || /[\u0000-\u001f\u007f]/u.test(cleaned)) {
-    throw new IdentityError("AUTHENTICATION_REQUIRED", `${label} is invalid in the trusted identity context.`);
-  }
-  return cleaned;
-}
-function normalizeRoles(values2) {
-  return [...new Set(values2.flatMap((value) => typeof value === "string" ? value.split(",") : []).map((value) => value.normalize("NFKC").trim().toLowerCase()).filter(Boolean))];
-}
-function principalFromMcp(context) {
-  const auth = context?.authInfo;
-  if (!auth)
-    return null;
-  if (auth.expiresAt !== undefined && (!Number.isFinite(auth.expiresAt) || auth.expiresAt <= Date.now() / 1000)) {
-    throw new IdentityError("AUTHENTICATION_REQUIRED", "The MCP access token is expired or has an invalid expiry.");
-  }
-  const extra = auth.extra ?? {};
-  const principalId = cleanIdentifier(extra.sub ?? extra.subject, "authInfo.extra.sub");
-  const issuer = cleanIdentifier(extra.iss ?? extra.issuer ?? "mcp-oauth", "authInfo issuer");
-  const displayName = typeof extra.name === "string" && extra.name.trim() ? extra.name.normalize("NFKC").trim() : principalId;
-  const extraRoles = Array.isArray(extra.roles) ? extra.roles : [];
-  const roles = normalizeRoles([...auth.scopes ?? [], ...extraRoles]);
-  return {
-    principalId,
-    actorKey: `${issuer}:${principalId}`.slice(0, 300),
-    displayName: displayName.slice(0, 300),
-    issuer,
-    roles,
-    assurance: "mcp_oauth"
-  };
-}
-function configuredIdentityMode() {
-  const mode = process.env.MEDIAOPS_IDENTITY_MODE;
-  return mode === "host-principal" || mode === "local-editorial" ? mode : null;
-}
-function principalFromHost() {
-  const mode = configuredIdentityMode();
-  if (!mode)
-    return null;
-  const principalId = cleanIdentifier(process.env.MEDIAOPS_TRUSTED_PRINCIPAL_ID, "MEDIAOPS_TRUSTED_PRINCIPAL_ID");
-  const issuer = cleanIdentifier(process.env.MEDIAOPS_TRUSTED_PRINCIPAL_ISSUER, "MEDIAOPS_TRUSTED_PRINCIPAL_ISSUER");
-  const displayName = (process.env.MEDIAOPS_TRUSTED_PRINCIPAL_NAME?.normalize("NFKC").trim() || principalId).slice(0, 300);
-  const roles = normalizeRoles([process.env.MEDIAOPS_TRUSTED_PRINCIPAL_ROLES ?? ""]);
-  if (roles.includes("*") || roles.includes("mediaops:*")) {
-    throw new IdentityError("AUTHENTICATION_REQUIRED", "Wildcard roles are rejected for host/local configured principals; grant explicit mediaops roles instead.");
-  }
-  return {
-    principalId,
-    actorKey: `${issuer}:${principalId}`.slice(0, 300),
-    displayName,
-    issuer,
-    roles,
-    assurance: mode === "local-editorial" ? "local_editorial" : "host_principal"
-  };
-}
-function resolveTrustedPrincipal(context) {
-  return principalFromMcp(context) ?? principalFromHost();
-}
-function hasRole(principal, role) {
-  const accepted = new Set([
-    "*",
-    role,
-    `mediaops:${role}`,
-    "mediaops:*"
-  ]);
-  return principal.roles.some((item) => accepted.has(item));
-}
-function bindNestedAccountability(toolName, args, actorKey) {
-  if (toolName !== "mediaops.editorial.review")
-    return;
-  const legal = args.legalReview;
-  if (legal && typeof legal === "object" && !Array.isArray(legal)) {
-    args.legalReview = { ...legal, reviewedBy: actorKey };
-  }
-  const disclosure = args.aiDisclosure;
-  if (disclosure && typeof disclosure === "object" && !Array.isArray(disclosure)) {
-    args.aiDisclosure = { ...disclosure, confirmedBy: actorKey };
-  }
-  if (Array.isArray(args.waivers)) {
-    args.waivers = args.waivers.map((waiver) => waiver && typeof waiver === "object" && !Array.isArray(waiver) ? { ...waiver, by: actorKey } : waiver);
-  }
-}
-function authorizeToolCall(toolName, rawArgs, context) {
-  const policy = POLICIES[toolName];
-  if (!policy)
-    return { args: rawArgs, principal: resolveTrustedPrincipal(context) };
-  const args = rawArgs && typeof rawArgs === "object" && !Array.isArray(rawArgs) ? { ...rawArgs } : {};
-  const serviceImportRequested = args.serviceImport === true;
-  delete args.serviceImport;
-  const localEditorial = !context?.authInfo && configuredIdentityMode() === "local-editorial";
-  let principal;
-  if (localEditorial && (SERVICE_ACTOR_TOOLS.has(toolName) || toolName === SERVICE_IMPORT_TOOL && serviceImportRequested)) {
-    const human = resolveTrustedPrincipal(context);
-    if (!human) {
-      throw new IdentityError("AUTHENTICATION_REQUIRED", "local-editorial mode requires the trusted local principal to be configured before service-actor operations run.");
-    }
-    if (toolName === SERVICE_IMPORT_TOOL && args.stage !== "intake") {
-      throw new IdentityError("AUTHORIZATION_DENIED", "The service actor may only register mechanical intake imports; later stages need the accountable human principal.");
-    }
-    principal = SERVICE_ACTOR;
-  } else {
-    if (serviceImportRequested) {
-      throw new IdentityError("AUTHORIZATION_DENIED", "serviceImport is only available for mediaops.content.save intake registration in MEDIAOPS_IDENTITY_MODE=local-editorial.");
-    }
-    principal = resolveTrustedPrincipal(context);
-  }
-  if (!principal) {
-    throw new IdentityError("AUTHENTICATION_REQUIRED", `${toolName} requires an MCP-authenticated subject or an explicitly configured host principal; caller-supplied names are not accepted as identity.`);
-  }
-  if (!hasRole(principal, policy.role)) {
-    throw new IdentityError("AUTHORIZATION_DENIED", `${principal.actorKey} lacks required role ${policy.role} for ${toolName}.`);
-  }
-  for (const field of policy.actorFields)
-    args[field] = principal.actorKey;
-  bindNestedAccountability(toolName, args, principal.actorKey);
-  return { args, principal };
-}
-var SECOND_HUMAN_GATES = Object.freeze([
-  "mediaops.originality.review",
-  "mediaops.editorial.review",
-  "mediaops.approval.decide",
-  "mediaops.profile.confirm"
-]);
-
-// src/server.ts
 var server = new McpServer({ name: "mediaops", version: VERSION });
 function register(name12, description12, inputSchema12, handler12) {
   server.registerTool(name12, { description: description12, inputSchema: inputSchema12 }, async (args, extra) => {

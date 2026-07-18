@@ -6,9 +6,9 @@
     "component": {
       "type": "application",
       "name": "crabcode-media-ops-mcp",
-      "version": "0.4.0",
-      "bom-ref": "pkg:npm/crabcode-media-ops-mcp@0.4.0",
-      "purl": "pkg:npm/crabcode-media-ops-mcp@0.4.0",
+      "version": "0.4.1",
+      "bom-ref": "pkg:npm/crabcode-media-ops-mcp@0.4.1",
+      "purl": "pkg:npm/crabcode-media-ops-mcp@0.4.1",
       "licenses": [
         {
           "expression": "Apache-2.0"
@@ -4706,7 +4706,7 @@
   ],
   "dependencies": [
     {
-      "ref": "pkg:npm/crabcode-media-ops-mcp@0.4.0",
+      "ref": "pkg:npm/crabcode-media-ops-mcp@0.4.1",
       "dependsOn": [
         "pkg:npm/%40axe-core/playwright@4.12.1",
         "pkg:npm/%40hono/node-server@1.19.14",

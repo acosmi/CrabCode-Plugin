@@ -74,6 +74,22 @@ for (const relative of manifest.skills ?? []) {
 for (const name of expectedSkills) if (!skillNames.has(name)) errors.push(`required skill missing: ${name}`)
 for (const name of skillNames) if (!expectedSkills.has(name)) errors.push(`unexpected skill in manifest: ${name}`)
 
+// Commands orchestrate mediaops.* from the main thread, so their references
+// must be real tools; subagents must not claim direct mediaops calls at all —
+// they return structured data for the main thread to submit (audit P1-C).
+for (const dir of ['commands', 'agents'] as const) {
+  for (const file of (await readdir(join(pluginRoot, dir))).filter((entry) => entry.endsWith('.md'))) {
+    const text = await readFile(join(pluginRoot, dir, file), 'utf8')
+    for (const tool of text.match(/mediaops\.[a-z0-9_.]+/g) ?? []) {
+      if (dir === 'agents') {
+        errors.push(`${dir}/${file}: subagents must not reference mediaops tools directly (${tool}); return structured data and let the main thread orchestrate`)
+      } else if (!knownTools.has(tool)) {
+        errors.push(`${dir}/${file}: unknown tool reference ${tool}`)
+      }
+    }
+  }
+}
+
 const schemaNames = [
   'content-manifest', 'claim', 'approval', 'creator-style-form', 'platform-rule', 'reference-material',
   'research-capture', 'research-review', 'originality-scan', 'editorial-review', 'article-doc', 'delivery-artifact', 'delivery-manifest', 'package-manifest',
