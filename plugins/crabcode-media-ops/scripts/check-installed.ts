@@ -28,10 +28,26 @@ function parseToolEnvelope(result: unknown): any {
   return JSON.parse(block.text)
 }
 
+/**
+ * Launch the server exactly the way `.mcp.json` does: the prebuilt
+ * self-contained dist entry. Falling back to src/server.ts is reported as an
+ * error because a 0.4.1+ distribution must ship dist/server.js.
+ */
+async function resolveServerEntry(installRoot: string): Promise<{ entry: string; distributionEntry: boolean }> {
+  const dist = join(installRoot, 'dist', 'server.js')
+  try {
+    await readFile(dist)
+    return { entry: dist, distributionEntry: true }
+  } catch {
+    return { entry: join(installRoot, 'src', 'server.ts'), distributionEntry: false }
+  }
+}
+
 async function installedClient(installRoot: string, env: Record<string, string>): Promise<Client> {
+  const { entry } = await resolveServerEntry(installRoot)
   const transport = new StdioClientTransport({
     command: process.execPath,
-    args: [join(installRoot, 'src', 'server.ts')],
+    args: ['--no-env-file', entry],
     cwd: installRoot,
     env,
     stderr: 'pipe',
@@ -104,8 +120,12 @@ if (process.argv[2] && resolve(process.argv[2]) !== installRoot) {
   throw new Error(`check-installed only certifies its own installation root (${installRoot}).`)
 }
 const packageVersion = await readPackageVersion(join(installRoot, 'package.json'))
+const serverEntry = await resolveServerEntry(installRoot)
 const dependencyVersions: Record<string, string> = {}
 const dependencyErrors: string[] = []
+if (!serverEntry.distributionEntry) {
+  dependencyErrors.push('dist/server.js is missing: 0.4.1+ distributions must ship the prebuilt sidecar (run `bun run build`); fell back to src/server.ts for diagnostics only.')
+}
 for (const [name, expected] of Object.entries(EXPECTED)) {
   try {
     const actual = await readPackageVersion(join(installRoot, 'node_modules', ...name.split('/'), 'package.json'))
@@ -126,6 +146,7 @@ const result = {
   status,
   installRoot,
   packageVersion,
+  serverEntry,
   dependencyVersions,
   dependencyErrors,
   identity,

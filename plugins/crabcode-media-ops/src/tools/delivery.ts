@@ -12,7 +12,6 @@ import {
   type DeliveryManifest,
 } from '../domain.ts'
 import { renderArticle, RENDER_CONTRACT } from '../rendering/renderer.ts'
-import { runDeliveryQa } from '../qa/index.ts'
 import { appendRecordsAtomically, dataDir, ensureDir, listRecords, storageWarnings } from '../storage.ts'
 import { getLatestContent } from './content.ts'
 
@@ -471,6 +470,9 @@ export async function verifyHandler(args: z.input<typeof verifySchema>): Promise
       }
     } else if (qaMode === 'full') {
       try {
+        // Heavy browser/validator QA loads lazily so the self-contained dist can
+        // reach MCP initialize/tools/list without Playwright, axe or vnu installed.
+        const { runDeliveryQa } = await import('../qa/index.ts')
         const qa = await runDeliveryQa(root, manifest.primaryArtifact.relativePath)
         const artifactByPath = new Map(
           [qa.reports.nu, qa.reports.browser, qa.reports.summary, ...qa.evidence]
@@ -500,11 +502,14 @@ export async function verifyHandler(args: z.input<typeof verifySchema>): Promise
         }
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error)
-        const infra = /ENOENT|ECONNREFUSED|Failed to connect|EAGAIN|ETIMEDOUT/i.test(message)
+        const missingDependency = /Cannot find (?:package|module)|Cannot resolve module/i.test(message)
+        const infra = missingDependency || /ENOENT|ECONNREFUSED|Failed to connect|EAGAIN|ETIMEDOUT/i.test(message)
         checks.push({
           id: infra ? 'qa_infrastructure_failed' : 'automated-delivery-qa',
           status: 'failed',
-          detail: message,
+          detail: missingDependency
+            ? `DEPENDENCY_NOT_READY: delivery QA dependencies are not installed in this distribution (${message}). Install @playwright/test, @axe-core/playwright and vnu-jar with Java/Chromium, or use MEDIAOPS_QA_MODE=static.`
+            : message,
         })
       }
     }

@@ -6,6 +6,7 @@
     "name": "CrabCode"
   },
   "license": "Apache-2.0",
+  "requiredMcpServers": ["mediaops"],
   "keywords": [
     "media-ops",
     "publishing",

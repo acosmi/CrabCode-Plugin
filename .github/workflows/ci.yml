@@ -27,6 +27,8 @@ jobs:
       - run: bun run lint:brand
       - run: bun run scripts/lint-brand.ts dist
       - run: bun run validate
+      - name: Verify media-ops standalone bundle is committed
+        run: git ls-files --error-unmatch plugins/crabcode-media-ops/dist/server.js
 
   html-video-plugin:
     runs-on: ubuntu-latest
@@ -73,7 +75,10 @@ jobs:
           java-version: '21'
       - run: bun install --frozen-lockfile
       - run: bun run typecheck
-      - run: bun run build
+      # check:distribution rebuilds into a temp dir and compares against the
+      # committed dist/server.js, then cold-start smokes it — so it must run
+      # before anything overwrites the checked-out bundle.
+      - run: bun run check:distribution
       - run: bun run test
       - run: bun run test:qa
       - run: bun run qa:release

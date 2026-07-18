@@ -2,7 +2,7 @@
   "mcpServers": {
     "mediaops": {
       "command": "bun",
-      "args": ["run", "--cwd", "${CRABCODE_PLUGIN_ROOT}", "--shell=bun", "--silent", "start"],
+      "args": ["--no-env-file", "--cwd", "${CRABCODE_PLUGIN_ROOT}", "${CRABCODE_PLUGIN_ROOT}/dist/server.js"],
       "env": {
         "MEDIAOPS_DATA_DIR": "${CRABCODE_PLUGIN_DATA}"
       }
