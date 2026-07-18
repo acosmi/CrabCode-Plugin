@@ -1804,3 +1804,31 @@ playwright.config.ts: 两处固定 http://127.0.0.1:4197
 结论：任务改动无密钥、token、私钥或完整 Gmail 地址；可执行应用/领域/脚本中无远程运行资产，插件范围的非 loopback URL 只有恢复账本中的 Figma 设计链接。依赖只用于开发与验收，运行实现继续使用浏览器原生 API、Bun 和 TypeScript，没有引入 React/Vite 或真实服务依赖；对当前“设计实施 + 本地可验收夹具”范围不存在为未来服务过度搭建的问题。
 
 最终预提交核验真实输出：当前分支为 `codex/crabpublish-hub-ui-implementation-20260718`；`git diff --cached --check` 零输出、exit 0；任务路径的 `git diff --name-only` 零输出，说明所有任务修改已暂存；最终暂存统计为 `62 files changed, 6443 insertions(+)`。敌意复核结论：根因边界清楚（设计交付与真实发布服务严格分层）、无静默真实副作用、无跨仓修改、无用户删除混入、无非必要运行框架，交付文档、恢复账本、代码、测试和固定截图齐全，可以提交到任务分支 HEAD；不得据此宣称 Gate B 或正式发布链路已经完成。
+
+#### 实施提交与 HEAD 交付核验
+
+```text
+$ git commit -m "feat(media-publisher): add hardened Apple-white Hub UI fixture"
+[codex/crabpublish-hub-ui-implementation-20260718 17f69b3]
+62 files changed, 6445 insertions(+)
+[exit 0]
+
+$ git rev-parse HEAD
+17f69b3132bd4442f5d9d7ccfa562ea10a9744f9
+
+$ git diff HEAD -- <all task paths>
+# 零输出，exit 0。
+
+$ git status --short --branch
+## codex/crabpublish-hub-ui-implementation-20260718
+ D plugins/crabcode-html-video/dist/bootstrap.js
+ D plugins/crabcode-html-video/dist/hyperframe.manifest.json
+ D plugins/crabcode-html-video/dist/hyperframe.runtime.iife.js
+ D plugins/crabcode-html-video/dist/server.js
+
+$ git rev-parse --abbrev-ref --symbolic-full-name @{u}
+fatal: no upstream configured for branch 'codex/crabpublish-hub-ui-implementation-20260718'
+[exit 128]
+```
+
+`git ls-tree -r --name-only HEAD plugins/crabcode-media-publisher` 列出 manifest、README、应用源码、领域模型、46 个设计令牌、Figma 恢复账本、QA 脚本、30 张 PNG、浏览器/安全/单元测试和许可证声明，确认插件全部产出已进入实施提交。分支没有 upstream，因此本窗口没有远程推送或远程同步；也没有 merge main、删分支、回滚或 force-push。工作树剩余四个删除均为用户原有、未提交状态。
