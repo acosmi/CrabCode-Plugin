@@ -2058,3 +2058,31 @@ $ git diff --cached --name-status
 # 仅两份 audit 文档与 plugins/crabcode-media-publisher；
 # 四个 plugins/crabcode-html-video/dist 删除保持未暂存。
 ```
+
+#### 提交与 HEAD 交付核验
+
+```text
+$ git commit -m "feat(media-publisher): add safe local document imports"
+[codex/crabpublish-editor-dual-preview-20260718 3f87020] feat(media-publisher): add safe local document imports
+23 files changed, 2058 insertions(+), 164 deletions(-)
+[exit 0]
+
+$ git diff --exit-code HEAD -- <all task paths>
+# 零输出，exit 0
+
+$ git status --short --branch
+## codex/crabpublish-editor-dual-preview-20260718
+ D plugins/crabcode-html-video/dist/bootstrap.js
+ D plugins/crabcode-html-video/dist/hyperframe.manifest.json
+ D plugins/crabcode-html-video/dist/hyperframe.runtime.iife.js
+ D plugins/crabcode-html-video/dist/server.js
+
+$ git rev-parse --abbrev-ref --symbolic-full-name @{u}
+fatal: no upstream configured for branch 'codex/crabpublish-editor-dual-preview-20260718'
+
+$ curl -sfI http://127.0.0.1:4174/app
+HTTP/1.1 200 OK
+Content-Security-Policy: ... frame-src 'self' blob: ... frame-ancestors 'none'
+```
+
+因此任务代码已提交，4174 开发服务器可访问；本分支没有 upstream、未推送、未合并。工作树只剩用户原有的四个 `crabcode-html-video/dist` 删除。
