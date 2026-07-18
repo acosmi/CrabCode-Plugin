@@ -40,7 +40,7 @@ describe("Hub deterministic renderer", () => {
       expect(articlePreviewDocument).toContain(text);
       expect(articlePreviewMarkdown).toContain(text);
     }
-    expect(articlePreviewDocument).toContain("HTML 是默认阅读交付，Markdown 为同 revision 备份");
-    expect(articlePreviewMarkdown).toContain("HTML 是默认阅读交付，Markdown 为同 revision 备份");
+    expect(articlePreviewDocument).toContain("HTML 是默认阅读交付，Markdown 为同一草稿派生的安全备份");
+    expect(articlePreviewMarkdown).toContain("HTML 是默认阅读交付，Markdown 为同一草稿派生的安全备份");
   });
 });

@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { readFile } from "node:fs/promises";
 import { articlePreviewDocument } from "../../apps/publisher-app/src/article-preview.ts";
 
 const routes = [
@@ -117,6 +118,103 @@ test("editor embeds the styled canonical HTML artifact in an opaque local frame"
   await expect(preview).toHaveScreenshot("article-preview-frame-390.png");
 });
 
+test("editor safely imports local Markdown and HTML into the synchronized HTML preview", async ({ page }) => {
+  await open(page, "/app/works/work-8F2C/edit", 1440, 900);
+  await page.evaluate(() => {
+    const original = URL.revokeObjectURL.bind(URL);
+    const state = window as unknown as { __revokedPreviewUrls: string[] };
+    state.__revokedPreviewUrls = [];
+    URL.revokeObjectURL = (url: string): void => {
+      state.__revokedPreviewUrls.push(url);
+      original(url);
+    };
+  });
+  const input = page.locator("#editor-import");
+  await expect(input).toHaveAttribute("accept", ".md,.markdown,.html,.htm,text/markdown,text/html");
+
+  await input.setInputFiles({
+    name: "oversized.md",
+    mimeType: "text/markdown",
+    buffer: Buffer.alloc(256 * 1024 + 1, "a")
+  });
+  await expect(page.locator("#import-state")).toContainText("超过 256 KiB");
+  await expect(page.locator("#editor-title")).toHaveValue("多平台分发，不该只是把同一篇文章复制八遍");
+
+  await page.locator("#editor-title").fill("不应覆盖导入的新标题");
+
+  await input.setInputFiles({
+    name: "local-draft.md",
+    mimeType: "text/markdown",
+    buffer: Buffer.from("# Markdown 导入标题\n\n这是 Markdown 导语。\n\n## 导入章节\n\n正文 **重点**。", "utf8")
+  });
+  await expect(page.locator("#editor-title")).toHaveValue("Markdown 导入标题");
+  await expect(page.locator("#editor-summary")).toHaveValue("这是 Markdown 导语。");
+  await expect(page.locator("#editor-body")).toHaveValue(/## 导入章节/);
+  await expect(page.locator("#source-format-badge")).toHaveText("MD 导入");
+  await expect(page.locator("#import-state")).toContainText("仅本机内存");
+  await expect(page.locator("#preview-source-check")).toContainText("来源待补充与核验");
+  await expect(page.locator("#preview-disclosure-check")).toContainText("待复核");
+  await expect(page.locator("#preview-state")).toHaveText("本页草稿预览 · 未冻结");
+  const preview = page.locator("#article-preview");
+  await expect(preview).toHaveAttribute("sandbox", "");
+  await expect(preview).toHaveAttribute("data-preview-source", "session");
+  const markdownPreviewUrl = await preview.getAttribute("src");
+  expect(markdownPreviewUrl).toMatch(/^blob:/);
+  await expect(preview.contentFrame().getByRole("heading", { level: 1 })).toHaveText("Markdown 导入标题");
+  await expect(preview.contentFrame().getByRole("heading", { level: 2 })).toHaveText("导入章节");
+  await page.waitForTimeout(350);
+  await expect(preview.contentFrame().getByRole("heading", { level: 1 })).toHaveText("Markdown 导入标题");
+
+  await input.setInputFiles({
+    name: "hostile.html",
+    mimeType: "text/html",
+    buffer: Buffer.from('<!doctype html><article><h1>HTML 导入标题</h1><p>这是 HTML 导语。</p><h2>安全章节</h2><p onclick="steal()">清洗后的正文 <strong>重点</strong></p><script>alert(1)</script><img src="https://evil.invalid/p.png" onerror="steal()"></article>', "utf8")
+  });
+  await expect(page.locator("#editor-title")).toHaveValue("HTML 导入标题");
+  await expect(page.locator("#editor-summary")).toHaveValue("这是 HTML 导语。");
+  await expect(page.locator("#editor-body")).toHaveValue(/## 安全章节/);
+  await expect(page.locator("#source-format-badge")).toHaveText("HTML 导入");
+  await expect(page.locator("#import-state")).toContainText("HTML 已清洗");
+  const htmlFrame = preview.contentFrame();
+  await expect(htmlFrame.getByRole("heading", { level: 1 })).toHaveText("HTML 导入标题");
+  await expect(htmlFrame.getByRole("heading", { level: 2 })).toHaveText("安全章节");
+  await expect(htmlFrame.locator("script, img, iframe, form")).toHaveCount(0);
+  expect(await htmlFrame.locator("body").innerText()).not.toContain("evil.invalid");
+  expect(await page.evaluate(() => (window as unknown as { __revokedPreviewUrls: string[] }).__revokedPreviewUrls))
+    .toContain(markdownPreviewUrl);
+
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "下载 MD 备份" }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe("hostile.backup.md");
+  const downloadPath = await download.path();
+  expect(downloadPath).toBeTruthy();
+  const backup = await readFile(downloadPath!, "utf8");
+  expect(backup).toContain("HTML 导入标题");
+  expect(backup).toContain("来源待补充与核验");
+  expect(backup).not.toMatch(/evil\.invalid|javascript:|<script|<img/i);
+
+  page.once("dialog", async (dialog) => {
+    expect(dialog.message()).toContain("未保存改动");
+    await dialog.dismiss();
+  });
+  await page.getByRole("link", { name: "查看平台变体" }).click();
+  await expect(page).toHaveURL(/\/app\/works\/work-8F2C\/edit$/);
+});
+
+test("Markdown toolbar changes the selected text and refreshes the HTML preview", async ({ page }) => {
+  await open(page, "/app/works/work-8F2C/edit", 820, 1180);
+  const body = page.locator("#editor-body");
+  await body.fill("重点");
+  await body.evaluate((element) => (element as HTMLTextAreaElement).setSelectionRange(0, 2));
+  await page.getByRole("button", { name: "加粗选中文字" }).click();
+  await expect(body).toHaveValue("**重点**");
+  await expect(page.locator("#preview-source-check")).toContainText("来源待补充与核验");
+  await expect(page.locator("#save-state")).toContainText("等待生成 HTML 成品与 MD 备份");
+  await expect(page.locator("#article-preview").contentFrame().getByText("重点", { exact: true })).toBeVisible();
+  await expect(page.locator("#save-state")).toContainText("HTML 成品与 MD 备份已同步");
+});
+
 test("loopback server enforces headers, methods and Host allowlist", async ({ request }) => {
   const deepLink = await request.get("/app/works/work-8F2C/edit");
   expect(deepLink.status()).toBe(200);
@@ -143,7 +241,7 @@ test("keyboard navigation, local save status and mobile menu work", async ({ pag
   await page.locator("#editor-summary").fill("会话内真实保存检查");
   await page.getByRole("button", { name: "保存本页草稿" }).click();
   await expect(page.locator("#save-state")).toContainText("本页会话草稿已保存");
-  await page.getByRole("link", { name: "冻结并生成变体" }).click();
+  await page.getByRole("link", { name: "查看平台变体" }).click();
   await page.goBack();
   await expect(page.locator("#editor-summary")).toHaveValue("会话内真实保存检查");
   await expect(page.locator("#save-state")).toContainText("本页会话草稿已恢复");
@@ -253,13 +351,14 @@ test("white theme remains white under dark preference and 200/400% equivalent re
 test("forced colors restores essential boundaries for the borderless visual theme", async ({ page }) => {
   await page.emulateMedia({ forcedColors: "active", reducedMotion: "reduce" });
   await open(page, "/app/works/work-8F2C/edit", 390, 844);
-  const boundaries = await page.evaluate(() => [".mobile-menu", "#editor-summary", "#article-preview"]
+  const boundaries = await page.evaluate(() => [".mobile-menu", ".import-strip", "#editor-summary", "#article-preview"]
     .map((selector) => {
       const style = getComputedStyle(document.querySelector<HTMLElement>(selector)!);
       return { selector, width: style.borderTopWidth, style: style.borderTopStyle };
     }));
   expect(boundaries).toEqual([
     { selector: ".mobile-menu", width: "1px", style: "solid" },
+    { selector: ".import-strip", width: "1px", style: "solid" },
     { selector: "#editor-summary", width: "1px", style: "solid" },
     { selector: "#article-preview", width: "1px", style: "solid" }
   ]);

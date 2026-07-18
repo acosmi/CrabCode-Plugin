@@ -1832,3 +1832,229 @@ fatal: no upstream configured for branch 'codex/crabpublish-hub-ui-implementatio
 ```
 
 `git ls-tree -r --name-only HEAD plugins/crabcode-media-publisher` 列出 manifest、README、应用源码、领域模型、46 个设计令牌、Figma 恢复账本、QA 脚本、30 张 PNG、浏览器/安全/单元测试和许可证声明，确认插件全部产出已进入实施提交。分支没有 upstream，因此本窗口没有远程推送或远程同步；也没有 merge main、删分支、回滚或 force-push。工作树剩余四个删除均为用户原有、未提交状态。
+
+### 2026-07-18：编辑器专业化与 HTML / Markdown 本地导入补强
+
+#### 需求纠正、分支与第一性根因
+
+用户先表述“支持 MD 和 HTML 预览”，随后明确纠正为“支持 HTML 和 MD 导入”。纠正发生在代码修改前，因此本轮不新增 Markdown 预览页签；保留 HTML 成品预览，并要求导入内容能够驱动编辑字段和安全 HTML 预览。
+
+```text
+$ git switch -c codex/crabpublish-editor-dual-preview-20260718
+Switched to a new branch 'codex/crabpublish-editor-dual-preview-20260718'
+[exit 0]
+```
+
+分支名沿用最初“双预览”工作名，但实际范围以本节纠正后的“HTML / Markdown 本地导入”需求为准；仅为改名再建分支没有交付价值，因此不制造额外分支。
+
+主控通过当前 `4174` 实页、DOM 与源码独立复核，确认根因不是配色：编辑字段、固定 HTML 和固定 Markdown 原为三份手写内容；正文工具栏没有动作；任何编辑都不会更新 iframe；“HTML / MD 同 revision”是不可变固定文案。若只增加文件按钮，导入后预览与 revision 仍会假同步，问题必然复发。
+
+#### 架构、依赖与安全论证（实施前记录）
+
+- 新增唯一 `EditorDraft` 内容事实源，由同一草稿确定性派生 HTML 成品和 Markdown 备份；构建时静态 `article-preview.html/.md` 与浏览器会话预览共用同一渲染函数。会话草稿仍不等于冻结 revision。
+- Markdown 解析不自行用正则实现。复用仓库 `crabcode-media-ops 0.4.0` 已锁定和使用的 unified/remark/rehype 版本：`unified 11.0.5`、`remark-parse 11.0.0`、`remark-gfm 4.0.1`、`remark-rehype 11.1.2`、`rehype-parse 9.0.1`、`rehype-sanitize 6.0.0`、`rehype-stringify 10.0.1`、`hast-util-to-text 4.0.2`。这是运行依赖变化，但没有引入第二套生态或富文本框架；原因是导入内容属于不可信输入，成熟 AST 管线比手写 Markdown/HTML 解析器更可审计。
+- Markdown 原始 HTML关闭，HTML 先解析为 HAST、按白名单清洗后再抽取标题、导语和正文；脚本、样式、iframe、表单、SVG、事件属性、远程图片均不得进入编辑模型。单文件上限设为 2 MiB，只接受 `.md/.markdown/.html/.htm`，文件仅在本机浏览器内读取，不上传、不写 local/sessionStorage、不保存路径。
+- 动态 HTML 草稿预览继续使用 `sandbox=""` 的不透明 iframe，禁止 `allow-scripts`、`allow-same-origin` 和 `postMessage`。父 CSP 仅增加 `frame-src blob:` 以承载本机内存中的确定性预览文档；预览文档自身继续 `default-src 'none'`、无脚本/连接/表单/远程资源，每次更新撤销旧 Blob URL。静态预览响应的 `SAMEORIGIN`、父页 `DENY`、Host allowlist、GET/HEAD 与 421 DNS-rebinding 防护不变。
+- 专业化编辑器只补齐真实可验收能力：导入、格式工具栏、字数/段落统计、dirty/stale 状态、会话保存和同步 HTML 预览；不引入 Tiptap/ProseMirror、协同编辑、服务端 revision 或真实发布能力，避免把 UI fixture 扩成未获授权的服务工程。
+
+#### 依赖安装、实现范围与包体积
+
+首次在受限沙箱安装依赖时，Bun 无法写临时目录；未改用不受控写文件方式，而是用同一命令在获准边界重跑：
+
+```text
+$ bun install
+bun is unable to write files to tempdir: PermissionDenied
+[exit 1]
+
+$ bun install                 # 获准在沙箱外使用 Bun 临时目录
+98 packages installed
+Saved lockfile
+[exit 0]
+```
+
+实现新增 `editor-document.ts` 与 `editor-actions.ts`，并修改 `article-preview.ts`、`routes.ts`、`main.ts`、`styles.css`、构建/安全脚本、依赖/第三方声明以及 unit/security/browser 测试。`EditorDraft` 是唯一草稿源；静态 HTML/MD 和会话 HTML 预览不再各自手写。工具栏的加粗、H2、引用和列表操作作用于真实选区；导入和后续编辑都触发 120 ms 防抖预览。导入状态明确区分“未导入 / 已导入 / 本页会话已保存 / 尚未冻结”，不再把会话草稿冒充 revision。
+
+```text
+$ du -sh apps/publisher-app/dist node_modules
+976K  apps/publisher-app/dist
+ 89M  node_modules
+
+$ ls -lh apps/publisher-app/dist/chunks/index-*.css apps/publisher-app/dist/chunks/index-*.js \
+      apps/publisher-app/dist/article-preview.html apps/publisher-app/dist/article-preview.md
+39K CSS；757K JS；4.1K HTML；1.3K MD
+
+$ bun audit --production
+No vulnerabilities found
+[exit 0]
+```
+
+`757K` 是当前 `minify:false` 的本地 QA fixture 浏览器 bundle，新增体积主要来自 unified/remark/rehype AST 管线；不把它伪称为 production 优化结果。它在当前本地验收范围内可接受，正式部署前仍应启用 minify、压缩/缓存并设置 bundle budget。一次探查误以为构建目录含 `dist/assets`，`ls` 真实返回 `No such file or directory`；构建实际输出目录是 `dist/chunks`，随后用确切文件路径核对成功。该探查失败未修改产物，也不属于同一问题连续失败。
+
+#### 导入、安全和编辑器自动化收敛
+
+首轮实现后的静态门禁：
+
+```text
+$ bun run lint
+ui-lint: 15 runtime files, 46 tokens, zero violations
+
+$ bun run test
+25 pass / 0 fail / 669 expect() calls
+
+$ bun run qa:nu
+nu-html: 26.7.15 (7eee590); 0 errors across 15 built HTML documents
+```
+
+浏览器用例没有在首次运行时全部通过，失败和修复均保留如下：
+
+```text
+$ playwright test -g "imports local Markdown and HTML|Markdown toolbar"
+2 failed
+1) textarea 错用 toContainText，产品实际已回填标题/导语
+2) strict `strong` 同时命中正文和披露区
+
+# 修正为 toHaveValue，并把正文断言限定在文章内容后
+2 passed (1.7s)
+
+$ playwright test -g "axe|keyboard|reflow|white theme|forced colors"
+3 passed / 2 failed
+1) HTML 预览格式胶囊对比度 4.46:1，axe 要求 4.5:1
+2) 键盘用例仍寻找旧文案“冻结并生成变体”而超时
+
+# 胶囊文字调整为 #1455b6；键盘用例对齐真实按钮“查看平台变体”
+2 passed (44.8s)
+```
+
+上述为不同断言/样式问题，均未连续失败三次。敌意 HTML、Markdown raw HTML、`javascript:`、远程图片、脚本/表单/iframe、Blob 撤销、空 sandbox、无 postMessage/存储权限均有负向断言。HTML 提取后又补了一条结构回归：即使 `<nav>` 先出现普通段落，标题与导语仍优先来自 `<article>/<main>/<body>` 内容根，不把导航噪声导入摘要。
+
+仅更新受到专业编辑器真实视觉变化影响的 5 张基线：`editor-1440/820/390`、`article-preview-frame-390`、`article-print-a4`。主控用原始分辨率人工查看了三种编辑器视口、实际 iframe 与 A4 页面；宽屏为结构/编辑/HTML 检查三区，820/390 单列重排，无根级水平溢出；常态卡片/胶囊无装饰线，只有表单必要边界和浅灰/纯白层级。
+
+#### 完整 QA 暴露的共享 CSS 回归与根因修复
+
+首次禁止更新截图的完整 QA 在浏览器阶段真实返回：
+
+```text
+$ bun run qa
+ui-lint: 15 runtime files, 46 tokens, zero violations
+25 pass / 0 fail / 669 expect() calls
+nu-html: 0 errors across 15 built HTML documents
+37 passed / 2 failed
+
+visual batch-new-1440: expected 1440x1078, actual 1440x1071
+visual batch-new-390:  expected 390x1637, actual 390x1630
+```
+
+没有直接更新两张旧图。期望/实际/diff 人工对比显示批次卡片整体提前 7 px；根因是新编辑器样式把 `.field-heading label` 与共享 `.stack-form legend` 合并，并误将后者既有 `margin:18px 0 7px` 清零。修复为编辑器字段和通用表单各自作用域，保留批次页面既有语义间距：
+
+```text
+$ playwright test -g "visual batch-new-" --update-snapshots=none
+2 passed (1.5s)
+
+$ bun run qa
+ui-lint: 15 runtime files, 46 tokens, zero violations
+25 pass / 0 fail / 669 expect() calls
+nu-html: 26.7.15 (7eee590); 0 errors across 15 built HTML documents
+39 passed (46.3s), --update-snapshots=none
+[exit 0]
+```
+
+这次失败证明共享 CSS 影响面检查有效；修复根因后旧批次基线恢复，无需接受视觉漂移。最后修改的内容根选择测试再次执行 `bun run test`，仍为 `25 pass / 0 fail / 669 expect() calls`。
+
+#### 仓库级边界复核（编辑器导入补强）
+
+```text
+$ bun test tests/validators/manifest.test.ts tests/validators/layout.test.ts
+19 pass / 0 fail / 24 expect() calls
+
+$ bun run lint:manifest
+[exit 0]
+$ bun run lint:layout
+[exit 0]
+$ bun run lint:refs
+lint:refs — 0 error(s), 1 warning(s)
+# 既有 crabfin-cn/fin-core/skills/audit-xls office-spreadsheets 路由 warning
+
+$ bun run validate
+[exit 1]
+[brand] 既有 docs/releases/2026-07-15-v0.4.0.md 命中 codex 分支文字
+[refs] 既有 crabfin-cn audit-xls 路由 warning
+
+$ git diff --check
+# 零输出，exit 0
+```
+
+两个全仓问题与本轮开始前相同，均位于任务未修改文件；没有为清零扩大范围。当前工作树仍包含用户预存的四个 `crabcode-html-video/dist` 删除，主控不恢复、不暂存。`CrabCode` 仓库未修改。README 和 UI 设计真源已把用户纠正固化为“HTML/Markdown 本地导入 + 单一 HTML 成品预览”，并明确本页会话草稿、固定 revision 和真实发布之间的边界。
+
+#### 收尾敌意复核与最终验收
+
+收尾复核只处理本地导入主线内的可复现问题：HTML 改为先清洗完整树再选内容根；安全链接改为幂等的可见文本；iframe 每次预览导航替换节点，避免旧 `load` 提前消耗监听；固定夹具一经编辑即把作者、来源数和 AI 披露置为 `pending_review`；256 KiB 字节上限之外增加同步复杂度预算，过密结构 fail closed。没有引入服务端、Worker、真实发布或 `CrabCode` 改动。
+
+```text
+$ bun run typecheck && bun run test
+25 pass / 0 fail / 683 expect() calls
+
+$ bun run lint && bun run qa:nu
+ui-lint: 15 runtime files, 46 tokens, zero violations
+nu-html: 26.7.15 (7eee590); 0 errors across 15 built HTML documents
+
+$ playwright test -g "imports local Markdown and HTML|Markdown toolbar"
+2 passed (2.4s)
+
+$ bun run qa
+25 pass / 0 fail / 683 expect() calls
+Nu: 0 errors across 15 built HTML documents
+38 passed / 1 failed：仅 editor-390 文案换行产生 2612 像素差异
+
+# 主控查看 expected/actual 后，仅更新 editor-390，并立即禁止更新复验
+visual editor-390: 1 passed (1.1s)
+```
+
+该截图失败属于需求文案变化，不是功能或布局回归；其余 38 个固定 Chrome 用例均在同次禁止更新运行中通过。没有同一问题连续失败三次。
+
+最终禁止更新截图的独立复验与仓库边界复核：
+
+```text
+$ bun run test:browser
+39 passed (47.4s), --update-snapshots=none
+[exit 0]
+
+$ bun test tests/validators/manifest.test.ts tests/validators/layout.test.ts
+19 pass / 0 fail / 24 expect() calls
+
+$ bun run lint:manifest && bun run lint:layout && bun run lint:refs
+lint:refs — 0 error(s), 1 个既有 crabfin audit-xls warning
+
+$ bun run validate
+[exit 1]
+[brand] 既有 docs/releases/2026-07-15-v0.4.0.md codex 分支文字
+[refs] 既有 crabfin audit-xls 路由 warning
+```
+
+两个 `validate` 项均未位于本轮修改路径，结论与实施前一致；未为清零扩大范围。
+
+最后针对 HTML fragment 解析补入危险祖先回归后，再次从头执行全部 QA：
+
+```text
+$ bun run qa
+ui-lint: 15 runtime files, 46 tokens, zero violations
+25 pass / 0 fail / 685 expect() calls
+nu-html: 0 errors across 15 built HTML documents
+39 passed (47.3s), --update-snapshots=none
+[exit 0]
+```
+
+最终敌意复核结论：根因已收敛为一个 `EditorDraft`、一条安全导入管线和同源 HTML/MD artifact 生成；导入或编辑不会继续冒用固定来源状态。回归覆盖危险 HTML/Markdown、Blob/iframe 边界、键盘与无障碍、三档响应式和固定截图。实现没有增加服务端、真实发布、第二个预览编辑器或 `CrabCode` 改动；AST 依赖属于解析不可信文档的必要范围，不继续扩展为富文本框架。
+
+```text
+$ git add <task paths>          # 受限沙箱首次尝试
+fatal: Unable to create '.git/index.lock': Operation not permitted
+[exit 128]
+
+$ git add <task paths>          # 获准写入 Git index 后重跑
+$ git diff --cached --check
+# 零输出，exit 0
+
+$ git diff --cached --name-status
+# 仅两份 audit 文档与 plugins/crabcode-media-publisher；
+# 四个 plugins/crabcode-html-video/dist 删除保持未暂存。
+```

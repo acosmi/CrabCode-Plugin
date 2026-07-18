@@ -1,6 +1,11 @@
 # Third-Party Notices
 
-This plugin's runtime UI is implemented with browser platform APIs and contains no remote runtime assets.
+This plugin's runtime UI contains no remote runtime assets. Local Markdown and HTML imports use the unified/remark/rehype ecosystem to parse and sanitize untrusted document content.
+
+Runtime document processing:
+
+- unified, remark, rehype, micromark, mdast and hast utilities (including `hast-util-to-mdast`), MIT License.
+- `rehype-sanitize`, MIT License; raw HTML is disabled before the allowlist sanitation stage.
 
 Development and acceptance tooling:
 

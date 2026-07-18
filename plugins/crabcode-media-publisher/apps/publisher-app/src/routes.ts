@@ -8,6 +8,7 @@ import {
 } from "../../../packages/domain/src/index.ts";
 import { accounts, attentionItems, auditEvents, batch, dashboardMetrics, demoClock, variants, work, workspace } from "./fixtures.ts";
 import { button, card, emptyState, escapeHtml, factBadge, keyValue, pageHeader, statusBadge } from "./components.ts";
+import { canonicalEditorDraft, MAX_EDITOR_BODY_CHARACTERS } from "./editor-document.ts";
 import { icon } from "./icons.ts";
 
 export type RouteDefinition = {
@@ -55,15 +56,54 @@ function worksList(): string {
 }
 
 function editor(): string {
+  const titleCount = canonicalEditorDraft.title.length;
+  const summaryCount = canonicalEditorDraft.summary.length;
+  const bodyCount = canonicalEditorDraft.bodyMarkdown.replace(/\s/g, "").length;
+  const paragraphCount = canonicalEditorDraft.bodyMarkdown.split(/\n\s*\n/).filter(Boolean).length;
   return `<div class="editor-page">${pageHeader({
     eyebrow: `内容 · ${work.revision}`,
-    title: work.title,
-    description: `最后冻结于 ${work.frozenAt} · ${work.wordCount.toLocaleString("zh-CN")} 字 · ${work.sourceCount} 个来源`,
-    actions: `${button("保存本页草稿", { action: "save-revision" })}${button("冻结并生成变体", { route: `/app/works/${work.id}/variants`, variant: "primary", iconName: "arrow" })}`
+    title: canonicalEditorDraft.title,
+    description: `本地编辑工作区 · 冻结基线 ${work.revision} · ${work.sourceCount} 个来源`,
+    actions: `${button("导入文稿", { action: "open-import", iconName: "external" })}${button("保存本页草稿", { action: "save-revision" })}${button("查看平台变体", { route: `/app/works/${work.id}/variants`, variant: "primary", iconName: "arrow" })}`
   })}<div class="editor-grid">
-    <aside class="editor-outline" aria-label="文章结构"><div class="panel-title"><h2>编辑导航</h2><span>5 项</span></div><nav><a class="active" href="#editor-title">文章标题</a><a href="#editor-summary">导语</a><a href="#editor-body">正文</a><a href="#article-preview">HTML 预览</a><a href="#save-state">保存状态</a></nav><div class="outline-meta"><span>当前 revision</span><strong class="mono">${escapeHtml(work.revision)}</strong><span>内容哈希</span><strong class="mono">${escapeHtml(work.hash)}</strong></div></aside>
-    <section class="editor-canvas" aria-labelledby="editor-title"><div class="rich-toolbar" role="toolbar" aria-label="正文格式"><button type="button" aria-label="加粗"><strong>B</strong></button><button type="button" aria-label="二级标题">H2</button><button type="button" aria-label="引用">“”</button><button type="button" aria-label="项目列表">•—</button><span class="toolbar-separator"></span><span class="save-state" id="save-state" role="status" aria-live="polite">固定 fixture · 尚无本页改动</span></div><div class="editor-fields"><label for="editor-title">文章标题</label><textarea id="editor-title" rows="2">${escapeHtml(work.title)}</textarea><label for="editor-summary">导语</label><textarea id="editor-summary" rows="3">${escapeHtml(work.summary)}</textarea><label for="editor-body">正文</label><textarea id="editor-body" rows="18">真正可靠的“一键发布”，不是少点一次按钮，而是让每个平台收到适合它、又能追溯到同一事实源的内容。\n\n一个作品可以有多个平台变体，但事实、来源与披露应绑定到同一 ContentRevision。普通微博与微博长博文不是同一发布项，头条文章和微头条也不能靠截断字符来假装差异化。\n\n当平台没有返回可核验 ID 或公开 URL 时，结果只能是“待核对”，系统必须禁止盲目重发。</textarea></div></section>
-    <aside class="inspector" aria-label="检查与 HTML 预览"><div class="inspector-tabs"><span class="active">HTML 预览</span><span>检查摘要</span></div><div class="preview-frame"><div class="preview-label"><span>规范预览</span><span>白底 · 704 px</span></div><iframe id="article-preview" title="文章白底 HTML 规范预览" sandbox="" referrerpolicy="no-referrer"></iframe></div><div class="checklist"><div>${icon("check")}<span>8 个来源已绑定</span></div><div>${icon("check")}<span>AI 辅助披露已填写</span></div><div>${icon("check")}<span>HTML / MD 同 revision</span></div></div></aside>
+    <aside class="editor-outline" aria-label="文稿结构">
+      <div class="panel-title"><div><span class="panel-kicker">DOCUMENT</span><h2>文稿结构</h2></div><span class="source-format-badge" id="source-format-badge">基础稿</span></div>
+      <nav><a class="active" href="#editor-title">文章标题</a><a href="#editor-summary">导语</a><a href="#editor-body">Markdown 正文</a><a href="#article-preview">HTML 成品</a><a href="#import-state">导入状态</a></nav>
+      <dl class="outline-stats"><div><dt>正文字符</dt><dd id="editor-word-count">${bodyCount.toLocaleString("zh-CN")}</dd></div><div><dt>段落</dt><dd id="editor-paragraph-count">${paragraphCount}</dd></div><div><dt>来源</dt><dd id="editor-source-count">${canonicalEditorDraft.sourceCount}</dd></div></dl>
+      <div class="outline-meta"><span>冻结基线</span><strong class="mono">${escapeHtml(work.revision)}</strong><span>内容哈希</span><strong class="mono" id="editor-hash">${escapeHtml(work.hash)}</strong></div>
+    </aside>
+    <section class="editor-canvas" aria-label="Markdown 文稿编辑区">
+      <div class="document-toolbar-head"><div><span class="panel-kicker">LOCAL EDITOR</span><strong>Markdown 文稿</strong></div><span class="document-mode">本机内存 · 未上传</span></div>
+      <div class="import-strip" data-import-dropzone>
+        <div class="import-strip-copy">${icon("external")}<div><strong>从现有文稿开始</strong><span id="import-help">支持不超过 256 KiB 的 .md、.markdown、.html、.htm；过密结构会安全拒绝，文件不会上传。</span></div></div>
+        ${button("选择文件", { action: "open-import", variant: "quiet" })}
+        <input id="editor-import" class="editor-file-input" type="file" accept=".md,.markdown,.html,.htm,text/markdown,text/html" tabindex="-1" aria-label="导入 Markdown 或 HTML 文件" aria-describedby="import-help import-state">
+      </div>
+      <div class="rich-toolbar" role="toolbar" aria-label="Markdown 正文格式">
+        <span class="toolbar-label">格式</span>
+        <button type="button" data-action="format-editor" data-format="bold" aria-label="加粗选中文字" title="加粗 · ⌘B"><strong>B</strong></button>
+        <button type="button" data-action="format-editor" data-format="heading-2" aria-label="设为二级标题" title="二级标题">H2</button>
+        <button type="button" data-action="format-editor" data-format="quote" aria-label="设为引用" title="引用">“”</button>
+        <button type="button" data-action="format-editor" data-format="bullet-list" aria-label="设为项目列表" title="项目列表">•—</button>
+        <span class="toolbar-separator" aria-hidden="true"></span>
+        <span class="save-state" id="save-state" role="status" aria-live="polite">固定基线 · 尚无本页改动</span>
+      </div>
+      <div class="editor-fields">
+        <div class="field-heading"><label for="editor-title">文章标题</label><span id="editor-title-count">${titleCount} / 64</span></div>
+        <textarea id="editor-title" data-editor-field rows="2" maxlength="64">${escapeHtml(canonicalEditorDraft.title)}</textarea>
+        <div class="field-heading"><label for="editor-summary">导语</label><span id="editor-summary-count">${summaryCount} / 160</span></div>
+        <textarea id="editor-summary" data-editor-field rows="3" maxlength="160">${escapeHtml(canonicalEditorDraft.summary)}</textarea>
+        <div class="field-heading"><label for="editor-body">正文</label><span>Markdown · ⌘B 加粗 · 实时 HTML</span></div>
+        <textarea id="editor-body" data-editor-field rows="24" maxlength="${MAX_EDITOR_BODY_CHARACTERS}" spellcheck="true">${escapeHtml(canonicalEditorDraft.bodyMarkdown)}</textarea>
+        <div class="editor-footnote"><span id="import-state" role="status" aria-live="polite">尚未导入文件 · 当前使用 ${escapeHtml(work.revision)} 固定内容</span><span>刷新页面会丢失本页会话草稿</span></div>
+      </div>
+    </section>
+    <aside class="inspector" aria-label="HTML 成品预览与检查">
+      <div class="inspector-header"><div><span class="panel-kicker">DELIVERY</span><h2>HTML 成品预览</h2></div><span class="preview-format-badge">HTML</span></div>
+      <div class="preview-frame"><div class="preview-label"><span id="preview-state">冻结基线 · ${escapeHtml(work.revision)}</span><span>白底 · 704 px</span></div><iframe id="article-preview" title="文章白底 HTML 成品预览" sandbox="" referrerpolicy="no-referrer"></iframe></div>
+      <div class="preview-explainer"><div><strong>默认交付为 HTML</strong><span>Markdown 是同一安全草稿派生的可下载备份，不是第二套编辑真源。</span></div>${button("下载 MD 备份", { action: "download-markdown", variant: "quiet" })}</div>
+      <div class="checklist"><div id="preview-source-check">${icon("check")}<span>${canonicalEditorDraft.sourceCount} 个固定夹具来源已绑定</span></div><div id="preview-disclosure-check">${icon("check")}<span>固定夹具的 AI 辅助披露已填写</span></div><div id="preview-sync-check">${icon("check")}<span>HTML 成品与 MD 备份由同一固定草稿生成</span></div><div id="preview-import-check">${icon("clock")}<span>未导入本地文件</span></div></div>
+    </aside>
   </div></div>`;
 }
 

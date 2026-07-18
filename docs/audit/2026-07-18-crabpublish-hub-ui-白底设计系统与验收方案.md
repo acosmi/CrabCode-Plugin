@@ -28,7 +28,7 @@
 - 让用户在任何发布副作用前，看清“什么内容、哪个账号、哪种体裁、什么动作、什么时间”。
 - 区分原始作品、平台变体、预览、已批准版本和 Adapter 实际回读内容。
 - 对部分成功、审核中、需人工处理、设备离线和未知结果给出准确、可恢复的界面。
-- 将白底精排 HTML 作为默认阅读与下载交付，MD 作为同 revision 备份。
+- 将白底精排 HTML 作为默认阅读与下载交付，MD 作为同一安全草稿/冻结 revision 确定性派生的可下载备份。
 - 让编辑、审批、运营、安全和审计角色看到各自必要信息，不暴露 Cookie、token 或无关敏感数据。
 
 ### 2.2 非目标
@@ -110,10 +110,17 @@ flowchart LR
 | 区域 | 建议宽度 | 内容 |
 |---|---:|---|
 | 左侧导航/结构 | 224–240 px | 文档结构、素材、来源、版本 |
-| 中间编辑主区 | min 640 px | 标题、摘要、Tiptap 正文、图片/图注 |
+| 中间编辑主区 | min 640 px | 标题、摘要、Markdown 正文、图片/图注 |
 | 右侧检查/预览 | 360–420 px | 原创、来源、披露、HTML 预览、平台缺失项 |
 
-编辑器工具栏使用粘性定位，但不得遮挡 H1 或手机端键盘。粘贴外部 HTML 时先清洗并显示变更摘要；不在后台静默改写可见正文。
+编辑器工具栏使用粘性定位，但不得遮挡 H1 或手机端键盘。首版 fixture 使用受控 Markdown 文本区和确定性 AST 渲染管线，不冒充已实施 Tiptap；服务端协作编辑如后续需要，应另行论证 ArticleDoc/ProseMirror 数据模型与迁移。导入外部 HTML 时先清洗并明确显示“HTML 已清洗”；不在后台静默改写可见正文。
+
+本地导入首版约束：
+
+- 接受 `.md/.markdown` 与 `.html/.htm`，单文件不超过 256 KiB；另设同步复杂度预算（300000 work units、8192 个结构标记、4096 个换行），过密结构导入会拒绝、编辑会暂停实时预览。浏览器只读文件内容，不上传、不保存本地绝对路径、不写 localStorage/sessionStorage。
+- 导入后回填标题、导语和正文，立即同步右侧 HTML 成品预览；UI 不新增 Markdown 预览页签，避免把“导入格式”误解为“两套成品预览”。
+- 导入、编辑、保存本页会话草稿都不等于生成或冻结 revision；刷新后允许丢失，界面必须如实标示。
+- 正文格式工具必须产生真实 Markdown 变换并同步预览，不得使用无动作的装饰按钮。
 
 ### 5.3 平台变体
 
@@ -234,7 +241,9 @@ UI 字体栈：
 
 ### 7.3 HTML 与 MD
 
-HTML 是默认用户呈现，MD 是同 revision 备份。UI 不提供两个互不相关的文本编辑器；ArticleDoc/Tiptap JSON 是交互事实源，HTML 和 MD 确定性渲染。两者可见文本、链接、图片、图注、来源和披露必须对等。
+HTML 是默认用户呈现，MD 是同一安全草稿或冻结 revision 的可下载备份。UI 不提供两个互不相关的文本编辑器，也不因支持 `.html`/`.md` 导入而新增双预览页签。当前本地 fixture 以 `EditorDraft`（标题、导语、规范化安全 Markdown 正文、作者/来源/披露状态）为唯一交互事实源，HTML 和 MD 由同一次 artifact 生成确定性派生；未来若引入 ArticleDoc/Tiptap JSON，必须提供明确迁移与等价性测试。
+
+安全对等规则：原始导入件不等于 MD 备份。原始 HTML、危险协议、远程图片和可执行结构在进入 `EditorDraft` 前被移除；安全 HTTP(S) 链接降级为可见 URL 文本，图片只保留可见替代文字。HTML 与 MD 必须对这些规范化后的可见文本、标题层级、列表、表格、作者、来源和披露保持对等，不承诺保留被安全策略拒绝的主动链接或远程媒体。
 
 ## 八、组件系统
 
@@ -333,7 +342,10 @@ HTML 是默认用户呈现，MD 是同 revision 备份。UI 不提供两个互�
 ## 十二、前端安全与隐私
 
 - 用户输入 HTML 按 allowlist 清洗，禁止 script、事件属性、危险 URL、任意 iframe 和远端 CSS。
-- 预览使用无权限、opaque-origin 的 `iframe sandbox=""`；禁止增加 `allow-scripts`、`allow-same-origin`、表单、弹窗或顶层导航权限。规范文章由本地构建产物 `/article-preview.html` 提供，不使用会继承父页 CSP 并导致样式失效的 `srcdoc`；该响应只允许同源父页嵌入，并独立使用 `default-src 'none'`、`style-src 'unsafe-inline'`、`img-src data:`、`connect/frame/object/form/base none` 的 CSP，配合 `referrerPolicy=no-referrer`。
+- Markdown 原始 HTML、危险协议与远程图片在规范化 AST 中移除；HTML 导入先清洗完整 HAST，再从清洗树选择 `main/article/body` 并通过维护中的 `hast-util-to-mdast` 转换。脚本、样式、表单、iframe、SVG、事件属性和远程媒体不得穿透。导入文件只在浏览器内存读取，受 256 KiB 与同步复杂度双预算约束，不上传、不持久化内容或路径。
+- 导入文稿不得继承固定 fixture 的作者、来源数或 AI 披露；固定稿一旦编辑也立即失效。这些字段进入 `EditorDraft`，变更后默认 `pending_review`，UI 明示“未通过冻结门”。标题/导语统一执行 64/160 UTF-16 字符约束。
+- 实时 artifact 生成使用 250 ms 防抖与 generation token；新导入、保存、换页会取消旧计时器。每次草稿导航替换 iframe 节点，只有该节点自身的 opaque iframe `load` 后才能显示“HTML 成品与 MD 备份已同步”。
+- 预览使用无权限、opaque-origin 的 `iframe sandbox=""`；禁止增加 `allow-scripts`、`allow-same-origin`、表单、弹窗或顶层导航权限。规范文章由本地构建产物 `/article-preview.html` 提供；本页会话草稿由可撤销的 Blob URL 提供，并在更新/换页时撤销旧 URL。两者都不使用 `srcdoc`，预览文档独立使用 `default-src 'none'`、`style-src 'unsafe-inline'`、`img-src data:`、`connect/frame/object/form/base none` 的 CSP，配合 `referrerPolicy=no-referrer`。父页 `frame-src` 仅开放 `'self' blob:`，不开放远程 frame。
 - 首版预览不使用 `postMessage`。未来确需通信时，上位安全方案必须先冻结消息 schema、来源/目标 origin、nonce 与负向测试，UI 文档不得自行放宽。
 - 前端不接收、存储、打印或导出平台 Cookie、localStorage、密码、短信码或原始 refresh token。
 - 截图、trace 和 EvidencePanel 只使用脱敏资产，显示采集时间、哈希、Adapter 版本和脱敏状态。
@@ -444,11 +456,11 @@ Hub UI 进入 production 前必须同时满足：
 ### 17.1 已完成
 
 - 独立插件：`plugins/crabcode-media-publisher/`，未修改 `CrabCode` 仓库，也未启用任何真实发布副作用。
-- 本地 Hub：11 个业务/QA 页面（13 个静态路由文档，含兼容别名）、白底系统、编辑与 HTML/MD 同 revision 备份、平台变体、批次、审批、结果、账号能力、审计、Edge 和敌意状态页。
+- 本地 Hub：11 个业务/QA 页面（13 个静态路由文档，含兼容别名）、白底系统、HTML/Markdown 本地导入、单一草稿派生 HTML 成品与 MD 备份、真实格式工具、会话草稿状态、平台变体、批次、审批、结果、账号能力、审计、Edge 和敌意状态页。
 - 可执行契约：46 个代码设计令牌；侧栏浅灰、工作区纯白、卡片/胶囊无装饰描边，输入/选择/编辑区域保留 3:1 必要边界；五维领域状态及其不可变 presentation/allowed-actions 映射。
-- 安全：独立本地 HTML 产物 + opaque sandbox 预览、预览/父页分离 CSP、Host allowlist、方法限制、无远程 runtime 资产、无浏览器凭据存储、固定 fixture、真实批准与平台提交 fail closed。
-- 自动化：16 个 unit/domain/security 测试；Nu 对 15 份实际构建 HTML 零错误；11 路由 axe、opaque iframe 独立 axe、键盘/live-region/移动导航、dark-preference 白底、200%/400% 等价 reflow 和 forced-colors 必要边界恢复。
-- 视觉：30 张 Chrome `150.0.7871.116` 固定基线，覆盖 1440、820、390、320、高风险状态、实际嵌入文章 iframe 和 A4 print media；最终禁止更新基线的独立复验为 37/37 通过。
+- 安全：本地文件仅内存读取、Markdown 原始 HTML 关闭、HTML allowlist 清洗、独立本地/Blob HTML 产物 + opaque sandbox 预览、预览/父页分离 CSP、旧 Blob URL 撤销、Host allowlist、方法限制、无远程 runtime 资产、无浏览器凭据存储、固定 fixture、真实批准与平台提交 fail closed。
+- 自动化：25 个 unit/domain/security 测试；Nu 对 15 份实际构建 HTML 零错误；11 路由 axe、opaque iframe 独立 axe、HTML/Markdown 敌意导入、格式工具、键盘/live-region/移动导航、dark-preference 白底、200%/400% 等价 reflow 和 forced-colors 必要边界恢复。
+- 视觉：30 张 Chrome `150.0.7871.116` 固定基线，覆盖 1440、820、390、320、高风险状态、专业编辑器、实际嵌入文章 iframe 和 A4 print media；最终禁止更新基线的独立复验为 39/39 通过。
 
 截图基线路径：`plugins/crabcode-media-publisher/tests/browser/snapshots/chrome-150-macos/`。
 

@@ -41,9 +41,10 @@ const appCss = await readFile(resolve(pluginRoot, "apps/publisher-app/src/styles
 for (const selector of ["html", "body", "#app"]) {
   if (!appCss.includes(selector)) errors.push(`styles.css: missing explicit ${selector} white-surface rule`);
 }
-const article = await readFile(resolve(pluginRoot, "apps/publisher-app/src/article-preview.ts"), "utf8");
-if (!article.includes("default-src 'none'")) errors.push("article-preview.ts: strict preview CSP is missing");
-if (!article.includes("background: #fff !important")) errors.push("article-preview.ts: explicit white article surface is missing");
+const articleRenderer = await readFile(resolve(pluginRoot, "apps/publisher-app/src/editor-document.ts"), "utf8");
+if (!articleRenderer.includes("default-src 'none'")) errors.push("editor-document.ts: strict preview CSP is missing");
+if (!articleRenderer.includes("background: #fff !important")) errors.push("editor-document.ts: explicit white article surface is missing");
+if (!articleRenderer.includes("allowDangerousHtml: false")) errors.push("editor-document.ts: raw Markdown HTML must remain disabled");
 
 if (errors.length > 0) {
   process.stderr.write(`${errors.join("\n")}\n`);
