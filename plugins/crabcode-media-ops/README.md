@@ -1,6 +1,12 @@
-# crabcode-media-ops 0.4.1
+# crabcode-media-ops 0.4.2
 
 可审计的新媒体运营插件：参考材料防火墙、联网可信来源研究、独立原创风险复核、创作者风格管理、精排白底 HTML 交付、可信身份约束的审批，以及冻结发布包。
+
+## 0.4.2 变更（分发验证硬化）
+
+- **CI 分发门禁在 Linux 实跑**：media-ops job 运行于 Playwright 官方容器镜像，该镜像不含 `unzip`，导致 `setup-bun` 解包 bun 失败、其后 `check:distribution` 等步骤从未在 Linux 执行。现于 `setup-bun` 前补装 `unzip`，使整个 media-ops job（含 `check:distribution` 冷启动 smoke 与全套 QA）首次在 Linux 走通。
+- **dist Linux 字节确定性确证**：经精确 CI 容器（digest 锁定）本地复现，`check:distribution` 重建的 `dist/server.js` 与入库产物字节一致，像素级黄金截图与全套测试（109 单测 + 全 QA）全绿；本版 `dist/server.js` 以 Linux 容器权威重建。
+- **运行时功能与 0.4.1 等价**：仅 `VERSION` 串更新与 dist 平台权威重建，无工具/schema/存储变化（工具数 38，`SCHEMA_VERSION=2` 不变）。
 
 ## 0.4.1 变更（MCP 可用性修复）
 

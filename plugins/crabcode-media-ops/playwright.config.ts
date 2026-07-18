@@ -6,6 +6,12 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   retries: 0,
+  // The full fail-closed delivery QA test drives Nu (JVM) + Chromium + axe end to
+  // end; its wall time swings with runner load (observed 14.6s / 23.4s / 30.4s) and
+  // once hit 30.4s — past Playwright's 30s default, a pure timeout, not an assertion
+  // failure (the same work gets 180s under `test:qa`). 120s leaves ample headroom;
+  // fast golden-screenshot tests finish in <2s regardless.
+  timeout: 120_000,
   forbidOnly: Boolean(process.env.CI),
   reporter: 'list',
   outputDir: 'test-results/playwright',
