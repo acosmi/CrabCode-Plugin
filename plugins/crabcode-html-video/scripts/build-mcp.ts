@@ -48,7 +48,9 @@ if (!result.success) {
 const serverPath = join(dist, 'server.js')
 const bundled = readFileSync(serverPath, 'utf8')
 const portable = bundled.replace(
-  /var __dirname = "[^"]*\/node_modules\/esbuild\/lib", __filename = "[^"]*\/node_modules\/esbuild\/lib\/main\.js";/,
+  // Windows builds embed escaped backslash separators, POSIX builds forward
+  // slashes; match either so the marker is found on every build platform.
+  /var __dirname = "[^"]*[\/\\]node_modules[\/\\]+esbuild[\/\\]+lib", __filename = "[^"]*[\/\\]node_modules[\/\\]+esbuild[\/\\]+lib[\/\\]+main\.js";/,
   'var __dirname = import.meta.dir, __filename = import.meta.path;',
 )
 if (portable === bundled) throw new Error('expected bundled esbuild path marker was not found')

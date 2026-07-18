@@ -22,6 +22,10 @@ import {
   validateReferences,
 } from "../src/policy/referenceValidator.ts";
 import {
+  formatMcpContractIssues,
+  validateMcpContract,
+} from "../src/policy/mcpContractValidator.ts";
+import {
   formatPresentationIssues,
   validatePresentation,
 } from "../src/policy/presentationValidator.ts";
@@ -82,6 +86,13 @@ if (references.length > 0) {
   hasOutput = true;
   process.stderr.write(`[refs]\n${formatReferenceIssues(references, root)}\n`);
   if (references.some((issue) => issue.severity === "error")) hasError = true;
+}
+
+const mcpContract = await validateMcpContract(root);
+if (mcpContract.length > 0) {
+  hasOutput = true;
+  process.stderr.write(`[mcp-contract]\n${formatMcpContractIssues(mcpContract, root)}\n`);
+  if (mcpContract.some((issue) => issue.severity === "error")) hasError = true;
 }
 
 if (!hasOutput) {
