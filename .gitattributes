@@ -1,3 +1,20 @@
+# ---------------------------------------------------------------------------
+# Line-ending policy. Store and check out all text as LF on every platform so
+# content-sensitive checks (SHA-256 fingerprints, dist byte comparisons, shell
+# shebangs) are byte-identical on Windows, macOS, and Linux CI. Without this,
+# core.autocrlf=true leaves Windows worktrees CRLF while blobs/Linux stay LF, so
+# any hash of file bytes diverges by platform (see
+# tests/workflow-skill-presentation-completeness.test.ts).
+# ---------------------------------------------------------------------------
+* text=auto eol=lf
+
+# Binary assets — never convert. Git already auto-detects these; explicit for safety.
+*.png binary
+
+# Shell scripts are shebang-critical: a CRLF turns `#!/usr/bin/env bash` into
+# `…bash\r`, which fails to exec on Linux. Force LF regardless of auto-detection.
+*.sh text eol=lf
+
 # Generated bundles may contain semantically significant whitespace in template
 # literals. Keep source whitespace checks strict while treating dist as binary-like
 # build output for Git whitespace diagnostics.
