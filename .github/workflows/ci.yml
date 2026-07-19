@@ -66,6 +66,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      # The Playwright container image ships without unzip, which oven-sh/setup-bun
+      # needs to unpack the bun release archive. Without it setup-bun fails and the
+      # whole job (check:distribution + QA) never runs on Linux. Install it first.
+      # Verified against the pinned image by local container reproduction (audit 2026-07-18).
+      - name: Install unzip (Playwright image lacks it; required by setup-bun)
+        run: apt-get update && apt-get install -y --no-install-recommends unzip
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.11
