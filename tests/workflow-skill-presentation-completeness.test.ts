@@ -6,7 +6,7 @@ import { basename, join, resolve } from 'node:path'
 const root = resolve(import.meta.dir, '..')
 const EXPECTED_WORKFLOW_SKILLS = 315
 const EXPECTED_INVOCATION_SET_SHA256 = 'f7b0838eba63cdf4c8e37e00a86c91185d3af4d98a3bdb816d406477e9e036af'
-const EXPECTED_MODEL_CONTENT_SHA256 = '2795ffee87aabe044e0552512e2b905de00ed902fff373d91d464126eb38dc43'
+const EXPECTED_MODEL_CONTENT_SHA256 = '5b5846e3f4d6bd03c53f824c27d154825110fe0680ff51e3cda8e134a51fe587'
 const HAN = /[\u3400-\u9fff]/u
 
 function sha256(value: string): string {
@@ -50,7 +50,13 @@ describe('official workflow skill presentation completeness', () => {
       for (const relativeSkillPath of manifest.skills ?? []) {
         const invocationName = basename(relativeSkillPath.replace(/[\\/]+$/, ''))
         const invocationKey = `${entry.name}:${invocationName}`
-        const text = readFileSync(join(pluginRoot, relativeSkillPath, 'SKILL.md'), 'utf8')
+        // Canonicalize to LF so the content fingerprint is byte-identical on every
+        // platform. Windows checkouts are CRLF under autocrlf while CI/Linux is LF;
+        // hashing raw bytes would otherwise diverge by platform.
+        const text = readFileSync(join(pluginRoot, relativeSkillPath, 'SKILL.md'), 'utf8').replace(
+          /\r\n?/g,
+          '\n',
+        )
         const displayName = frontmatterScalar(text, 'name')
         const shortDescription = frontmatterScalar(text, 'short-description')
         const shortLength = Array.from(shortDescription).length
