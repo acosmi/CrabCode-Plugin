@@ -128,7 +128,13 @@ afterEach(async () => {
   }
 })
 
-describe('CrabAccount Bash client', () => {
+// The CrabAccount client is a POSIX Bash script run via its shebang. Native
+// Windows cannot exec a .sh directly (ENOENT), and this harness relies on a
+// POSIX PATH (`:` separator) plus a Bash fake-curl, so the suite is POSIX-only.
+// Linux CI is the authoritative environment and exercises every assertion below.
+const describeClient = process.platform === 'win32' ? describe.skip : describe
+
+describeClient('CrabAccount Bash client', () => {
   test('passes shell syntax checks and enforces URL, permission, and symlink policy', async () => {
     const syntax = Bun.spawnSync([
       'bash',
