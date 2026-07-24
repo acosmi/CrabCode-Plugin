@@ -235129,6 +235129,10 @@ import { accessSync as accessSync3, constants as constants7, existsSync as exist
 import { join as join55 } from "path";
 import { delimiter as delimiter2 } from "path";
 import { spawnSync as spawnSync5 } from "child_process";
+function probeCandidate(path16) {
+  const probe = probeBrowserExecutable(path16);
+  return probe.ok ? { path: path16, probe } : null;
+}
 function probeBrowserExecutable(path16) {
   if (!isExecutableFile(path16))
     return { ok: false, versionLine: null, error: "not an executable file" };
@@ -235149,8 +235153,9 @@ ${result.stderr || ""}`.split(`
 }
 function resolveBrowserPath(cacheDir) {
   const env3 = process.env.HYPERFRAMES_BROWSER_PATH || process.env.PRODUCER_HEADLESS_SHELL_PATH || process.env.PUPPETEER_EXECUTABLE_PATH || process.env.CHROME_PATH;
-  if (env3 && probeBrowserExecutable(env3).ok) {
-    return { path: env3, source: "env", message: `Using browser from env: ${env3}` };
+  const fromEnv = env3 ? probeCandidate(env3) : null;
+  if (fromEnv) {
+    return { ...fromEnv, source: "env", message: `Using browser from env: ${fromEnv.path}` };
   }
   const roots = [
     cacheDir,
@@ -235159,7 +235164,7 @@ function resolveBrowserPath(cacheDir) {
   for (const root2 of roots) {
     const found = findBinary(root2, CHROME_NAMES, PINNED_CHROME_VERSION);
     if (found) {
-      return { path: found, source: "cache", message: `Found browser in cache: ${found}` };
+      return { ...found, source: "cache", message: `Found browser in cache: ${found.path}` };
     }
   }
   for (const name52 of [
@@ -235168,14 +235173,16 @@ function resolveBrowserPath(cacheDir) {
     "google-chrome",
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
   ]) {
-    const executable = name52.startsWith("/") ? probeBrowserExecutable(name52).ok ? name52 : null : findExecutableOnPath(name52);
-    if (executable)
-      return { path: executable, source: "system", message: `Using system browser: ${executable}` };
+    const executable = name52.startsWith("/") ? probeCandidate(name52) : findExecutableOnPath(name52);
+    if (executable) {
+      return { ...executable, source: "system", message: `Using system browser: ${executable.path}` };
+    }
   }
   return {
     path: null,
     source: "missing",
-    message: "No browser found. Run doctor to download chrome-headless-shell (npmmirror mirror supported), or set HYPERFRAMES_BROWSER_PATH."
+    message: "No browser found. Run doctor to download chrome-headless-shell (npmmirror mirror supported), or set HYPERFRAMES_BROWSER_PATH.",
+    probe: null
   };
 }
 function findBinary(root2, names, requiredVersion) {
@@ -235195,8 +235202,11 @@ function findBinary(root2, names, requiredVersion) {
     for (const entry of entries3) {
       visited += 1;
       const candidate = join55(current, entry.name);
-      if (entry.isFile() && wanted.has(entry.name) && (!requiredVersion || candidate.includes(requiredVersion)) && probeBrowserExecutable(candidate).ok)
-        return candidate;
+      if (entry.isFile() && wanted.has(entry.name) && (!requiredVersion || candidate.includes(requiredVersion))) {
+        const probed = probeCandidate(candidate);
+        if (probed)
+          return probed;
+      }
       if (entry.isDirectory())
         pending.push(candidate);
     }
@@ -235207,9 +235217,9 @@ function findExecutableOnPath(name52) {
   for (const root2 of (process.env.PATH || "").split(delimiter2)) {
     if (!root2)
       continue;
-    const candidate = join55(root2, process.platform === "win32" ? `${name52}.exe` : name52);
-    if (probeBrowserExecutable(candidate).ok)
-      return candidate;
+    const probed = probeCandidate(join55(root2, process.platform === "win32" ? `${name52}.exe` : name52));
+    if (probed)
+      return probed;
   }
   return null;
 }
@@ -235253,16 +235263,18 @@ async function ensureBrowser(opts) {
           log(`download ${Math.floor(downloaded / total * 100)}%`);
       }
     });
-    if (installed.executablePath && probeBrowserExecutable(installed.executablePath).ok) {
-      process.env.HYPERFRAMES_BROWSER_PATH = installed.executablePath;
-      process.env.PRODUCER_HEADLESS_SHELL_PATH = installed.executablePath;
-      return { path: installed.executablePath, source: "cache", message: `Installed browser: ${installed.executablePath}` };
+    const probed = installed.executablePath ? probeCandidate(installed.executablePath) : null;
+    if (probed) {
+      process.env.HYPERFRAMES_BROWSER_PATH = probed.path;
+      process.env.PRODUCER_HEADLESS_SHELL_PATH = probed.path;
+      return { ...probed, source: "cache", message: `Installed browser: ${probed.path}` };
     }
   } catch (error40) {
     return {
       path: null,
       source: "missing",
-      message: `Browser install failed: ${error40 instanceof Error ? error40.message : String(error40)}. Set HYPERFRAMES_BROWSER_PATH or install chromium manually.`
+      message: `Browser install failed: ${error40 instanceof Error ? error40.message : String(error40)}. Set HYPERFRAMES_BROWSER_PATH or install chromium manually.`,
+      probe: null
     };
   }
   const after3 = resolveBrowserPath(opts.cacheDir);
@@ -235274,7 +235286,8 @@ async function ensureBrowser(opts) {
   return {
     path: null,
     source: "missing",
-    message: "Browser install reported success but binary not found in cache."
+    message: "Browser install reported success but binary not found in cache.",
+    probe: null
   };
 }
 function detectPlatform() {
@@ -254317,7 +254330,7 @@ async function handler8(raw2 = {}) {
     process.env.HYPERFRAMES_BROWSER_PATH = browser.path;
     process.env.PRODUCER_HEADLESS_SHELL_PATH = browser.path;
   }
-  const browserProbe = browser.path ? probeBrowserExecutable(browser.path) : { ok: false, versionLine: null, error: "browser not found" };
+  const browserProbe = browser.probe ?? { ok: false, versionLine: null, error: "browser not found" };
   checks4.browser = { ...browser, probe: browserProbe };
   checks4.paths = {
     pluginRoot: pluginRoot(),

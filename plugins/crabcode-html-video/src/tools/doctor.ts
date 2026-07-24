@@ -2,7 +2,6 @@ import {
   resolveFfmpegPath,
   resolveBrowserPath,
   ensureBrowser,
-  probeBrowserExecutable,
   probeProducer,
 } from '@crabcode/multi-segment'
 import { createHash } from 'node:crypto'
@@ -81,9 +80,11 @@ export async function handler(raw: unknown = {}): Promise<Envelope> {
     process.env.HYPERFRAMES_BROWSER_PATH = browser.path
     process.env.PRODUCER_HEADLESS_SHELL_PATH = browser.path
   }
-  const browserProbe = browser.path
-    ? probeBrowserExecutable(browser.path)
-    : { ok: false, versionLine: null, error: 'browser not found' }
+  // resolveBrowserPath/ensureBrowser never return a path they have not already
+  // qualified with `chrome --version`, so reuse that probe. Re-running it here
+  // spawned the browser a second time and doubled this tool's latency for a
+  // version line already in hand.
+  const browserProbe = browser.probe ?? { ok: false, versionLine: null, error: 'browser not found' }
   checks.browser = { ...browser, probe: browserProbe }
 
   // paths
