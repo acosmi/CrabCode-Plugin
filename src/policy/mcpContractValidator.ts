@@ -30,11 +30,7 @@ const CHANNEL_DECLARATION_BASELINE = new Set(["discord", "fakechat", "imessage",
 const INSTALL_ON_START_BASELINE = new Set(["discord", "fakechat", "imessage", "telegram"]);
 
 /** crabwork connectors shipped with empty placeholder URLs. */
-const EMPTY_URL_BASELINE = new Set([
-  "crabwork-bio-research", "crabwork-customer-support", "crabwork-data", "crabwork-design",
-  "crabwork-engineering", "crabwork-enterprise-search", "crabwork-hr", "crabwork-marketing",
-  "crabwork-operations", "crabwork-product-management", "crabwork-productivity", "crabwork-sales",
-]);
+const EMPTY_URL_BASELINE = new Set(["crabwork-bio-research", "crabwork-data"]);
 
 /** Plugins with floating (@latest / versionless npx / unpinned git) launcher versions. */
 const FLOATING_VERSION_BASELINE = new Set([

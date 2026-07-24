@@ -11,9 +11,9 @@
 | 类别 | 占位符 | 内置服务 | 其它可选 |
 |---|---|---|---|
 | ATS | `~~ATS` | — | Greenhouse、Lever、Ashby、Workable |
-| 日历 | `~~calendar` | Google Calendar | Microsoft 365 |
+| 日历 | `~~calendar` | — | Google Calendar、Microsoft 365 |
 | 聊天 | `~~chat` | Slack | Microsoft Teams |
-| 邮件 | `~~email` | Gmail、Microsoft 365 | — |
+| 邮件 | `~~email` | Microsoft 365 | Gmail |
 | HRIS | `~~HRIS` | — | Workday、BambooHR、Rippling、Gusto |
 | 知识库 | `~~knowledge base` | Notion、Atlassian(Confluence) | Guru、Coda |
 | 薪酬数据 | `~~compensation data` | — | Pave、Radford、Levels.fyi |

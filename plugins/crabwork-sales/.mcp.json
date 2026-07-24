@@ -40,14 +40,6 @@
       "type": "http",
       "url": "https://api.outreach.io/mcp/"
     },
-    "google calendar": {
-      "type": "http",
-      "url": ""
-    },
-    "gmail": {
-      "type": "http",
-      "url": ""
-    },
     "similarweb": {
       "type": "http",
       "url": "https://mcp.similarweb.com/mcp"
