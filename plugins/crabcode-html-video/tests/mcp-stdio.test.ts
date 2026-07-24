@@ -75,6 +75,12 @@ describe('MCP stdio contract', () => {
     expect(JSON.stringify(result.content)).toContain('Input validation error')
   })
 
+  // doctor is an open-world probe: it spawns `ffmpeg -version` and resolves the
+  // browser by spawning `chrome --version` (once to pick the binary, once for the
+  // reported versionLine), each capped at 10s inside the tool. Bun's 5s default is
+  // therefore smaller than the tool's own budget — this test cost 2.5s on a fast
+  // runner and went hard red once the image's Chrome startup regressed ~3x. Give it
+  // the same allowance the other external-binary tests use.
   test('security bootstrap removes inherited provider credentials before server import', async () => {
     const connected = await connect({
       VENDOR_API_KEY: 'must-not-enter-sidecar',
@@ -114,5 +120,5 @@ describe('MCP stdio contract', () => {
     expect(JSON.stringify(result.structuredContent)).not.toContain('must-not-enter-sidecar')
     expect(JSON.stringify(result.structuredContent)).not.toContain('opaque-name-must-not-bypass-allowlist')
     expect(JSON.stringify(result.structuredContent)).not.toContain('allowed-render-worker-secret')
-  })
+  }, 60_000)
 })

@@ -136,7 +136,9 @@ describe('seek-shim', () => {
         await browser.close()
       }
     },
-    30_000,
+    // A cold Chromium launch on a hosted runner has been observed at 27.4s, which
+    // left this 2.6s from failing at the previous 30s allowance.
+    60_000,
   )
 
   test('hooks producer seek and applies a browser-layer network deny policy', () => {
