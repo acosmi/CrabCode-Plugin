@@ -47,7 +47,7 @@
 - `FULL-PORT.patch` 为 `475580` 字节，SHA-256 为 `da912e2ca5e002816ccb9ee3818ea30ff46fe6a9788a0df17fbe05894b99ba08`。重放不是“对空目录只应用一个 patch”：校验器先在空临时目录按锁定路径和 mode materialize 固定上游的 25 个 blob，再以 `git apply -p2` 重建目标的 25 个路径、mode 和字节。
 - 活动 `.crabcode-plugin/marketplace.json` 中 `crabcode-security` 实得 `0` 条；这个 selector 零匹配只作为 promotion 快照，不绑定无关的 Marketplace 元数据版本。候选条目仅保存在 `TARGET-MARKETPLACE-ENTRY.json`，状态为 `staged-not-active`，其规范 SHA-256 为 `32cdc33f271035c5e418214e7d9dccaf58058fce7d8804e0303e676ebcafe090`。
 - patch generator、sealer 和 verifier 的版本、字节数、SHA-256，显式 normalization 规则及 seal 环境均已写入 `SOURCE-LOCK.json`；`bun run scripts/build-crabcode-security-port-patch.ts --check <完整上游 checkout>` 可复算 patch，`bun run scripts/verify-crabcode-security-port.ts <完整上游 checkout>` 已执行 `505` 项检查。
-- 当前证据尚未进入最终公开 commit，因此是“本地可复现 seal”，不是不可变发布封存；commit/CI Gate 仍开放。
+- 当前证据已进入公开候选分支 `codex/crabcode-security-full-port-20260724` 的实现提交 `49b9c68afbbf648b34033686007334545d5e0842` 并推送；内容已 commit-pinned，但 review、commit-bound CI、合并与发布 Gate 仍开放，因此不是不可变发布封存。
 
 ## 3. 允许的改动轴
 
@@ -105,16 +105,16 @@
 
 ## 5. 逐文件改动、证据与残余账本
 
-“改名”按相对插件根的完整路径判断；父目录改名也记为“是”。“具体修改点”说明实际差异，而不是重复抽象改动轴。三个 Python 脚本和 `scan.js` 进一步列出主要逻辑 hunk，避免以品牌替换掩盖目标侧安全加固。表中未带目录的插件测试名均位于 `tests/crabcode-security/`，Core 测试名位于私有 Core 的 `tests/unit/` 或 `apps/agent-worker/tests/`；不使用模糊通配符代替证据定位。“完整 patch 人审”与自动测试分开命名，不能把人工阅读冒充机器证明。Core 相关项只标记为未提交 preview 旁证，绑定私有审计归档 SHA256 `ac44903283333577424e09f817e8b31a1de1701a5ba7b723ce0b209193b399d3`，不与插件仓内可重放证据混称稳定发布证明。机器证据只证明确定性合同；“未关闭”栏保留不能从源码重放、人工差异复核或单元测试推出的事项。
+“改名”按相对插件根的完整路径判断；父目录改名也记为“是”。“具体修改点”说明实际差异，而不是重复抽象改动轴。三个 Python 脚本和 `scan.js` 进一步列出主要逻辑 hunk，避免以品牌替换掩盖目标侧安全加固。表中未带目录的插件测试名均位于 `tests/crabcode-security/`，Core 测试名位于私有 Core 的 `tests/unit/` 或 `apps/agent-worker/tests/`；不使用模糊通配符代替证据定位。“完整 patch 人审”与自动测试分开命名，不能把人工阅读冒充机器证明。Core 相关项标记为候选提交 `869045f3e857a3c81d8d8e83d78cbeed8d64219f` 的预提交本地验证旁证，绑定私有审计归档 SHA256 `7b66968d569e2308c68175110be4fe81728015eb23253f320723bc2ec0805860`；它不是 commit-bound 远程 CI、制品或稳定发布证明，也不与插件仓内可重放证据混称。机器证据只证明确定性合同；“未关闭”栏保留不能从源码重放、人工差异复核或单元测试推出的事项。
 
-| # | 改名 | 具体修改点 | 审计证据 / preview 旁证 | 尚未关闭 |
+| # | 改名 | 具体修改点 | 审计证据 / Core 候选提交旁证 | 尚未关闭 |
 |---:|:---:|---|---|---|
 | 1 | 是 | `.claude-plugin`→`.crabcode-plugin`；名称、派生版本、描述、作者、许可证字段、关键词和 Skill 声明适配 CrabCode；描述补充可信仓库和模型提供方边界。 | `source-integrity.test.ts`；manifest/presentation validators；505 项 verifier | 正式最低 Core 版本 Gate、真实安装/升级路径 |
-| 2 | 否 | 仅对复制法律文本中的产品/主体品牌执行逐处文本替换；段落结构和条款次序保留。 | `source-integrity.test.ts`；完整 patch 重放 | 不产生运行时行为；最终发布审阅仍需绑定实际 commit |
+| 2 | 否 | 仅对复制法律文本中的产品/主体品牌执行逐处文本替换；段落结构和条款次序保留。 | `source-integrity.test.ts`；完整 patch 重放 | 不产生运行时行为；最终发布审阅须绑定 `49b9c68afbbf648b34033686007334545d5e0842` 或明确后继提交 |
 | 3 | 否 | README 品牌、命令、路径、变量和产物前缀适配；新增 runtime 未发布警告、可信仓库/已加载项目配置边界、模型推理数据去向、原子 snapshot/owner marker、scratch 非沙箱及不自动 apply/commit/push 说明。 | `source-integrity.test.ts`；brand/reference validators | 用户理解度、真实安装器和 CLI/GUI 体验 |
 | 4 | 否 | 私密披露入口改为真实 CrabCode Security Advisory；版本路径、in/out-of-scope、可信仓库、模型数据和“不可信仓库需 OS 隔离 + clean profile”边界重写。 | `source-integrity.test.ts`；brand/reference validators | Security/Privacy owner 签署与事故演练 |
-| 5 | 是 | 主 Agent 与命令/Workflow/子 Agent namespace 全量改名；`opus/xhigh` 映射为 `best/max`；把上游既有 `initialPrompt`、插件根变量和显式可调用 Agent allowlist 适配到 CrabCode，保留固定启动确认和不自动提交合同。 | `source-integrity.test.ts`；完整 patch 人审；Core `workflow-agent-contract`、main-agent scope 为 preview 旁证 | AppServer 动态 `--agents` 定义合同；模型端到端质量 |
-| 6 | 否 | `sonnet/xhigh` 映射为 `inherit/max`；把已在会话建立时加载的配置与工具新读到的文件副本明确分层，保留绝对 `SCAN_ROOT` 和只读探索。 | `source-integrity.test.ts`；完整 patch 人审；Core 嵌套 Agent/权限测试为 preview 旁证 | 提示注入防护的模型统计效果；hostile repository 不受支持 |
+| 5 | 是 | 主 Agent 与命令/Workflow/子 Agent namespace 全量改名；`opus/xhigh` 映射为 `best/max`；把上游既有 `initialPrompt`、插件根变量和显式可调用 Agent allowlist 适配到 CrabCode，保留固定启动确认和不自动提交合同。 | `source-integrity.test.ts`；完整 patch 人审；Core `869045f3` 的 `workflow-agent-contract`、main-agent scope 本地测试旁证 | AppServer 动态 `--agents` 定义合同；模型端到端质量 |
+| 6 | 否 | `sonnet/xhigh` 映射为 `inherit/max`；把已在会话建立时加载的配置与工具新读到的文件副本明确分层，保留绝对 `SCAN_ROOT` 和只读探索。 | `source-integrity.test.ts`；完整 patch 人审；Core `869045f3` 的嵌套 Agent/权限本地测试旁证 | 提示注入防护的模型统计效果；hostile repository 不受支持 |
 | 7 | 否 | effort 与 `explore` namespace 适配；生成器职责、scratch 内编辑、单 finding 和不得写 live checkout 的合同保持。 | `source-integrity.test.ts`；patch 脚本状态机测试；完整 patch 人审 | 真实项目测试的 OS 级隔离只属于未来不可信仓库范围 |
 | 8 | 否 | effort 与 `explore` namespace 适配；独立 verifier、三项 confidence claim、测试与 reviewed paths 合同保持。 | `source-integrity.test.ts`；patch 脚本状态机测试；完整 patch 人审 | 随机 verifier 判断质量和真实项目测试覆盖 |
 | 9 | 否 | 产品品牌与模型别名适配；把仓库工具新读内容限定为数据，同时承认已加载项目配置；保留上游按顶层目录分区和列账的 Agent 职责。根文件也进入覆盖账本的扩展实际发生在第 17、20、24 行，不归功于本文件。 | `source-integrity.test.ts`；完整 patch 人审；`workflow.test.ts`、`workflow-edge-cases.test.ts` 仅作为跨文件调度旁证 | 模型组件划分质量；不可信仓库 clean profile |
@@ -129,11 +129,11 @@
 | 18 | 是 | Skill 身份、Workflow/Agent allowlist、命令、路径变量和报告前缀适配；增加中文 `name`/`short-description`；安全说明区分已加载配置与新读数据，披露模型提供方，并明确不支持不可信仓库。 | `source-integrity.test.ts`；presentation/reference validators；完整 patch 人审 | 真实菜单、权限提示和旧 Core 拒绝 UX |
 | 19 | 是 | Workflow/品牌适配；Git 读增加 `GIT_OPTIONAL_LOCKS=0`；branch/PR/commit 先冻结完整 ENDPOINT，不在后续偷换 HEAD；改用 helper 原子创建 run 与 endpoint snapshot，Workflow 只读 analysis root，并沿用严格 renderer。 | `source-integrity.test.ts`；`scripts.test.ts`；`scripts-edge-cases.test.ts`；`write-scan-meta.test.ts`；完整 patch 人审；`workflow.test.ts`、`workflow-edge-cases.test.ts` 为跨文件间接证据 | branch/PR/commit 三路径真实 CLI/GUI E2E |
 | 20 | 是 | Workflow/品牌适配；Git 读禁止 index refresh；由手工 `mkdir` 改为 helper 原子 owner-bound run；clean/dirty/non-Git 均读取冻结 analysis root；覆盖账本由目录扩展到所有 immediate root entries。 | `source-integrity.test.ts`；`scripts.test.ts`；`scripts-edge-cases.test.ts`；`write-scan-meta.test.ts`；完整 patch 人审；`workflow.test.ts`、`workflow-edge-cases.test.ts` 为跨文件间接证据 | 全库/限定范围/非 Git 的真实制品 E2E |
-| 21 | 是 | 品牌/Agent namespace 适配；在选 finding 前执行 `--validate-report`，由 `--prepare-run` 返回 nonce/owner-bound 路径；固定 PATCH BASE 和 validated paths，在 scratch checkout 顺序生成/验证；renderer 对 diff/REVIEWED_PATHS/owner/hash 做全量预检并只清理 marker-bound 路径。 | `scripts.test.ts`；`scripts-edge-cases.test.ts`；Core 嵌套 Agent/取消测试仅为 preview 旁证 | 真实大型仓项目测试、崩溃恢复和磁盘压力 |
+| 21 | 是 | 品牌/Agent namespace 适配；在选 finding 前执行 `--validate-report`，由 `--prepare-run` 返回 nonce/owner-bound 路径；固定 PATCH BASE 和 validated paths，在 scratch checkout 顺序生成/验证；renderer 对 diff/REVIEWED_PATHS/owner/hash 做全量预检并只清理 marker-bound 路径。 | `scripts.test.ts`；`scripts-edge-cases.test.ts`；Core `869045f3` 的嵌套 Agent/取消本地测试旁证 | 真实大型仓项目测试、崩溃恢复和磁盘压力 |
 | 22 | 是 | 团队/Workflow 品牌适配；信任文字区分会话已加载配置与工具新读数据；披露模型 provider；保持单命令 Bash、用户沟通和不自动执行报告内容。 | `source-integrity.test.ts`；reference validator；完整 patch 人审 | 用户交互和长任务真实 E2E |
 | 23 | 是 | 从两层产物合同扩展为“owner records + decision record + byte-faithful products”；逐项记录 nonce、报告/仓库/revision/results 绑定、路径/diff 对账、全量预检、受控清理和同用户 TOCTOU 残余。 | `source-integrity.test.ts`；`scripts.test.ts`；`scripts-edge-cases.test.ts`；完整 patch 人审 | 文档合同仍需真实制品消费方 E2E |
 | 24 | 是 | 品牌/文件名适配；报告首段区分 source root 与 analysis root/snapshot；coverage 从顶层目录扩展到所有根条目；同步严格 path/line、panel/ledger、dirty/unversioned 和不可夸大验证状态的合同。 | `scripts.test.ts`；`scripts-edge-cases.test.ts`；`write-scan-meta.test.ts`；`workflow.test.ts`；`workflow-edge-cases.test.ts` | 人类报告可读性与模型叙述质量 |
-| 25 | 否 | 精确差异为 3 处展示品牌、3 处 slash command、3 个 `agentType` namespace，以及 XML escaper 增加 `&/< />` 实体编码并在 whole-tree context、inventory、threat model、sweep、panel、max red-team 共 6 个 `scanRoot` 插值点调用；没有独立 runtime API 或算法 hunk。逆品牌并撤销这两类 escaping 加固后与固定上游逐字节相等，5 文件/300 行阈值、12/24 component cap、400/45 candidate cap、8s/25s retry、三票、2/3 quorum 与 max adversarial 控制流均未改变。 | `workflow.test.ts`；`workflow-edge-cases.test.ts` 覆盖六阶段和原始 `&`；`workflow-host.ts`；`upstream-differential.test.ts` 的精确逆变换；Core runtime/预算/调度仅为 preview 旁证 | provider 随机输出等价、真实制品时延/成本/取消表现；当前产品把宿主给出的 canonical `scanRoot` 纳入可信会话边界，escaping 只是纵深防御而非 hostile-input 沙箱。若未来把路径也视为不可信，仍需结构化/围栏通道并验证特殊字符路径的模型识别 |
+| 25 | 否 | 精确差异为 3 处展示品牌、3 处 slash command、3 个 `agentType` namespace，以及 XML escaper 增加 `&/< />` 实体编码并在 whole-tree context、inventory、threat model、sweep、panel、max red-team 共 6 个 `scanRoot` 插值点调用；没有独立 runtime API 或算法 hunk。逆品牌并撤销这两类 escaping 加固后与固定上游逐字节相等，5 文件/300 行阈值、12/24 component cap、400/45 candidate cap、8s/25s retry、三票、2/3 quorum 与 max adversarial 控制流均未改变。 | `workflow.test.ts`；`workflow-edge-cases.test.ts` 覆盖六阶段和原始 `&`；`workflow-host.ts`；`upstream-differential.test.ts` 的精确逆变换；Core `869045f3` runtime/预算/调度本地测试旁证 | provider 随机输出等价、真实制品时延/成本/取消表现；当前产品把宿主给出的 canonical `scanRoot` 纳入可信会话边界，escaping 只是纵深防御而非 hostile-input 沙箱。若未来把路径也视为不可信，仍需结构化/围栏通道并验证特殊字符路径的模型识别 |
 
 ## 6. 分组交叉复核
 
@@ -142,11 +142,11 @@
 | 映射行 | 差异焦点 | 确定性证据 | 尚未由该证据证明 |
 |---|---|---|---|
 | 1–4 | manifest、品牌、信任/数据边界、文档链接 | `source-integrity.test.ts`、仓库 `validate`、brand/reference validators | 用户对文案的理解、真实安装器兼容性 |
-| 5–11 | 七个 Agent 的 namespace、工具/子 Agent allowlist、模型/effort 语义和 prompt 数据边界 | `source-integrity.test.ts`、完整 patch 人审；Core preview 的 `workflow-agent-contract` 与 main-agent scope 旁证 | 模型发现质量与固定上游的统计非劣性；CLI `--agents` flagSettings 跨进程定义 |
+| 5–11 | 七个 Agent 的 namespace、工具/子 Agent allowlist、模型/effort 语义和 prompt 数据边界 | `source-integrity.test.ts`、完整 patch 人审；Core `869045f3` 的 `workflow-agent-contract` 与 main-agent scope 本地测试旁证 | 模型发现质量与固定上游的统计非劣性；CLI `--agents` flagSettings 跨进程定义 |
 | 12–14 | Hook 事件、环境变量、仅命令触发、Banner | `banner.test.ts`、shell/Python syntax gate | 未测试平台的原生启动行为 |
 | 15–17 | 元数据、报告、补丁状态机以及 target-only fail-closed 加固 | `scripts.test.ts`、`scripts-edge-cases.test.ts`、`write-scan-meta.test.ts`、`upstream-differential.test.ts` | hostile repository 的 OS 级隔离；SIGKILL 后同进程自动清理 |
 | 18–24 | Skill/Role/Job/Spec 路由、输入模式、产物合同和信任措辞 | `source-integrity.test.ts`、`scripts.test.ts`、`scripts-edge-cases.test.ts`、仓库 presentation/reference validators | 真实 CLI/GUI 七输入 E2E、模型输出质量 |
-| 25 | cap、retry、dedupe、coverage、panel、quorum、adversarial、失败传播 | `workflow.test.ts`、`workflow-edge-cases.test.ts`、`workflow-host.ts`、`upstream-differential.test.ts`；Core runtime/预算/调度只作 preview 旁证 | provider 随机输出的统计等价、真实发布制品表现 |
+| 25 | cap、retry、dedupe、coverage、panel、quorum、adversarial、失败传播 | `workflow.test.ts`、`workflow-edge-cases.test.ts`、`workflow-host.ts`、`upstream-differential.test.ts`；Core `869045f3` runtime/预算/调度只作预提交本地测试旁证 | provider 随机输出的统计等价、真实发布制品表现 |
 | 1–25 + Marketplace | blob/mode/path 一一映射、目标字节、patch 可重放、候选未激活 | `provenance-verifier.test.ts`、`source-integrity.test.ts`、generator `--check`、505 项 verifier | 语义正确性、模型质量和 GA readiness |
 
 当前分层结论：
