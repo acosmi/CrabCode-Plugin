@@ -1,0 +1,647 @@
+{
+  "schemaVersion": 1,
+  "lockKind": "complete-source-port-provenance",
+  "lockDate": "2026-07-23",
+  "upstream": {
+    "repository": "https://github.com/anthropics/claude-plugins-official.git",
+    "commit": "4b3d2a2a965ce1a36eb4b03078db891ab46bc257",
+    "commitTreeGitSha1": "0961f052c654edbaf6d5f5c1da676920ddc38706",
+    "plugin": {
+      "path": "plugins/claude-security",
+      "treeGitSha1": "e6d006720d46909dd1295a03c41efe11957ec5ec",
+      "declaredVersion": "0.10.0",
+      "fileCount": 25,
+      "byteCount": 246940,
+      "manifest": {
+        "algorithm": "sha256",
+        "digest": "c1273995451841d9ae9f1015683920efdd47c4006ab31589b04e62b35ca88a7d",
+        "canonicalization": "Sort records by UTF-8 sourcePath ascending; encode each as sourcePath + TAB + decimal size + TAB + lowercase sha256 + LF; concatenate without a header."
+      }
+    },
+    "marketplace": {
+      "path": ".claude-plugin/marketplace.json",
+      "size": 158611,
+      "sha256": "f313d12222ef9e33b132d01ae2bae674fbe540bfbe18c5fa1d14d5977618d1b7",
+      "gitBlobSha1": "4469f32a4ac74d846d20e556a99bbd28509b2bf6",
+      "selector": {
+        "collectionJsonPointer": "/plugins",
+        "predicate": {
+          "field": "name",
+          "operator": "equals",
+          "value": "claude-security"
+        },
+        "expectedMatches": 1,
+        "observedMatches": 1
+      },
+      "canonicalEntry": {
+        "snapshotPath": "plugins/crabcode-security/docs/legal/UPSTREAM-MARKETPLACE-ENTRY.json",
+        "snapshotFileSize": 634,
+        "snapshotFileSha256": "ce06e42aeec20eec5a08f75c27101ec0aee246ce4b384eb3191ea748327f63b7",
+        "serialization": "UTF-8 JSON with every object key recursively sorted ascending, arrays kept in source order, no insignificant whitespace, and exactly one trailing LF.",
+        "size": 594,
+        "sha256": "648dadb6149a4d98bc8dd1b17218129eb4d10409ee037b85d327580dff0b894f"
+      }
+    }
+  },
+  "port": {
+    "targetRepository": "CrabCode-Plugin",
+    "targetRoot": "plugins/crabcode-security",
+    "targetVersion": "0.10.0-crabcode.1",
+    "mappingCardinality": "one-to-one",
+    "expectedSourceFiles": 25,
+    "observedSourceFiles": 25,
+    "observedUniqueTargetPaths": 25,
+    "unmappedSourcePaths": [],
+    "duplicatedTargetPaths": [],
+    "targetModePolicy": "Preserve each upstream executable bit; renamed files retain the source mode.",
+    "changeAxisDefinitions": {
+      "brandRename": "Replace upstream product, vendor, and model-family brand references with CrabCode-safe terminology.",
+      "namespaceRename": "Rename plugin, skill, agent, workflow, command, report, and internal identifiers from claude-security to crabcode-security without dropping behavior.",
+      "pluginPackageLayout": "Adapt the upstream .claude-plugin package directory and its references to the CrabCode .crabcode-plugin layout.",
+      "manifestMetadata": "Adapt manifest fields to the CrabCode schema, fork version, local author identity, required license, and keywords.",
+      "presentationMetadata": "Adapt only user-facing marketplace/skill presentation fields required by the CrabCode ecosystem while retaining the stable invocation identity and model-facing workflow body.",
+      "hostContract": "Translate host-specific tools, instruction/config paths, command syntax, prompts, and lifecycle behavior to the CrabCode runtime contract.",
+      "modelPolicy": "Translate upstream model aliases and reasoning-effort values to CrabCode-supported dynamic best/inherit and max policy without hard-coding a model ID or weakening role intent.",
+      "environmentVariables": "Translate the upstream plugin-root and related host paths to the CrabCode plugin environment.",
+      "artifactNamespace": "Rename generated report, scratch, metadata, and patch artifact prefixes/directories to the CrabCode namespace while retaining formats.",
+      "documentationLinks": "Replace upstream-only installation, sandbox, product, and repository links with truthful CrabCode guidance.",
+      "supportChannel": "Replace upstream vendor contact and disclosure channels with the real CrabCode security/support path.",
+      "legalBrandText": "Apply the requested full brand transformation to the copied legal text; provenance remains recorded only under docs/legal.",
+      "hookEvent": "Adapt UserPromptExpansion matching to CrabCode UserPromptSubmit input filtering while keeping the banner display-only.",
+      "bannerPresentation": "Replace branded banner text and artwork while preserving the notice's informational purpose.",
+      "securityHardening": "Add target-only fail-closed validation, immutable snapshot ownership, path containment, concurrency, lifecycle, or prompt-boundary controls without removing an upstream scan stage or result contract."
+    },
+    "targetSnapshot": {
+      "fileCount": 25,
+      "byteCount": 361113,
+      "manifest": {
+        "algorithm": "sha256",
+        "digest": "ec70515a65b70c370669ac710eacdd8f18b7193757b574262fc06926544e4bea",
+        "canonicalization": "Sort records by UTF-8 targetPath ascending; encode each as targetPath + TAB + decimal targetSize + TAB + lowercase targetSha256 + LF; concatenate without a header."
+      }
+    },
+    "targetMarketplace": {
+      "releaseStatus": "staged-not-active",
+      "stagedEntryPath": "plugins/crabcode-security/docs/legal/TARGET-MARKETPLACE-ENTRY.json",
+      "canonicalEntry": {
+        "serialization": "UTF-8 JSON with every object key recursively sorted ascending, arrays kept in source order, no insignificant whitespace, and exactly one trailing LF.",
+        "size": 1317,
+        "sha256": "32cdc33f271035c5e418214e7d9dccaf58058fce7d8804e0303e676ebcafe090"
+      }
+    },
+    "replay": {
+      "patchPath": "plugins/crabcode-security/docs/legal/FULL-PORT.patch",
+      "patchSize": 475580,
+      "patchSha256": "da912e2ca5e002816ccb9ee3818ea30ff46fe6a9788a0df17fbe05894b99ba08",
+      "stripComponents": 2,
+      "expectedResultFileCount": 25,
+      "normalization": {
+        "baseline": "In a new empty temporary directory, materialize every locked upstream blob at sourceRelativePath with its locked Git mode; do not rewrite file bytes.",
+        "target": "Materialize exactly the 25 mapped product files at targetRelativePath with their current bytes and preserved source mode; do not include evidence files.",
+        "pathRoots": "Generate a no-index Git binary diff from baseline/ to target/ with a/ and b/ prefixes; replay with git apply -p2.",
+        "excludedEvidence": "plugins/crabcode-security/docs/legal/** is provenance evidence outside the 25-file product target and is excluded to prevent self-reference."
+      },
+      "tools": {
+        "generator": {
+          "path": "scripts/build-crabcode-security-port-patch.ts",
+          "version": "1",
+          "size": 7502,
+          "sha256": "38beb3ed0679f4a7831fc84b41625e0d81f9988e5c1733509d72d936affaebb1"
+        },
+        "sealer": {
+          "path": "scripts/seal-crabcode-security-port.ts",
+          "version": "1",
+          "size": 10711,
+          "sha256": "207d6d97e98d1c32b7e0bd903d304b9e79c3111ea9777e4ead12a6585f3d0d70"
+        },
+        "verifier": {
+          "path": "scripts/verify-crabcode-security-port.ts",
+          "version": "1",
+          "size": 30795,
+          "sha256": "a3c3b41a711de4fcfc498dd97f7cfe6973b84672148af7a9bd1f295ddef65d99"
+        }
+      },
+      "environment": {
+        "bunVersion": "1.3.11",
+        "gitVersion": "git version 2.50.1 (Apple Git-155)",
+        "platform": "darwin-arm64",
+        "locale": "C"
+      },
+      "sealResult": {
+        "status": "passed",
+        "verificationChecks": 505,
+        "upstreamCommit": "4b3d2a2a965ce1a36eb4b03078db891ab46bc257",
+        "replayedFileCount": 25
+      }
+    },
+    "promotionGateSnapshot": {
+      "activeMarketplacePath": ".crabcode-plugin/marketplace.json",
+      "selector": {
+        "collectionJsonPointer": "/plugins",
+        "predicate": {
+          "field": "name",
+          "operator": "equals",
+          "value": "crabcode-security"
+        },
+        "expectedMatches": 0,
+        "observedMatches": 0
+      }
+    }
+  },
+  "files": [
+    {
+      "sourcePath": "plugins/claude-security/.claude-plugin/plugin.json",
+      "sourceRelativePath": ".claude-plugin/plugin.json",
+      "targetPath": "plugins/crabcode-security/.crabcode-plugin/plugin.json",
+      "targetRelativePath": ".crabcode-plugin/plugin.json",
+      "mode": "100644",
+      "size": 580,
+      "sha256": "3b60dc88457fbe0fce8ff2868b4a0d3374eac0cdc1e2fd9d5d1782e0a30cbee6",
+      "gitBlobSha1": "eafb703f0b7ede13704ed9ca5aa4c42ee6a71fd4",
+      "changeAxes": [
+        "brandRename",
+        "namespaceRename",
+        "pluginPackageLayout",
+        "manifestMetadata",
+        "presentationMetadata",
+        "supportChannel",
+        "securityHardening"
+      ],
+      "targetSize": 803,
+      "targetSha256": "eb7a61cc617f2e620ad6d00fc4238417d40232403f6e98f026ceb3c7dc25f3a2",
+      "targetMode": "100644"
+    },
+    {
+      "sourcePath": "plugins/claude-security/LICENSE",
+      "sourceRelativePath": "LICENSE",
+      "targetPath": "plugins/crabcode-security/LICENSE",
+      "targetRelativePath": "LICENSE",
+      "mode": "100644",
+      "size": 1500,
+      "sha256": "15d46b21bd3c8ead21dd4fe0f4b82a8d934b698cf6367b09c06211058fc4332d",
+      "gitBlobSha1": "76ab7e0acb6ce7ba636abfe57041762a2540e3af",
+      "changeAxes": [
+        "brandRename",
+        "legalBrandText"
+      ],
+      "targetSize": 1486,
+      "targetSha256": "fb2972d5bd5be864e1357eb422dcaa2e0c4deb32d9b770ddacc8e7b00a473c4e",
+      "targetMode": "100644"
+    },
+    {
+      "sourcePath": "plugins/claude-security/README.md",
+      "sourceRelativePath": "README.md",
+      "targetPath": "plugins/crabcode-security/README.md",
+      "targetRelativePath": "README.md",
+      "mode": "100644",
+      "size": 8582,
+      "sha256": "0b98ee1692fe0efea8bdb8193e73ab2daa833a99404b99a7ab9fea274b6b246a",
+      "gitBlobSha1": "73fc0eecbfc3b36dfba55c8550500da992664ef4",
+      "changeAxes": [
+        "brandRename",
+        "namespaceRename",
+        "pluginPackageLayout",
+        "hostContract",
+        "environmentVariables",
+        "artifactNamespace",
+        "documentationLinks",
+        "supportChannel",
+        "securityHardening"
+      ],
+      "targetSize": 11893,
+      "targetSha256": "14e6c51256f0b0c6e3ea9d6e01f9347b9f01ae14249b21321041ab2eaf92eb42",
+      "targetMode": "100644"
+    },
+    {
+      "sourcePath": "plugins/claude-security/SECURITY.md",
+      "sourceRelativePath": "SECURITY.md",
+      "targetPath": "plugins/crabcode-security/SECURITY.md",
+      "targetRelativePath": "SECURITY.md",
+      "mode": "100644",
+      "size": 2015,
+      "sha256": "b60e6fcc9f67467478500b150fe7f87fe76c3d04404b2baffccfc5b6ad6f5caf",
+      "gitBlobSha1": "99983e9b03de3bda1c101e68ae2e041b63dcf6a9",
+      "changeAxes": [
+        "brandRename",
+        "pluginPackageLayout",
+        "hostContract",
+        "artifactNamespace",
+        "documentationLinks",
+        "supportChannel",
+        "securityHardening"
+      ],
+      "targetSize": 2504,
+      "targetSha256": "e65f2b3de36050f891814d9e9aed581465e2e3c58f58361a4289d67b44e77c7f",
+      "targetMode": "100644"
+    },
+    {
+      "sourcePath": "plugins/claude-security/agents/claude-security.md",
+      "sourceRelativePath": "agents/claude-security.md",
+      "targetPath": "plugins/crabcode-security/agents/crabcode-security.md",
+      "targetRelativePath": "agents/crabcode-security.md",
+      "mode": "100644",
+      "size": 3828,
+      "sha256": "0a31975296c57e39ef42fedcddf50868e083b6077bde26b7f7ddebff1347fcea",
+      "gitBlobSha1": "13c543656dc1718dce482c12091f434e7875914b",
+      "changeAxes": [
+        "brandRename",
+        "namespaceRename",
+        "hostContract",
+        "modelPolicy",
+        "environmentVariables"
+      ],
+      "targetSize": 3858,
+      "targetSha256": "fdbb165f4605f7c68cf41aabedc3c0da80dae808aac60c0689ac4adc4d2ba97f",
+      "targetMode": "100644"
+    },
+    {
+      "sourcePath": "plugins/claude-security/agents/explore.md",
+      "sourceRelativePath": "agents/explore.md",
+      "targetPath": "plugins/crabcode-security/agents/explore.md",
+      "targetRelativePath": "agents/explore.md",
+      "mode": "100644",
+      "size": 2504,
+      "sha256": "e5410a273f76afe402ce842b0311e8f253e0792c624eac982ce67cdd4d314083",
+      "gitBlobSha1": "19ae23467a258f09e4200175c5d636fd49ff220e",
+      "changeAxes": [
+        "brandRename",
+        "hostContract",
+        "modelPolicy",
+        "securityHardening"
+      ],
+      "targetSize": 2674,
+      "targetSha256": "a3ea89a976ddeacef33436e6c45b87bbb71bdcf1403074e9eab43397dde2942a",
+      "targetMode": "100644"
+    },
+    {
+      "sourcePath": "plugins/claude-security/agents/patch-generator.md",
+      "sourceRelativePath": "agents/patch-generator.md",
+      "targetPath": "plugins/crabcode-security/agents/patch-generator.md",
+      "targetRelativePath": "agents/patch-generator.md",
+      "mode": "100644",
+      "size": 4892,
+      "sha256": "a39feaa41498b4da8783531d62b0ebcf6746b1f5e52e6a6bbdae57d734ace789",
+      "gitBlobSha1": "a9083750dc075b32e89f70c0cf29c23f989751a8",
+      "changeAxes": [
+        "brandRename",
+        "namespaceRename",
+        "hostContract",
+        "modelPolicy"
+      ],
+      "targetSize": 4894,
+      "targetSha256": "e94206ce4991db39320662717f8c73cf073cbaa9859c947081531fdbcdc08f83",
+      "targetMode": "100644"
+    },
+    {
+      "sourcePath": "plugins/claude-security/agents/patch-verifier.md",
+      "sourceRelativePath": "agents/patch-verifier.md",
+      "targetPath": "plugins/crabcode-security/agents/patch-verifier.md",
+      "targetRelativePath": "agents/patch-verifier.md",
+      "mode": "100644",
+      "size": 7404,
+      "sha256": "d7c80e161401a73699952236e4ca9190a3889896f3eb8c09282a79d709a561b4",
+      "gitBlobSha1": "84fac57d33944f247f6f5cff066b5ae2b4cd5821",
+      "changeAxes": [
+        "namespaceRename",
+        "hostContract",
+        "modelPolicy"
+      ],
+      "targetSize": 7404,
+      "targetSha256": "d2e90d9254bcc9a4c3db021b6f1bb06526cf7984b6c28e8fdc34dc15e7d70d3a",
+      "targetMode": "100644"
+    },
+    {
+      "sourcePath": "plugins/claude-security/agents/scan-inventory.md",
+      "sourceRelativePath": "agents/scan-inventory.md",
+      "targetPath": "plugins/crabcode-security/agents/scan-inventory.md",
+      "targetRelativePath": "agents/scan-inventory.md",
+      "mode": "100644",
+      "size": 4141,
+      "sha256": "6f10f8291a6e0aad68676ff336ac22951949f078996d709ec3f541c01d93dd75",
+      "gitBlobSha1": "29359728f0129f75620529eebd982e47045b1647",
+      "changeAxes": [
+        "brandRename",
+        "hostContract",
+        "modelPolicy",
+        "securityHardening"
+      ],
+      "targetSize": 4316,
+      "targetSha256": "c90e31882291f191d08497c8e65d6a1cf2991f23c603affe28401359e2dd823b",
+      "targetMode": "100644"
+    },
+    {
+      "sourcePath": "plugins/claude-security/agents/scan-researcher.md",
+      "sourceRelativePath": "agents/scan-researcher.md",
+      "targetPath": "plugins/crabcode-security/agents/scan-researcher.md",
+      "targetRelativePath": "agents/scan-researcher.md",
+      "mode": "100644",
+      "size": 6437,
+      "sha256": "bc3bdbae48936df9521463b41a3d60e10d27f28168bde49bf2f6d3ce84b02fcd",
+      "gitBlobSha1": "eaf8ae6f16775aa48a76ff44d2f9a638afa19324",
+      "changeAxes": [
+        "brandRename",
+        "namespaceRename",
+        "hostContract",
+        "modelPolicy",
+        "securityHardening"
+      ],
+      "targetSize": 6618,
+      "targetSha256": "dc6414ff4bb5bdf6dac2d06d949865f343924038fa0dc813d42190db554ffd78",
+      "targetMode": "100644"
+    },
+    {
+      "sourcePath": "plugins/claude-security/agents/scan-verifier.md",
+      "sourceRelativePath": "agents/scan-verifier.md",
+      "targetPath": "plugins/crabcode-security/agents/scan-verifier.md",
+      "targetRelativePath": "agents/scan-verifier.md",
+      "mode": "100644",
+      "size": 4100,
+      "sha256": "2de72927ea1e8585fa8c131484a351b9ca55e92c7c4fcd5c06d59fe45e6c93a3",
+      "gitBlobSha1": "c798d3276d5b60bf1f29fe2b793a30ccc2ecafeb",
+      "changeAxes": [
+        "brandRename",
+        "namespaceRename",
+        "hostContract",
+        "modelPolicy"
+      ],
+      "targetSize": 4102,
+      "targetSha256": "d03b1e0bb41c710b5ffbbbcb1b4ad0d5433f1abc85c16696a6b70044b7b18b02",
+      "targetMode": "100644"
+    },
+    {
+      "sourcePath": "plugins/claude-security/hooks/banner_hook.sh",
+      "sourceRelativePath": "hooks/banner_hook.sh",
+      "targetPath": "plugins/crabcode-security/hooks/banner_hook.sh",
+      "targetRelativePath": "hooks/banner_hook.sh",
+      "mode": "100755",
+      "size": 302,
+      "sha256": "05e9eef43a6e201a9507a14bf6dd70dfded6a743ad5ac1cf4a91e60355b467e6",
+      "gitBlobSha1": "da82a1208a291accf26b45c975e227495b393107",
+      "changeAxes": [
+        "environmentVariables",
+        "hostContract",
+        "hookEvent"
+      ],
+      "targetSize": 117,
+      "targetSha256": "33b27d440e931fc5b5fcc648cbe0f0549031459e8f6ecd01755aa2e825fc06fa",
+      "targetMode": "100755"
+    },
+    {
+      "sourcePath": "plugins/claude-security/hooks/banner_notice.py",
+      "sourceRelativePath": "hooks/banner_notice.py",
+      "targetPath": "plugins/crabcode-security/hooks/banner_notice.py",
+      "targetRelativePath": "hooks/banner_notice.py",
+      "mode": "100755",
+      "size": 3753,
+      "sha256": "2f25895ef85df2a8c98f66223aa36c222007b783ffef1570f2cc927db80133ee",
+      "gitBlobSha1": "030b626fb88726977a980b04a992a4be1e7c48c4",
+      "changeAxes": [
+        "brandRename",
+        "namespaceRename",
+        "hostContract",
+        "hookEvent",
+        "bannerPresentation"
+      ],
+      "targetSize": 3861,
+      "targetSha256": "1201c8602a5b6bd366f219047fa0ed78485be93f0b1182b062344fccbec395af",
+      "targetMode": "100755"
+    },
+    {
+      "sourcePath": "plugins/claude-security/hooks/hooks.json",
+      "sourceRelativePath": "hooks/hooks.json",
+      "targetPath": "plugins/crabcode-security/hooks/hooks.json",
+      "targetRelativePath": "hooks/hooks.json",
+      "mode": "100644",
+      "size": 553,
+      "sha256": "a4b11a05555b4773af240f3893d7b807376ea63080bee307ed40cfd20c89d0eb",
+      "gitBlobSha1": "9608c949c3b17e2103ab120dfa083613fc649e1c",
+      "changeAxes": [
+        "brandRename",
+        "namespaceRename",
+        "environmentVariables",
+        "hookEvent"
+      ],
+      "targetSize": 455,
+      "targetSha256": "79aab35ac91ffdec35aeb85cdc3b4f9b6e87f680dc879b2282a2fc73609f8da4",
+      "targetMode": "100644"
+    },
+    {
+      "sourcePath": "plugins/claude-security/scripts/patch_artifacts.py",
+      "sourceRelativePath": "scripts/patch_artifacts.py",
+      "targetPath": "plugins/crabcode-security/scripts/patch_artifacts.py",
+      "targetRelativePath": "scripts/patch_artifacts.py",
+      "mode": "100755",
+      "size": 34454,
+      "sha256": "c1773d0b14f452137b1a3c6e595ebdf94c8435f1b34eb019466cf0704842fe6f",
+      "gitBlobSha1": "f11d87aee17074f5faefe2e2fb9a3dac3df4b28f",
+      "changeAxes": [
+        "brandRename",
+        "namespaceRename",
+        "artifactNamespace",
+        "securityHardening"
+      ],
+      "targetSize": 81891,
+      "targetSha256": "bf2576c285299ac603bcce7e4991243017b63e60831d7335e13bc01d45bf80c0",
+      "targetMode": "100755"
+    },
+    {
+      "sourcePath": "plugins/claude-security/scripts/render_report.py",
+      "sourceRelativePath": "scripts/render_report.py",
+      "targetPath": "plugins/crabcode-security/scripts/render_report.py",
+      "targetRelativePath": "scripts/render_report.py",
+      "mode": "100755",
+      "size": 24126,
+      "sha256": "e319c564b10b3b0f6ed58e8cc48d4df1bb3bc400256c3b2cc3138431678d16c3",
+      "gitBlobSha1": "a87b1922ddc1b737f382f37082ec8c87dec54e8a",
+      "changeAxes": [
+        "brandRename",
+        "namespaceRename",
+        "artifactNamespace",
+        "securityHardening"
+      ],
+      "targetSize": 48944,
+      "targetSha256": "49037bf9bbee5697bb6d9342c3089d222899620dfdc73f136138c3eb79de3298",
+      "targetMode": "100755"
+    },
+    {
+      "sourcePath": "plugins/claude-security/scripts/write_scan_meta.py",
+      "sourceRelativePath": "scripts/write_scan_meta.py",
+      "targetPath": "plugins/crabcode-security/scripts/write_scan_meta.py",
+      "targetRelativePath": "scripts/write_scan_meta.py",
+      "mode": "100755",
+      "size": 8212,
+      "sha256": "88ddaea2a8fb03c0d77a3642493f93b4d6682959e6d03f7e01b6601a5609e7e3",
+      "gitBlobSha1": "6cf3bd83d00f98ed288c8c5eeac03f29f6061a43",
+      "changeAxes": [
+        "brandRename",
+        "namespaceRename",
+        "artifactNamespace",
+        "securityHardening"
+      ],
+      "targetSize": 37616,
+      "targetSha256": "1cbf3e6550ac4d2034e7648fdfd05e43040205b5d262e407b6f1494195485cfe",
+      "targetMode": "100755"
+    },
+    {
+      "sourcePath": "plugins/claude-security/skills/claude-security/SKILL.md",
+      "sourceRelativePath": "skills/claude-security/SKILL.md",
+      "targetPath": "plugins/crabcode-security/skills/crabcode-security/SKILL.md",
+      "targetRelativePath": "skills/crabcode-security/SKILL.md",
+      "mode": "100644",
+      "size": 5130,
+      "sha256": "e63503bfc43a4db9653fe14ff6fe7fe500109c911bf2217db357d7c3b354f10a",
+      "gitBlobSha1": "32619cabb43e40c3b358233f72780c201c0ee664",
+      "changeAxes": [
+        "brandRename",
+        "namespaceRename",
+        "hostContract",
+        "presentationMetadata",
+        "environmentVariables",
+        "artifactNamespace",
+        "documentationLinks",
+        "securityHardening"
+      ],
+      "targetSize": 5657,
+      "targetSha256": "eb6a5ea65e66dc317750d4cf8ffbdabd3d11e54fafba8ffc3d911944de3a3a75",
+      "targetMode": "100644"
+    },
+    {
+      "sourcePath": "plugins/claude-security/skills/claude-security/jobs/scan-changes.md",
+      "sourceRelativePath": "skills/claude-security/jobs/scan-changes.md",
+      "targetPath": "plugins/crabcode-security/skills/crabcode-security/jobs/scan-changes.md",
+      "targetRelativePath": "skills/crabcode-security/jobs/scan-changes.md",
+      "mode": "100644",
+      "size": 20570,
+      "sha256": "792fb42aaff40274b4716396cf6d96c66ddf0c407ad1a8e9b02365ea047a6953",
+      "gitBlobSha1": "2b7db19497c4089b914e20c552d4cfcbe6b0e444",
+      "changeAxes": [
+        "brandRename",
+        "namespaceRename",
+        "hostContract",
+        "environmentVariables",
+        "artifactNamespace",
+        "securityHardening"
+      ],
+      "targetSize": 21568,
+      "targetSha256": "c924f0ab0aed50d5ecb6bd23aac82706150f79a41f0ffa8e3ff34ddc9b1a829b",
+      "targetMode": "100644"
+    },
+    {
+      "sourcePath": "plugins/claude-security/skills/claude-security/jobs/scan-codebase.md",
+      "sourceRelativePath": "skills/claude-security/jobs/scan-codebase.md",
+      "targetPath": "plugins/crabcode-security/skills/crabcode-security/jobs/scan-codebase.md",
+      "targetRelativePath": "skills/crabcode-security/jobs/scan-codebase.md",
+      "mode": "100644",
+      "size": 21929,
+      "sha256": "e4d043fc03847dd543d7019d735d1de981f078ccec50d790417baccd17596db5",
+      "gitBlobSha1": "152b14686253e72ccbfe6c96af6da7ad5cab1e2c",
+      "changeAxes": [
+        "brandRename",
+        "namespaceRename",
+        "hostContract",
+        "environmentVariables",
+        "artifactNamespace",
+        "securityHardening"
+      ],
+      "targetSize": 22608,
+      "targetSha256": "3603feda04b69b4cda6ce952ed4218afd4771451b0e518f5bc7fb0bc9b4b369a",
+      "targetMode": "100644"
+    },
+    {
+      "sourcePath": "plugins/claude-security/skills/claude-security/jobs/suggest-patches.md",
+      "sourceRelativePath": "skills/claude-security/jobs/suggest-patches.md",
+      "targetPath": "plugins/crabcode-security/skills/crabcode-security/jobs/suggest-patches.md",
+      "targetRelativePath": "skills/crabcode-security/jobs/suggest-patches.md",
+      "mode": "100644",
+      "size": 24227,
+      "sha256": "90b17667283863d3195aaeda290df8c4a1f15f2bf2fda9526ec417136d1e918c",
+      "gitBlobSha1": "ec89b67780d7de205a91924cf0331ea042a1b4e3",
+      "changeAxes": [
+        "brandRename",
+        "namespaceRename",
+        "hostContract",
+        "environmentVariables",
+        "artifactNamespace",
+        "securityHardening"
+      ],
+      "targetSize": 27189,
+      "targetSha256": "a0d1a266af7cf4bb3924667c1a3f8ecb28ddd947e551675610c0b8ef09266365",
+      "targetMode": "100644"
+    },
+    {
+      "sourcePath": "plugins/claude-security/skills/claude-security/role.md",
+      "sourceRelativePath": "skills/claude-security/role.md",
+      "targetPath": "plugins/crabcode-security/skills/crabcode-security/role.md",
+      "targetRelativePath": "skills/crabcode-security/role.md",
+      "mode": "100644",
+      "size": 10020,
+      "sha256": "23d7b9db41cf100eb2bfc7102e7d3d1a8e2fba0f39e406f08bf44f0143ea93df",
+      "gitBlobSha1": "3aa603bf305702380464f0b2fa7c1dc9fdd5f53a",
+      "changeAxes": [
+        "brandRename",
+        "namespaceRename",
+        "hostContract",
+        "securityHardening"
+      ],
+      "targetSize": 10279,
+      "targetSha256": "5b9a96405bc6ca633942f3bab9e03832c8ed6788e56d6c26c2812df4c6770931",
+      "targetMode": "100644"
+    },
+    {
+      "sourcePath": "plugins/claude-security/skills/claude-security/specs/patch-spec.md",
+      "sourceRelativePath": "skills/claude-security/specs/patch-spec.md",
+      "targetPath": "plugins/crabcode-security/skills/crabcode-security/specs/patch-spec.md",
+      "targetRelativePath": "skills/crabcode-security/specs/patch-spec.md",
+      "mode": "100644",
+      "size": 8241,
+      "sha256": "f271c9bd41c9f8ccf4c748ec3b56f25730ea6fd7d812d6fbbe5ffc5d9e876188",
+      "gitBlobSha1": "006e4f9d5423d3b998f1961edafe01254beb92c5",
+      "changeAxes": [
+        "brandRename",
+        "namespaceRename",
+        "artifactNamespace",
+        "securityHardening"
+      ],
+      "targetSize": 10552,
+      "targetSha256": "6d733e3707eca6ec0449ebba2995722ebef9afea60343cd9e82ac8319063f020",
+      "targetMode": "100644"
+    },
+    {
+      "sourcePath": "plugins/claude-security/skills/claude-security/specs/report-spec.md",
+      "sourceRelativePath": "skills/claude-security/specs/report-spec.md",
+      "targetPath": "plugins/crabcode-security/skills/crabcode-security/specs/report-spec.md",
+      "targetRelativePath": "skills/crabcode-security/specs/report-spec.md",
+      "mode": "100644",
+      "size": 7508,
+      "sha256": "ad2f95dc850eb7341ddae55ed9d90cf6d43053d1a0553722b2269d626e64d0af",
+      "gitBlobSha1": "43f68752d88ed20e868922c536008f35af23c32d",
+      "changeAxes": [
+        "brandRename",
+        "namespaceRename",
+        "artifactNamespace",
+        "securityHardening"
+      ],
+      "targetSize": 7786,
+      "targetSha256": "01c21c8ac40efe005e7617dc8e3a99277ffe0608c6df8d2ce084b2df292d60fc",
+      "targetMode": "100644"
+    },
+    {
+      "sourcePath": "plugins/claude-security/workflows/scan.js",
+      "sourceRelativePath": "workflows/scan.js",
+      "targetPath": "plugins/crabcode-security/workflows/scan.js",
+      "targetRelativePath": "workflows/scan.js",
+      "mode": "100644",
+      "size": 31932,
+      "sha256": "ad07e70b5c78c19e3106aa3ebf7fa7b98199d25897097dafe6c395f615d491c1",
+      "gitBlobSha1": "dc3512083970a947abb7daf7c618cafbf1f1d61b",
+      "changeAxes": [
+        "brandRename",
+        "namespaceRename",
+        "securityHardening"
+      ],
+      "targetSize": 32038,
+      "targetSha256": "6dd4e02279439770c9d7551a5a29012a212518d96e1b517aedaed6df256b7061",
+      "targetMode": "100644"
+    }
+  ]
+}

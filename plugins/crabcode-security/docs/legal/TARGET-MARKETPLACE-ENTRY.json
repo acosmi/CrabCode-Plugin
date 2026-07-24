@@ -1,0 +1,23 @@
+{
+  "name": "crabcode-security",
+  "source": "./plugins/crabcode-security",
+  "version": "0.10.0-crabcode.1",
+  "displayName": "CrabCode 深度安全扫描",
+  "shortDescription": "多智能体深度扫描全库、指定范围或代码变更，并对每项发现独立复核后生成可选补丁",
+  "longDescription": "面向自有且可信代码库的深度安全工作流。按投入档位完成组件盘点、威胁建模、漏洞研究、缺口扫描和三验证者复核；支持全库、指定范围、分支、拉取请求或单次提交，并可在 marker 绑定的 scratch checkout（非 OS 沙箱）中生成经独立审查的补丁文件。模型推理使用 CrabCode 已配置的提供方。与轻量的提交前安全审查插件分工独立。",
+  "defaultPrompt": [
+    "/crabcode-security:crabcode-security 深度扫描整个代码库并复核每项安全发现",
+    "/crabcode-security:crabcode-security 对当前分支变更做多智能体深度安全扫描",
+    "/crabcode-security:crabcode-security 根据最新安全报告生成并验证可选补丁"
+  ],
+  "brandColor": "#7c3aed",
+  "description": "Deep multi-agent vulnerability scanning for codebases and changes, with adversarial verification and reviewable patch generation.",
+  "category": "security",
+  "tags": [
+    "security",
+    "vulnerability-scanning",
+    "multi-agent",
+    "patch-review"
+  ],
+  "tier": "workflow"
+}

@@ -19,3 +19,6 @@
 # literals. Keep source whitespace checks strict while treating dist as binary-like
 # build output for Git whitespace diagnostics.
 plugins/crabcode-html-video/dist/** -whitespace
+
+# Byte-faithful provenance patch: whitespace is evidence and must not be normalized.
+plugins/crabcode-security/docs/legal/FULL-PORT.patch -whitespace

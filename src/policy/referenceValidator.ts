@@ -39,11 +39,13 @@ type Registry = {
 const REGISTRY_RELATIVE = path.join("docs", "capability-routing.json");
 const WALK_SKIP_DIRS = new Set(["node_modules", "dist", "coverage", ".git", "vendor"]);
 
-// `plugin:skill` fully-qualified reference wrapped in backticks. The plugin part
-// must resolve to a real plugin directory (or a registry provider plugin) before
-// we treat it as a cross-plugin skill reference — this keeps tokens like
-// `https:example` or arbitrary prose out of scope.
+// A bare backticked FQN is intentionally kind-neutral because the surrounding
+// prose may name a skill, agent, or workflow. Typed Agent(...) / Workflow(...)
+// calls are checked against their exact namespaces below. Only canonical
+// plugin roots contribute callables; arbitrary nested folders never do.
 const FQN_PATTERN = /`([a-z0-9][a-z0-9-]*):([a-z0-9][a-z0-9-]*)`/g;
+const TYPED_CALL_PATTERN = /\b(Agent|Workflow)\(([^)]*)\)/g;
+const TYPED_FQN_PATTERN = /^([a-z0-9][a-z0-9-]*):([a-z0-9][a-z0-9-]*)$/;
 
 // Bare `mcp__<server>__` tool references must match a server declared in the
 // owning plugin's .mcp.json. `mcp__plugin_...` names document CrabCode's
@@ -71,8 +73,21 @@ export async function validateReferences(root: string): Promise<ReferenceIssue[]
   const pluginsDir = path.join(absRoot, "plugins");
   const pluginNames = await listDirectories(pluginsDir);
   const skillIndex = new Map<string, Set<string>>();
+  const agentIndex = new Map<string, Set<string>>();
+  const workflowIndex = new Map<string, Set<string>>();
+  const callableIndex = new Map<string, Set<string>>();
   for (const plugin of pluginNames) {
-    skillIndex.set(plugin, await collectSkillNames(path.join(pluginsDir, plugin)));
+    const pluginDir = path.join(pluginsDir, plugin);
+    const skills = await collectSkillNames(pluginDir);
+    const agents = await collectDirectFileStems(path.join(pluginDir, "agents"), [".md"]);
+    const workflows = await collectDirectFileStems(
+      path.join(pluginDir, "workflows"),
+      [".js", ".mjs", ".cjs", ".ts"],
+    );
+    skillIndex.set(plugin, skills);
+    agentIndex.set(plugin, agents);
+    workflowIndex.set(plugin, workflows);
+    callableIndex.set(plugin, new Set([...skills, ...agents, ...workflows]));
   }
 
   if (registry) {
@@ -95,7 +110,8 @@ export async function validateReferences(root: string): Promise<ReferenceIssue[]
         continue;
       }
 
-      checkDeadFqns(content, file, skillIndex, registryPluginSet, issues);
+      checkDeadFqns(content, file, callableIndex, registryPluginSet, issues);
+      checkTypedCallableReferences(content, file, agentIndex, workflowIndex, issues);
       await checkMcpToolRefs(content, file, plugin, pluginDir, mcpServerCache, issues);
       if (content.includes(CONTAINER_PATH)) {
         issues.push({
@@ -197,24 +213,50 @@ async function validateRegistryIntegrity(
 function checkDeadFqns(
   content: string,
   file: string,
-  skillIndex: Map<string, Set<string>>,
+  callableIndex: Map<string, Set<string>>,
   registryPluginSet: Set<string>,
   issues: ReferenceIssue[],
 ): void {
   for (const match of content.matchAll(FQN_PATTERN)) {
     const plugin = match[1] ?? "";
     const skill = match[2] ?? "";
-    const known = skillIndex.has(plugin);
+    const known = callableIndex.has(plugin);
     const planned = registryPluginSet.has(plugin);
     if (!known && !planned) continue;
-    if (known && skillIndex.get(plugin)?.has(skill)) continue;
+    if (known && callableIndex.get(plugin)?.has(skill)) continue;
     issues.push({
       severity: "error",
       file,
       message: known
-        ? `死链引用 \`${plugin}:${skill}\`:插件存在但技能不存在`
+        ? `死链引用 \`${plugin}:${skill}\`:插件存在但规范根目录中无对应技能、代理或工作流`
         : `死链引用 \`${plugin}:${skill}\`:provider 插件尚未就位(注册表状态 planned),请改用 pending 标记与升级路径措辞`,
     });
+  }
+}
+
+function checkTypedCallableReferences(
+  content: string,
+  file: string,
+  agentIndex: Map<string, Set<string>>,
+  workflowIndex: Map<string, Set<string>>,
+  issues: ReferenceIssue[],
+): void {
+  for (const call of content.matchAll(TYPED_CALL_PATTERN)) {
+    const kind = call[1] as "Agent" | "Workflow";
+    const index = kind === "Agent" ? agentIndex : workflowIndex;
+    for (const raw of (call[2] ?? "").split(",")) {
+      const token = raw.trim();
+      const match = TYPED_FQN_PATTERN.exec(token);
+      if (!match) continue;
+      const plugin = match[1] ?? "";
+      const callable = match[2] ?? "";
+      if (!index.has(plugin) || index.get(plugin)?.has(callable)) continue;
+      issues.push({
+        severity: "error",
+        file,
+        message: `死链引用 ${kind}(${plugin}:${callable}):插件存在但对应${kind === "Agent" ? "代理" : "工作流"}不存在于规范根目录`,
+      });
+    }
   }
 }
 
@@ -396,6 +438,23 @@ async function collectSkillNames(pluginDir: string): Promise<Set<string>> {
   const skillDirs: string[] = [];
   await walkForSkillDirs(pluginDir, skillDirs);
   return new Set(skillDirs.map((dir) => path.basename(dir)));
+}
+
+async function collectDirectFileStems(dir: string, extensions: string[]): Promise<Set<string>> {
+  const out = new Set<string>();
+  try {
+    const entries = await readdir(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isFile()) continue;
+      const extension = path.extname(entry.name).toLowerCase();
+      if (extensions.includes(extension)) {
+        out.add(path.basename(entry.name, extension));
+      }
+    }
+  } catch {
+    return out;
+  }
+  return out;
 }
 
 async function walkForSkillDirs(dir: string, out: string[]): Promise<void> {

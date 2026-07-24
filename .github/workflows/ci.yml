@@ -30,6 +30,69 @@ jobs:
       - name: Verify media-ops standalone bundle is committed
         run: git ls-files --error-unmatch plugins/crabcode-media-ops/dist/server.js
 
+  security-plugin:
+    runs-on: ${{ matrix.os }}
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONPYCACHEPREFIX: ${{ runner.temp }}/crabcode-security-pycache
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+        python-version:
+          - "3.9"
+          - "3.13"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.11
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - run: bun install --frozen-lockfile
+      - name: Fetch the immutable upstream source snapshot
+        run: |
+          UPSTREAM_REPOSITORY="$(jq -r '.upstream.repository' plugins/crabcode-security/docs/legal/SOURCE-LOCK.json)"
+          UPSTREAM_COMMIT="$(jq -r '.upstream.commit' plugins/crabcode-security/docs/legal/SOURCE-LOCK.json)"
+          git init "${RUNNER_TEMP}/crabcode-security-upstream"
+          git -C "${RUNNER_TEMP}/crabcode-security-upstream" remote add origin "${UPSTREAM_REPOSITORY}"
+          git -C "${RUNNER_TEMP}/crabcode-security-upstream" fetch --depth=1 origin "${UPSTREAM_COMMIT}"
+          git -C "${RUNNER_TEMP}/crabcode-security-upstream" checkout --detach FETCH_HEAD
+      - name: Verify upstream provenance and the complete target port
+        run: >-
+          bun run scripts/verify-crabcode-security-port.ts
+          "${RUNNER_TEMP}/crabcode-security-upstream"
+      - name: Verify the full port patch is reproducible
+        run: >-
+          bun run scripts/build-crabcode-security-port-patch.ts
+          --check
+          "${RUNNER_TEMP}/crabcode-security-upstream"
+      - run: bun test ./tests/crabcode-security/
+        env:
+          CRABCODE_SECURITY_UPSTREAM_CHECKOUT: ${{ runner.temp }}/crabcode-security-upstream
+      - run: sh -n plugins/crabcode-security/hooks/banner_hook.sh
+      - run: >-
+          python -m py_compile
+          plugins/crabcode-security/hooks/banner_notice.py
+          plugins/crabcode-security/scripts/patch_artifacts.py
+          plugins/crabcode-security/scripts/render_report.py
+          plugins/crabcode-security/scripts/write_scan_meta.py
+      - name: Verify executable source files keep mode 100755
+        run: |
+          test "$(git ls-files -s plugins/crabcode-security/hooks/banner_hook.sh | cut -d' ' -f1)" = "100755"
+          test "$(git ls-files -s plugins/crabcode-security/hooks/banner_notice.py | cut -d' ' -f1)" = "100755"
+          test "$(git ls-files -s plugins/crabcode-security/scripts/patch_artifacts.py | cut -d' ' -f1)" = "100755"
+          test "$(git ls-files -s plugins/crabcode-security/scripts/render_report.py | cut -d' ' -f1)" = "100755"
+          test "$(git ls-files -s plugins/crabcode-security/scripts/write_scan_meta.py | cut -d' ' -f1)" = "100755"
+
   html-video-plugin:
     runs-on: ubuntu-latest
 

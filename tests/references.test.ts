@@ -54,6 +54,49 @@ describe("reference validator", () => {
     expect(errors.some((message) => message.includes("office-suite:missing-skill"))).toBe(true);
   });
 
+  test("accepts fully-qualified agent and workflow references", async () => {
+    const root = await makeFixture([
+      { rel: "plugins/office-suite/agents/reviewer.md", content: "# reviewer" },
+      { rel: "plugins/office-suite/workflows/audit.js", content: "export const meta = {};" },
+      {
+        rel: "plugins/alpha/skills/writer/SKILL.md",
+        content: "委派 Agent(office-suite:reviewer) 后运行 Workflow(office-suite:audit)。",
+      },
+    ]);
+    const issues = await validateReferences(root);
+    expect(messages(issues, "error")).toEqual([]);
+  });
+
+  test("keeps skill, agent, and workflow namespaces type-safe", async () => {
+    const root = await makeFixture([
+      { rel: "plugins/office-suite/agents/reviewer.md", content: "# reviewer" },
+      { rel: "plugins/office-suite/workflows/audit.js", content: "export const meta = {};" },
+      {
+        rel: "plugins/alpha/skills/writer/SKILL.md",
+        content:
+          "不存在的引用 `office-suite:missing`，错误类型 Agent(office-suite:audit)，以及 Workflow(office-suite:reviewer)。",
+      },
+    ]);
+    const errors = messages(await validateReferences(root), "error");
+    expect(errors.some((message) => message.includes("office-suite:missing"))).toBe(true);
+    expect(errors.some((message) => message.includes("对应代理不存在"))).toBe(true);
+    expect(errors.some((message) => message.includes("对应工作流不存在"))).toBe(true);
+  });
+
+  test("does not accept arbitrary nested agents or workflows as plugin callables", async () => {
+    const root = await makeFixture([
+      { rel: "plugins/office-suite/docs/agents/ghost.md", content: "# not loadable" },
+      { rel: "plugins/office-suite/vendor/workflows/ghost.js", content: "export const meta = {};" },
+      {
+        rel: "plugins/alpha/skills/writer/SKILL.md",
+        content: "调用 Agent(office-suite:ghost) 与 Workflow(office-suite:ghost)。",
+      },
+    ]);
+    const errors = messages(await validateReferences(root), "error");
+    expect(errors.some((message) => message.includes("对应代理不存在"))).toBe(true);
+    expect(errors.some((message) => message.includes("对应工作流不存在"))).toBe(true);
+  });
+
   test("reports references to planned provider plugins as dead links", async () => {
     const root = await makeFixture([
       { rel: "plugins/alpha/skills/writer/SKILL.md", content: "调用 `future-research:deep-research` 做调研。" },

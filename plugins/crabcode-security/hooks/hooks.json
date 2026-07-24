@@ -1,0 +1,15 @@
+{
+  "description": "A display-only banner for the CrabCode Security menu. The command reads the UserPromptSubmit payload and emits a systemMessage only for this plugin's slash command. It never returns a permission decision.",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CRABCODE_PLUGIN_ROOT}/hooks/banner_hook.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}
