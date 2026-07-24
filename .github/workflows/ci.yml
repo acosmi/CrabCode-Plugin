@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -59,12 +62,36 @@ jobs:
 
       - run: bun install --frozen-lockfile
       - name: Fetch the immutable upstream source snapshot
+        env:
+          # Force the https transport so a tampered lock cannot select a
+          # remote-helper transport (e.g. ext::) that would execute a command.
+          GIT_ALLOW_PROTOCOL: https
         run: |
+          # SOURCE-LOCK.json is repository-tracked and therefore attacker-controllable
+          # on a fork pull_request. Validate its values before handing them to git:
+          # require an https github.com URL free of shell/transport metacharacters and a
+          # bare 40-hex commit id. This blocks SSRF to arbitrary hosts, ext:: remote-helper
+          # execution, and argument/refspec injection via git fetch; well-formed but wrong
+          # content is still rejected downstream by the provenance verifier.
           UPSTREAM_REPOSITORY="$(jq -r '.upstream.repository' plugins/crabcode-security/docs/legal/SOURCE-LOCK.json)"
           UPSTREAM_COMMIT="$(jq -r '.upstream.commit' plugins/crabcode-security/docs/legal/SOURCE-LOCK.json)"
+          case "${UPSTREAM_REPOSITORY}" in
+            https://github.com/*) : ;;
+            *) echo "::error::Refusing to fetch: upstream.repository must be an https://github.com/ URL." >&2; exit 1 ;;
+          esac
+          case "${UPSTREAM_REPOSITORY}" in
+            *[!A-Za-z0-9:/._-]*) echo "::error::Refusing to fetch: upstream.repository has unexpected characters." >&2; exit 1 ;;
+          esac
+          case "${UPSTREAM_COMMIT}" in
+            "" | *[!0-9a-f]*) echo "::error::Refusing to fetch: upstream.commit must be a lowercase 40-hex commit id." >&2; exit 1 ;;
+          esac
+          if [ "${#UPSTREAM_COMMIT}" -ne 40 ]; then
+            echo "::error::Refusing to fetch: upstream.commit must be a lowercase 40-hex commit id." >&2
+            exit 1
+          fi
           git init "${RUNNER_TEMP}/crabcode-security-upstream"
           git -C "${RUNNER_TEMP}/crabcode-security-upstream" remote add origin "${UPSTREAM_REPOSITORY}"
-          git -C "${RUNNER_TEMP}/crabcode-security-upstream" fetch --depth=1 origin "${UPSTREAM_COMMIT}"
+          git -C "${RUNNER_TEMP}/crabcode-security-upstream" -c protocol.ext.allow=never fetch --depth=1 origin "${UPSTREAM_COMMIT}"
           git -C "${RUNNER_TEMP}/crabcode-security-upstream" checkout --detach FETCH_HEAD
       - name: Verify upstream provenance and the complete target port
         run: >-
