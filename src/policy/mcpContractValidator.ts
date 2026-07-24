@@ -29,8 +29,13 @@ const CHANNEL_DECLARATION_BASELINE = new Set(["discord", "fakechat", "imessage",
 /** Plugins whose sidecar start script still runs an installer (forbidden for anything required/auto-activated). */
 const INSTALL_ON_START_BASELINE = new Set(["discord", "fakechat", "imessage", "telegram"]);
 
-/** crabwork connectors shipped with empty placeholder URLs. */
-const EMPTY_URL_BASELINE = new Set(["crabwork-bio-research"]);
+/**
+ * crabwork connectors shipped with empty placeholder URLs.
+ * Ratcheted to zero on 2026-07-24 — every empty URL is now a hard error. Keep the
+ * set (and its stale check) so a future legacy import can be baselined explicitly
+ * rather than by loosening the rule.
+ */
+const EMPTY_URL_BASELINE = new Set<string>([]);
 
 /** Plugins with floating (@latest / versionless npx / unpinned git) launcher versions. */
 const FLOATING_VERSION_BASELINE = new Set([

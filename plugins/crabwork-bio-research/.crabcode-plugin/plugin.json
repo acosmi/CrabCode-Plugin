@@ -23,5 +23,19 @@
     "./skills/scvi-tools",
     "./skills/single-cell-rna-qc",
     "./skills/start"
+  ],
+  "channels": [
+    {
+      "server": "benchling",
+      "displayName": "Benchling",
+      "userConfig": {
+        "benchling_tenant": {
+          "type": "string",
+          "title": "Benchling 租户名",
+          "description": "Benchling 网址中 .benchling.com 之前的部分,形如 mycompany。不要带 https:// 前缀。租户需已启用 Benchling AI(Chat)与 V3 API;Validated Cloud 租户需联系 Benchling 开通,学术版暂不支持。",
+          "required": true
+        }
+      }
+    }
   ]
 }
