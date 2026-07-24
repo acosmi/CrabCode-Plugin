@@ -162,7 +162,7 @@ integrationTest(
 );
 
 integrationTest(
-  "limits scan.js changes to branding, namespaces, and the declared XML hardening",
+  "limits scan.js changes to branding, namespaces, and the declared XML + log-sanitization hardening",
   async () => {
     const source = await readFile(
       path.join(upstreamPlugin, "workflows", "scan.js"),
@@ -180,14 +180,42 @@ integrationTest(
     expect(target.split(targetEscaper)).toHaveLength(2);
     expect(target.match(/fe\(o\)/g)).toHaveLength(6);
 
+    // F2 hardening: the untrusted inventory component name/reason is routed through
+    // the existing S() sanitizer at the four log() transcript sinks. Pin each edit so
+    // an unreviewed change to these lines fails, then reverse them below.
+    for (const sink of [
+      'log(S(e.name)+": skipping memory-and-unsafe',
+      'Be.map(e=>S(e.name)+" -- "+S(e.reason)).join("; ")',
+      'dropped: "+Me.slice(ee).map(e=>S(e.name)).join(", ")',
+      'component(s): "+qe.map(e=>S(e.name)).join(", ")',
+    ]) {
+      expect(target.split(sink)).toHaveLength(2);
+    }
+
     const reverted = target
       .replace(targetEscaper, sourceEscaper)
       .replaceAll("fe(o)", "o")
+      .replace(
+        'log(S(e.name)+": skipping memory-and-unsafe',
+        'log(e.name+": skipping memory-and-unsafe',
+      )
+      .replace(
+        'Be.map(e=>S(e.name)+" -- "+S(e.reason)).join("; ")',
+        'Be.map(e=>e.name+" -- "+e.reason).join("; ")',
+      )
+      .replace(
+        'dropped: "+Me.slice(ee).map(e=>S(e.name)).join(", ")',
+        'dropped: "+Me.slice(ee).map(e=>e.name).join(", ")',
+      )
+      .replace(
+        'component(s): "+qe.map(e=>S(e.name)).join(", ")',
+        'component(s): "+qe.map(e=>e.name).join(", ")',
+      )
       .replaceAll("CrabCode", sourceTitle)
       .replaceAll("crabcode", sourceLower);
 
     expect(reverted).toBe(source);
-    expect(Buffer.byteLength(target) - Buffer.byteLength(source)).toBe(106);
+    expect(Buffer.byteLength(target) - Buffer.byteLength(source)).toBe(121);
   },
 );
 

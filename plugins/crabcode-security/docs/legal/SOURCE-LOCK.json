@@ -73,10 +73,10 @@
     },
     "targetSnapshot": {
       "fileCount": 25,
-      "byteCount": 361113,
+      "byteCount": 361128,
       "manifest": {
         "algorithm": "sha256",
-        "digest": "ec70515a65b70c370669ac710eacdd8f18b7193757b574262fc06926544e4bea",
+        "digest": "cc9bfbed1482d5b2be04d16030afb5eab07e6f56f3c32da06ef3649d222e638a",
         "canonicalization": "Sort records by UTF-8 targetPath ascending; encode each as targetPath + TAB + decimal targetSize + TAB + lowercase targetSha256 + LF; concatenate without a header."
       }
     },
@@ -91,8 +91,8 @@
     },
     "replay": {
       "patchPath": "plugins/crabcode-security/docs/legal/FULL-PORT.patch",
-      "patchSize": 475580,
-      "patchSha256": "da912e2ca5e002816ccb9ee3818ea30ff46fe6a9788a0df17fbe05894b99ba08",
+      "patchSize": 475595,
+      "patchSha256": "43935dc54fbe9677a2d678a7dfa5d44e0eb843c9ba6c360e571ca7ca9f59ae5a",
       "stripComponents": 2,
       "expectedResultFileCount": 25,
       "normalization": {
@@ -123,8 +123,8 @@
       },
       "environment": {
         "bunVersion": "1.3.11",
-        "gitVersion": "git version 2.50.1 (Apple Git-155)",
-        "platform": "darwin-arm64",
+        "gitVersion": "git version 2.47.3",
+        "platform": "linux-x64",
         "locale": "C"
       },
       "sealResult": {
@@ -639,8 +639,8 @@
         "namespaceRename",
         "securityHardening"
       ],
-      "targetSize": 32038,
-      "targetSha256": "6dd4e02279439770c9d7551a5a29012a212518d96e1b517aedaed6df256b7061",
+      "targetSize": 32053,
+      "targetSha256": "574424311f02b522ce2fa0bd010bafd467ed2abb43c604d1ee513dfdb9ff312f",
       "targetMode": "100644"
     }
   ]

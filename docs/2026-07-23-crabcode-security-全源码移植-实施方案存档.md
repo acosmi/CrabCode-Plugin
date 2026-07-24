@@ -1024,7 +1024,7 @@ promotion gate 固定为受控手动或定时任务，不进入每个 PR 的必�
 - [x] 生成文件 SHA256/blob/mode 清单
 - [x] 创建 `SOURCE-LOCK.json`
 - [x] 创建 `PORTING-MAP.md`
-- [x] 生成并锁定 `FULL-PORT.patch`，刷新 `SOURCE-LOCK.json` 的 staged Marketplace、promotion 快照、normalization、工具哈希与实际 replay 结果；在空临时目录先 materialize 固定上游 25 个 blob，再逐字节重放（patch `475580` bytes，SHA256 `da912e2ca5e002816ccb9ee3818ea30ff46fe6a9788a0df17fbe05894b99ba08`；目标 25 文件、`361113` bytes，manifest SHA256 `ec70515a65b70c370669ac710eacdd8f18b7193757b574262fc06926544e4bea`；verifier `505` 项通过）
+- [x] 生成并锁定 `FULL-PORT.patch`，刷新 `SOURCE-LOCK.json` 的 staged Marketplace、promotion 快照、normalization、工具哈希与实际 replay 结果；在空临时目录先 materialize 固定上游 25 个 blob，再逐字节重放（patch `475595` bytes，SHA256 `43935dc54fbe9677a2d678a7dfa5d44e0eb843c9ba6c360e571ca7ca9f59ae5a`；目标 25 文件、`361128` bytes，manifest SHA256 `cc9bfbed1482d5b2be04d16030afb5eab07e6f56f3c32da06ef3649d222e638a`；verifier `505` 项通过）
 
 ### CrabCode Runtime
 
@@ -1167,7 +1167,7 @@ OS 级文件系统/网络/进程隔离与不加载项目指令、Hook、MCP 的 
 | 来源锁 | `plugins/crabcode-security/docs/legal/SOURCE-LOCK.json` | 固定 commit、tree/subtree、blob、mode、target mapping |
 | 人工差异表 | `plugins/crabcode-security/docs/legal/PORTING-MAP.md` | 逐文件差异类别和测试关联 |
 | Marketplace 快照 | `plugins/crabcode-security/docs/legal/UPSTREAM-MARKETPLACE-ENTRY.json`、`TARGET-MARKETPLACE-ENTRY.json` | 目录外来源与 `staged-not-active` 目标候选 |
-| 重放 patch | `plugins/crabcode-security/docs/legal/FULL-PORT.patch` | 在空临时目录先 materialize 固定上游 25 个 blob 后的完整目标重建证明；`475580` bytes，SHA256 `da912e2ca5e002816ccb9ee3818ea30ff46fe6a9788a0df17fbe05894b99ba08` |
+| 重放 patch | `plugins/crabcode-security/docs/legal/FULL-PORT.patch` | 在空临时目录先 materialize 固定上游 25 个 blob 后的完整目标重建证明；`475595` bytes，SHA256 `43935dc54fbe9677a2d678a7dfa5d44e0eb843c9ba6c360e571ca7ca9f59ae5a` |
 | 来源工具 | `scripts/build-crabcode-security-port-patch.ts`、`seal-crabcode-security-port.ts`、`verify-crabcode-security-port.ts` | 生成器复算、原子 seal、25/25、mode、staged Marketplace、promotion selector 与重放等式；三项工具自身哈希进入锁，固定上游完整 checkout 通过 `505` 项检查 |
 | 插件测试 | `tests/crabcode-security/` | 来源、差分、Workflow host、脚本、边界和 Banner 的确定性证据 |
 | 运行入口 | `plugins/crabcode-security/skills/crabcode-security/jobs/`、`plugins/crabcode-security/workflows/scan.js` | 三个任务和控制流合同 |
@@ -1177,7 +1177,7 @@ OS 级文件系统/网络/进程隔离与不加载项目指令、Hook、MCP 的 
 | Core 交叉复核副本 | `/private/tmp/CrabCode-security-runtime-copy` | 与 Core 候选提交的预提交 50 路径字节范围具有相同聚合 SHA256；仅用于验证交叉复核，不是权威落点或发布证据 |
 | 私有 Core 审计归档 | `/Users/fushihua/.codex/visualizations/2026/07/23/019f8fcf-ca67-78c2-8b72-7cbcc6025999/private-core/2026-07-23-crabcode-security-private-core-实施审计归档.md` | 仅含私有实现元数据、测试结果、边界和变更清单，不向公开插件仓复制 Core 源码或 patch；SHA256 `7b66968d569e2308c68175110be4fe81728015eb23253f320723bc2ec0805860` |
 
-本次本地可复现 seal 的精确值已经写入 `SOURCE-LOCK.json`：上游 manifest SHA256 为 `c1273995451841d9ae9f1015683920efdd47c4006ab31589b04e62b35ca88a7d`，目标 manifest SHA256 为 `ec70515a65b70c370669ac710eacdd8f18b7193757b574262fc06926544e4bea`，目标 Marketplace 规范化条目 SHA256 为 `32cdc33f271035c5e418214e7d9dccaf58058fce7d8804e0303e676ebcafe090`，重放 patch SHA256 为 `da912e2ca5e002816ccb9ee3818ea30ff46fe6a9788a0df17fbe05894b99ba08`。公开实现提交 `49b9c68afbbf648b34033686007334545d5e0842` 与 Core 实现提交 `869045f3e857a3c81d8d8e83d78cbeed8d64219f` 均已推送独立候选分支；独立 review、commit-bound 远程 CI、构建制品、合并和发布记录尚未生成，不得把候选分支称为发布封存。
+本次本地可复现 seal 的精确值已经写入 `SOURCE-LOCK.json`：上游 manifest SHA256 为 `c1273995451841d9ae9f1015683920efdd47c4006ab31589b04e62b35ca88a7d`，目标 manifest SHA256 为 `cc9bfbed1482d5b2be04d16030afb5eab07e6f56f3c32da06ef3649d222e638a`，目标 Marketplace 规范化条目 SHA256 为 `32cdc33f271035c5e418214e7d9dccaf58058fce7d8804e0303e676ebcafe090`，重放 patch SHA256 为 `43935dc54fbe9677a2d678a7dfa5d44e0eb843c9ba6c360e571ca7ca9f59ae5a`。公开实现提交 `49b9c68afbbf648b34033686007334545d5e0842` 与 Core 实现提交 `869045f3e857a3c81d8d8e83d78cbeed8d64219f` 均已推送独立候选分支；独立 review、commit-bound 远程 CI、构建制品、合并和发布记录尚未生成，不得把候选分支称为发布封存。
 
 本轮最终本地验证记录：
 

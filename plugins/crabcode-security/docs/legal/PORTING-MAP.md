@@ -43,8 +43,8 @@
 
 目标本地可复现 seal 的实证值为：
 
-- 25 个目标产品文件共 `361113` 字节；目标清单 SHA-256 为 `ec70515a65b70c370669ac710eacdd8f18b7193757b574262fc06926544e4bea`。
-- `FULL-PORT.patch` 为 `475580` 字节，SHA-256 为 `da912e2ca5e002816ccb9ee3818ea30ff46fe6a9788a0df17fbe05894b99ba08`。重放不是“对空目录只应用一个 patch”：校验器先在空临时目录按锁定路径和 mode materialize 固定上游的 25 个 blob，再以 `git apply -p2` 重建目标的 25 个路径、mode 和字节。
+- 25 个目标产品文件共 `361128` 字节；目标清单 SHA-256 为 `cc9bfbed1482d5b2be04d16030afb5eab07e6f56f3c32da06ef3649d222e638a`。
+- `FULL-PORT.patch` 为 `475595` 字节，SHA-256 为 `43935dc54fbe9677a2d678a7dfa5d44e0eb843c9ba6c360e571ca7ca9f59ae5a`。重放不是“对空目录只应用一个 patch”：校验器先在空临时目录按锁定路径和 mode materialize 固定上游的 25 个 blob，再以 `git apply -p2` 重建目标的 25 个路径、mode 和字节。
 - 活动 `.crabcode-plugin/marketplace.json` 中 `crabcode-security` 实得 `0` 条；这个 selector 零匹配只作为 promotion 快照，不绑定无关的 Marketplace 元数据版本。候选条目仅保存在 `TARGET-MARKETPLACE-ENTRY.json`，状态为 `staged-not-active`，其规范 SHA-256 为 `32cdc33f271035c5e418214e7d9dccaf58058fce7d8804e0303e676ebcafe090`。
 - patch generator、sealer 和 verifier 的版本、字节数、SHA-256，显式 normalization 规则及 seal 环境均已写入 `SOURCE-LOCK.json`；`bun run scripts/build-crabcode-security-port-patch.ts --check <完整上游 checkout>` 可复算 patch，`bun run scripts/verify-crabcode-security-port.ts <完整上游 checkout>` 已执行 `505` 项检查。
 - 当前证据已进入公开候选分支 `codex/crabcode-security-full-port-20260724` 的实现提交 `49b9c68afbbf648b34033686007334545d5e0842` 并推送；内容已 commit-pinned，但 review、commit-bound CI、合并与发布 Gate 仍开放，因此不是不可变发布封存。
@@ -133,7 +133,7 @@
 | 22 | 是 | 团队/Workflow 品牌适配；信任文字区分会话已加载配置与工具新读数据；披露模型 provider；保持单命令 Bash、用户沟通和不自动执行报告内容。 | `source-integrity.test.ts`；reference validator；完整 patch 人审 | 用户交互和长任务真实 E2E |
 | 23 | 是 | 从两层产物合同扩展为“owner records + decision record + byte-faithful products”；逐项记录 nonce、报告/仓库/revision/results 绑定、路径/diff 对账、全量预检、受控清理和同用户 TOCTOU 残余。 | `source-integrity.test.ts`；`scripts.test.ts`；`scripts-edge-cases.test.ts`；完整 patch 人审 | 文档合同仍需真实制品消费方 E2E |
 | 24 | 是 | 品牌/文件名适配；报告首段区分 source root 与 analysis root/snapshot；coverage 从顶层目录扩展到所有根条目；同步严格 path/line、panel/ledger、dirty/unversioned 和不可夸大验证状态的合同。 | `scripts.test.ts`；`scripts-edge-cases.test.ts`；`write-scan-meta.test.ts`；`workflow.test.ts`；`workflow-edge-cases.test.ts` | 人类报告可读性与模型叙述质量 |
-| 25 | 否 | 精确差异为 3 处展示品牌、3 处 slash command、3 个 `agentType` namespace，以及 XML escaper 增加 `&/< />` 实体编码并在 whole-tree context、inventory、threat model、sweep、panel、max red-team 共 6 个 `scanRoot` 插值点调用；没有独立 runtime API 或算法 hunk。逆品牌并撤销这两类 escaping 加固后与固定上游逐字节相等，5 文件/300 行阈值、12/24 component cap、400/45 candidate cap、8s/25s retry、三票、2/3 quorum 与 max adversarial 控制流均未改变。 | `workflow.test.ts`；`workflow-edge-cases.test.ts` 覆盖六阶段和原始 `&`；`workflow-host.ts`；`upstream-differential.test.ts` 的精确逆变换；Core `869045f3` runtime/预算/调度本地测试旁证 | provider 随机输出等价、真实制品时延/成本/取消表现；当前产品把宿主给出的 canonical `scanRoot` 纳入可信会话边界，escaping 只是纵深防御而非 hostile-input 沙箱。若未来把路径也视为不可信，仍需结构化/围栏通道并验证特殊字符路径的模型识别 |
+| 25 | 否 | 精确差异为 3 处展示品牌、3 处 slash command、3 个 `agentType` namespace，以及 XML escaper 增加 `&/< />` 实体编码并在 whole-tree context、inventory、threat model、sweep、panel、max red-team 共 6 个 `scanRoot` 插值点调用；以及 securityHardening 追加：不可信 inventory 组件 `name`/`reason` 在 4 个 `log()` transcript sink（memory-and-unsafe 跳过、未扫描组件账、cap 丢弃、保留组件清单）经既有 `S()` 净化（共 5 处 `S(...)` 包裹、+15 字节）以防日志注入。除该净化外无独立 runtime API 或扫描算法 hunk。逆品牌并撤销这两类 escaping 与 5 处 `S()` 日志净化后与固定上游逐字节相等，5 文件/300 行阈值、12/24 component cap、400/45 candidate cap、8s/25s retry、三票、2/3 quorum 与 max adversarial 控制流均未改变。 | `workflow.test.ts`；`workflow-edge-cases.test.ts` 覆盖六阶段和原始 `&`；`workflow-host.ts`；`upstream-differential.test.ts` 的精确逆变换；Core `869045f3` runtime/预算/调度本地测试旁证 | provider 随机输出等价、真实制品时延/成本/取消表现；当前产品把宿主给出的 canonical `scanRoot` 纳入可信会话边界，escaping 只是纵深防御而非 hostile-input 沙箱。若未来把路径也视为不可信，仍需结构化/围栏通道并验证特殊字符路径的模型识别 |
 
 ## 6. 分组交叉复核
 
