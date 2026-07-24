@@ -37,7 +37,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       PYTHONDONTWRITEBYTECODE: "1"
-      PYTHONPYCACHEPREFIX: ${{ runner.temp }}/crabcode-security-pycache
 
     strategy:
       fail-fast: false
@@ -106,7 +105,12 @@ jobs:
         env:
           CRABCODE_SECURITY_UPSTREAM_CHECKOUT: ${{ runner.temp }}/crabcode-security-upstream
       - run: sh -n plugins/crabcode-security/hooks/banner_hook.sh
-      - run: >-
+      - name: Byte-compile the plugin's Python sources
+        env:
+          # runner.temp is available at step scope (not job scope); keep py_compile
+          # bytecode out of the checked-out workspace.
+          PYTHONPYCACHEPREFIX: ${{ runner.temp }}/crabcode-security-pycache
+        run: >-
           python -m py_compile
           plugins/crabcode-security/hooks/banner_notice.py
           plugins/crabcode-security/scripts/patch_artifacts.py
