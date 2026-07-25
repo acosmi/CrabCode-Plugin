@@ -2,11 +2,11 @@
 
 > 日期：2026-07-25
 >
-> 状态：立项存档，尚未实施
+> 状态：**已立项，可直接实施。本文件不留待决项**——§6 的每个取值都已写死，实施时按序执行即可，无需再回来做选择。
 >
 > 审计范围：`crabcode-html-video` 的外部二进制解析与探测路径、嵌套超时预算的对齐关系、探针失败的降级语义，以及全仓同类问题
 >
-> CrabCode-Plugin 基线：`62e1783`
+> CrabCode-Plugin 基线：`b659558`（发现均在 `62e1783` 上读码坐实）
 >
 > 触发来源：PR #4（merge `62e1783`）的实测推翻了本仓记忆中"消除冗余浏览器探针可将 doctor 延迟砍半"的预估
 
@@ -20,7 +20,7 @@
 2. `runFfmpeg()` 每次调用都重新执行 `resolveFfmpegPath()`，因此一次多段渲染中的每条 ffmpeg 命令都先额外付一次 `-version` 探测。解析结果从未被缓存。
 3. 探测统一压在 **5000ms** 上限上——与 07-24 把 CI 顶红的那个数字相同——且探测失败不是报错，而是**静默降级**（换用系统 ffmpeg，或让测试静默 `skip`）。
 4. 至少两处**嵌套超时倒挂**：外层墙钟预算小于它所包裹的内层预算，使内层参数永远不可达。这与把 CI 顶红的缺陷（外层 5000ms < 内层 30s）是同一个不变式被违反。
-5. `doctor` 约 6.6s 的耗时归属**仍未定论**。ffmpeg-static 冷加载是当前最有依据的怀疑对象，但**未实测**，本方案的第一优先级就是把它测定，而不是直接动手改。
+5. `doctor` 约 6.6s 的耗时归属**仍未定论**。批次 A 用一次"同会话内连续调用两次 doctor"的测量直接判定它是一次性成本还是每次成本，**批次 B 的修复不依赖该结论**。
 
 一条必须先写下来的反直觉结论，否则本方案会重蹈 PR #4 的覆辙：**去重不等于省下冷加载**。冷加载成本由第一次 spawn 承担，第二次已在 page cache 中。因此 F1 的去重只回收"温成本"（每次数十毫秒量级），**不能**预期它消除那 2.3–7s。谁要宣称它能，先测。
 
@@ -115,6 +115,8 @@ export async function runFfmpeg(args: string[], opts?: ProcessRunOptions) {
 
 两处的 `signal` 都由外层 `renderCancellation` 提供并向内传递，因此实际生效值恒为外层。后果不是挂死，而是：**内层那个参数是死配置**，且用户看到的错误永远是 `render wall timeout`，而非"第 N 段超时"，定位信息丢失。
 
+注意墙钟值可经 `CRABCODE_HTML_VIDEO_WALL_TIMEOUT_MS` / `..._PREVIEW_TIMEOUT_MS` 配置（`cancellation.ts:5` `boundedWallTimeoutMs`，上限 30 分钟），因此倒挂是**默认值下成立**，而非所有配置下成立。§6 的修法让它在任何配置下都成立。
+
 严重度：**中**（诊断误导 + 死旋钮，非正确性）。
 
 ### F4 探针失败转为静默 `skip`，CI 保持绿（已确认）
@@ -122,33 +124,29 @@ export async function runFfmpeg(args: string[], opts?: ProcessRunOptions) {
 - `ffmpeg.test.ts:14-15`：`const mediaTest = ffmpegAvailable ? test : test.skip`
 - `seek-shim/src/index.test.ts:109`：`test.skipIf(!chromiumPath)(...)`
 
-两者都把"外部依赖探测失败"翻译成"跳过"，并且跳过计数不会让 job 变红。PR #4 新增的三条 POSIX-only 测试同样使用这个模式（这是刻意对齐仓内既有约定），因此该模式的覆盖损失面还在扩大。
+两者都把"外部依赖探测失败"翻译成"跳过"，并且跳过计数不会让 job 变红。
 
 严重度：**中**。当前 CI runner 上 ffmpeg 与 Chromium 均可用（实测 `(pass) audio mux [209ms]`、`(pass) real Chromium [886ms]`），所以尚未真实丢覆盖；风险在于它丢的时候**没有任何信号**。
 
-### F5 `doctor` 那约 6.6s 到底在哪（**待实测，本方案第一优先级**）
+需与**平台门**区分：`packages/multi-segment/src/browser.test.ts` 的 `test.skipIf(process.platform === 'win32')` 跳过的是"这台机器不是 POSIX"，不是"依赖缺失"，**不在 F4 的整改范围内，保持 skip**。
 
-已知：同文件另两条只做 MCP connect 的测试为 348ms / 310ms，故 connect 约 300ms，其余约 6.6s 在 `doctor` 处理器内部。远端模式下 `@hyperframes/producer` 不被导入、`probeProducer` 因无 URL 返回 null，故无网络 I/O。
+### F5 `doctor` 那约 6.6s 到底在哪（**待实测，由批次 A 判定**）
 
-浏览器侧已实测出局（约 20ms）。剩余候选：
+已知：同文件另两条只做 MCP connect 的测试为 348ms / 310ms，故 connect 约 300ms，其余约 6.6s 在 `doctor` 处理器内部。远端模式下 `@hyperframes/producer` 不被导入、`probeProducer` 因无 URL 返回 null，故无网络 I/O。浏览器侧已实测出局（约 20ms）。
 
-1. **ffmpeg 探测（当前最有依据）**：`resolveFfmpegPath` 把 ffmpeg-static 的 77MB 二进制排在系统 ffmpeg 之前，doctor 路径上冷加载它。旁证有二：跨运行 2.3–7s 的波动符合冷盘读特征；排在其后执行的 audio-mux 测试仅需 209ms，符合 page cache 已热。
-2. `verifyProducerRuntimeAssets()` 读取并 sha256 `dist/hyperframe.runtime.iife.js`（本地实测 251KB，量级不符，优先级低）。
-3. bun 加载 `server.js` 包中 doctor 分支的惰性代价。
+剩余候选：① ffmpeg 探测（当前最有依据：77MB 二进制冷加载，且跨运行 2.3–7s 的波动符合冷盘读特征，排在其后的 audio-mux 测试仅 209ms 符合 page cache 已热）；② `verifyProducerRuntimeAssets()` 读取并 sha256 `dist/hyperframe.runtime.iife.js`（实测 251KB，量级不符）；③ bun 加载 server 包中 doctor 分支的惰性代价。
 
-**明确标注：以上均未实测，不得作为结论引用。** 本方案不接受"看起来最像"就动手。
+**以上均未实测，不得作为结论引用。**
 
 ## 4. 全仓同类问题
 
-| 位置 | 形状 | 状态 |
+| 位置 | 形状 | 处置 |
 |---|---|---|
-| `crabcode-html-video` | 见 F1–F5 | 已确认 |
-| `crabcode-media-ops` `src/tools/doctor.ts:58` + `src/qa/delivery-qa.ts:475,490` | `Bun.which('java')` 判存在，随后 `runCommand([javaBin, '-version'])` 再探一次；与 F1 同形 | **疑似，需独立一次审计** |
-| `crabwork-bio-research/skills/nextflow-development/scripts/check_environment.py` | `shutil.which` + `subprocess([..., '-version'])`；独立环境检查脚本，不在热路径 | 已确认存在但低优先级 |
+| `crabcode-html-video` | 见 F1–F5 | 本方案范围 |
+| `crabcode-media-ops` `src/tools/doctor.ts:58` + `src/qa/delivery-qa.ts:475,490` | `Bun.which('java')` 判存在，随后 `runCommand([javaBin, '-version'])` 再探一次；与 F1 同形 | 疑似，**明确不并入本次**，另立 |
+| `crabwork-bio-research/skills/nextflow-development/scripts/check_environment.py` | `shutil.which` + `subprocess([..., '-version'])`；独立环境检查脚本，不在热路径 | 已确认存在，**不处理** |
 
-`crabcode-media-ops` 那一条不并入本次范围：它是另一个插件、另一套 CI job，混进来会让本方案的验收标准失去边界。
-
-## 5. 测量方法学（本方案的硬约束）
+## 5. 测量方法学（硬约束）
 
 本节的存在本身就是 PR #4 的产物。以下四条为**强制**，违反则结论无效：
 
@@ -157,44 +155,113 @@ export async function runFfmpeg(args: string[], opts?: ProcessRunOptions) {
 3. **未实测的性能收益不得写入提交信息、PR 正文或记忆**；确需记录时必须显式标注"未实测"。
 4. **冷/温必须分别标注**。去重只回收温成本；冷成本由第一次 spawn 承担。任何"消除冗余调用可省 X 秒"的表述，先回答"这次 spawn 是冷的还是温的"。
 
-## 6. 实施方案（分批，严格按序）
+## 6. 实施方案
+
+**顺序强制：A 必须在 B 之前完成并取得数据。** 原因：B 的记忆化会让 A 的测量对象（重复解析的成本）消失，届时再测已无意义。
 
 ### 批次 A：测定 F5（不改任何生产逻辑）
 
-1. 新增一条**只测量 ffmpeg 解析成本**的测试（对齐 PR #4 `browser.test.ts` 的做法）：分别测 `resolveFfmpegPath()` 首次调用与二次调用，二者之差即冷/温差值。
-2. 同一提交跑两轮 CI，取得噪声基线。
-3. 若冷成本占 `doctor` 6.6s 的主要部分 → F5 结案，进入批次 C；若不占 → 按候选 2、3 顺次排查，**不进入批次 C**。
+在 `plugins/crabcode-html-video/tests/mcp-stdio.test.ts` 中新增一条测试，**同一 MCP 会话内连续调用两次 `doctor`** 并输出两次耗时：
 
-批次 A 的产出是数据，不是修复。它必须先于 B、C 落地。
+```ts
+test('measure: doctor first vs second call in one session', async () => {
+  const connected = await connect({ CRABCODE_HTML_VIDEO_RENDER_MODE: 'remote' })
+  const t0 = performance.now()
+  await connected.callTool({ name: 'doctor', arguments: {} })
+  const first = performance.now() - t0
+  const t1 = performance.now()
+  await connected.callTool({ name: 'doctor', arguments: {} })
+  const second = performance.now() - t1
+  console.log(`[measure] doctor first=${first.toFixed(0)}ms second=${second.toFixed(0)}ms`)
+}, 120_000)
+```
 
-### 批次 B：与 F5 结论无关、可独立落地的修复
+这个设计不依赖测试文件执行顺序，也不需要制造冷 page cache：两次调用在同一进程内，第二次对 page cache 而言必然是温的，**差值即一次性成本**。
 
-- **F3**：把两处倒挂的内层预算改为由外层派生（或直接删除内层死旋钮），使"外层 ≥ 内层"成立；并为该不变式补一条测试，防止再次倒挂。这是与 07-24 CI 红同类的问题，独立于 F5 的结论都应该修。
-- **F4**：让探测失败产生**可见信号**（例如在 CI 环境变量下把 skip 升级为 fail，或至少输出一行说明"因 X 不可用而跳过 N 条"）。目标是"丢覆盖时有声音"，不是取消 skip 机制。
-- **F2 的一半**：把 `canRunBinary` 的 5000ms 提高到与被探测对象的实际分布相称，并**注释写明依据**（对齐 PR #3 确立的"按工具自身预算上限设，不按实测典型值设"）。
+判据（写死，实施时直接套用）：
 
-### 批次 C：仅在批次 A 确认冷加载主导时执行
+- `first − second ≥ 1500ms` → **一次性成本主导**，F5 结案为"冷加载类"，在批次 B 的注释中记录该数字。
+- `first − second < 1500ms` 且 `second ≥ 1500ms` → **每次成本**，F5 结案为"per-call 工作"，另开工单排查候选 ②③，**不阻塞批次 B**。
+- 其余情况 → 记录数字，F5 标记为"低于噪声，暂不追查"，**不阻塞批次 B**。
 
-- **F1 / F1b**：给 `resolveFfmpegPath` / `resolveFfprobePath` 加进程级记忆化，并让探针结果随路径返回（复用 PR #4 在 `BrowserResolveResult` 上确立的形状）。预期收益是温成本 × 调用次数，**不预期消除冷成本**。
-- **偏好顺序是决策而非修复**：`resolveFfmpegPath` 目前把 ffmpeg-static 排在系统 ffmpeg 之前，这是版本固定与编解码器保证的**刻意选择**。若批次 A 证明冷加载确实主导，改序需要单独决策，并评估"版本不再固定"的代价，不得作为性能优化顺手做掉。
+按 §5 第 1 条，本测试须在**同一份代码**上跑两轮 CI 取噪声基线，两轮数字都写进批次 B 的提交信息。
+
+批次 A 的产出是数据，不是修复；完成后**保留**这条测试（它同时是 doctor 的回归探针）。
+
+### 批次 B：全部修复（不依赖 A 的结论，A 完成后即可实施）
+
+按下列顺序执行，每步的取值均已写死：
+
+**B1 统一外部二进制探测上限为 `20_000`**
+
+- 在 `packages/multi-segment/src/browser.ts` 顶部新增并导出 `export const EXTERNAL_BINARY_PROBE_TIMEOUT_MS = 20_000`，经 `packages/multi-segment/src/index.ts` 导出。
+- 替换以下四处的字面量：`ffmpeg.ts:83`（5000）、`browser.ts:44`（10_000）、`src/tools/doctor.ts:51`（10_000）、`packages/multi-segment/src/ffmpeg.test.ts:14`（5000）。
+- 注释写明依据：探测对象含 ffmpeg-static 的 77MB 静态二进制；5000 与 10_000 都是无依据的数字；探测失败的代价是静默降级（F2），因此按"最坏预算"设，与 PR #3 确立的纪律一致。代价是探针挂死时最坏等待由 5s/10s 变为 20s，此代价被接受。
+
+**B2 同步放大 doctor 测试的允许上限（B1 的连锁项，不可遗漏）**
+
+B1 之后 doctor 的最坏预算变为 ffmpeg 20s + chrome 20s = 40s，已顶穿 `tests/mcp-stdio.test.ts:123` 现有的 `60_000`——**这正是本方案要修的倒挂**。因此：
+
+- `tests/mcp-stdio.test.ts` 中 doctor 那条测试的允许上限 `60_000` → `120_000`。
+- `packages/seek-shim/src/index.test.ts:139` 的 `60_000` **不动**：它是 puppeteer 启动 Chromium，不经过这些探针。
+
+方向是**放大**，与 §7 "不因变快就收紧"的纪律一致，不构成回调。
+
+**B3 F1 / F1b：探针随路径返回 + 记忆化**
+
+在 `packages/multi-segment/src/ffmpeg.ts`：
+
+- 新增 `export interface FfmpegResolveResult { path: string; probe: { ok: boolean; versionLine: string | null } | null }` 与 `export function resolveFfmpegPathDetailed(): FfmpegResolveResult`，形状对齐 PR #4 的 `BrowserResolveResult.probe`。
+- `resolveFfmpegPath(): string` 保留，实现改为 `resolveFfmpegPathDetailed().path`，其余调用方不动。
+- 模块级记忆化：缓存 `{ envKey, result }`，`envKey` 为 `HYPERFRAMES_FFMPEG_PATH`、`CRABCODE_FFMPEG_PATH`、`FFMPEG_PATH` 三者的拼接。**关键细节**：`doctor.ts:66` 在探测成功后会写回 `process.env.HYPERFRAMES_FFMPEG_PATH = ffmpeg`，这会改变 `envKey`；因此缓存命中规则须为"**若新的 env 指向的路径与缓存路径相同且缓存 `probe.ok`，直接返回缓存**"，否则会白白多出一次 spawn。
+- `resolveFfprobePath()` 同样记忆化，其内部对 `resolveFfmpegPath()` 的调用因此变为缓存命中。
+- `src/tools/doctor.ts:48-51`：改用 `resolveFfmpegPathDetailed()`，删除第 51 行的二次 `spawnSync`，`checks.ffmpeg` 的字段与取值保持不变（`path` / `ok` / `versionLine` / `env` 四项，取自返回的 probe）。
+
+**B4 F3：消除嵌套超时倒挂**
+
+- `src/tools/renderFrames.ts`：把 `boundedWallTimeoutMs('CRABCODE_HTML_VIDEO_WALL_TIMEOUT_MS', 270_000)` 的返回值提为局部常量 `wallMs`，同时用于 `renderCancellation(context.signal, wallMs)` 与传入 `renderMultiSegment({ ..., segmentTimeoutMs: wallMs })`。
+- `src/tools/previewFrame.ts`：把 `boundedWallTimeoutMs('CRABCODE_HTML_VIDEO_PREVIEW_TIMEOUT_MS', 120_000)` 提为 `previewMs`，同时用于 `renderCancellation` 与 `renderViaProducerHttp({ ..., timeoutMs: previewMs })`（替换第 114 行的 `300_000`）。
+- `render.ts:43` 的 `segmentTimeoutMs?: number` 与 `:125` 的 `?? 600_000` **保留不动**（供无外层约束的直接调用方使用）。
+- **不新增测试**：修复后两个值来自同一局部变量，不变式由构造保证，再加测试等于测试语言本身。此项为已决定，不要在实施时改主意。
+
+**B5 F4：让覆盖损失可见**
+
+在 `packages/multi-segment/src/ffmpeg.test.ts` 与 `packages/seek-shim/src/index.test.ts` 各自内联（两个包相互独立，此处重复是正确的，不要抽公共模块）：
+
+```ts
+if (process.env.CI && !ffmpegAvailable) {
+  throw new Error('CI 要求 ffmpeg 可用，探测失败意味着覆盖损失而非环境差异')
+}
+```
+
+（seek-shim 处把条件换成 `!chromiumPath`、文案换成 Chromium。）模块顶层抛出会让该文件失败、job 变红，即所需信号。本地开发（无 `CI`）行为不变，仍 skip。
+
+`browser.test.ts` 的 POSIX 平台门**不改**（见 F4 末段）。
+
+### 交付方式
+
+按本仓惯例：分支 `task/html-video-external-binary-cost-20260725` → PR → 合并。批次 A 与批次 B 可以是同一 PR 的两个提交，但 **A 的提交必须先落地并跑过两轮 CI**，其数字写进 B 的提交信息。
 
 ## 7. 明确不做
 
-- 不在本方案内处理 `crabcode-media-ops` 的 java 探针（另立）。
-- 不回调 PR #3 确立的两个 `60_000` 测试上限。即使批次 C 让 doctor 变快，门限依然按工具最坏预算设——"因为现在变快了就收紧"正是本仓刚吃过亏的思路。
-- 不为性能往生产代码里加常驻计时或埋点。
-- 不在批次 A 出数据之前改任何 ffmpeg 解析逻辑。
+- **不改 `resolveFfmpegPath` 的偏好顺序。** 它把 ffmpeg-static 排在系统 ffmpeg 之前，是版本固定与编解码器保证的刻意选择；即使批次 A 证明冷加载主导，改序会让产出不再可复现，代价大于收益。**此项为已决定，不是待决**；将来若要改，另立独立方案并单独评估。
+- 不在本方案内处理 `crabcode-media-ops` 的 java 探针（另立），也不处理 bio-research 的环境检查脚本。
+- 不回调 PR #3 确立的两个 `60_000`。B2 是**放大**（60_000 → 120_000）且仅针对 doctor 那条，seek-shim 那条不动；"因为现在变快了就收紧"是本仓刚吃过亏的思路。
+- 不为性能往生产代码里加常驻计时或埋点（批次 A 的计时在测试内，不进生产路径）。
 
 ## 8. 验收标准
 
-1. F5 有实测数字，且该数字来自同代码两轮基线之上的对比。
-2. F3 的两处倒挂消除，并有一条测试守住"外层 ≥ 内层"。
-3. F4 的覆盖损失可观测：人为使 ffmpeg 不可用时，CI 有明确信号而非静默变绿。
-4. F2 的每个超时常数在代码中都能回答"这个数字的依据是什么"。
-5. 本方案中任何一条被实测推翻时，**更正写回本文件与对应记忆**，与 PR #4 的处理方式一致。
+1. 批次 A 的两轮 CI 数字已记录在批次 B 的提交信息中，且 F5 已按 §6 的三条判据之一结案。
+2. 四处探测上限已统一为 `EXTERNAL_BINARY_PROBE_TIMEOUT_MS`，且 `tests/mcp-stdio.test.ts` 的 doctor 允许上限已同步为 `120_000`（B1 与 B2 必须同批落地，缺一即重现倒挂）。
+3. `doctor` 处理器内不再出现第二次 ffmpeg `spawnSync`；`checks.ffmpeg` 的输出字段与取值与改动前一致。
+4. `renderFrames` / `previewFrame` 各自只有一处墙钟预算字面量，内层不再出现独立的 `300_000`。
+5. 人为使 ffmpeg 不可用并置 `CI=1` 时，`bun test ./packages` 变红且报出上述文案；不置 `CI` 时仍为 skip。
+6. `bun run typecheck`、`bun test ./tests ./packages`、`bun run check:distribution` 全绿，dist 已重封提交且洁净度检查通过。
+7. 本方案中任何一条被实测推翻时，**更正写回本文件与对应记忆**，与 PR #4 的处理方式一致。
 
 ## 9. 相关记录
 
 - PR #3 `815ae9d` / merge `1537c59`：外部二进制测试超时对齐工具自身预算（CI 常红的直接修复）
 - PR #4 `c800c86` / merge `62e1783`：doctor 复用 resolve 已付过的浏览器探针（本方案的触发来源）
 - 记忆 `html-video-ci-env-red`：根因、六次实测数据、以及被推翻的"砍半"预估
+- 记忆 `shared-worktree-concurrent-sessions`：本工作树存在并发会话，提交前须确认 HEAD
