@@ -121,4 +121,21 @@ describe('MCP stdio contract', () => {
     expect(JSON.stringify(result.structuredContent)).not.toContain('opaque-name-must-not-bypass-allowlist')
     expect(JSON.stringify(result.structuredContent)).not.toContain('allowed-render-worker-secret')
   }, 60_000)
+
+  // doctor has been observed between 2.3s and 7.0s on identical code, and where
+  // that time goes was never measured. Two calls in one session separate the two
+  // possibilities: whatever is paid once (loading a large static binary into the
+  // page cache, lazy module init) lands only in `first`, while per-call work
+  // shows up in `second` too. Keep this test after the measurement lands — it
+  // doubles as a regression probe on doctor's cost.
+  test('measure: doctor first vs second call in one session', async () => {
+    const connected = await connect({ CRABCODE_HTML_VIDEO_RENDER_MODE: 'remote' })
+    const t0 = performance.now()
+    await connected.callTool({ name: 'doctor', arguments: {} })
+    const first = performance.now() - t0
+    const t1 = performance.now()
+    await connected.callTool({ name: 'doctor', arguments: {} })
+    const second = performance.now() - t1
+    console.log(`[measure] doctor first=${first.toFixed(0)}ms second=${second.toFixed(0)}ms`)
+  }, 120_000)
 })
