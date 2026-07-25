@@ -1,5 +1,6 @@
 ---
 name: crabcode-md-improver
+display-name: 项目记忆优化
 description: Audit and improve CRABCODE.md files in repositories. Use when user asks to check, audit, update, improve, or fix CRABCODE.md files. Scans for all CRABCODE.md files, evaluates quality against templates, outputs quality report, then makes targeted updates. Also use when the user mentions "CRABCODE.md maintenance" or "project memory optimization".
 tools: Read, Glob, Grep, Bash, Edit
 ---

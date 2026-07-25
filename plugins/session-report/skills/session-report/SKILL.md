@@ -1,5 +1,6 @@
 ---
 name: session-report
+display-name: 会话用量报告
 description: Generate an explorable HTML report of CrabCode session usage (tokens, cache, agents, skills, expensive prompts) from ~/.crabcode/projects transcripts.
 ---
 

@@ -1,5 +1,6 @@
 ---
 name: mcp-builder
+display-name: MCP 服务开发
 description: "Guide for creating high-quality MCP (Model Context Protocol) servers that enable agents to interact with external services through well-designed tools. Use this skill when building an MCP server to integrate an external API or service, whether in Python (FastMCP) or Node/TypeScript (MCP SDK)."
 license: Apache-2.0. See ../../docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---

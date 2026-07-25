@@ -1,6 +1,6 @@
 {
   "name": "crabcode-memory-management",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Maintain and improve CRABCODE.md project memory files: audit quality, capture session learnings, and keep guidance current.",
   "author": {
     "name": "CrabCode"

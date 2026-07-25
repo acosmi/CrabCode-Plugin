@@ -1,5 +1,6 @@
 ---
 name: doc-coauthoring
+display-name: 文档协同写作
 description: "Guide the user through a structured workflow for co-authoring documentation. Use this skill when the user wants to write documentation, proposals, technical specs, decision docs, RFCs, PRDs, or similar structured content. The workflow helps the user transfer context efficiently, refine content through iteration, and verify the document works for downstream readers."
 license: Apache-2.0. See ../../docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---

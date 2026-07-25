@@ -1,6 +1,6 @@
 {
   "name": "hookify",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "User-configurable CrabCode hooks driven by markdown rule files in .crabcode/hookify.*.local.md. Block or warn on Bash, Edit/Write/MultiEdit, Stop, and UserPromptSubmit events using regex or structured conditions.",
   "author": {
     "name": "CrabCode"

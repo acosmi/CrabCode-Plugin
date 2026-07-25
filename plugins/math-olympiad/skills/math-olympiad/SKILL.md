@@ -1,5 +1,6 @@
 ---
 name: math-olympiad
+display-name: 竞赛数学求解
 description:
   "Solve competition math problems (IMO, Putnam, USAMO, AIME) with adversarial
   verification that catches the errors self-verification misses. Activates when

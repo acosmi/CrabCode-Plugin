@@ -1,5 +1,6 @@
 ---
 name: internal-comms
+display-name: 内部沟通文案
 description: "A workflow for writing all kinds of internal communications using formats common in modern teams. Use this skill when the user asks for an internal communication artifact such as a 3P update (Progress, Plans, Problems), a company newsletter, an FAQ response, a status report, a leadership update, a project update, or an incident report."
 license: Apache-2.0. See ../../docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---

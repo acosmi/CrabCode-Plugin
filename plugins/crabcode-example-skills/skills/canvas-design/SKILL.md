@@ -1,5 +1,6 @@
 ---
 name: canvas-design
+display-name: 平面设计创作
 description: "Create beautiful visual art in .png and .pdf documents using a design philosophy. Use this skill when the user asks for a poster, piece of art, design artifact, or other static visual piece. Produce original visual designs; never copy a specific living artist's identifiable style."
 license: Apache-2.0. See ../../docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---
