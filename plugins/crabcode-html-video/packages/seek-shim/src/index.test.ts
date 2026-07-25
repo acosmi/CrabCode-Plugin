@@ -23,6 +23,17 @@ const chromiumPath = [
   Bun.which('chromium'),
 ].find((path): path is string => Boolean(path && existsSync(path)))
 
+// Same rule the multi-segment media tests apply to ffmpeg: on CI a missing
+// Chromium means this file quietly stops covering the parser-differential path
+// while the job stays green. Duplicated on purpose — the two packages are
+// independent, and neither should acquire a dependency on the other to share
+// four lines.
+if (process.env.CI && !chromiumPath) {
+  throw new Error(
+    'CI requires a runnable Chromium: a failed probe here means lost coverage, not a benign environment difference',
+  )
+}
+
 describe('seek-shim', () => {
   test('wraps fragment with composition + seek runtime', () => {
     const r = wrapFrameAsComposition({

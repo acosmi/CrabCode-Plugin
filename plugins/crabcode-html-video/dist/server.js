@@ -24489,12 +24489,16 @@ var init_src = __esm(() => {
   ]);
 });
 
+// node_modules/@crabcode/multi-segment/src/probeTimeout.ts
+var EXTERNAL_BINARY_PROBE_TIMEOUT_MS = 20000;
+
 // node_modules/@crabcode/multi-segment/src/ffmpeg.ts
 var exports_ffmpeg = {};
 __export(exports_ffmpeg, {
   runFfprobe: () => runFfprobe,
   runFfmpeg: () => runFfmpeg,
   resolveFfprobePath: () => resolveFfprobePath,
+  resolveFfmpegPathDetailed: () => resolveFfmpegPathDetailed,
   resolveFfmpegPath: () => resolveFfmpegPath,
   probeDurationSec: () => probeDurationSec,
   muxAudio: () => muxAudio,
@@ -24507,24 +24511,56 @@ import { existsSync, mkdirSync, rmSync, writeFileSync } from "fs";
 import { dirname, join, resolve } from "path";
 import { tmpdir } from "os";
 import { randomUUID } from "crypto";
+function resolveFfmpegPathDetailed() {
+  const envValue = firstEnvValue("HYPERFRAMES_FFMPEG_PATH", "CRABCODE_FFMPEG_PATH", "FFMPEG_PATH");
+  const cached2 = ffmpegCache;
+  if (cached2 && cached2.result.probe?.ok && (envValue === cached2.envValue || envValue === cached2.result.path)) {
+    return cached2.result;
+  }
+  const result = computeFfmpegPath(envValue);
+  ffmpegCache = { envValue, result };
+  return result;
+}
 function resolveFfmpegPath() {
-  const env = process.env.HYPERFRAMES_FFMPEG_PATH || process.env.CRABCODE_FFMPEG_PATH || process.env.FFMPEG_PATH;
-  if (env && existsSync(env) && canRunBinary(env))
-    return env;
+  return resolveFfmpegPathDetailed().path;
+}
+function resolveFfprobePath() {
+  const envValue = firstEnvValue("HYPERFRAMES_FFPROBE_PATH", "CRABCODE_FFPROBE_PATH", "FFPROBE_PATH");
+  const cached2 = ffprobeCache;
+  if (cached2 && envValue === cached2.envValue)
+    return cached2.path;
+  const path = computeFfprobePath(envValue);
+  ffprobeCache = { envValue, path };
+  return path;
+}
+function firstEnvValue(...names) {
+  for (const name52 of names) {
+    const value = process.env[name52];
+    if (value)
+      return value;
+  }
+  return "";
+}
+function computeFfmpegPath(envValue) {
+  if (envValue && existsSync(envValue)) {
+    const fromEnv = probeCandidate(envValue);
+    if (fromEnv)
+      return fromEnv;
+  }
   const fromStatic = resolvePackageBinary("ffmpeg-static");
   if (fromStatic)
     return fromStatic;
-  if (canRunBinary("ffmpeg"))
-    return "ffmpeg";
-  return fromStatic || "ffmpeg";
+  const fromPath = probeCandidate("ffmpeg");
+  if (fromPath)
+    return fromPath;
+  return { path: "ffmpeg", probe: null };
 }
-function resolveFfprobePath() {
-  const env = process.env.HYPERFRAMES_FFPROBE_PATH || process.env.CRABCODE_FFPROBE_PATH || process.env.FFPROBE_PATH;
-  if (env && existsSync(env) && canRunBinary(env))
-    return env;
+function computeFfprobePath(envValue) {
+  if (envValue && existsSync(envValue) && canRunBinary(envValue))
+    return envValue;
   const fromStatic = resolvePackageBinary("ffprobe-static");
   if (fromStatic)
-    return fromStatic;
+    return fromStatic.path;
   const ffmpeg = resolveFfmpegPath();
   if (ffmpeg !== "ffmpeg" && existsSync(ffmpeg)) {
     const sibling = ffmpeg.replace(/ffmpeg(\.exe)?$/i, "ffprobe$1");
@@ -24544,21 +24580,37 @@ function resolvePackageBinary(pkg) {
         const req = createRequire(base);
         const mod = req(pkg);
         const p = typeof mod === "string" ? mod : mod?.path || mod?.default;
-        if (p && existsSync(p) && canRunBinary(p))
-          return p;
+        if (p && existsSync(p)) {
+          const probed = probeCandidate(p);
+          if (probed)
+            return probed;
+        }
       } catch {}
     }
   } catch {}
   return null;
 }
-function canRunBinary(bin) {
+function probeCandidate(path) {
+  const probe = probeBinary(path);
+  return probe.ok ? { path, probe } : null;
+}
+function probeBinary(bin) {
   try {
     const { spawnSync } = __require("child_process");
-    const r = spawnSync(bin, ["-version"], { encoding: "utf-8", timeout: 5000 });
-    return r.status === 0;
-  } catch {
-    return false;
+    const r = spawnSync(bin, ["-version"], {
+      encoding: "utf-8",
+      timeout: EXTERNAL_BINARY_PROBE_TIMEOUT_MS
+    });
+    const versionLine = (r.stdout || "").split(`
+`)[0] || (r.stderr || "").split(`
+`)[0] || null;
+    return { ok: r.status === 0, versionLine };
+  } catch (error40) {
+    return { ok: false, versionLine: null, error: error40 instanceof Error ? error40.message : String(error40) };
   }
+}
+function canRunBinary(bin) {
+  return probeBinary(bin).ok;
 }
 async function runFfmpeg(args, opts) {
   const bin = resolveFfmpegPath();
@@ -24806,6 +24858,7 @@ async function generateToneAudio(outputPath, durationSec, freqHz = 440, sampleRa
   if (r.code !== 0)
     throw new Error(`generateToneAudio failed: ${r.stderr}`);
 }
+var ffmpegCache = null, ffprobeCache = null;
 var init_ffmpeg = () => {};
 
 // node_modules/@crabcode/multi-segment/src/producerClient.ts
@@ -234944,6 +234997,7 @@ import { randomUUID as randomUUID3 } from "crypto";
 async function renderMultiSegment(input3) {
   validateInput(input3);
   const fps = input3.fps ?? 30;
+  const stepTimeoutMs = input3.segmentTimeoutMs ?? 600000;
   const workDir = input3.workDir ?? join53(process.cwd(), ".crabcode-html-video-work", randomUUID3());
   const segDir = join53(workDir, "segments");
   const wrappedDir = join53(workDir, "wrapped");
@@ -234997,7 +235051,7 @@ async function renderMultiSegment(input3) {
           width: seg.width ?? input3.width,
           height: seg.height ?? input3.height,
           durationSec: seg.durationSec,
-          timeoutMs: input3.segmentTimeoutMs ?? 600000,
+          timeoutMs: stepTimeoutMs,
           headers: input3.headers,
           signal: input3.signal
         });
@@ -235018,10 +235072,10 @@ async function renderMultiSegment(input3) {
     progress({ stage: "concat", message: `Concatenating ${segmentPaths.length} segments` });
     const concatPath = join53(workDir, "concat.mp4");
     input3.signal?.throwIfAborted();
-    await concatVideos(segmentPaths, concatPath, { signal: input3.signal });
+    await concatVideos(segmentPaths, concatPath, { signal: input3.signal, timeoutMs: stepTimeoutMs });
     progress({ stage: "mux", message: input3.audioPath ? "Muxing audio" : "Finalizing (no audio)" });
     const finalTmp = join53(workDir, "final.mp4");
-    await muxAudio(concatPath, input3.audioPath ?? null, finalTmp, { signal: input3.signal });
+    await muxAudio(concatPath, input3.audioPath ?? null, finalTmp, { signal: input3.signal, timeoutMs: stepTimeoutMs });
     publishWithoutOverwrite(finalTmp, input3.outputPath);
     const { statSync: statSync16 } = await import("fs");
     const durationSec = await probeDurationSec(input3.outputPath);
@@ -235129,7 +235183,7 @@ import { accessSync as accessSync3, constants as constants7, existsSync as exist
 import { join as join55 } from "path";
 import { delimiter as delimiter2 } from "path";
 import { spawnSync as spawnSync5 } from "child_process";
-function probeCandidate(path16) {
+function probeCandidate2(path16) {
   const probe = probeBrowserExecutable(path16);
   return probe.ok ? { path: path16, probe } : null;
 }
@@ -235137,7 +235191,10 @@ function probeBrowserExecutable(path16) {
   if (!isExecutableFile(path16))
     return { ok: false, versionLine: null, error: "not an executable file" };
   try {
-    const result = spawnSync5(path16, ["--version"], { encoding: "utf8", timeout: 1e4 });
+    const result = spawnSync5(path16, ["--version"], {
+      encoding: "utf8",
+      timeout: EXTERNAL_BINARY_PROBE_TIMEOUT_MS
+    });
     const versionLine = `${result.stdout || ""}
 ${result.stderr || ""}`.split(`
 `).map((line) => line.trim()).find(Boolean) ?? null;
@@ -235153,7 +235210,7 @@ ${result.stderr || ""}`.split(`
 }
 function resolveBrowserPath(cacheDir) {
   const env3 = process.env.HYPERFRAMES_BROWSER_PATH || process.env.PRODUCER_HEADLESS_SHELL_PATH || process.env.PUPPETEER_EXECUTABLE_PATH || process.env.CHROME_PATH;
-  const fromEnv = env3 ? probeCandidate(env3) : null;
+  const fromEnv = env3 ? probeCandidate2(env3) : null;
   if (fromEnv) {
     return { ...fromEnv, source: "env", message: `Using browser from env: ${fromEnv.path}` };
   }
@@ -235173,7 +235230,7 @@ function resolveBrowserPath(cacheDir) {
     "google-chrome",
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
   ]) {
-    const executable = name52.startsWith("/") ? probeCandidate(name52) : findExecutableOnPath(name52);
+    const executable = name52.startsWith("/") ? probeCandidate2(name52) : findExecutableOnPath(name52);
     if (executable) {
       return { ...executable, source: "system", message: `Using system browser: ${executable.path}` };
     }
@@ -235203,7 +235260,7 @@ function findBinary(root2, names, requiredVersion) {
       visited += 1;
       const candidate = join55(current, entry.name);
       if (entry.isFile() && wanted.has(entry.name) && (!requiredVersion || candidate.includes(requiredVersion))) {
-        const probed = probeCandidate(candidate);
+        const probed = probeCandidate2(candidate);
         if (probed)
           return probed;
       }
@@ -235217,7 +235274,7 @@ function findExecutableOnPath(name52) {
   for (const root2 of (process.env.PATH || "").split(delimiter2)) {
     if (!root2)
       continue;
-    const probed = probeCandidate(join55(root2, process.platform === "win32" ? `${name52}.exe` : name52));
+    const probed = probeCandidate2(join55(root2, process.platform === "win32" ? `${name52}.exe` : name52));
     if (probed)
       return probed;
   }
@@ -235263,7 +235320,7 @@ async function ensureBrowser(opts) {
           log(`download ${Math.floor(downloaded / total * 100)}%`);
       }
     });
-    const probed = installed.executablePath ? probeCandidate(installed.executablePath) : null;
+    const probed = installed.executablePath ? probeCandidate2(installed.executablePath) : null;
     if (probed) {
       process.env.HYPERFRAMES_BROWSER_PATH = probed.path;
       process.env.PRODUCER_HEADLESS_SHELL_PATH = probed.path;
@@ -235323,6 +235380,7 @@ __export(exports_src, {
   validateProducerBaseUrl: () => validateProducerBaseUrl,
   runFfmpeg: () => runFfmpeg,
   resolveSafeOutputPath: () => resolveSafeOutputPath,
+  resolveFfmpegPathDetailed: () => resolveFfmpegPathDetailed,
   resolveFfmpegPath: () => resolveFfmpegPath,
   resolveBrowserPath: () => resolveBrowserPath,
   reserveOutputFile: () => reserveOutputFile,
@@ -254107,7 +254165,8 @@ async function handler7(raw2, context3 = {}) {
   const releaseSlot = tryAcquireRenderSlot();
   if (!releaseSlot)
     return fail("render_busy", "render capacity is busy; retry after the active render completes");
-  const cancellation = renderCancellation(context3.signal, boundedWallTimeoutMs("CRABCODE_HTML_VIDEO_WALL_TIMEOUT_MS", 270000));
+  const wallMs = boundedWallTimeoutMs("CRABCODE_HTML_VIDEO_WALL_TIMEOUT_MS", 270000);
+  const cancellation = renderCancellation(context3.signal, wallMs);
   try {
     const result = await renderMultiSegment({
       segments: args.segments,
@@ -254117,6 +254176,7 @@ async function handler7(raw2, context3 = {}) {
       producerUrl,
       headers: producerHeaders,
       signal: cancellation.signal,
+      segmentTimeoutMs: wallMs,
       outputPath,
       audioPath,
       workDir: join57(workDir(), `render-${randomUUID5()}`),
@@ -254294,26 +254354,18 @@ async function handler8(raw2 = {}) {
     version: process.versions.bun || process.version,
     ok: true
   };
-  const ffmpeg = resolveFfmpegPath();
-  let ffmpegOk = false;
-  try {
-    const { spawnSync: spawnSync6 } = await import("child_process");
-    const r = spawnSync6(ffmpeg, ["-version"], { encoding: "utf-8", timeout: 1e4 });
-    ffmpegOk = r.status === 0;
-    checks4.ffmpeg = {
-      path: ffmpeg,
-      ok: ffmpegOk,
-      versionLine: (r.stdout || "").split(`
-`)[0] || r.stderr?.split(`
-`)[0],
-      env: {
-        HYPERFRAMES_FFMPEG_PATH: process.env.HYPERFRAMES_FFMPEG_PATH || null,
-        CRABCODE_FFMPEG_PATH: process.env.CRABCODE_FFMPEG_PATH || null
-      }
-    };
-  } catch (e) {
-    checks4.ffmpeg = { path: ffmpeg, ok: false, error: e instanceof Error ? e.message : String(e) };
-  }
+  const { path: ffmpeg, probe: ffmpegProbe } = resolveFfmpegPathDetailed();
+  const ffmpegOk = ffmpegProbe?.ok === true;
+  checks4.ffmpeg = {
+    path: ffmpeg,
+    ok: ffmpegOk,
+    versionLine: ffmpegProbe?.versionLine ?? null,
+    env: {
+      HYPERFRAMES_FFMPEG_PATH: process.env.HYPERFRAMES_FFMPEG_PATH || null,
+      CRABCODE_FFMPEG_PATH: process.env.CRABCODE_FFMPEG_PATH || null
+    },
+    ...ffmpegProbe?.error ? { error: ffmpegProbe.error } : {}
+  };
   if (ffmpegOk)
     process.env.HYPERFRAMES_FFMPEG_PATH = ffmpeg;
   let browser = resolveBrowserPath(browsersDir());
@@ -254484,7 +254536,8 @@ async function handler9(raw2, context3 = {}) {
       reservation.release();
       return fail("render_busy", "render capacity is busy; retry after the active render completes");
     }
-    const cancellation = renderCancellation(context3.signal, boundedWallTimeoutMs("CRABCODE_HTML_VIDEO_PREVIEW_TIMEOUT_MS", 120000));
+    const previewMs = boundedWallTimeoutMs("CRABCODE_HTML_VIDEO_PREVIEW_TIMEOUT_MS", 120000);
+    const cancellation = renderCancellation(context3.signal, previewMs);
     let htmlWritten = false;
     try {
       writeFileSync18(htmlPath, wrapped.html, { encoding: "utf-8", flag: "wx", mode: 384 });
@@ -254500,7 +254553,7 @@ async function handler9(raw2, context3 = {}) {
           width,
           height,
           durationSec,
-          timeoutMs: 300000,
+          timeoutMs: previewMs,
           headers: producerHeaders,
           signal: cancellation.signal
         });

@@ -92,10 +92,11 @@ export async function handler(raw: unknown, context: ToolContext = {}): Promise<
       reservation.release()
       return fail('render_busy', 'render capacity is busy; retry after the active render completes')
     }
-    const cancellation = renderCancellation(
-      context.signal,
-      boundedWallTimeoutMs('CRABCODE_HTML_VIDEO_PREVIEW_TIMEOUT_MS', 120_000),
-    )
+    // One budget for the wall clock and for the remote call it wraps. The inner
+    // 300s could never be reached under a 120s wall, and worse, it capped the
+    // preview knob at 300s no matter how high the operator set it.
+    const previewMs = boundedWallTimeoutMs('CRABCODE_HTML_VIDEO_PREVIEW_TIMEOUT_MS', 120_000)
+    const cancellation = renderCancellation(context.signal, previewMs)
     let htmlWritten = false
     try {
       writeFileSync(htmlPath, wrapped.html, { encoding: 'utf-8', flag: 'wx', mode: 0o600 })
@@ -111,7 +112,7 @@ export async function handler(raw: unknown, context: ToolContext = {}): Promise<
           width,
           height,
           durationSec,
-          timeoutMs: 300_000,
+          timeoutMs: previewMs,
           headers: producerHeaders,
           signal: cancellation.signal,
         })

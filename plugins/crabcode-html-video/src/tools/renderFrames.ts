@@ -86,10 +86,12 @@ export async function handler(raw: unknown, context: ToolContext = {}): Promise<
 
   const releaseSlot = tryAcquireRenderSlot()
   if (!releaseSlot) return fail('render_busy', 'render capacity is busy; retry after the active render completes')
-  const cancellation = renderCancellation(
-    context.signal,
-    boundedWallTimeoutMs('CRABCODE_HTML_VIDEO_WALL_TIMEOUT_MS', 270_000),
-  )
+  // One budget for the wall clock and for the per-segment cap it contains. They
+  // were 270s and 600s, so the inner value could never be reached — a dead knob —
+  // and raising the wall above 600s silently reimposed a per-segment cap the
+  // operator never asked for.
+  const wallMs = boundedWallTimeoutMs('CRABCODE_HTML_VIDEO_WALL_TIMEOUT_MS', 270_000)
+  const cancellation = renderCancellation(context.signal, wallMs)
   try {
     const result = await renderMultiSegment({
       segments: args.segments,
@@ -99,6 +101,7 @@ export async function handler(raw: unknown, context: ToolContext = {}): Promise<
       producerUrl,
       headers: producerHeaders,
       signal: cancellation.signal,
+      segmentTimeoutMs: wallMs,
       outputPath,
       audioPath,
       workDir: join(workDir(), `render-${randomUUID()}`),

@@ -2,6 +2,7 @@ import { accessSync, constants, existsSync, mkdirSync, readdirSync, statSync } f
 import { join } from 'node:path'
 import { delimiter } from 'node:path'
 import { spawnSync } from 'node:child_process'
+import { EXTERNAL_BINARY_PROBE_TIMEOUT_MS } from './probeTimeout.ts'
 
 // Keep this aligned with puppeteer-core's PUPPETEER_REVISIONS in the frozen
 // @hyperframes/producer dependency graph.
@@ -41,7 +42,10 @@ function probeCandidate(path: string): ProbedBinary | null {
 export function probeBrowserExecutable(path: string): BrowserProbeResult {
   if (!isExecutableFile(path)) return { ok: false, versionLine: null, error: 'not an executable file' }
   try {
-    const result = spawnSync(path, ['--version'], { encoding: 'utf8', timeout: 10_000 })
+    const result = spawnSync(path, ['--version'], {
+      encoding: 'utf8',
+      timeout: EXTERNAL_BINARY_PROBE_TIMEOUT_MS,
+    })
     const versionLine = `${result.stdout || ''}\n${result.stderr || ''}`
       .split('\n')
       .map((line) => line.trim())

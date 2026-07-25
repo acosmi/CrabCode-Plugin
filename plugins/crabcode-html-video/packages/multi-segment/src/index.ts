@@ -11,7 +11,16 @@
  */
 
 export { renderMultiSegment, type MultiSegmentInput, type MultiSegmentResult, type SegmentInput } from './render.ts'
-export { concatVideos, muxAudio, probeDurationSec, runFfmpeg, resolveFfmpegPath } from './ffmpeg.ts'
+export {
+  concatVideos,
+  muxAudio,
+  probeDurationSec,
+  runFfmpeg,
+  resolveFfmpegPath,
+  resolveFfmpegPathDetailed,
+  type FfmpegResolveResult,
+  type FfmpegProbeResult,
+} from './ffmpeg.ts'
 export {
   ensureBrowser,
   resolveBrowserPath,

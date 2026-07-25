@@ -39,7 +39,11 @@ export interface MultiSegmentInput {
   onProgress?: (event: { stage: string; index?: number; total?: number; message: string }) => void
   /** Auth headers for producer. */
   headers?: Record<string, string>
-  /** Per-segment render timeout. Default 10min. */
+  /**
+   * Budget for each externally-timed step: one segment render, the concat, the
+   * mux. Default 10min. Callers that wrap this in a wall clock should pass that
+   * wall here so no step can outlive it.
+   */
   segmentTimeoutMs?: number
   /** Cancel producer and ffmpeg work. */
   signal?: AbortSignal
@@ -60,6 +64,13 @@ export async function renderMultiSegment(input: MultiSegmentInput): Promise<Mult
   validateInput(input)
 
   const fps = input.fps ?? 30
+  // One budget for every externally-timed step of a render — segment render,
+  // concat, mux. The concat and mux helpers default to 300s/600s of their own
+  // when a caller passes none, which is longer than the 270s wall renderFrames
+  // wraps this call in: the inner value could never fire, and an operator who
+  // raised the wall past those defaults got their concat killed at 300s anyway.
+  // Inheriting the caller's budget keeps inner ≤ outer under every configuration.
+  const stepTimeoutMs = input.segmentTimeoutMs ?? 600_000
   const workDir = input.workDir ?? join(process.cwd(), '.crabcode-html-video-work', randomUUID())
   const segDir = join(workDir, 'segments')
   const wrappedDir = join(workDir, 'wrapped')
@@ -122,7 +133,7 @@ export async function renderMultiSegment(input: MultiSegmentInput): Promise<Mult
           width: seg.width ?? input.width,
           height: seg.height ?? input.height,
           durationSec: seg.durationSec,
-          timeoutMs: input.segmentTimeoutMs ?? 600_000,
+          timeoutMs: stepTimeoutMs,
           headers: input.headers,
           signal: input.signal,
         })
@@ -145,11 +156,11 @@ export async function renderMultiSegment(input: MultiSegmentInput): Promise<Mult
     progress({ stage: 'concat', message: `Concatenating ${segmentPaths.length} segments` })
     const concatPath = join(workDir, 'concat.mp4')
     input.signal?.throwIfAborted()
-    await concatVideos(segmentPaths, concatPath, { signal: input.signal })
+    await concatVideos(segmentPaths, concatPath, { signal: input.signal, timeoutMs: stepTimeoutMs })
 
     progress({ stage: 'mux', message: input.audioPath ? 'Muxing audio' : 'Finalizing (no audio)' })
     const finalTmp = join(workDir, 'final.mp4')
-    await muxAudio(concatPath, input.audioPath ?? null, finalTmp, { signal: input.signal })
+    await muxAudio(concatPath, input.audioPath ?? null, finalTmp, { signal: input.signal, timeoutMs: stepTimeoutMs })
 
     publishWithoutOverwrite(finalTmp, input.outputPath)
 

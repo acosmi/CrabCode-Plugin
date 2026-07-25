@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { tmpdir } from 'node:os'
 import { randomUUID } from 'node:crypto'
+import { EXTERNAL_BINARY_PROBE_TIMEOUT_MS } from './probeTimeout.ts'
 
 export interface FfmpegRunResult {
   code: number
@@ -16,35 +17,100 @@ export interface ProcessRunOptions {
   signal?: AbortSignal
 }
 
+export interface FfmpegProbeResult {
+  ok: boolean
+  versionLine: string | null
+  error?: string
+}
+
+export interface FfmpegResolveResult {
+  path: string
+  /**
+   * The `-version` probe that qualified `path`, or null when nothing runnable
+   * was found and `path` is only a name for error messages. Resolution never
+   * returns a binary it has not probed, so callers that want the version line
+   * must read it from here instead of spawning ffmpeg a second time.
+   */
+  probe: FfmpegProbeResult | null
+}
+
+interface ProbedBinary {
+  path: string
+  probe: FfmpegProbeResult
+}
+
 /**
- * Resolve ffmpeg binary.
+ * Resolve ffmpeg binary, keeping the probe that qualified it.
  * Priority (matches hyperframes engine contract + our domestic mirror wiring):
  * 1. HYPERFRAMES_FFMPEG_PATH / CRABCODE_FFMPEG_PATH
  * 2. ffmpeg-static (if present and file exists)
  * 3. system `ffmpeg` on PATH — only if it actually runs (broken brew links are skipped)
+ *
+ * Memoized: this is a pure function of the environment, but `runFfmpeg` calls it
+ * once per ffmpeg command, so an unmemoized resolution charged a `-version`
+ * spawn of a 77MB static binary to every concat, mux and duration probe in a
+ * render.
  */
+export function resolveFfmpegPathDetailed(): FfmpegResolveResult {
+  const envValue = firstEnvValue('HYPERFRAMES_FFMPEG_PATH', 'CRABCODE_FFMPEG_PATH', 'FFMPEG_PATH')
+  const cached = ffmpegCache
+  // doctor, renderFrames and previewFrame all write the resolved path back into
+  // HYPERFRAMES_FFMPEG_PATH. That changes the env without changing the answer,
+  // so an env naming the binary we already qualified counts as a hit — keying
+  // on the raw env alone would charge a fresh spawn to every one of those writes.
+  if (cached && cached.result.probe?.ok && (envValue === cached.envValue || envValue === cached.result.path)) {
+    return cached.result
+  }
+  const result = computeFfmpegPath(envValue)
+  ffmpegCache = { envValue, result }
+  return result
+}
+
 export function resolveFfmpegPath(): string {
-  const env =
-    process.env.HYPERFRAMES_FFMPEG_PATH ||
-    process.env.CRABCODE_FFMPEG_PATH ||
-    process.env.FFMPEG_PATH
-  if (env && existsSync(env) && canRunBinary(env)) return env
+  return resolveFfmpegPathDetailed().path
+}
+
+export function resolveFfprobePath(): string {
+  const envValue = firstEnvValue('HYPERFRAMES_FFPROBE_PATH', 'CRABCODE_FFPROBE_PATH', 'FFPROBE_PATH')
+  const cached = ffprobeCache
+  if (cached && envValue === cached.envValue) return cached.path
+  const path = computeFfprobePath(envValue)
+  ffprobeCache = { envValue, path }
+  return path
+}
+
+let ffmpegCache: { envValue: string; result: FfmpegResolveResult } | null = null
+let ffprobeCache: { envValue: string; path: string } | null = null
+
+function firstEnvValue(...names: string[]): string {
+  for (const name of names) {
+    const value = process.env[name]
+    if (value) return value
+  }
+  return ''
+}
+
+function computeFfmpegPath(envValue: string): FfmpegResolveResult {
+  if (envValue && existsSync(envValue)) {
+    const fromEnv = probeCandidate(envValue)
+    if (fromEnv) return fromEnv
+  }
 
   const fromStatic = resolvePackageBinary('ffmpeg-static')
   if (fromStatic) return fromStatic
 
   // Prefer a runnable system binary; skip broken dylib links.
-  if (canRunBinary('ffmpeg')) return 'ffmpeg'
-  // Last resort: still return name so error messages mention it
-  return fromStatic || 'ffmpeg'
+  const fromPath = probeCandidate('ffmpeg')
+  if (fromPath) return fromPath
+  // Last resort: still return the name so error messages mention it
+  return { path: 'ffmpeg', probe: null }
 }
 
-export function resolveFfprobePath(): string {
-  const env = process.env.HYPERFRAMES_FFPROBE_PATH || process.env.CRABCODE_FFPROBE_PATH || process.env.FFPROBE_PATH
-  if (env && existsSync(env) && canRunBinary(env)) return env
+function computeFfprobePath(envValue: string): string {
+  if (envValue && existsSync(envValue) && canRunBinary(envValue)) return envValue
 
   const fromStatic = resolvePackageBinary('ffprobe-static')
-  if (fromStatic) return fromStatic
+  if (fromStatic) return fromStatic.path
 
   // Prefer sibling of ffmpeg when env points at a full path
   const ffmpeg = resolveFfmpegPath()
@@ -57,7 +123,7 @@ export function resolveFfprobePath(): string {
   return ''
 }
 
-function resolvePackageBinary(pkg: string): string | null {
+function resolvePackageBinary(pkg: string): ProbedBinary | null {
   try {
     const { createRequire } = require('node:module') as typeof import('node:module')
     const bases = [import.meta.url, join(process.cwd(), 'package.json')]
@@ -66,7 +132,10 @@ function resolvePackageBinary(pkg: string): string | null {
         const req = createRequire(base)
         const mod = req(pkg) as string | { path?: string; default?: string } | null
         const p = typeof mod === 'string' ? mod : mod?.path || mod?.default
-        if (p && existsSync(p) && canRunBinary(p)) return p
+        if (p && existsSync(p)) {
+          const probed = probeCandidate(p)
+          if (probed) return probed
+        }
       } catch {
         // try next base
       }
@@ -77,14 +146,30 @@ function resolvePackageBinary(pkg: string): string | null {
   return null
 }
 
-function canRunBinary(bin: string): boolean {
+/** Accept a candidate only if it actually runs, keeping the probe. */
+function probeCandidate(path: string): ProbedBinary | null {
+  const probe = probeBinary(path)
+  return probe.ok ? { path, probe } : null
+}
+
+function probeBinary(bin: string): FfmpegProbeResult {
   try {
     const { spawnSync } = require('node:child_process') as typeof import('node:child_process')
-    const r = spawnSync(bin, ['-version'], { encoding: 'utf-8', timeout: 5000 })
-    return r.status === 0
-  } catch {
-    return false
+    const r = spawnSync(bin, ['-version'], {
+      encoding: 'utf-8',
+      timeout: EXTERNAL_BINARY_PROBE_TIMEOUT_MS,
+    })
+    // First line of stdout, falling back to stderr — the rule doctor used when
+    // it ran its own probe, kept verbatim so its report is unchanged.
+    const versionLine = (r.stdout || '').split('\n')[0] || (r.stderr || '').split('\n')[0] || null
+    return { ok: r.status === 0, versionLine }
+  } catch (error) {
+    return { ok: false, versionLine: null, error: error instanceof Error ? error.message : String(error) }
   }
+}
+
+function canRunBinary(bin: string): boolean {
+  return probeBinary(bin).ok
 }
 
 export async function runFfmpeg(args: string[], opts?: ProcessRunOptions): Promise<FfmpegRunResult> {

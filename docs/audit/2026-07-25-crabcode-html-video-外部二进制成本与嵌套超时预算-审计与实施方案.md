@@ -2,7 +2,7 @@
 
 > 日期：2026-07-25
 >
-> 状态：**已立项，可直接实施。本文件不留待决项**——§6 的每个取值都已写死，实施时按序执行即可，无需再回来做选择。
+> 状态：**已实施**（分支 `task/html-video-external-binary-cost-20260725`）。实施中有 4 项与本文正文不符，全部记在 §10，正文中会误导的两处已就地订正并标注。
 >
 > 审计范围：`crabcode-html-video` 的外部二进制解析与探测路径、嵌套超时预算的对齐关系、探针失败的降级语义，以及全仓同类问题
 >
@@ -119,6 +119,19 @@ export async function runFfmpeg(args: string[], opts?: ProcessRunOptions) {
 
 严重度：**中**（诊断误导 + 死旋钮，非正确性）。
 
+### F3b 同类倒挂另有 2 处，本审计漏了（实施期间的交付复核发现）
+
+`packages/multi-segment/src/render.ts` 调用两个 ffmpeg 助手时只传了 `signal`，没传 `timeoutMs`：
+
+| 外层 | 内层 | 关系 |
+|---|---|---|
+| `renderFrames.ts` 墙钟 `270_000` | `concatVideos` 落到 `opts?.timeoutMs ?? 300_000`（copy）/ `?? 600_000`（re-encode） | 内层 1.1×–2.2× 外层 |
+| 同上 | `muxAudio` 落到 `opts?.timeoutMs ?? 300_000` | 内层 1.1× 外层 |
+
+与 F3 是同一个病灶——**内层用硬编码兜底，而不是继承调用方预算**——所以按"一次修掉一整类"处理，见 §10。
+
+已扫描确认**不属于**本类的两处：`hfRender.ts:216` 的 `120_000` 小于墙钟且该处无旋钮；`producerClient.ts:65` 的 `?? 600_000` 两个活调用方现在都显式传预算。
+
 ### F4 探针失败转为静默 `skip`，CI 保持绿（已确认）
 
 - `ffmpeg.test.ts:14-15`：`const mediaTest = ffmpegAvailable ? test : test.skip`
@@ -178,6 +191,8 @@ test('measure: doctor first vs second call in one session', async () => {
 
 这个设计不依赖测试文件执行顺序，也不需要制造冷 page cache：两次调用在同一进程内，第二次对 page cache 而言必然是温的，**差值即一次性成本**。
 
+> **订正（实施后）**：上面这段推理是错的。page cache 是**机器级**而非进程级的，而本测试排在同文件那条调 doctor 的测试之后——冷加载的账早被它付掉，所以 `first` 同样是温的，差值测不到一次性成本。实测差值仅 4ms / 7ms。F5 最终由横向比较判定，见 §10。
+
 判据（写死，实施时直接套用）：
 
 - `first − second ≥ 1500ms` → **一次性成本主导**，F5 结案为"冷加载类"，在批次 B 的注释中记录该数字。
@@ -194,8 +209,8 @@ test('measure: doctor first vs second call in one session', async () => {
 
 **B1 统一外部二进制探测上限为 `20_000`**
 
-- 在 `packages/multi-segment/src/browser.ts` 顶部新增并导出 `export const EXTERNAL_BINARY_PROBE_TIMEOUT_MS = 20_000`，经 `packages/multi-segment/src/index.ts` 导出。
-- 替换以下四处的字面量：`ffmpeg.ts:83`（5000）、`browser.ts:44`（10_000）、`src/tools/doctor.ts:51`（10_000）、`packages/multi-segment/src/ffmpeg.test.ts:14`（5000）。
+- ~~在 `packages/multi-segment/src/browser.ts` 顶部新增并导出~~ **订正**：常量放独立模块 `packages/multi-segment/src/probeTimeout.ts`，且**不经 index.ts 导出**。理由见 §10。
+- 替换以下~~四~~**三**处的字面量：`ffmpeg.ts:83`（5000）、`browser.ts:44`（10_000）、`packages/multi-segment/src/ffmpeg.test.ts:14`（5000）。**`src/tools/doctor.ts:51` 的 10_000 不是被替换而是被 B3 整条删除**——原文把它列进 B1 与 B3 冲突。
 - 注释写明依据：探测对象含 ffmpeg-static 的 77MB 静态二进制；5000 与 10_000 都是无依据的数字；探测失败的代价是静默降级（F2），因此按"最坏预算"设，与 PR #3 确立的纪律一致。代价是探针挂死时最坏等待由 5s/10s 变为 20s，此代价被接受。
 
 **B2 同步放大 doctor 测试的允许上限（B1 的连锁项，不可遗漏）**
@@ -265,3 +280,37 @@ if (process.env.CI && !ffmpegAvailable) {
 - PR #4 `c800c86` / merge `62e1783`：doctor 复用 resolve 已付过的浏览器探针（本方案的触发来源）
 - 记忆 `html-video-ci-env-red`：根因、六次实测数据、以及被推翻的"砍半"预估
 - 记忆 `shared-worktree-concurrent-sessions`：本工作树存在并发会话，提交前须确认 HEAD
+
+## 10. 实施记录与订正
+
+### F5 结案：一次性成本主导（~99%）
+
+批次 A 在 PR #5 上跑了两轮（同一 commit `2e9fef0`，第二轮为 rerun）：
+
+| | 轮 1 | 轮 2 |
+|---|---|---|
+| `[measure] doctor` | first=34ms second=30ms | first=35ms second=28ms |
+| 同文件那条调 doctor 的测试 | 3567ms | 2930ms |
+| 测量测试整条 | 371.98ms | 379.00ms |
+
+§6 写死的判据字面套用会得出"低于噪声"，**但那是测量设计的缺陷而非事实**（见 §6 批次 A 的订正）。真正的判据来自横向比较，两轮一致：
+
+- 371.98 − (34 + 30) ≈ **308ms**，与同文件两条纯 connect 测试（348ms / 310ms）吻合，确认 connect 约 300ms
+- 3567 − 308 ≈ **3.26s** 是冷的 doctor；同一台机器上温的 doctor 只要 **30ms**
+
+即 doctor 观测延迟的约 99% 是一次性冷加载，per-call 工作约 30ms。这同时解释了历史上同代码 6956ms vs 2293ms 的 3 倍差——是冷盘读方差，不是环境劣化，也不是每次成本。
+
+**推论**：B3 的去重省下的是那 30ms 里的温 spawn，**碰不到那 3.2s**。这正是 §1 预先写下的"去重不等于省下冷加载"，此处得到实测确认。B3 的价值在渲染循环（`runFfmpeg` 每条命令一次解析）与消除 TOCTOU，不在 doctor 延迟。
+
+### 与正文不符的 4 项
+
+1. **B1 与 B3 冲突**：B1 要替换 `doctor.ts:51` 的 `10_000`，B3 要删掉整行。终态取 B3：探测上限统一为**三处**，doctor 那处消失。§8 验收标准 2 相应按三处计。
+2. **常量归属**：放 `browser.ts` 会使 `ffmpeg.ts` import 浏览器模块，造成两个无关关注点耦合。改为独立模块 `probeTimeout.ts`；并且**不从 index.ts 导出**——B3 删掉 doctor 的探针后包外已无消费者，导出即投机性 API 面。
+3. **B2 附带**：`tests/mcp-stdio.test.ts` 那段注释仍写"chrome 探针两次、各 10s"，PR #4 早已推翻，一并重写，否则留下误导性遗留。
+4. **F3b（新增，超出原范围）**：交付复核发现 `render.ts:148/152` 的同类倒挂。修法与 F3 同源：把 `input.segmentTimeoutMs ?? 600_000` 提为 `stepTimeoutMs`，同时用于单段渲染、concat、mux，使"内层 ≤ 外层"在任何配置下成立。`render.ts:43` 的文档注释（"Per-segment render timeout"）已同步订正。
+
+### 验证方式
+
+- Linux 平价（Docker `oven/bun:1.3.11`）全量：43 pass / 1 skip / 0 fail
+- B5 负向**实证**（非推断）：`CI=1` + 移除 ffmpeg → exit 1 并报出预期文案；同状态不设 `CI` → skip 且 exit 0。Chromium 侧同理。
+- `bun run typecheck`、`bun run check:distribution` 绿，dist 已重封且洁净。
