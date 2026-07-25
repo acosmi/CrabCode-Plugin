@@ -1,5 +1,5 @@
 import {
-  resolveFfmpegPath,
+  resolveFfmpegPathDetailed,
   resolveBrowserPath,
   ensureBrowser,
   probeProducer,
@@ -44,23 +44,22 @@ export async function handler(raw: unknown = {}): Promise<Envelope> {
   }
 
   // ffmpeg
-  const ffmpeg = resolveFfmpegPath()
-  let ffmpegOk = false
-  try {
-    const { spawnSync } = await import('node:child_process')
-    const r = spawnSync(ffmpeg, ['-version'], { encoding: 'utf-8', timeout: 10_000 })
-    ffmpegOk = r.status === 0
-    checks.ffmpeg = {
-      path: ffmpeg,
-      ok: ffmpegOk,
-      versionLine: (r.stdout || '').split('\n')[0] || r.stderr?.split('\n')[0],
-      env: {
-        HYPERFRAMES_FFMPEG_PATH: process.env.HYPERFRAMES_FFMPEG_PATH || null,
-        CRABCODE_FFMPEG_PATH: process.env.CRABCODE_FFMPEG_PATH || null,
-      },
-    }
-  } catch (e) {
-    checks.ffmpeg = { path: ffmpeg, ok: false, error: e instanceof Error ? e.message : String(e) }
+  // Resolution never returns a binary it has not already qualified with
+  // `-version`, so reuse that probe. Running it again here spawned
+  // ffmpeg-static's 77MB static binary a second time for a version line already
+  // in hand — the same defect PR #4 removed on the browser side, on a binary
+  // roughly thirty times larger.
+  const { path: ffmpeg, probe: ffmpegProbe } = resolveFfmpegPathDetailed()
+  const ffmpegOk = ffmpegProbe?.ok === true
+  checks.ffmpeg = {
+    path: ffmpeg,
+    ok: ffmpegOk,
+    versionLine: ffmpegProbe?.versionLine ?? null,
+    env: {
+      HYPERFRAMES_FFMPEG_PATH: process.env.HYPERFRAMES_FFMPEG_PATH || null,
+      CRABCODE_FFMPEG_PATH: process.env.CRABCODE_FFMPEG_PATH || null,
+    },
+    ...(ffmpegProbe?.error ? { error: ffmpegProbe.error } : {}),
   }
   if (ffmpegOk) process.env.HYPERFRAMES_FFMPEG_PATH = ffmpeg
 
