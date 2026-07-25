@@ -1,6 +1,6 @@
 {
   "name": "crabwork-data",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Write SQL, explore datasets, and generate insights faster. Build visualizations and dashboards, and turn raw data into clear stories for stakeholders.",
   "license": "Apache-2.0",
   "author": {
@@ -27,5 +27,49 @@
     "./skills/statistical-analysis",
     "./skills/validate-data",
     "./skills/write-query"
+  ],
+  "channels": [
+    {
+      "server": "snowflake",
+      "displayName": "Snowflake",
+      "userConfig": {
+        "snowflake_account": {
+          "type": "string",
+          "title": "Snowflake 账号标识",
+          "description": "账号 URL 中 .snowflakecomputing.com 之前的部分，形如 myorg-myaccount 或 xy12345.us-east-1。不要带 https:// 前缀。",
+          "required": true
+        },
+        "snowflake_database": {
+          "type": "string",
+          "title": "MCP 服务器所在数据库",
+          "description": "创建 MCP 服务器对象时所用的数据库名。",
+          "required": true
+        },
+        "snowflake_schema": {
+          "type": "string",
+          "title": "MCP 服务器所在 schema",
+          "description": "创建 MCP 服务器对象时所用的 schema 名。",
+          "required": true
+        },
+        "snowflake_mcp_server": {
+          "type": "string",
+          "title": "MCP 服务器对象名",
+          "description": "Snowflake 不提供公共 MCP 端点：需先在自己账号里用 CREATE MCP SERVER 建好对象，这里填该对象的名字。",
+          "required": true
+        }
+      }
+    },
+    {
+      "server": "databricks",
+      "displayName": "Databricks",
+      "userConfig": {
+        "databricks_workspace_hostname": {
+          "type": "string",
+          "title": "Databricks 工作区主机名",
+          "description": "完整主机名，形如 dbc-xxxxxxxx-xxxx.cloud.databricks.com 或 adb-xxxxxxxxxxxx.11.azuredatabricks.net。不要带 https:// 前缀或结尾斜杠。",
+          "required": true
+        }
+      }
+    }
   ]
 }

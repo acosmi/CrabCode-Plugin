@@ -79,22 +79,27 @@ describe("mcp contract validator", () => {
     expect(messages).toContain("raw LSP proxy");
   });
 
+  // Anchored on LSP_PROXY_BASELINE rather than EMPTY_URL_BASELINE: the empty-URL
+  // baseline is being ratcheted to zero as the crabwork connectors get real URLs,
+  // and a fixture that names a member of an emptied baseline would break the moment
+  // the last entry is removed. The downgrade/stale machinery is shared by all five
+  // baselines, so any populated one exercises it.
   test("downgrades legacy baseline members to warnings and flags stale entries only when the plugin is present", async () => {
     const root = await makeTempRoot();
-    await writePlugin(root, "crabwork-data", {
-      ".crabcode-plugin/plugin.json": { name: "crabwork-data", version: "0.1.0" },
-      ".mcp.json": { mcpServers: { snowflake: { type: "http", url: "" } } },
+    await writePlugin(root, "clangd-lsp", {
+      ".crabcode-plugin/plugin.json": { name: "clangd-lsp", version: "0.1.0" },
+      ".mcp.json": { mcpServers: { "clangd-lsp": { type: "stdio", command: "bun", args: ["run", "src/lsp-wrapper.ts"] } } },
     });
-    const withPlaceholder = await validateMcpContract(root);
-    expect(errorsOf(withPlaceholder)).toEqual([]);
-    expect(withPlaceholder.some((issue) => issue.severity === "warning" && issue.message.includes("legacy baseline"))).toBe(true);
+    const withProxy = await validateMcpContract(root);
+    expect(errorsOf(withProxy)).toEqual([]);
+    expect(withProxy.some((issue) => issue.severity === "warning" && issue.message.includes("legacy baseline"))).toBe(true);
 
     const fixedRoot = await makeTempRoot();
-    await writePlugin(fixedRoot, "crabwork-data", {
-      ".crabcode-plugin/plugin.json": { name: "crabwork-data", version: "0.1.0" },
-      ".mcp.json": { mcpServers: { snowflake: { type: "http", url: "https://example.invalid/mcp" } } },
+    await writePlugin(fixedRoot, "clangd-lsp", {
+      ".crabcode-plugin/plugin.json": { name: "clangd-lsp", version: "0.1.0" },
+      ".mcp.json": { mcpServers: { clangd: { type: "http", url: "https://example.invalid/mcp" } } },
     });
     const stale = await validateMcpContract(fixedRoot);
-    expect(errorsOf(stale).some((issue) => issue.message.includes("stale EMPTY_URL_BASELINE"))).toBe(true);
+    expect(errorsOf(stale).some((issue) => issue.message.includes("stale LSP_PROXY_BASELINE"))).toBe(true);
   });
 });
