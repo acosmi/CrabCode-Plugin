@@ -1,5 +1,6 @@
 ---
 name: writing-hookify-rules
+display-name: 钩子规则编写
 description: "Use this skill when the user asks to 'create a hookify rule', 'write a hook rule', 'configure hookify', 'add a hookify rule', or needs guidance on hookify rule syntax and patterns."
 version: 0.1.0
 ---

@@ -1,5 +1,6 @@
 ---
 name: webapp-testing
+display-name: 网页应用测试
 description: "Toolkit for interacting with and testing local web applications using Playwright. Use this skill to verify frontend functionality, debug UI behavior, capture browser screenshots, view browser logs, or drive an end-to-end smoke test against a local dev server."
 license: Apache-2.0. See ../../docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---

@@ -1,5 +1,6 @@
 ---
 name: theme-factory
+display-name: 主题样式工厂
 description: "Toolkit for styling artifacts with a theme. Artifacts include slide decks, documents, reports, HTML landing pages, and similar visual outputs. There are ten preset themes with color palettes and font pairings, and the skill can also generate a new theme on demand."
 license: Apache-2.0. See ../../docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---

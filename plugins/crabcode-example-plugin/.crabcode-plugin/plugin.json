@@ -1,6 +1,6 @@
 {
   "name": "crabcode-example-plugin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Reference CrabCode plugin demonstrating commands, agents, skills, hooks, and MCP server configuration.",
   "author": {
     "name": "CrabCode"

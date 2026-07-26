@@ -355,7 +355,7 @@
     {
       "name": "crabcode-memory-management",
       "source": "./plugins/crabcode-memory-management",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "displayName": "CrabCode 记忆管理",
       "shortDescription": "维护与改进 CRABCODE.md 项目记忆:审计质量、沉淀会话经验、保持指引最新",
       "longDescription": "维护和改进项目的 CRABCODE.md 记忆文件:审计记忆质量、把会话中的经验沉淀进文档、保持协作指引与代码现状同步,让 CrabCode 在长期项目中持续了解上下文。",
@@ -469,7 +469,7 @@
     {
       "name": "cwc-makers",
       "source": "./plugins/cwc-makers",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "displayName": "创客硬件(Cardputer)",
       "shortDescription": "Code-with-CrabCode 创客 M5Stack Cardputer 上手:一条命令刷固件并安装设备技能",
       "longDescription": "面向 Code-with-CrabCode 创客的 M5Stack Cardputer 上手插件:一条 /maker-setup 命令即可刷写固件并安装设备技能,快速把硬件接入 CrabCode。",
@@ -492,7 +492,7 @@
     {
       "name": "crabcode-example-plugin",
       "source": "./plugins/crabcode-example-plugin",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "displayName": "CrabCode 示例插件",
       "shortDescription": "演示命令、智能体、技能、钩子与 MCP 服务配置的参考插件",
       "longDescription": "一个参考用的 CrabCode 插件,完整演示命令(commands)、智能体(agents)、技能(skills)、钩子(hooks)与 MCP 服务的配置方式,适合作为开发自己插件时的模板与对照。",
@@ -537,7 +537,7 @@
     {
       "name": "frontend-design",
       "source": "./plugins/frontend-design",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "displayName": "前端设计",
       "shortDescription": "面向 UI/UX 实现的前端设计技能,产出生产级的视觉品质",
       "longDescription": "面向 UI/UX 实现的前端设计技能,帮助产出具备生产级视觉品质的界面,兼顾美观与可用性。",
@@ -560,7 +560,7 @@
     {
       "name": "math-olympiad",
       "source": "./plugins/math-olympiad",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "displayName": "数学奥林匹克",
       "shortDescription": "求解竞赛数学(IMO、Putnam、USAMO),以独立验证者对抗式校验,宁可弃权不蒙混",
       "longDescription": "求解竞赛数学题(IMO、Putnam、USAMO 等),由全新上下文的验证者做对抗式校验;在没有把握时校准地选择弃权,而非蒙混作答。",
@@ -606,7 +606,7 @@
     {
       "name": "playground",
       "source": "./plugins/playground",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "displayName": "交互式演练场",
       "shortDescription": "创建交互式 HTML 演练场:自包含单文件、可视化控件、实时预览与一键复制提示词",
       "longDescription": "创建交互式 HTML 演练场:自包含的单文件探索器,带可视化控件、实时预览与一键复制提示词输出,适合快速试验与演示。",
@@ -647,7 +647,34 @@
         "hooks",
         "mcp"
       ],
-      "tier": "workflow"
+      "tier": "workflow",
+      "groups": [
+        {
+          "name": "plugin-foundation",
+          "displayName": "插件骨架",
+          "skills": [
+            "plugin-structure",
+            "plugin-settings"
+          ]
+        },
+        {
+          "name": "component-dev",
+          "displayName": "组件开发",
+          "skills": [
+            "skill-development",
+            "command-development",
+            "agent-development",
+            "hook-development"
+          ]
+        },
+        {
+          "name": "external-integration",
+          "displayName": "外部集成",
+          "skills": [
+            "mcp-integration"
+          ]
+        }
+      ]
     },
     {
       "name": "pr-review-toolkit",
@@ -675,7 +702,7 @@
     {
       "name": "session-report",
       "source": "./plugins/session-report",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "displayName": "会话报告",
       "shortDescription": "从本地转录文件生成带样式的 CrabCode 会话 HTML 报告,便于分享与复盘",
       "longDescription": "从本地转录(transcript)文件生成带样式的 CrabCode 会话 HTML 报告,适合分享与事后复盘(post-mortem)。",
@@ -696,7 +723,7 @@
     {
       "name": "skill-creator",
       "source": "./plugins/skill-creator",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "displayName": "技能创建器",
       "shortDescription": "创建、改进与评估 CrabCode 技能,配分析/评分/对比辅助智能体",
       "longDescription": "用于创建、改进与评估 CrabCode 技能的工具,内置分析器、评分器与对比器辅助智能体,帮助快速产出高质量、可评估的技能。",
@@ -764,7 +791,7 @@
     {
       "name": "discord",
       "source": "./plugins/discord",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "displayName": "Discord 频道桥接",
       "shortDescription": "把 CrabCode 接入 Discord 频道,内置配对、白名单与服务器频道访问控制",
       "longDescription": "为 CrabCode 提供的 Discord 频道桥接。自带 MCP 服务,支持配对、白名单与服务器(guild)频道级访问控制,通过 /discord:access 技能管理谁可以触达智能体,让团队在 Discord 中与智能体协作。",
@@ -904,7 +931,7 @@
     {
       "name": "imessage",
       "source": "./plugins/imessage",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "displayName": "iMessage 频道桥接",
       "shortDescription": "macOS 上把 CrabCode 接入 iMessage,直读 chat.db 并经 AppleScript 收发",
       "longDescription": "面向 macOS 的 iMessage 频道桥接。直接读取 chat.db 获取消息、通过 AppleScript 发送回复,并以白名单方式控制谁可以触达智能体,让你在 iMessage 中与 CrabCode 智能体对话。",
@@ -1020,7 +1047,7 @@
     {
       "name": "telegram",
       "source": "./plugins/telegram",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "displayName": "Telegram 频道桥接",
       "shortDescription": "把 CrabCode 接入 Telegram,内置配对与白名单访问控制",
       "longDescription": "为 CrabCode 提供的 Telegram 频道桥接。自带 MCP 服务,支持配对与白名单访问控制,通过 /telegram:access 技能管理谁可以触达智能体,让你在 Telegram 中与 CrabCode 智能体对话。",
@@ -1329,7 +1356,7 @@
     {
       "name": "hookify",
       "source": "./plugins/hookify",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "displayName": "自定义钩子规则",
       "shortDescription": "用 Markdown 规则文件配置 CrabCode 钩子,按正则或结构化条件拦截或告警",
       "longDescription": "由 .crabcode/hookify.*.local.md 中的 Markdown 规则文件驱动的可自定义 CrabCode 钩子。可针对 Bash、Edit/Write/MultiEdit、Stop 与 UserPromptSubmit 等事件,使用正则或结构化条件进行拦截(block)或告警(warn),为团队定制护栏。",
@@ -1493,7 +1520,7 @@
     {
       "name": "crabcode-example-skills",
       "source": "./plugins/crabcode-example-skills",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "displayName": "CrabCode 示例技能集",
       "shortDescription": "演示算法艺术、视觉设计、文档协作、MCP 编写、GIF 制作等的示例技能集合",
       "longDescription": "一组示例 CrabCode 技能,涵盖算法艺术、视觉设计、品牌样式、文档协同撰写、内部沟通、MCP 服务编写、技能编写、GIF 制作、主题样式、Web 制品打包与基于 Playwright 的 Web 应用测试,适合学习技能写法。",
@@ -1517,7 +1544,7 @@
     {
       "name": "ai-api-dev",
       "source": "./plugins/ai-api-dev",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "displayName": "AI API 开发",
       "shortDescription": "厂商中立的 LLM 应用构建、调试与迁移指引",
       "longDescription": "厂商中立(provider-neutral)的指引,帮助构建、调试与迁移基于大语言模型的应用,覆盖 API 调用、工具使用(tool use)、提示词缓存与智能体设计等主题。",
@@ -1953,7 +1980,26 @@
         "triage",
         "knowledge-base"
       ],
-      "tier": "workflow"
+      "tier": "workflow",
+      "groups": [
+        {
+          "name": "ticket-flow",
+          "displayName": "工单处理",
+          "skills": [
+            "ticket-triage",
+            "draft-response",
+            "customer-escalation"
+          ]
+        },
+        {
+          "name": "knowledge-insight",
+          "displayName": "知识与洞察",
+          "skills": [
+            "kb-article",
+            "customer-research"
+          ]
+        }
+      ]
     },
     {
       "name": "crabwork-product-management",
@@ -2181,7 +2227,25 @@
         "memory",
         "dashboard"
       ],
-      "tier": "workflow"
+      "tier": "workflow",
+      "groups": [
+        {
+          "name": "daily-ops",
+          "displayName": "日常运转",
+          "skills": [
+            "start",
+            "task-management",
+            "update"
+          ]
+        },
+        {
+          "name": "memory-upkeep",
+          "displayName": "记忆维护",
+          "skills": [
+            "memory-management"
+          ]
+        }
+      ]
     },
     {
       "name": "crabwork-enterprise-search",
@@ -2204,7 +2268,32 @@
         "knowledge-base",
         "productivity"
       ],
-      "tier": "workflow"
+      "tier": "workflow",
+      "groups": [
+        {
+          "name": "retrieval",
+          "displayName": "检索执行",
+          "skills": [
+            "search",
+            "search-strategy"
+          ]
+        },
+        {
+          "name": "knowledge-refine",
+          "displayName": "知识加工",
+          "skills": [
+            "knowledge-synthesis",
+            "digest"
+          ]
+        },
+        {
+          "name": "source-governance",
+          "displayName": "数据源治理",
+          "skills": [
+            "source-management"
+          ]
+        }
+      ]
     },
     {
       "name": "crabwork-plugin-management",
@@ -2250,7 +2339,33 @@
         "single-cell",
         "drug-discovery"
       ],
-      "tier": "workflow"
+      "tier": "workflow",
+      "groups": [
+        {
+          "name": "research-setup",
+          "displayName": "课题与起步",
+          "skills": [
+            "start",
+            "scientific-problem-selection"
+          ]
+        },
+        {
+          "name": "single-cell",
+          "displayName": "单细胞分析",
+          "skills": [
+            "single-cell-rna-qc",
+            "scvi-tools"
+          ]
+        },
+        {
+          "name": "data-pipeline",
+          "displayName": "数据与流程工程",
+          "skills": [
+            "instrument-data-to-allotrope",
+            "nextflow-development"
+          ]
+        }
+      ]
     },
     {
       "name": "crabwork-small-business",
@@ -2422,7 +2537,7 @@
     {
       "name": "crabcode-html-video",
       "source": "./plugins/crabcode-html-video",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "displayName": "HTML 视频渲染",
       "shortDescription": "HTML→视频：content-graph 分镜 + 逐帧 HTML + 确定性渲染 sidecar",
       "longDescription": "按 content-graph 生成分镜，逐帧产出可 seek 的 HTML，经用户确认后由 MCP sidecar 调用渲染 worker 合成为 MP4。Sidecar 不调模型、不持 key。",

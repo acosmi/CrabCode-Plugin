@@ -1,5 +1,6 @@
 ---
 name: video-storyboard
+display-name: 视频分镜编排
 description: >
   将用户内容意图转成 content-graph（分镜 IR）：语义节点图 + sequence/dependency/contrast 边。
   用于 HTML→视频的第一轮创作。不直接渲染。

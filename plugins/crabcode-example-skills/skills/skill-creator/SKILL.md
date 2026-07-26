@@ -1,5 +1,6 @@
 ---
 name: skill-creator
+display-name: 技能创建器
 description: "Create new agent skills, modify and improve existing ones, and measure skill performance. Use this skill when the user wants to write a skill from scratch, edit or optimize an existing skill, run evaluations against a skill, benchmark skill performance with variance analysis, or tune a skill description for better triggering accuracy."
 license: Apache-2.0. See ../../docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---

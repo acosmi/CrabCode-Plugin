@@ -1,5 +1,6 @@
 ---
 name: frontend-design
+display-name: 前端界面设计
 description: "Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications such as websites, landing pages, dashboards, React components, or HTML/CSS layouts. Generate creative, polished code and UI that avoids generic AI aesthetics."
 license: Apache-2.0. See ../../docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---
