@@ -1,6 +1,6 @@
 {
   "name": "@crabcode/office-suite",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "private": true,
   "description": "TypeScript runtime helpers for the CrabCode office suite plugin.",
   "license": "Apache-2.0",
