@@ -47,7 +47,8 @@
 - `FULL-PORT.patch` 为 `475595` 字节，SHA-256 为 `43935dc54fbe9677a2d678a7dfa5d44e0eb843c9ba6c360e571ca7ca9f59ae5a`。重放不是“对空目录只应用一个 patch”：校验器先在空临时目录按锁定路径和 mode materialize 固定上游的 25 个 blob，再以 `git apply -p2` 重建目标的 25 个路径、mode 和字节。
 - 活动 `.crabcode-plugin/marketplace.json` 中 `crabcode-security` 实得 `0` 条；这个 selector 零匹配只作为 promotion 快照，不绑定无关的 Marketplace 元数据版本。候选条目仅保存在 `TARGET-MARKETPLACE-ENTRY.json`，状态为 `staged-not-active`，其规范 SHA-256 为 `32cdc33f271035c5e418214e7d9dccaf58058fce7d8804e0303e676ebcafe090`。
 - patch generator、sealer 和 verifier 的版本、字节数、SHA-256，显式 normalization 规则及 seal 环境均已写入 `SOURCE-LOCK.json`；`bun run scripts/build-crabcode-security-port-patch.ts --check <完整上游 checkout>` 可复算 patch，`bun run scripts/verify-crabcode-security-port.ts <完整上游 checkout>` 已执行 `505` 项检查。
-- 当前证据已进入公开候选分支 `codex/crabcode-security-full-port-20260724` 的实现提交 `49b9c68afbbf648b34033686007334545d5e0842` 并推送；内容已 commit-pinned，但 review、commit-bound CI、合并与发布 Gate 仍开放，因此不是不可变发布封存。
+- 当前证据以实现提交 `49b9c68afbbf648b34033686007334545d5e0842` 为准；该提交已随合并提交 `58b80e1` 进入 `main`，`git merge-base --is-ancestor` 对二者均为真。承载它的公开候选分支 `codex/crabcode-security-full-port-20260724` 已于合并后删除；commit-pinned 内容不受影响，证据定位改由 `main` 可达性提供，不再依赖该分支存在。
+- Gate 现状：合并 Gate 已关闭；commit-bound CI 已就位并通过——`.github/workflows/ci.yml` 的 `security-plugin` job 在 ubuntu/macOS × Python 3.9/3.13 四个组合上，对每个 `main` 提交重跑 `verify-crabcode-security-port.ts`（上游 provenance 与 25/25 完整移植）、`build-crabcode-security-port-patch.ts --check`（patch 可复算）、`tests/crabcode-security/` 以及可执行文件 mode `100755` 断言，证据为 `main` 提交 `97c466a` 的 run `30246584271`（7/7 绿）。独立 review 与发布 Gate 仍开放：活动 `.crabcode-plugin/marketplace.json` 中 `crabcode-security` 实得仍为 `0` 条，候选条目仍为 `staged-not-active`。因此仍不是不可变发布封存。
 
 ## 3. 允许的改动轴
 

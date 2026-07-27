@@ -11,7 +11,7 @@
 ## 0. 元信息
 
 - 文档日期：2026-07-23
-- 文档状态：深度复核、全量实施并完成候选分支推送；25/25 源码集合与重放完成、确定性合同已测试，模型行为等价和 GA Gate 未关闭，以第 14 节实施审计记录为准
+- 文档状态：深度复核、全量实施并完成候选分支推送；25/25 源码集合与重放完成、确定性合同已测试，模型行为等价和 GA Gate 未关闭，以第 14 节实施审计记录为准；2026-07-23 之后的状态变化见第 15 节
 - 工作仓：`/Users/fushihua/Desktop/CrabCode-Plugin`
 - 公开候选分支：`codex/crabcode-security-full-port-20260724`
 - 公开实现提交：`49b9c68afbbf648b34033686007334545d5e0842`（已推送）
@@ -1248,3 +1248,14 @@ OS 级文件系统/网络/进程隔离与不加载项目指令、Hook、MCP 的 
 | `untrusted-repository-supported` | **NO** | worker/vm 与 scratch 不是 OS 沙箱，且尚无从会话建立前禁用项目配置的 clean profile |
 
 `source-set/replay-complete` 和 `deterministic-host-contract-tested` 都不能被宣传成 `GA-ready` 或模型质量等价。在开放项关闭前，`crabcode-security` 必须保持 `staged-not-active`，用户面只允许 preview/受控 beta 口径。
+
+---
+
+## 15. 2026-07-27 状态后记
+
+本节只记录 2026-07-23 之后发生的状态变化。第 0–14 节一字未改：那些陈述是 2026-07-23 审计时点的记录，按当时口径成立，不因后续事实而追改。
+
+- **公开插件已合并进 `main`。** 实现提交 `49b9c68afbbf648b34033686007334545d5e0842` 随合并提交 `58b80e1` 进入 `main`，`git merge-base --is-ancestor` 对二者均为真。第 0 节“公开候选分支”与第 14.1 节“公开插件候选提交”所载的 `codex/crabcode-security-full-port-20260724` 已在合并后删除；两处记载的提交 SHA 仍然有效且可解析，证据定位改由 `main` 可达性提供，不再依赖该分支存在。
+- **commit-bound CI 已就位并通过。** `.github/workflows/ci.yml` 的 `security-plugin` job 在 ubuntu/macOS × Python 3.9/3.13 四个组合上，对每个 `main` 提交重跑 `verify-crabcode-security-port.ts`（上游 provenance 与 25/25 完整移植）、`build-crabcode-security-port-patch.ts --check`（patch 可复算）、`tests/crabcode-security/` 以及可执行文件 mode `100755` 断言。证据：`main` 提交 `97c466a` 的 run `30246584271`，7/7 绿。
+- **未变化的 Gate。** 独立 review、`model-behavior-equivalence`、GA 与发布封存仍开放；活动 `.crabcode-plugin/marketplace.json` 中 `crabcode-security` 实得仍为 `0` 条，候选条目仍为 `staged-not-active`。第 14.5 节的分层结论除 `source-set/replay-complete` 行中“合并”与“CI”两项已关闭外，其余维持原值；第 14.5 节 `GA-not-complete` 行所列各项针对私有 Core，不受本次公开插件合并影响。
+- **私有 Core 不在本次变更范围内。** 第 0 节的 `codex/crabcode-security-runtime-20260724` 不属于本仓，也不在本仓 2026-07-24 分支清理所删除的 10 条之列，其状态以本体仓为准。
