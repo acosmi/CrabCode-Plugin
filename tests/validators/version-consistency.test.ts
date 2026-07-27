@@ -188,12 +188,15 @@ describe("version consistency validator", () => {
     expect(issues.some((i) => i.message.includes("not valid JSON"))).toBe(true);
   });
 
+  // Driven through an explicit baseline rather than a shipped member: the shipped set
+  // is empty (ratcheted 2026-07-27), and naming a member of an emptied baseline is the
+  // fixture trap mcp-contract.test.ts documents.
   test("a baselined plugin drifts as a warning, not an error", async () => {
     const root = await makeTempRoot();
     await scaffold(root, [
-      { name: "crabcode-setup", source: "./", entryVersion: "0.1.0", manifestVersion: "0.1.0", packageVersion: "0.3.0" },
+      { name: "legacy", source: "./plugins/legacy", entryVersion: "0.1.0", manifestVersion: "0.1.0", packageVersion: "0.3.0" },
     ]);
-    const issues = await validateVersionConsistency(root);
+    const issues = await validateVersionConsistency(root, new Set(["legacy"]));
     expect(issues).toHaveLength(1);
     expect(issues[0]!.severity).toBe("warning");
   });
@@ -201,12 +204,22 @@ describe("version consistency validator", () => {
   test("ratchet: a baselined plugin whose versions now agree is a stale-entry error", async () => {
     const root = await makeTempRoot();
     await scaffold(root, [
-      { name: "crabcode-setup", source: "./", entryVersion: "0.1.0", manifestVersion: "0.1.0", packageVersion: "0.1.0" },
+      { name: "legacy", source: "./plugins/legacy", entryVersion: "0.1.0", manifestVersion: "0.1.0", packageVersion: "0.1.0" },
     ]);
-    const issues = await validateVersionConsistency(root);
+    const issues = await validateVersionConsistency(root, new Set(["legacy"]));
     expect(issues).toHaveLength(1);
     expect(issues[0]!.severity).toBe("error");
     expect(issues[0]!.message).toContain("stale PACKAGE_VERSION_BASELINE");
+  });
+
+  test("an unbaselined plugin with the same drift is an error, not a warning", async () => {
+    const root = await makeTempRoot();
+    await scaffold(root, [
+      { name: "legacy", source: "./plugins/legacy", entryVersion: "0.1.0", manifestVersion: "0.1.0", packageVersion: "0.3.0" },
+    ]);
+    const issues = await validateVersionConsistency(root, new Set());
+    expect(issues).toHaveLength(1);
+    expect(issues[0]!.severity).toBe("error");
   });
 
   test("stays silent when marketplace.json is absent — that is marketplaceValidator's finding", async () => {
@@ -214,8 +227,10 @@ describe("version consistency validator", () => {
     expect(await validateVersionConsistency(root)).toEqual([]);
   });
 
-  test("the real repo has no unbaselined version drift", async () => {
+  test("the real repo is clean — no drift at all, baselined or otherwise", async () => {
+    // Pins the ratcheted-to-zero state: any new warning means someone re-baselined
+    // instead of reconciling, any error means live drift shipped.
     const issues = await validateVersionConsistency(path.resolve("."));
-    expect(issues.filter((i) => i.severity === "error")).toEqual([]);
+    expect(issues).toEqual([]);
   });
 });

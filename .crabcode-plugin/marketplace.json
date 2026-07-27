@@ -11,7 +11,7 @@
     {
       "name": "crabcode-setup",
       "source": "./",
-      "version": "0.1.0",
+      "version": "0.3.0",
       "displayName": "CrabCode 一键配置",
       "shortDescription": "分析仓库并推荐 CrabCode 原生自动化:技能、钩子、智能体、插件与 MCP 服务",
       "longDescription": "扫描当前仓库结构与工作流,推荐适合的 CrabCode 原生自动化能力(技能 Skills、钩子 Hooks、智能体 Agents、插件 Plugins、MCP 服务),帮助快速把项目接入 CrabCode 生态。",
