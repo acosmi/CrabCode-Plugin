@@ -32,12 +32,12 @@ export type VersionConsistencyIssue = {
 /**
  * Plugins whose package.json version predates this gate.
  *
- * `crabcode-setup` publishes from the repo root: package.json is at 0.3.0 while
- * its manifest and marketplace entry are at 0.1.0. Reconciling them is a release
- * decision (raising the marketplace version republishes to every consumer), so it
- * is baselined rather than silently rewritten.
+ * Ratcheted to zero on 2026-07-27 — `crabcode-setup` was reconciled to 0.3.0 across
+ * all three files, so every version drift is now a hard error. Keep the set (and its
+ * stale check) so a future legacy import can be baselined explicitly rather than by
+ * loosening the rule.
  */
-const PACKAGE_VERSION_BASELINE = new Set<string>(["crabcode-setup"]);
+const PACKAGE_VERSION_BASELINE = new Set<string>([]);
 
 type MarketplaceEntry = {
   name?: unknown;
@@ -64,8 +64,15 @@ function readVersion(manifest: Record<string, unknown> | null): string | null {
   return typeof raw === "string" && raw.length > 0 ? raw : null;
 }
 
+/**
+ * `baseline` defaults to the shipped set and exists so the ratchet stays testable once
+ * that set is empty: a fixture may not name a member of an emptied baseline, and this
+ * validator — unlike mcpContractValidator — has only one, so there is no populated
+ * sibling to anchor on. Production callers pass `root` alone.
+ */
 export async function validateVersionConsistency(
   root: string,
+  baseline: ReadonlySet<string> = PACKAGE_VERSION_BASELINE,
 ): Promise<VersionConsistencyIssue[]> {
   const issues: VersionConsistencyIssue[] = [];
   const marketplacePath = path.join(root, ".crabcode-plugin", "marketplace.json");
@@ -160,7 +167,7 @@ export async function validateVersionConsistency(
       continue;
     }
 
-    const baselined = PACKAGE_VERSION_BASELINE.has(name);
+    const baselined = baseline.has(name);
     if (baselined) evaluatedBaseline.add(name);
 
     if (packageVersion !== manifestVersion) {
