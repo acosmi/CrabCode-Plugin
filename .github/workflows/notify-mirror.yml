@@ -134,7 +134,7 @@ jobs:
           fi
 
       - name: Check out the exact release for byte-level comparison
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ steps.target.outputs.sha }}
           path: expected-source
@@ -265,6 +265,64 @@ jobs:
                   if local_exec != archive_exec:
                       raise SystemExit(f"archive executable mode mismatch: {name}")
           print(f"verified archive files={len(local)} prefix={prefix}")
+          PY
+
+          fetch -D "${WORK}/marketplace.final.headers" \
+            -o "${WORK}/marketplace.final.json" \
+            "${MIRROR_BASE}/marketplace.json" \
+            || fail "mirror marketplace.json became unreachable during the audit"
+          fetch -D "${WORK}/marketplace-checksum.final.headers" \
+            -o "${WORK}/marketplace.final.json.sha256" \
+            "${MIRROR_BASE}/marketplace.json.sha256" \
+            || fail "mirror marketplace checksum became unreachable during the audit"
+          cmp -s expected-source/.crabcode-plugin/marketplace.json "${WORK}/marketplace.final.json" \
+            || fail "mirror marketplace.json changed during the audit"
+          python3 - "${WORK}/marketplace.final.json" "${WORK}/marketplace.final.json.sha256" <<'PY' \
+            || fail "mirror marketplace checksum changed during the audit"
+          import hashlib, pathlib, re, sys
+          payload = pathlib.Path(sys.argv[1])
+          checksum = pathlib.Path(sys.argv[2]).read_text(encoding="ascii")
+          match = re.fullmatch(r"([0-9a-f]{64})  marketplace\.json\n?", checksum)
+          if match is None or match.group(1) != hashlib.sha256(payload.read_bytes()).hexdigest():
+              raise SystemExit("final marketplace checksum mismatch")
+          PY
+          fetch -H 'Cache-Control: no-cache' \
+            -D "${WORK}/latest.final.headers" \
+            -o "${WORK}/latest.final" \
+            "${MIRROR_BASE}/latest" \
+            || fail "mirror latest became unreachable during the audit"
+          python3 - \
+            "${WORK}/latest.final" \
+            "${WORK}/latest.final.headers" \
+            "${WORK}/marketplace.final.headers" \
+            "${WORK}/marketplace-checksum.final.headers" \
+            "${SHA}" <<'PY' \
+            || fail "mutable mirror state or cache policy changed during the audit"
+          import pathlib, re, sys
+          pointer_path = pathlib.Path(sys.argv[1])
+          latest_headers_path = pathlib.Path(sys.argv[2])
+          mutable_headers = [pathlib.Path(value) for value in sys.argv[2:5]]
+          expected = sys.argv[5]
+          raw = pointer_path.read_bytes()
+          if raw != expected.encode("ascii"):
+              raise SystemExit(f"mirror latest changed during audit: {raw!r}")
+          for headers_path in mutable_headers:
+              headers = headers_path.read_text(encoding="iso-8859-1").lower()
+              cache_lines = re.findall(r"^cache-control:\s*(.+)$", headers, flags=re.MULTILINE)
+              directives = ",".join(cache_lines)
+              parts = {part.strip() for part in directives.split(",")}
+              ages = [
+                  int(value)
+                  for value in re.findall(r"(?:s-maxage|max-age)\s*=\s*\"?(\d+)\"?", directives)
+              ]
+              if "immutable" in directives:
+                  raise SystemExit(f"mutable response became immutable: {headers_path.name}")
+              if not ({"no-store", "no-cache"} & parts) and not ages:
+                  raise SystemExit(f"mutable response lost explicit freshness: {headers_path.name}")
+              if ages and max(ages) > 300:
+                  raise SystemExit(f"mutable response cache lifetime exceeds 300s: {headers_path.name}")
+              if headers_path == latest_headers_path and not ({"no-store", "no-cache"} & parts):
+                  raise SystemExit("mirror latest no longer requires revalidation")
           PY
 
           ZIP_SHA256="$(sha256sum "${WORK}/${SHA}.zip" | cut -d' ' -f1)"
