@@ -73,9 +73,18 @@ jobs:
           set -euo pipefail
           WORK="${RUNNER_TEMP}/mirror-audit"
           mkdir -p "${WORK}"
-          curl -fsSL --retry 5 --retry-all-errors --connect-timeout 10 --max-time 120 \
+          curl -fsSL --proto '=https' --proto-redir '=https' \
+            --retry 5 --retry-all-errors --connect-timeout 10 --max-time 120 \
+            -H 'Cache-Control: no-cache' \
             -D "${WORK}/latest.headers" -o "${WORK}/latest" "${MIRROR_BASE}/latest"
-          POINTER="$(tr -d '\r\n' < "${WORK}/latest")"
+          POINTER="$(python3 - "${WORK}/latest" <<'PY'
+          import pathlib, re, sys
+          raw = pathlib.Path(sys.argv[1]).read_bytes()
+          if re.fullmatch(b"[0-9a-f]{40}", raw) is None:
+              raise SystemExit(f"mirror latest is not exactly one 40-byte lowercase SHA: {raw!r}")
+          print(raw.decode("ascii"))
+          PY
+          )"
           read -r TARGET_SHA TARGET_CI_URL FRESHNESS PENDING_SHA PENDING_AGE < <(
             python3 - "${RUNNER_TEMP}/ci-runs.json" "${POINTER}" "${EVENT_NAME}" \
               "${FRESHNESS_SLO_SECONDS}" "${LATEST_SHA}" <<'PY'
@@ -147,7 +156,8 @@ jobs:
           mkdir -p "${WORK}"
           FAIL_HINT="Run: gh workflow run sync-plugins-to-mirror.yml -R acosmi/crabcode-source"
           fetch() {
-            curl -fsSL --retry 5 --retry-all-errors --connect-timeout 10 --max-time 120 "$@"
+            curl -fsSL --proto '=https' --proto-redir '=https' \
+              --retry 5 --retry-all-errors --connect-timeout 10 --max-time 120 "$@"
           }
           fail() {
             echo "::error::$1"
@@ -160,7 +170,7 @@ jobs:
           cmp -s expected-source/.crabcode-plugin/marketplace.json "${WORK}/marketplace.json" \
             || fail "mirror marketplace.json does not byte-match ${SHA}"
 
-          fetch -o "${WORK}/${SHA}.zip" "${MIRROR_BASE}/${SHA}.zip" \
+          fetch -D "${WORK}/zip.headers" -o "${WORK}/${SHA}.zip" "${MIRROR_BASE}/${SHA}.zip" \
             || fail "mirror archive ${SHA}.zip is unreachable"
           fetch -o "${WORK}/${SHA}.zip.sha256" "${MIRROR_BASE}/${SHA}.zip.sha256" \
             || fail "mirror archive checksum ${SHA}.zip.sha256 is unreachable"
@@ -174,16 +184,28 @@ jobs:
               headers = path.read_text(encoding="iso-8859-1").lower()
               cache_lines = re.findall(r"^cache-control:\s*(.+)$", headers, flags=re.MULTILINE)
               directives = ",".join(cache_lines)
+              parts = {part.strip() for part in directives.split(",")}
               if "immutable" in directives:
                   raise SystemExit(f"mutable response is immutable: {path.name}")
               ages = [
                   int(value)
                   for value in re.findall(r"(?:s-maxage|max-age)\s*=\s*\"?(\d+)\"?", directives)
               ]
-              if "no-store" not in directives and "no-cache" not in directives and not ages:
+              if not ({"no-store", "no-cache"} & parts) and not ages:
                   raise SystemExit(f"mutable response lacks an explicit safe freshness policy: {path.name}")
               if ages and max(ages) > 300:
                   raise SystemExit(f"mutable response cache lifetime exceeds 300s: {path.name}")
+              if path.name == "latest.headers" and not ({"no-store", "no-cache"} & parts):
+                  raise SystemExit("latest must require revalidation via no-cache or no-store")
+          PY
+          python3 - "${WORK}/zip.headers" <<'PY' \
+            || fail "content-addressed ZIP lacks a one-year immutable cache policy"
+          import pathlib, re, sys
+          headers = pathlib.Path(sys.argv[1]).read_text(encoding="iso-8859-1").lower()
+          directives = ",".join(re.findall(r"^cache-control:\s*(.+)$", headers, flags=re.MULTILINE))
+          ages = [int(value) for value in re.findall(r"max-age\s*=\s*\"?(\d+)\"?", directives)]
+          if "immutable" not in directives or not ages or min(ages) < 31_536_000:
+              raise SystemExit("unsafe ZIP cache policy")
           PY
           python3 - "${WORK}" "${SHA}" <<'PY' \
             || fail "published checksum files are unsafe or do not match mirror bytes"
