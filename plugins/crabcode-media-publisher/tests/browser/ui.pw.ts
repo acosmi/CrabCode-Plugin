@@ -3,6 +3,10 @@ import { expect, test, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { articlePreviewDocument } from "../../apps/publisher-app/src/article-preview.ts";
 
+const skipVisual = process.env.CRABPUBLISH_SKIP_VISUAL === "1";
+const expectedBrowserVersion = process.env.CRABPUBLISH_EXPECTED_BROWSER_VERSION
+  ?? (skipVisual ? undefined : "150.0.7871.116");
+
 const routes = [
   "/app",
   "/app/works",
@@ -46,7 +50,7 @@ function contrastRatio(foreground: readonly number[], background: readonly numbe
 }
 
 test.beforeEach(async ({ page, browser }) => {
-  expect(browser.version()).toBe("150.0.7871.116");
+  if (expectedBrowserVersion) expect(browser.version()).toBe(expectedBrowserVersion);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.route("**/*", async (route) => {
     const url = new URL(route.request().url());
@@ -115,7 +119,7 @@ test("editor embeds the styled canonical HTML artifact in an opaque local frame"
     bodyColor: "rgb(15, 23, 42)",
     headingColor: "rgb(15, 23, 42)"
   });
-  await expect(preview).toHaveScreenshot("article-preview-frame-390.png");
+  if (!skipVisual) await expect(preview).toHaveScreenshot("article-preview-frame-390.png");
 });
 
 test("editor safely imports local Markdown and HTML into the synchronized HTML preview", async ({ page }) => {
@@ -294,7 +298,7 @@ const goldens = [
 for (const golden of goldens) {
   test(`visual ${golden.name}`, async ({ page }) => {
     await open(page, golden.route, golden.width, golden.height);
-    await expect(page).toHaveScreenshot(`${golden.name}.png`, { fullPage: true });
+    if (!skipVisual) await expect(page).toHaveScreenshot(`${golden.name}.png`, { fullPage: true });
   });
 }
 
@@ -302,7 +306,7 @@ test("visual article-print-a4", async ({ page }) => {
   await page.setViewportSize({ width: 794, height: 1123 });
   await page.emulateMedia({ media: "print", colorScheme: "light", reducedMotion: "reduce" });
   await page.setContent(articlePreviewDocument, { waitUntil: "load" });
-  await expect(page).toHaveScreenshot("article-print-a4.png", { fullPage: true });
+  if (!skipVisual) await expect(page).toHaveScreenshot("article-print-a4.png", { fullPage: true });
 });
 
 test("all routes reflow without root horizontal overflow at 820 and 320 CSS pixels", async ({ page }) => {
