@@ -1,0 +1,17 @@
+{
+  "name": "crabcode-media-publisher",
+  "version": "0.1.0",
+  "description": "Local-first CrabPublish Hub UI for governed multi-platform publishing previews, approvals, capability checks, evidence, and Edge coordination.",
+  "author": {
+    "name": "CrabCode"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "media-publisher",
+    "publishing-hub",
+    "approval",
+    "edge",
+    "multi-platform",
+    "ui"
+  ]
+}
