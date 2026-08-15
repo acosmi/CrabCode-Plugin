@@ -166,7 +166,7 @@ tail -f ~/.crabcode/debug/latest
 ### Level 4: Argument Testing
 
 **What to test:**
-- Positional arguments work ($1, $2, etc.)
+- Positional arguments work ($0, $1, etc. — numbering starts at zero)
 - $ARGUMENTS captures all arguments
 - Missing arguments handled gracefully
 - Invalid arguments detected
@@ -176,8 +176,8 @@ tail -f ~/.crabcode/debug/latest
 | Test Case | Command | Expected Result |
 |-----------|---------|-----------------|
 | No args | `/cmd` | Graceful handling or useful message |
-| One arg | `/cmd arg1` | $1 substituted correctly |
-| Two args | `/cmd arg1 arg2` | $1 and $2 substituted |
+| One arg | `/cmd arg1` | $0 substituted correctly |
+| Two args | `/cmd arg1 arg2` | $0 and $1 substituted |
 | Extra args | `/cmd a b c d` | All captured or extras ignored appropriately |
 | Special chars | `/cmd "arg with spaces"` | Quotes handled correctly |
 | Empty arg | `/cmd ""` | Empty string handled |
@@ -666,12 +666,12 @@ crabcode --debug
 **Issue: Arguments not substituting**
 
 ```bash
-# Verify syntax
-grep '\$1' .crabcode/commands/my-command.md
+# Verify syntax — $0 is the FIRST argument, so that is what to look for
+grep '\$0' .crabcode/commands/my-command.md
 grep '\$ARGUMENTS' .crabcode/commands/my-command.md
 
 # Test with simple command first
-echo "Test: \$1 and \$2" > .crabcode/commands/test-args.md
+echo "Test: \$0 and \$1" > .crabcode/commands/test-args.md
 ```
 
 **Issue: Bash commands not executing**

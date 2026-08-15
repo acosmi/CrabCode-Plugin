@@ -95,9 +95,9 @@ argument-hint: [test-file]
 allowed-tools: Bash(npm:*), Bash(jest:*)
 ---
 
-Run tests for $1:
+Run tests for $0:
 
-Test execution: !`npm test $1`
+Test execution: !`npm test $0`
 
 Analyze results:
 - Tests passed/failed
@@ -125,7 +125,7 @@ description: Generate documentation for file
 argument-hint: [source-file]
 ---
 
-Generate comprehensive documentation for @$1
+Generate comprehensive documentation for @$0
 
 Include:
 
@@ -204,16 +204,16 @@ argument-hint: [environment] [version]
 allowed-tools: Bash(kubectl:*), Read
 ---
 
-Deploy to $1 environment using version $2
+Deploy to $0 environment using version $1
 
 **Pre-deployment Checks:**
-1. Verify $1 configuration exists
-2. Check version $2 is valid
+1. Verify $0 configuration exists
+2. Check version $1 is valid
 3. Verify cluster accessibility: !`kubectl cluster-info`
 
 **Deployment Steps:**
-1. Update deployment manifest with version $2
-2. Apply configuration to $1
+1. Update deployment manifest with version $1
+2. Apply configuration to $0
 3. Monitor rollout status
 4. Verify pod health
 5. Run smoke tests
@@ -241,7 +241,7 @@ description: Compare two files
 argument-hint: [file1] [file2]
 ---
 
-Compare @$1 with @$2
+Compare @$0 with @$1
 
 **Analysis:**
 
@@ -367,7 +367,7 @@ description: Explain how code works
 argument-hint: [file-or-function]
 ---
 
-Explain @$1 in detail
+Explain @$0 in detail
 
 **Explanation Structure:**
 
@@ -441,7 +441,7 @@ Analyze and suggest...
 argument-hint: [target]
 ---
 
-Process $1...
+Process $0...
 ```
 
 **Use for:** File operations, targeted actions
@@ -453,7 +453,7 @@ Process $1...
 argument-hint: [source] [target] [options]
 ---
 
-Process $1 to $2 with $3...
+Process $0 to $1 with $2...
 ```
 
 **Use for:** Workflows, deployments, comparisons
@@ -473,7 +473,7 @@ Quick simple task...
 ### Pattern 6: File Comparison
 
 ```markdown
-Compare @$1 with @$2...
+Compare @$0 with @$1...
 ```
 
 **Use for:** Diff analysis, migration planning

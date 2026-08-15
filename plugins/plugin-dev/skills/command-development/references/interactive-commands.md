@@ -879,7 +879,7 @@ argument-hint: [project-name]
 allowed-tools: AskUserQuestion, Write
 ---
 
-Setup for project: $1
+Setup for project: $0
 
 Now gather additional configuration...
 
@@ -888,7 +888,7 @@ Use AskUserQuestion for options that require explanation.
 
 **Questions for complex choices:**
 ```markdown
-Project name from argument: $1
+Project name from argument: $0
 
 Now use AskUserQuestion to choose:
 - Architecture pattern

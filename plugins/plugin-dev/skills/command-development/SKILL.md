@@ -239,7 +239,9 @@ Fix issue #456 following our coding standards...
 
 ### Using Positional Arguments
 
-Capture individual arguments with `$1`, `$2`, `$3`, etc.:
+Capture individual arguments with `$0`, `$1`, `$2`, etc. **The numbering starts
+at zero** — `$0` is the first argument, not the command name as in a shell.
+Writing `$1` for the first argument leaves it empty.
 
 ```markdown
 ---
@@ -247,8 +249,8 @@ description: Review PR with priority and assignee
 argument-hint: [pr-number] [priority] [assignee]
 ---
 
-Review pull request #$1 with priority level $2.
-After review, assign to $3 for follow-up.
+Review pull request #$0 with priority level $1.
+After review, assign to $2 for follow-up.
 ```
 
 **Usage:**
@@ -269,7 +271,7 @@ After review, assign to alice for follow-up.
 Mix positional and remaining arguments:
 
 ```markdown
-Deploy $1 to $2 environment with options: $3
+Deploy $0 to $1 environment with options: $2
 ```
 
 **Usage:**
@@ -296,7 +298,7 @@ description: Review specific file
 argument-hint: [file-path]
 ---
 
-Review @$1 for:
+Review @$0 for:
 
 - Code quality
 - Best practices
@@ -420,9 +422,9 @@ by *telling the model what to do*, which is what a command body is for:
 argument-hint: [pr-number]
 ---
 
-Review pull request #$1.
+Review pull request #$0.
 
-If $1 is empty, do not guess — reply asking for a PR number and show the
+If $0 is empty, do not guess — reply asking for a PR number and show the
 usage: /review-pr [number]
 ```
 
@@ -459,7 +461,7 @@ Requires: AWS credentials configured
 Example: /deploy staging v1.2.3
 -->
 
-Deploy application to $1 environment using version $2...
+Deploy application to $0 environment using version $1...
 ```
 
 ## Common Patterns
@@ -493,7 +495,7 @@ argument-hint: [test-file]
 allowed-tools: Bash(npm:*)
 ---
 
-Run tests: !`npm test $1`
+Run tests: !`npm test $0`
 
 Analyze results and suggest fixes for failures.
 ```
@@ -506,7 +508,7 @@ description: Generate documentation for file
 argument-hint: [source-file]
 ---
 
-Generate comprehensive documentation for @$1 including:
+Generate comprehensive documentation for @$0 including:
 
 - Function/class descriptions
 - Parameter documentation
@@ -524,9 +526,9 @@ argument-hint: [pr-number]
 allowed-tools: Bash(gh:*), Read
 ---
 
-PR #$1 Workflow:
+PR #$0 Workflow:
 
-1. Fetch PR: !`gh pr view $1`
+1. Fetch PR: !`gh pr view $0`
 2. Review changes
 3. Run checks
 4. Approve or request changes
@@ -543,7 +545,8 @@ PR #$1 Workflow:
 
 **Arguments not working:**
 
-- Verify `$1`, `$2` syntax correct
+- Verify `$0`, `$1` syntax correct — numbering starts at zero, so a first
+  argument written as `$1` silently resolves to empty
 - Check `argument-hint` matches usage
 - Ensure no extra spaces
 
@@ -582,7 +585,7 @@ description: Analyze using plugin script
 allowed-tools: Bash(node:*)
 ---
 
-Run analysis: !`node ${CRABCODE_PLUGIN_ROOT}/scripts/analyze.js $1`
+Run analysis: !`node ${CRABCODE_PLUGIN_ROOT}/scripts/analyze.js $0`
 
 Review results and report findings.
 ```
@@ -658,9 +661,9 @@ argument-hint: [environment]
 allowed-tools: Read, Bash(*)
 ---
 
-Load configuration: @${CRABCODE_PLUGIN_ROOT}/config/$1-deploy.json
+Load configuration: @${CRABCODE_PLUGIN_ROOT}/config/$0-deploy.json
 
-Deploy to $1 using configuration settings.
+Deploy to $0 using configuration settings.
 Monitor deployment and report status.
 ```
 
@@ -674,7 +677,7 @@ argument-hint: [component]
 
 Template: @${CRABCODE_PLUGIN_ROOT}/templates/docs.md
 
-Generate documentation for $1 following template structure.
+Generate documentation for $0 following template structure.
 ```
 
 **Multi-script pattern:**
@@ -708,7 +711,7 @@ description: Deep code review
 argument-hint: [file-path]
 ---
 
-Initiate comprehensive review of @$1 using the code-reviewer agent.
+Initiate comprehensive review of @$0 using the code-reviewer agent.
 
 The agent will analyze:
 
@@ -740,7 +743,7 @@ description: Document API with standards
 argument-hint: [api-file]
 ---
 
-Document API in @$1 following plugin standards.
+Document API in @$0 following plugin standards.
 
 Use the api-docs-standards skill to ensure:
 
@@ -781,10 +784,10 @@ argument-hint: [file]
 allowed-tools: Bash(node:*), Read
 ---
 
-Target: @$1
+Target: @$0
 
 Phase 1 - Static Analysis:
-!`node ${CRABCODE_PLUGIN_ROOT}/scripts/lint.js $1`
+!`node ${CRABCODE_PLUGIN_ROOT}/scripts/lint.js $0`
 
 Phase 2 - Deep Review:
 Launch code-reviewer agent for detailed analysis.
@@ -817,10 +820,10 @@ description: Deploy with validation
 argument-hint: [environment]
 ---
 
-Validate environment: !`echo "$1" | grep -E "^(dev|staging|prod)$" || echo "INVALID"`
+Validate environment: !`echo "$0" | grep -E "^(dev|staging|prod)$" || echo "INVALID"`
 
-If $1 is valid environment:
-Deploy to $1
+If $0 is valid environment:
+Deploy to $0
 Otherwise:
 Explain valid environments: dev, staging, prod
 Show usage: /deploy [environment]
@@ -834,10 +837,10 @@ description: Process configuration
 argument-hint: [config-file]
 ---
 
-Check file exists: !`test -f $1 && echo "EXISTS" || echo "MISSING"`
+Check file exists: !`test -f $0 && echo "EXISTS" || echo "MISSING"`
 
 If file exists:
-Process configuration: @$1
+Process configuration: @$0
 Otherwise:
 Explain where to place config file
 Show expected format

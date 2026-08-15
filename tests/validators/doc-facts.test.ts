@@ -173,6 +173,66 @@ describe("docFactsValidator — /plugin subcommands", () => {
   });
 });
 
+describe("docFactsValidator — zero-based positional arguments", () => {
+  const commandBody = (body: string) =>
+    ["```markdown", "---", "description: demo", "---", "", body, "```", ""].join("\n");
+
+  test("a command body using $1 for the first argument is caught", async () => {
+    const root = await makeRoot();
+    await writePluginDoc(root, "plugin-dev", commandBody("Deploy $1 to $2."));
+    const issues = await validateDocFacts(root);
+    expect(rulesOf(errorsOf(issues))).toContain("command-arg-off-by-one");
+  });
+
+  test("the same body numbered from zero is clean", async () => {
+    const root = await makeRoot();
+    await writePluginDoc(root, "plugin-dev", commandBody("Deploy $0 to $1."));
+    expect(await validateDocFacts(root)).toHaveLength(0);
+  });
+
+  test("a yaml-fenced command file is judged too", async () => {
+    // frontmatter-reference.md labels whole command files as ```yaml, which is
+    // where three of these hid from a markdown-only sweep.
+    const root = await makeRoot();
+    await writePluginDoc(
+      root,
+      "plugin-dev",
+      ["```yaml", "---", "description: demo", "---", "", "Fix issue #$1", "```", ""].join("\n"),
+    );
+    expect(rulesOf(errorsOf(await validateDocFacts(root)))).toContain("command-arg-off-by-one");
+  });
+
+  test("a real shell script using $1 is left alone", async () => {
+    // $1 is the first parameter in shell. Only command bodies are zero-based,
+    // so the rule must not reach into ```bash.
+    const root = await makeRoot();
+    await writePluginDoc(
+      root,
+      "plugin-dev",
+      ['```bash', 'COMMAND_FILE="$1"', 'echo "$COMMAND_FILE"', "```", ""].join("\n"),
+    );
+    expect(await validateDocFacts(root)).toHaveLength(0);
+  });
+
+  test("prose outside any fence is left alone", async () => {
+    // The skill has to be able to say "writing $1 for the first argument is the
+    // mistake" without tripping the rule that enforces exactly that.
+    const root = await makeRoot();
+    await writePluginDoc(
+      root,
+      "plugin-dev",
+      "Numbering starts at zero; writing `$1` for the first argument leaves it empty.\n",
+    );
+    expect(await validateDocFacts(root)).toHaveLength(0);
+  });
+
+  test("a block that starts at $2 is not silently shifted — it is left for a human", async () => {
+    const root = await makeRoot();
+    await writePluginDoc(root, "plugin-dev", commandBody("Use $2 and $3."));
+    expect(rulesOf(await validateDocFacts(root))).not.toContain("command-arg-off-by-one");
+  });
+});
+
 describe("docFactsValidator — counter-example markers", () => {
   test("a marker on the same line suppresses the finding", async () => {
     const root = await makeRoot();

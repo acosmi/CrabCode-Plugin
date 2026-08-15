@@ -109,11 +109,13 @@ const BANNED_RULE_IDS = new Set(BANNED_CLAIMS.map((claim) => claim.rule));
 
 const RULE_UNKNOWN_HOOK_EVENT = "unknown-hook-event";
 const RULE_UNKNOWN_PLUGIN_SUBCOMMAND = "unknown-plugin-subcommand";
+const RULE_COMMAND_ARG_OFF_BY_ONE = "command-arg-off-by-one";
 
 const ALL_RULE_IDS = new Set<string>([
   ...BANNED_RULE_IDS,
   RULE_UNKNOWN_HOOK_EVENT,
   RULE_UNKNOWN_PLUGIN_SUBCOMMAND,
+  RULE_COMMAND_ARG_OFF_BY_ONE,
 ]);
 
 /**
@@ -143,6 +145,20 @@ const EVENT_LIST_PATTERN = /(?:Available|Supported|Commonly used|Valid) events\*
 const HOOK_CONFIG_KEY_PATTERN = /"([A-Z][A-Za-z]+)"\s*:\s*[[{]/g;
 
 const PLUGIN_COMMAND_PATTERN = /\/plugin\s+([a-z-]+)(?:\s+([a-z-]+))?/g;
+
+/**
+ * Positional arguments in a command body are zero-based: substituteArguments
+ * maps $0 to the first argument, so the shell habit of writing $1 for the first
+ * one shifts every argument along and drops the last into an empty string. It
+ * fails silently — the command still runs, just with the wrong values — which
+ * is why it survived in 171 places until it was measured.
+ *
+ * A block is judged as a whole rather than line by line: what marks it as
+ * shell-numbered is that it uses $1 while never using $0.
+ */
+const POSITIONAL_ARG_PATTERN = /\$(\d+)(?!\w)/g;
+const COMMAND_FILE_FENCE_LANGS = new Set(["markdown", "md", "yaml", "yml"]);
+const FENCE_PATTERN = /^\s*(`{3,})\s*([A-Za-z0-9_-]*)\s*$/;
 
 export async function validateDocFacts(root: string): Promise<DocFactsIssue[]> {
   const absRoot = path.resolve(root);
@@ -207,7 +223,68 @@ function checkFile(
     checkPluginSubcommands(line, raise);
   });
 
+  checkPositionalArgs(lines, allowed, used, severity, file, issues);
   reportUnusedMarkers(allowed, used, file, issues);
+}
+
+function checkPositionalArgs(
+  lines: string[],
+  allowed: Map<number, Set<string>>,
+  used: Set<string>,
+  severity: DocFactsSeverity,
+  file: string,
+  issues: DocFactsIssue[],
+): void {
+  let openTicks: string | null = null;
+  let isCommandFile = false;
+  let blockStart = 0;
+  let indices = new Set<number>();
+  let firstHit = 0;
+
+  const closeBlock = (): void => {
+    if (isCommandFile && indices.size > 0 && !indices.has(0) && Math.min(...indices) === 1) {
+      if (allowed.get(firstHit)?.has(RULE_COMMAND_ARG_OFF_BY_ONE)) {
+        used.add(`${firstHit}:${RULE_COMMAND_ARG_OFF_BY_ONE}`);
+      } else {
+        issues.push({
+          severity,
+          file,
+          line: firstHit,
+          rule: RULE_COMMAND_ARG_OFF_BY_ONE,
+          message: `命令正文用 $1 指代第一个参数(块起于第 ${blockStart} 行);位置参数从 $0 起算,写 $1 会取到第二个参数、并让最后一个静默为空`,
+        });
+      }
+    }
+    openTicks = null;
+    isCommandFile = false;
+    indices = new Set();
+  };
+
+  lines.forEach((line, i) => {
+    const fence = FENCE_PATTERN.exec(line);
+    if (fence) {
+      const [, ticks, lang] = fence;
+      if (openTicks === null) {
+        openTicks = ticks ?? "```";
+        isCommandFile = COMMAND_FILE_FENCE_LANGS.has((lang ?? "").toLowerCase());
+        blockStart = i + 1;
+        indices = new Set();
+        firstHit = 0;
+        return;
+      }
+      // Only a fence at least as long as the opener can close it, so a nested
+      // shorter fence inside a wrapped example does not end the block early.
+      if ((ticks?.length ?? 0) >= openTicks.length && !lang) closeBlock();
+      return;
+    }
+    if (openTicks === null || !isCommandFile) return;
+    POSITIONAL_ARG_PATTERN.lastIndex = 0;
+    for (const match of line.matchAll(POSITIONAL_ARG_PATTERN)) {
+      if (indices.size === 0) firstHit = i + 1;
+      indices.add(Number(match[1]));
+    }
+  });
+  if (openTicks !== null) closeBlock();
 }
 
 function checkEventList(line: string, raise: (rule: string, message: string) => void): void {

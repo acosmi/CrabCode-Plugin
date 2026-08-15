@@ -7,7 +7,7 @@ Comprehensive guidance on creating CrabCode slash commands, including file forma
 This skill provides knowledge about:
 - Slash command file format and structure
 - YAML frontmatter configuration fields
-- Dynamic arguments ($ARGUMENTS, $1, $2, etc.)
+- Dynamic arguments ($ARGUMENTS, $0, $1, etc.)
 - File references with @ syntax
 - Bash execution with !` syntax
 - Command organization and namespacing
@@ -122,7 +122,7 @@ allowed-tools: Read, Bash(git:*)
 ---
 
 Command prompt content with:
-- Arguments: $1, $2, or $ARGUMENTS
+- Arguments: $0, $1, or $ARGUMENTS
 - Files: @path/to/file
 - Bash: !`command here`
 ```
@@ -137,7 +137,7 @@ Command prompt content with:
 
 **Dynamic arguments:**
 - `$ARGUMENTS` - All arguments as single string
-- `$1`, `$2`, `$3` - Positional arguments
+- `$0`, `$1`, `$2` - Positional arguments (zero-based: `$0` is the first)
 
 **File references:**
 - `@path/to/file` - Include file contents
@@ -175,7 +175,7 @@ description: Deploy to environment
 argument-hint: [environment] [version]
 ---
 
-Deploy to $1 environment using version $2
+Deploy to $0 environment using version $1
 ```
 
 ### Command with File Reference
@@ -186,7 +186,7 @@ description: Document file
 argument-hint: [file-path]
 ---
 
-Generate documentation for @$1
+Generate documentation for @$0
 ```
 
 ### Command with Bash Execution

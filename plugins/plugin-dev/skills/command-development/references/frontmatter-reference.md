@@ -246,7 +246,7 @@ description: Fix issue by number
 argument-hint: [issue-number]
 ---
 
-Fix issue #$1...
+Fix issue #$0...
 ```
 
 **Multi-argument:**
@@ -256,7 +256,7 @@ description: Deploy to environment
 argument-hint: [app-name] [environment] [version]
 ---
 
-Deploy $1 to $2 using version $3...
+Deploy $0 to $1 using version $2...
 ```
 
 **With options:**
@@ -266,7 +266,7 @@ description: Run tests with options
 argument-hint: [test-pattern] [options]
 ---
 
-Run tests matching $1 with options: $2
+Run tests matching $0 with options: $1
 ```
 
 ### disable-model-invocation
@@ -375,12 +375,12 @@ allowed-tools: Bash(kubectl:*), Bash(helm:*), Read
 model: best
 ---
 
-Deploy $1 to $2 environment using version $3
+Deploy $0 to $1 environment using version $2
 
 Pre-deployment checks:
-- Verify $2 configuration
+- Verify $1 configuration
 - Check cluster status: !`kubectl cluster-info`
-- Validate version $3 exists
+- Validate version $2 exists
 
 Proceed with deployment following deployment runbook.
 ```
@@ -402,9 +402,9 @@ MANUAL APPROVAL REQUIRED
 This command requires human judgment and cannot be automated.
 -->
 
-Review deployment $1 for production approval:
+Review deployment $0 for production approval:
 
-Deployment details: !`gh api /deployments/$1`
+Deployment details: !`gh api /deployments/$0`
 
 Verify:
 - All tests passed
