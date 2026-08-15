@@ -132,7 +132,7 @@ Checking prerequisites...
 <!-- SECTION 2: ANALYSIS -->
 <!-- Analyzes the differences between branches -->
 
-Analyzing differences between $1 and $2...
+Analyzing differences between $0 and $1...
 [Analysis logic...]
 
 <!-- SECTION 3: RECOMMENDATIONS -->
@@ -149,45 +149,42 @@ Based on analysis, recommend:
 ```markdown
 ---
 description: Deployment command with inline docs
+argument-hint: [environment]
 ---
 
-# Deploy to $1
+# Deploy to $0
 
 ## Pre-flight Checks
 
-<!-- We check branch status to prevent deploying from wrong branch -->
+<!-- Branch status is injected before the prompt reaches the model, so the
+     model can reason about it rather than having to ask. -->
 Current branch: !`git branch --show-current`
 
-<!-- Production deploys must come from main/master -->
-if [ "$1" = "production" ] && [ "$(git branch --show-current)" != "main" ]; then
-  ⚠️  WARNING: Not on main branch for production deploy
-  This is unusual. Confirm this is intentional.
-fi
+<!-- Production deploys are expected to come from main. State the rule and let
+     the model apply it — a command body is a prompt, so an `if` here would be
+     read as literal text, not evaluated. -->
+If the target environment is `production` and the branch above is not `main`,
+warn that this is an unusual combination and ask the user to confirm before
+continuing.
 
-<!-- Test status ensures we don't deploy broken code -->
 Running tests: !`npm test`
 
-✓ All checks passed
+If the tests above failed, stop and report the failure instead of deploying.
 
 ## Deployment
 
-<!-- Actual deployment happens here -->
 <!-- Uses blue-green strategy for zero-downtime -->
-Deploying to $1 environment...
-[Deployment steps...]
-
-<!-- Post-deployment verification -->
-Verifying deployment health...
-[Health checks...]
-
-Deployment complete!
+Deploy to the `$0` environment, then verify deployment health and report the
+result.
 
 ## Next Steps
 
 <!-- Guide user on what to do after deployment -->
-1. Monitor logs: /logs $1
-2. Run smoke tests: /smoke-test $1
-3. Notify team: /notify-deployment $1
+Tell the user how to follow up:
+
+1. Monitor logs: `/logs $0`
+2. Run smoke tests: `/smoke-test $0`
+3. Notify team: `/notify-deployment $0`
 ```
 
 ### Decision Point Documentation
@@ -195,15 +192,16 @@ Deployment complete!
 ```markdown
 ---
 description: Interactive deployment command
+argument-hint: [target] [new-version]
 ---
 
 # Interactive Deployment
 
 ## Configuration Review
 
-Target: $1
+Target: $0
 Current version: !`cat version.txt`
-New version: $2
+New version: $1
 
 <!-- DECISION POINT: User confirms configuration -->
 <!-- This pause allows user to verify everything is correct -->
@@ -238,32 +236,31 @@ argument-hint: [subcommand] [args]
 
 # Command Processor
 
-if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
-  **Command Help**
+The first argument is `$0`. If it is `help`, `--help` or `-h`, print the help
+text below verbatim and do nothing else:
 
-  USAGE:
-    /command [subcommand] [args]
+> **Command Help**
+>
+> USAGE:
+>   /command [subcommand] [args]
+>
+> SUBCOMMANDS:
+>   init [name]       Initialize new configuration
+>   deploy [env]      Deploy to environment
+>   status            Show current status
+>   rollback          Rollback last deployment
+>   help              Show this help
+>
+> EXAMPLES:
+>   /command init my-project
+>   /command deploy staging
+>   /command status
+>   /command rollback
+>
+> For detailed help on a subcommand:
+>   /command [subcommand] --help
 
-  SUBCOMMANDS:
-    init [name]       Initialize new configuration
-    deploy [env]      Deploy to environment
-    status            Show current status
-    rollback          Rollback last deployment
-    help              Show this help
-
-  EXAMPLES:
-    /command init my-project
-    /command deploy staging
-    /command status
-    /command rollback
-
-  For detailed help on a subcommand:
-    /command [subcommand] --help
-
-  Exit.
-fi
-
-[Regular command processing...]
+Otherwise carry out the requested subcommand.
 ```
 
 ### Contextual Help
@@ -278,27 +275,27 @@ argument-hint: [operation] [target]
 
 # Context-Aware Operation
 
-if [ -z "$1" ]; then
-  **No operation specified**
+The operation is `$0` and the target is `$1`.
 
-  Available operations:
-  - analyze: Analyze target for issues
-  - fix: Apply automatic fixes
-  - report: Generate detailed report
+If no operation was given, print the guidance below and stop:
 
-  Usage: /command [operation] [target]
+> **No operation specified**
+>
+> Available operations:
+> - analyze: Analyze target for issues
+> - fix: Apply automatic fixes
+> - report: Generate detailed report
+>
+> Usage: /command [operation] [target]
+>
+> Examples:
+>   /command analyze src/
+>   /command fix src/app.js
+>   /command report
+>
+> Run /command help for more details.
 
-  Examples:
-    /command analyze src/
-    /command fix src/app.js
-    /command report
-
-  Run /command help for more details.
-
-  Exit.
-fi
-
-[Command continues if operation provided...]
+Otherwise carry out the requested operation on the target.
 ```
 
 ## Error Message Documentation
@@ -308,45 +305,41 @@ fi
 ```markdown
 ---
 description: Command with good error messages
+argument-hint: [file-path]
 ---
 
 # Validation Command
 
-if [ -z "$1" ]; then
-  ❌ ERROR: Missing required argument
+Validate the file at `$0`.
 
-  The 'file-path' argument is required.
+If no path was given, report this and stop:
 
-  USAGE:
-    /validate [file-path]
+> ❌ ERROR: Missing required argument
+>
+> The 'file-path' argument is required.
+>
+> USAGE:
+>   /validate [file-path]
+>
+> EXAMPLE:
+>   /validate src/app.js
 
-  EXAMPLE:
-    /validate src/app.js
+If the path was given but the file does not exist or cannot be read, report
+that instead, quoting the path and listing what usually causes it:
 
-  Try again with a file path.
+> ❌ ERROR: File not found
+>
+> COMMON CAUSES:
+> 1. Typo in the file path
+> 2. File was deleted or moved
+> 3. Insufficient permissions
+>
+> SUGGESTIONS:
+> - Check the spelling of the path
+> - List the containing directory to confirm the file is there
+> - Check the file's permissions
 
-  Exit.
-fi
-
-if [ ! -f "$1" ]; then
-  ❌ ERROR: File not found: $1
-
-  The specified file does not exist or is not accessible.
-
-  COMMON CAUSES:
-  1. Typo in file path
-  2. File was deleted or moved
-  3. Insufficient permissions
-
-  SUGGESTIONS:
-  - Check spelling: $1
-  - Verify file exists: ls -la $(dirname "$1")
-  - Check permissions: ls -l "$1"
-
-  Exit.
-fi
-
-[Command continues if validation passes...]
+Otherwise validate the file and report findings.
 ```
 
 ### Error Recovery Guidance
@@ -362,32 +355,30 @@ Running operation...
 
 !`risky-operation.sh`
 
-if [ $? -ne 0 ]; then
-  ❌ OPERATION FAILED
+The output above is the result of the operation. If it failed, do not continue
+— report the failure using this structure, so the user learns what state the
+system is in rather than just that something broke:
 
-  The operation encountered an error and could not complete.
-
-  WHAT HAPPENED:
-  The risky-operation.sh script returned a non-zero exit code.
-
-  WHAT THIS MEANS:
-  - Changes may be partially applied
-  - System may be in inconsistent state
-  - Manual intervention may be needed
-
-  RECOVERY STEPS:
-  1. Check operation logs: cat /tmp/operation.log
-  2. Verify system state: /check-state
-  3. If needed, rollback: /rollback-operation
-  4. Fix underlying issue
-  5. Retry operation: /retry-operation
-
-  NEED HELP?
-  - Check troubleshooting guide: /help troubleshooting
-  - Contact support with error code: ERR_OP_FAILED_001
-
-  Exit.
-fi
+> ❌ OPERATION FAILED
+>
+> WHAT HAPPENED:
+> risky-operation.sh exited non-zero. Quote the relevant output.
+>
+> WHAT THIS MEANS:
+> - Changes may be partially applied
+> - The system may be in an inconsistent state
+> - Manual intervention may be needed
+>
+> RECOVERY STEPS:
+> 1. Check operation logs: cat /tmp/operation.log
+> 2. Verify system state: /check-state
+> 3. If needed, rollback: /rollback-operation
+> 4. Fix the underlying issue
+> 5. Retry: /retry-operation
+>
+> NEED HELP?
+> - Troubleshooting guide: /help troubleshooting
+> - Contact support with error code: ERR_OP_FAILED_001
 ```
 
 ## Usage Example Documentation
@@ -501,8 +492,8 @@ test,42
 
 ## Your Transformation
 
-File: $1
-Format: $2
+File: $0
+Format: $1
 
 [Perform transformation...]
 ```
