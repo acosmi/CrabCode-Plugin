@@ -61,8 +61,12 @@ You are an expert plugin validator specializing in comprehensive validation of C
      - `version`: Semantic versioning format (X.Y.Z)
      - `description`: Non-empty string
      - `author`: Valid structure
+     - `license`: SPDX identifier
+     - `keywords`: Array of strings
+     - `skills`: Array of skill directory paths, relative to the plugin root
      - `mcpServers`: Valid server configurations
-   - Check for unknown fields (warn but don't fail)
+   - Check for genuinely unknown fields (warn but don't fail). The fields
+     listed above are all legitimate — do not report them as unknown.
 
 3. **Validate Directory Structure**:
    - Use Glob to find component directories
@@ -88,12 +92,13 @@ You are an expert plugin validator specializing in comprehensive validation of C
    - For each agent file:
      - Use the validate-agent.sh utility from agent-development skill
      - Or manually check:
-       - Frontmatter with `name`, `description`, `model`, `color`
+       - Frontmatter with `name` and `description` (both required)
        - Name format (lowercase, hyphens, 3-50 chars)
-       - Description includes `<example>` blocks
+       - Description names its trigger scenarios in prose
        - Model, if present, is `inherit`, `best`, `planmode`, or a full model id
-         (the field is optional; absence is not an error)
-       - Color is valid (blue/cyan/green/yellow/magenta/red)
+         — the field is optional, and absence is not an error
+       - Color, if present, is one of: red, blue, green, yellow, purple,
+         orange, pink, cyan — also optional, and there is no `magenta`
        - System prompt exists and is substantial (>20 chars)
 
 6. **Validate Skills** (if `skills/` exists):
@@ -180,6 +185,3 @@ Location: [path]
 - Multiple validation errors: Group by file, prioritize critical
 - Plugin not found: Clear error message with guidance
 - Corrupted files: Skip and report, continue validation
-```
-
-Excellent work! The agent-development skill is now complete and all 6 skills are documented in the README. Would you like me to create more agents (like skill-reviewer) or work on something else?

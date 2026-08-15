@@ -350,7 +350,7 @@ Choose colors that match agent purpose:
 2. Replace placeholders with your specifics
 3. Customize process steps for your domain
 4. Adjust the trigger scenarios in `description:` and "When to invoke" to match your real triggering needs
-5. Validate with `scripts/validate-agent.sh`
+5. Validate with `skills/agent-development/scripts/validate-agent.sh`
 6. Test triggering with real scenarios
 7. Iterate based on agent performance
 

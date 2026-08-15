@@ -108,11 +108,14 @@ single catalog entry that will eventually be retired.
 
 **Recommendation:** Use `inherit` unless agent needs specific model capabilities.
 
-### color (required)
+### color (optional)
 
-Visual identifier for agent in UI.
+Visual identifier for the agent in the UI. Omit it and one is assigned.
 
-**Options:** `blue`, `cyan`, `green`, `yellow`, `magenta`, `red`
+**Options:** `red`, `blue`, `green`, `yellow`, `purple`, `orange`, `pink`,
+`cyan` — these eight and no others. An unrecognised value (there is no
+`magenta`) does not fail the load, it is simply ignored, so a typo here is
+silent.
 
 **Guidelines:**
 - Choose distinct colors for different agents in same plugin
@@ -121,7 +124,8 @@ Visual identifier for agent in UI.
 - Green: Success-oriented tasks
 - Yellow: Caution, validation
 - Red: Critical, security
-- Magenta: Creative, generation
+- Purple/pink: Creative, generation
+- Orange: Long-running or background work
 
 ### tools (optional)
 
@@ -386,7 +390,6 @@ Working examples in `examples/`:
 Development tools in `scripts/`:
 
 - **`validate-agent.sh`** - Validate agent file structure
-- **`test-agent-trigger.sh`** - Test if agent triggers correctly
 
 ## Implementation Workflow
 
@@ -398,7 +401,7 @@ To create an agent for a plugin:
 4. Write frontmatter with all required fields
 5. Write system prompt following best practices
 6. Name 2-4 trigger scenarios in description (prose) and detail them in a "When to invoke" body section
-7. Validate with `scripts/validate-agent.sh`
+7. Validate with `skills/agent-development/scripts/validate-agent.sh`
 8. Test triggering with real scenarios
 9. Document agent in plugin README
 

@@ -29,7 +29,8 @@ description: |
   Plugin development with agent addition, trigger agent-creator.
   </commentary>
   </example>
-color: magenta
+model: inherit
+color: purple
 tools: ["Write", "Read"]
 ---
 
@@ -101,12 +102,14 @@ When a user describes what they want an agent to do, you will:
 3. **Select Configuration**:
    - **Model**: Use `inherit` unless the user specifies otherwise (`best` for
      genuinely complex agents, `planmode` for planning agents)
-   - **Color**: Choose appropriate color:
+   - **Color** (optional): pick from red, blue, green, yellow, purple,
+     orange, pink, cyan. Suggested associations:
      - blue/cyan: Analysis, review
      - green: Generation, creation
      - yellow: Validation, caution
      - red: Security, critical
-     - magenta: Transformation, creative
+     - purple/pink: Transformation, creative
+     - orange: Long-running or background work
    - **Tools**: Recommend minimal set needed, or omit for full access
 
 4. **Generate Agent File**: Use Write tool to create `agents/[identifier].md`:
@@ -159,7 +162,7 @@ This agent will trigger when [triggering scenarios].
 
 Test it by: [suggest test scenario]
 
-Validate with: `scripts/validate-agent.sh agents/[identifier].md`
+Validate with: `skills/agent-development/scripts/validate-agent.sh agents/[identifier].md`
 
 ### Next Steps
 [Recommendations for testing, integration, or improvements]
@@ -171,6 +174,3 @@ Validate with: `scripts/validate-agent.sh agents/[identifier].md`
 - User wants specific tool access: Honor the request in agent configuration
 - User specifies model: Use specified model instead of inherit
 - First agent in plugin: Create agents/ directory first
-```
-
-This agent automates agent creation using the proven patterns from CrabCode's internal implementation, making it easy for users to create high-quality autonomous agents.

@@ -146,7 +146,7 @@ mkdir -p plugin-name/skills/skill-name/{references,examples,scripts}
 touch plugin-name/skills/skill-name/SKILL.md
 ```
 
-**Note:** Unlike the generic skill-creator which uses `init_skill.py`, plugin skills are created directly in the plugin's `skills/` directory with a simpler manual structure.
+**Note:** Plugin skills are created directly in the plugin's `skills/` directory. There is no scaffolding script to run — make the directory and write `SKILL.md`.
 
 ### Step 4: Edit the Skill
 
@@ -171,6 +171,29 @@ description: This skill should be used when the user asks to "specific phrase 1"
 version: 0.1.0
 ---
 ```
+
+**Two scopes, two requirements.** The fields above are what the runtime needs,
+and they are enough for a skill in your own plugin.
+
+Publishing into this marketplace at the **workflow** tier adds a presentation
+contract on top, enforced by the repository's own validator:
+
+- `name` must be a Chinese display name (it is the card title users read)
+- `short-description` is **required**, also Chinese, and 18-72 characters
+- It must describe user value; repeating the trigger template is rejected
+
+```yaml
+---
+name: 插件钩子开发
+short-description: 开发事件驱动的插件钩子，校验工具调用并实现自动化控制
+description: This skill should be used when the user asks to "create a hook", ...
+version: 0.1.0
+---
+```
+
+Every SKILL.md in this plugin is an example of the second form. `description`
+stays English trigger prose in both cases — it is read by the model, while
+`name` and `short-description` are read by people.
 
 **Good description examples:**
 ```yaml
@@ -329,7 +352,9 @@ Each demonstrates progressive disclosure and strong triggering.
 - Pointers to references/examples/scripts
 - Most common use cases
 
-**Keep under 3,000 words, ideally 1,500-2,000 words**
+**Target 1,500-2,000 words; treat 5,000 as the hard ceiling** (see
+"Progressive Disclosure" — the body is loaded in full whenever the skill
+triggers, so its length is a cost paid on every trigger)
 
 ### What Goes in references/
 
@@ -619,7 +644,6 @@ Plugin-dev's skills demonstrate best practices:
 ### Reference Files
 
 For complete skill-creator methodology:
-- **`references/skill-creator-original.md`** - Full original skill-creator content
 
 ## Implementation Workflow
 

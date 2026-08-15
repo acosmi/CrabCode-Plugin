@@ -226,18 +226,22 @@ After successful build:
 
 ```markdown
 ---
-description: Orchestrates complex multi-environment deployments with rollback capabilities and health monitoring
-capabilities:
-  - Plan and execute multi-stage deployments
-  - Coordinate service dependencies
-  - Monitor deployment health
-  - Execute automated rollbacks
-  - Manage deployment approvals
+name: deployment-orchestrator
+description: Use this agent when the user asks to deploy across multiple environments, coordinate a staged rollout, or roll back a deployment. Typical triggers include multi-stage releases, dependency-ordered service deploys, and post-deploy health checks.
+model: inherit
 ---
 
 # Deployment Orchestrator Agent
 
 Specialized agent for orchestrating complex deployments across multiple environments.
+
+## Responsibilities
+
+- Plan and execute multi-stage deployments
+- Coordinate service dependencies
+- Monitor deployment health
+- Execute automated rollbacks
+- Manage deployment approvals
 
 ## Expertise
 
