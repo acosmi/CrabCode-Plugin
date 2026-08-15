@@ -265,8 +265,10 @@ To update this skill:
 
 ## Version History
 
-**v0.1.0** (2025-01-15):
-- Initial release with basic command fundamentals
-- Frontmatter field reference
+A skill carries no version of its own — it ships inside the plugin, so the
+number below is the `plugin-dev` release this content belongs to.
+
+**plugin-dev 0.2.2**:
+- Command fundamentals and frontmatter field reference
 - 10 simple command examples
-- Ready for plugin-specific pattern additions
+- Runtime claims re-checked against the product source (2026-08-15)

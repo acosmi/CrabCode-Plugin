@@ -215,4 +215,4 @@ Adapted from upstream open-source plugin source. See `docs/legal/THIRD_PARTY_NOT
 
 ## Version
 
-1.0.0
+0.1.1
