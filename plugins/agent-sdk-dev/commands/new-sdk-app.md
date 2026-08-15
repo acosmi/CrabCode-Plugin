@@ -7,22 +7,23 @@ You are tasked with helping the user create a new CrabCode Agent SDK application
 
 ## Reference Documentation
 
-Before starting, review the official documentation to ensure you provide accurate and up-to-date guidance. Use WebFetch to read these pages:
+The authoritative Agent SDK reference ships inside the product as the bundled
+`crabcode-api` skill. Invoke `/crabcode-api` and consult, for the user's chosen
+language:
 
-1. **Start with the overview**: [upstream documentation reference removed]
-2. **Based on the user's language choice, read the appropriate SDK reference**:
-   - TypeScript: [upstream documentation reference removed]
-   - Python: [upstream documentation reference removed]
-3. **Read relevant guides mentioned in the overview** such as:
-   - Streaming vs Single Mode
-   - Permissions
-   - Custom Tools
-   - MCP integration
-   - Agents
-   - Sessions
-   - Any other relevant guides based on the user's needs
+- `typescript/agent-sdk/README.md` + `typescript/agent-sdk/patterns.md`
+- `python/agent-sdk/README.md` + `python/agent-sdk/patterns.md`
 
-**IMPORTANT**: Always check for and use the latest versions of packages. Use WebSearch or WebFetch to verify current versions before installation.
+Those files carry the installation commands, the `Agent` / `Tool` surface, and
+the built-in tool table. Read them before scaffolding so the code you write
+matches the SDK the product actually ships.
+
+For topics beyond the Agent SDK itself — streaming, permissions, MCP
+integration, sessions, error handling — the same skill routes to
+`{lang}/crabcode-api/*.md` and `shared/*.md`.
+
+**IMPORTANT**: Do not guess a package version. Query the registry your package
+manager is configured against (see "Check for Latest Versions" below).
 
 ## Gather Requirements
 
@@ -73,18 +74,20 @@ Based on the user's answers, create a plan that includes:
 
 2. **Check for Latest Versions**:
 
-   - BEFORE installing, use WebSearch or check npm/PyPI to find the latest version
-   - For TypeScript: Check https://www.npmjs.com/package/agent-sdk
-   - For Python: Check https://pypi.org/project/agent-sdk/
+   - BEFORE installing, ask the package manager itself rather than browsing a
+     registry website — `npm view crabcode-agent-sdk version` resolves against
+     whatever registry the project is configured for, a web page does not
+   - Python: `pip install` takes the latest by default; report the resolved
+     version after the fact rather than predicting it
    - Inform the user which version you're installing
 
 3. **SDK Installation**:
 
-   - TypeScript: `npm install agent-sdk@latest` (or specify latest version)
-   - Python: `pip install agent-sdk` (pip installs latest by default)
+   - TypeScript: `npm install crabcode-agent-sdk@latest` (or specify latest version)
+   - Python: `pip install crabcode-agent-sdk` (pip installs latest by default)
    - After installation, verify the installed version:
-     - TypeScript: Check package.json or run `npm list agent-sdk`
-     - Python: Run `pip show agent-sdk`
+     - TypeScript: Check package.json or run `npm list crabcode-agent-sdk`
+     - Python: Run `pip show crabcode-agent-sdk`
 
 4. **Create starter files**:
 
@@ -95,9 +98,12 @@ Based on the user's answers, create a plan that includes:
 
 5. **Environment setup**:
 
-   - Create a `.env.example` file with `AGENT_API_KEY=your_api_key_here`
+   - Create a `.env.example` file with `ACOSMI_API_KEY=your_api_key_here`
    - Add `.env` to `.gitignore`
-   - Explain how to get an API key from https://console.crabcode.com/
+   - Explain how to obtain a key: running `/login` in CrabCode completes the
+     OAuth flow and provisions the key for you. Setting `ACOSMI_API_KEY` by
+     hand is the alternative when the app cannot run interactively (CI, for
+     instance)
 
 6. **Optional: Create .crabcode directory structure**:
    - Offer to create `.crabcode/` directory for agents, commands, and settings
@@ -107,7 +113,7 @@ Based on the user's answers, create a plan that includes:
 
 After gathering requirements and getting user confirmation on the plan:
 
-1. Check for latest package versions using WebSearch or WebFetch
+1. Resolve the package version through the package manager (`npm view`), not a web search
 2. Execute the setup steps
 3. Create all necessary files
 4. Install dependencies (always use latest stable versions)
@@ -147,8 +153,8 @@ Once setup is complete and verified, provide the user with:
 
 2. **Useful resources**:
 
-   - Link to TypeScript SDK reference: [upstream documentation reference removed]
-   - Link to Python SDK reference: [upstream documentation reference removed]
+   - The bundled `crabcode-api` skill (`/crabcode-api`) — `{lang}/agent-sdk/`
+     for the SDK itself, `{lang}/crabcode-api/` for the underlying API
    - Explain key concepts: system prompts, permissions, tools, MCP servers
 
 3. **Common next steps**:
@@ -159,7 +165,10 @@ Once setup is complete and verified, provide the user with:
 
 ## Important Notes
 
-- **ALWAYS USE LATEST VERSIONS**: Before installing any packages, check for the latest versions using WebSearch or by checking npm/PyPI directly
+- **ALWAYS USE LATEST VERSIONS**: Resolve versions through the package manager
+  against the registry the project is configured for. Do not paste a version
+  read off a public registry web page — the package name there may belong to
+  someone else entirely
 - **VERIFY CODE RUNS CORRECTLY**:
   - For TypeScript: Run `npx tsc --noEmit` and fix ALL type errors before finishing
   - For Python: Verify syntax and imports are correct
