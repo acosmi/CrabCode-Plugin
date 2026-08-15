@@ -362,7 +362,7 @@ Note the asymmetry that trips people up: the post-tool payload is
 
 Prompt hooks substitute exactly one placeholder: **`$ARGUMENTS`**, which
 expands to the entire stdin JSON as a string. There are no per-field
-placeholders — `$TOOL_INPUT`, `$TOOL_RESULT` and `$USER_PROMPT` are not
+placeholders — `$TOOL_INPUT`, `$TOOL_RESULT` and `$USER_PROMPT` are not <!-- doc-facts-allow: fictional-hook-placeholder -->
 substituted and would reach the model as literal text.
 
 If a prompt contains no placeholder at all, the JSON is appended automatically

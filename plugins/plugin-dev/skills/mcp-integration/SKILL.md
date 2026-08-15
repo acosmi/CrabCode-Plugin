@@ -203,7 +203,7 @@ mcp__p_<24-hex-digest>__<tool-name>
 
 **You cannot derive this by hand, and you should not try.** Run `/mcp` and
 copy the tool names it prints. That is the only supported way to learn them —
-a hand-assembled name like `mcp__plugin_asana_asana__create_task` matches
+a hand-assembled name like `mcp__plugin_asana_asana__create_task` matches <!-- doc-facts-allow: fictional-mcp-namespace -->
 nothing and fails silently at allowlist time, because an entry that never
 matches simply never grants anything.
 

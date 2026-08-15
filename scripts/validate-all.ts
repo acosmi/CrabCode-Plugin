@@ -33,6 +33,7 @@ import {
   formatVersionConsistencyIssues,
   validateVersionConsistency,
 } from "../src/policy/versionConsistencyValidator.ts";
+import { formatDocFactsIssues, validateDocFacts } from "../src/policy/docFactsValidator.ts";
 
 const root = path.resolve(process.argv[2] ?? ".");
 
@@ -104,6 +105,13 @@ if (mcpContract.length > 0) {
   hasOutput = true;
   process.stderr.write(`[mcp-contract]\n${formatMcpContractIssues(mcpContract, root)}\n`);
   if (mcpContract.some((issue) => issue.severity === "error")) hasError = true;
+}
+
+const docFacts = await validateDocFacts(root);
+if (docFacts.length > 0) {
+  hasOutput = true;
+  process.stderr.write(`[doc-facts]\n${formatDocFactsIssues(docFacts, root)}\n`);
+  if (docFacts.some((issue) => issue.severity === "error")) hasError = true;
 }
 
 if (!hasOutput) {

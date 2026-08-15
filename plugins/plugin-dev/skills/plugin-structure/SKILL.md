@@ -227,7 +227,7 @@ hooks/
 }
 ```
 
-**Available events**: PreToolUse, PostToolUse, Stop, AgentStop, SessionStart, SessionEnd, UserPromptSubmit, PreCompact, Notification
+**Commonly used events**: PreToolUse, PostToolUse, Stop, SubagentStop, SessionStart, SessionEnd, UserPromptSubmit, PreCompact, Notification — the runtime emits 27 in total; the `hook-development` skill lists the rest.
 
 **Usage**: Hooks execute automatically in response to CrabCode events
 

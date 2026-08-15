@@ -57,7 +57,7 @@ Use AskUserQuestion to gather configuration:
 ### Step 2: Parse Answers
 
 The result's `answers` object is keyed by the **question text**, not by a
-numeric index — `answers["0"]` reads nothing:
+numeric index — `answers["0"]` reads nothing: <!-- doc-facts-allow: fictional-answers-index -->
 
 - `answers["Enable plugin for this project?"]` → `"Yes"` or `"No"`
 - `answers["Validation mode?"]` → `"Strict"`, `"Standard"` or `"Lenient"`
