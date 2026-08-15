@@ -38,7 +38,7 @@ Guide the user through creating a complete, high-quality CrabCode plugin from in
 
 **Actions**:
 
-1. Create todo list with all 7 phases
+1. Create todo list with all 8 phases
 2. If plugin purpose is clear from arguments:
    - Summarize understanding
    - Identify plugin type (integration, workflow, analysis, toolkit, etc.)
@@ -307,9 +307,11 @@ Guide the user through creating a complete, high-quality CrabCode plugin from in
 1. **Installation instructions**:
    - Show user how to test locally:
      ```bash
-     cc --plugin-dir /path/to/plugin-name
+     crabcode --plugin-dir /path/to/plugin-name
      ```
-   - Or copy to `.crabcode-plugin/` for project testing
+   - Do NOT copy components into `.crabcode-plugin/` — that directory holds
+     only the manifest. Components live at the plugin root, and `--plugin-dir`
+     already loads them from there.
 
 2. **Verification checklist** for user to perform:
    - [ ] Skills load when triggered (ask questions with trigger phrases)

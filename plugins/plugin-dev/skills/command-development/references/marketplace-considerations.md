@@ -439,7 +439,8 @@ if [  "$PLUGIN_VERSION" < "2.0.0" ]; then
   Current version: $PLUGIN_VERSION
 
   Update plugin:
-    /plugin update plugin-name
+    /plugin marketplace update <marketplace>   # refresh the catalog
+    /plugin manage                             # then update from the UI
 
   Exit.
 fi
@@ -563,55 +564,20 @@ Ready to analyze your code...
 [Command implementation...]
 ```
 
-### User Reviews and Feedback
+### Feedback Channels
 
-**Feedback mechanism:**
+There is no in-product rating widget and no `/command feedback` — do not print
+one, or users will reply into a channel that does not exist.
 
-```markdown
----
-description: Command with feedback
----
+Point people at something real instead, in your README rather than in every
+command's output:
 
-# Command Complete
+- The issue tracker for the repository the plugin ships from
+- A contact address you actually monitor
 
-[Command results...]
-
----
-
-**How was your experience?**
-
-This helps improve the command for everyone.
-
-Rate this command:
-- 👍 Helpful
-- 👎 Not helpful
-- 🐛 Found a bug
-- 💡 Have a suggestion
-
-Reply with an emoji or:
-- /command feedback
-
-Your feedback matters!
-```
-
-**Usage analytics preparation:**
-
-```markdown
-<!--
-ANALYTICS NOTES:
-
-Track for improvement:
-- Most common arguments
-- Failure rates
-- Average execution time
-- User satisfaction scores
-
-Privacy-preserving:
-- No personally identifiable information
-- Aggregate statistics only
-- User opt-out respected
--->
-```
+Likewise, do not design around usage telemetry. Commands do not report
+analytics, so "track failure rates" is not something a plugin can do; if you
+need to know how a command behaves, log locally and ask the user to share.
 
 ## Quality Standards
 
@@ -769,47 +735,19 @@ Support:
 -->
 ```
 
-### Beta Testing
+### Signalling Pre-Release Status
 
-**Beta release approach:**
+Beta enrolment commands (`/command join-beta` and friends) do not exist. To
+mark a plugin as pre-release, use the things that are real:
 
-```markdown
----
-description: Beta command (v0.9.0)
----
+- A `0.x` version in `plugin.json`, which is the conventional signal
+- A short "Status: preview" line at the top of the README, listing what is
+  incomplete
+- Honest `description` text on the affected commands
 
-# 🧪 Beta Command
-
-**This is a beta release**
-
-Features may change based on feedback.
-
-BETA STATUS:
-- Version: 0.9.0
-- Stability: Experimental
-- Support: Limited
-- Feedback: Encouraged
-
-Known limitations:
-- Performance not optimized
-- Some edge cases not handled
-- Documentation incomplete
-
-Help improve this command:
-- Report issues: /command report-issue
-- Suggest features: /command suggest
-- Join beta testers: /command join-beta
-
----
-
-[Command implementation...]
-
----
-
-**Thank you for beta testing!**
-
-Your feedback helps make this command better.
-```
+Keep the disclaimer in the README, not in every command's output — a banner
+reprinted on each invocation costs the user attention every time while telling
+them something they already know.
 
 ## Maintenance and Updates
 
@@ -867,9 +805,8 @@ if [ "$CURRENT_VERSION" != "$LATEST_VERSION" ]; then
   - Performance enhancements
 
   Update with:
-    /plugin update plugin-name
-
-  Release notes: https://releases.example.com/v$LATEST_VERSION
+    /plugin marketplace update <marketplace>   # refresh the catalog
+    /plugin manage                             # then update from the UI
 fi
 
 [Command continues...]

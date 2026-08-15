@@ -450,10 +450,12 @@ argument-hint: [environment]
 
 Validate environment: !`echo "$1" | grep -E "^(dev|staging|prod)$" || echo "INVALID"`
 
-$IF($1 in [dev, staging, prod],
-  Deploy to $1 environment using validated configuration,
-  ERROR: Invalid environment '$1'. Must be one of: dev, staging, prod
-)
+The line above runs before the model reads the body, so its output is already
+in front of the model. Instruct on it:
+
+If the validation printed INVALID, stop and tell the user that '$1' is not a
+valid environment and that it must be one of: dev, staging, prod.
+Otherwise deploy to the $1 environment using the validated configuration.
 ```
 
 **Validation approaches:**
@@ -493,10 +495,8 @@ argument-hint: [environment] [version]
 
 Validate inputs: !`test -n "$1" -a -n "$2" && echo "OK" || echo "MISSING"`
 
-$IF($1 AND $2,
-  Deploy version $2 to $1 environment,
-  ERROR: Both environment and version required. Usage: /deploy [env] [version]
-)
+If the check printed MISSING, stop and reply with the usage:
+/deploy [env] [version]. Otherwise deploy version $2 to the $1 environment.
 ```
 
 ### Plugin Resource Validation

@@ -99,9 +99,12 @@ Which model the agent should use.
 
 **Options:**
 - `inherit` - Use same model as parent (recommended)
-- `<model-id>` - CrabCode <model-id> (balanced)
-- `<model-id>` - CrabCode <model-id> (most capable, expensive)
-- `<model-id>` - CrabCode <model-id> (fast, cheap)
+- `inherit` - use the session's model (recommended, and the effective default)
+- `best` - ask for the strongest model available
+- `planmode` - the model configured for planning work
+
+A full model id is also accepted, but do not ship one: it pins the agent to a
+single catalog entry that will eventually be retired.
 
 **Recommendation:** Use `inherit` unless agent needs specific model capabilities.
 
@@ -338,7 +341,7 @@ Output: [What to provide]
 |-------|----------|--------|---------|
 | name | Yes | lowercase-hyphens | code-reviewer |
 | description | Yes | Prose triggers | Use when... Typical triggers include... |
-| model | Yes | inherit/<model-id>/<model-id>/<model-id> | inherit |
+| model | No | `inherit` / `best` / `planmode` / full model id | inherits session model |
 | color | Yes | Color name | blue |
 | tools | No | Array of tool names | ["Read", "Grep"] |
 

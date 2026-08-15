@@ -86,7 +86,7 @@ echo "✓ Command file structure valid"
 COMMAND_FILE="$1"
 
 # Extract YAML frontmatter
-FRONTMATTER=$(sed -n '/^---$/,/^---$/p' "$COMMAND_FILE" | sed '1d;$d')
+FRONTMATTER=$(awk 'NR==1 && /^---$/ {c=1; next} c==1 && /^---$/ {exit} c==1' "$COMMAND_FILE")
 
 if [ -z "$FRONTMATTER" ]; then
   echo "No frontmatter to validate"
@@ -159,7 +159,7 @@ crabcode --debug
 # Verify expected behavior
 
 # 5. Check debug logs
-tail -f ~/.crabcode/debug-logs/latest
+tail -f ~/.crabcode/debug/latest
 # Look for errors or warnings
 ```
 

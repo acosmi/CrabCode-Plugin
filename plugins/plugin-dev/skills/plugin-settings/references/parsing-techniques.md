@@ -30,13 +30,24 @@ It's useful for prompts, documentation, or additional context.
 FILE=".crabcode/my-plugin.local.md"
 
 # Extract everything between --- markers (excluding the markers themselves)
-FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$FILE")
+FRONTMATTER=$(awk 'NR==1 && /^---$/ {c=1; next} c==1 && /^---$/ {exit} c==1' "$FILE")
 ```
 
 **How it works:**
-- `sed -n` - Suppress automatic printing
-- `/^---$/,/^---$/` - Range from first `---` to second `---`
-- `{ /^---$/d; p; }` - Delete the `---` lines, print everything else
+- `NR==1 && /^---$/ {c=1; next}` - only a fence on line 1 opens the frontmatter
+- `c==1 && /^---$/ {exit}` - the next fence closes it, and parsing stops there
+- `c==1` - print the lines in between
+
+**Why not a `sed` range.** The obvious version,
+`sed -n '/^---$/,/^---$/{ /^---$/d; p; }'`, pairs fences greedily across the
+whole file. A `---` horizontal rule in the body opens a *second* range, so body
+text is emitted as though it were frontmatter. On a file whose body contains a
+rule and the line `enabled: false`, that extractor returns **two** `enabled`
+lines; a downstream `[[ "$ENABLED" == "true" ]]` then compares against a
+two-line value, fails, and silently disables the plugin.
+
+The awk form stops at the closing fence, so nothing below it can be read as
+configuration.
 
 ### Extract Individual Fields
 
@@ -108,21 +119,28 @@ FILE=".crabcode/my-plugin.local.md"
 
 # Extract everything after the closing ---
 # Counts --- markers: first is opening, second is closing, everything after is body
-BODY=$(awk '/^---$/{i++; next} i>=2' "$FILE")
+BODY=$(awk 'c==2{print; next} /^---$/{c++}' "$FILE")
 ```
 
 **How it works:**
-- `/^---$/` - Match `---` lines
-- `{i++; next}` - Increment counter and skip the `---` line
-- `i>=2` - Print all lines after second `---`
+- `c==2{print; next}` - once past the closing fence, print every line and stop
+  inspecting it
+- `/^---$/{c++}` - count fences, but only while still inside the frontmatter
 
-**Handles edge case:** If `---` appears in the markdown body, it still works because we only count the first two `---` at the start.
+**Why the rule order matters:** the print rule comes first and ends with
+`next`, so once the body has started a `---` line is emitted as content instead
+of being counted as a fence.
+
+The obvious-looking alternative, `awk '/^---$/{i++; next} i>=2'`, is wrong: it
+skips *every* `---` line in the file, so a horizontal rule inside the body is
+silently deleted from the extracted prompt. Silently, because the output still
+looks plausible — which is exactly what makes it worth avoiding.
 
 ### Use Body as Prompt
 
 ```bash
 # Extract body
-PROMPT=$(awk '/^---$/{i++; next} i>=2' "$RALPH_STATE_FILE")
+PROMPT=$(awk 'c==2{print; next} /^---$/{c++}' "$RALPH_STATE_FILE")
 
 # Feed back to CrabCode
 echo '{"decision": "block", "reason": "'"$PROMPT"'"}' | jq .
@@ -131,7 +149,7 @@ echo '{"decision": "block", "reason": "'"$PROMPT"'"}' | jq .
 **Important:** Use `jq -n --arg` for safer JSON construction with user content:
 
 ```bash
-PROMPT=$(awk '/^---$/{i++; next} i>=2' "$FILE")
+PROMPT=$(awk 'c==2{print; next} /^---$/{c++}' "$FILE")
 
 # Safe JSON construction
 jq -n --arg prompt "$PROMPT" '{
@@ -333,7 +351,9 @@ Here's a separator:
 More content after the separator.
 ```
 
-The `awk '/^---$/{i++; next} i>=2'` pattern handles this correctly.
+The `awk 'c==2{print; next} /^---$/{c++}'` pattern handles this correctly:
+it stops counting fences once the body begins, so `---` inside the body is
+preserved verbatim.
 
 ### Empty Values
 
@@ -382,7 +402,7 @@ If reading settings multiple times:
 
 ```bash
 # Parse once
-FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$FILE")
+FRONTMATTER=$(awk 'NR==1 && /^---$/ {c=1; next} c==1 && /^---$/ {exit} c==1' "$FILE")
 
 # Extract multiple fields from cached frontmatter
 FIELD1=$(echo "$FRONTMATTER" | grep '^field1:' | sed 's/field1: *//')
@@ -426,7 +446,7 @@ FILE=".crabcode/my-plugin.local.md"
 if [[ -f "$FILE" ]]; then
   echo "Settings file found" >&2
 
-  FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$FILE")
+  FRONTMATTER=$(awk 'NR==1 && /^---$/ {c=1; next} c==1 && /^---$/ {exit} c==1' "$FILE")
   echo "Frontmatter:" >&2
   echo "$FRONTMATTER" >&2
 
@@ -458,7 +478,7 @@ For complex YAML, consider using `yq`:
 # Install: brew install yq
 
 # Parse YAML properly
-FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$FILE")
+FRONTMATTER=$(awk 'NR==1 && /^---$/ {c=1; next} c==1 && /^---$/ {exit} c==1' "$FILE")
 
 # Extract fields with yq
 ENABLED=$(echo "$FRONTMATTER" | yq '.enabled')
@@ -500,7 +520,7 @@ if [[ ! -f "$SETTINGS_FILE" ]]; then
   MAX_SIZE=1000000
 else
   # Parse frontmatter
-  FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$SETTINGS_FILE")
+  FRONTMATTER=$(awk 'NR==1 && /^---$/ {c=1; next} c==1 && /^---$/ {exit} c==1' "$SETTINGS_FILE")
 
   # Extract fields with defaults
   ENABLED=$(echo "$FRONTMATTER" | grep '^enabled:' | sed 's/enabled: *//')

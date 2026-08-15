@@ -99,7 +99,8 @@ When a user describes what they want an agent to do, you will:
      - Edge case handling
 
 3. **Select Configuration**:
-   - **Model**: Use `inherit` unless user specifies (<model-id> for complex, <model-id> for simple)
+   - **Model**: Use `inherit` unless the user specifies otherwise (`best` for
+     genuinely complex agents, `planmode` for planning agents)
    - **Color**: Choose appropriate color:
      - blue/cyan: Analysis, review
      - green: Generation, creation

@@ -83,16 +83,16 @@ Deployment state saved to `.crabcode/deployment-state.local.md`:
 \`\`\`markdown
 ---
 initialized: true
-branch: $(git branch --show-current)
-commit: $(git log -1 --format=%H)
-timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+branch: !`git branch --show-current`
+commit: !`git log -1 --format=%H`
+timestamp: !`date -u +%Y-%m-%dT%H:%M:%SZ`
 status: initialized
 ---
 
 # Deployment Tracking
 
-Branch: $(git branch --show-current)
-Started: $(date)
+Branch: !`git branch --show-current`
+Started: !`date`
 
 Next steps:
 1. Run tests: /deploy-test
@@ -457,10 +457,11 @@ description: Deploy with optional version
 argument-hint: [environment] [version]
 ---
 
-Environment: ${1:-staging}
-Version: ${2:-latest}
+Environment: $1
+Version: $2
 
-Deploying ${2:-latest} to ${1:-staging}...
+Deploying $2 to $1. If either is empty, treat the environment as "staging"
+and the version as "latest", and say so before proceeding.
 
 Note: Using defaults for missing arguments:
 - Environment defaults to 'staging'

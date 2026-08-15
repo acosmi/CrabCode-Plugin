@@ -116,7 +116,7 @@ Add configuration using YAML frontmatter:
 ---
 description: Review code for security issues
 allowed-tools: Read, Grep, Bash(git:*)
-model: <model-id>
+model: inherit
 ---
 
 Review this code for security vulnerabilities...
@@ -161,20 +161,20 @@ allowed-tools: Read, Write, Edit, Bash(git:*)
 ### model
 
 **Purpose:** Specify model for command execution
-**Type:** String (<model-id>, <model-id>, <model-id>)
+**Type:** String (`inherit`, `best`, `planmode`, or a full model id)
 **Default:** Inherits from conversation
 
 ```yaml
 ---
-model: <model-id>
+model: inherit
 ---
 ```
 
 **Use cases:**
 
-- `<model-id>` - Fast, simple commands
-- `<model-id>` - Standard workflows
-- `<model-id>` - Complex analysis
+- `inherit` - follow the session's model (recommended)
+- `planmode` - commands that produce a plan
+- `best` - complex analysis where capability changes the answer
 
 ### argument-hint
 
@@ -412,15 +412,18 @@ Organize commands in subdirectories:
 3. **Document format:** Explain expected argument format
 4. **Handle edge cases:** Consider missing or invalid arguments
 
+There is no conditional syntax in command markdown. Handle the missing case
+by *telling the model what to do*, which is what a command body is for:
+
 ```markdown
 ---
 argument-hint: [pr-number]
 ---
 
-$IF($1,
-Review PR #$1,
-Please provide a PR number. Usage: /review-pr [number]
-)
+Review pull request #$1.
+
+If $1 is empty, do not guess — reply asking for a PR number and show the
+usage: /review-pr [number]
 ```
 
 ### File References
@@ -617,13 +620,18 @@ Plugin commands discovered automatically from `commands/` directory:
 
 ```
 plugin-name/
-├── commands/
-│   ├── foo.md              # /foo (plugin:plugin-name)
-│   ├── bar.md              # /bar (plugin:plugin-name)
-│   └── utils/
-│       └── helper.md       # /helper (plugin:plugin-name:utils)
-└── plugin.json
+├── .crabcode-plugin/
+│   └── plugin.json         # manifest lives here, never at the root
+└── commands/
+    ├── foo.md              # /plugin-name:foo
+    ├── bar.md              # /plugin-name:bar
+    └── utils/
+        └── helper.md       # /plugin-name:utils:helper
 ```
+
+Subdirectories become namespace segments, joined with `:` — the invocation is
+`<plugin>:<subdir>:<file>`, in that order. Nested directories are discovered
+recursively, so a command does not need to sit directly in `commands/`.
 
 **Namespace benefits:**
 

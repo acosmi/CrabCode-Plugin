@@ -49,7 +49,7 @@ Provide specific feedback with file and line references.
 ---
 description: Review code for security vulnerabilities
 allowed-tools: Read, Grep
-model: <model-id>
+model: inherit
 ---
 
 Perform comprehensive security review checking for:
@@ -284,7 +284,7 @@ Present as structured comparison report.
 ---
 description: Quick fix for common issues
 argument-hint: [issue-description]
-model: <model-id>
+model: inherit
 ---
 
 Quickly fix: $ARGUMENTS
@@ -320,7 +320,7 @@ Provide code changes with file paths and line numbers.
 ---
 description: Research best practices for topic
 argument-hint: [topic]
-model: <model-id>
+model: inherit
 ---
 
 Research best practices for: $ARGUMENTS
@@ -462,7 +462,7 @@ Process $1 to $2 with $3...
 
 ```markdown
 ---
-model: <model-id>
+model: inherit
 ---
 
 Quick simple task...

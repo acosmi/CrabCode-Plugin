@@ -288,7 +288,7 @@ Test skills by installing plugin locally:
 
 ```bash
 # Test with --plugin-dir
-cc --plugin-dir /path/to/plugin
+crabcode --plugin-dir /path/to/plugin
 
 # Ask questions that should trigger the skill
 # Verify skill loads correctly
@@ -300,20 +300,20 @@ Study the skills in this plugin as examples of best practices:
 
 **hook-development skill:**
 - Excellent trigger phrases: "create a hook", "add a PreToolUse hook", etc.
-- Lean SKILL.md (1,651 words)
+- Lean SKILL.md
 - 3 references/ files for detailed content
 - 3 examples/ of working hooks
 - 3 scripts/ utilities
 
 **agent-development skill:**
 - Strong triggers: "create an agent", "agent frontmatter", etc.
-- Focused SKILL.md (1,438 words)
+- Focused SKILL.md
 - References include the AI generation prompt from CrabCode
 - Complete agent examples
 
 **plugin-settings skill:**
 - Specific triggers: "plugin settings", ".local.md files", "YAML frontmatter"
-- References show real implementations (multi-agent-swarm, ralph-loop)
+- References show a real implementation (ralph-loop)
 - Working parsing scripts
 
 Each demonstrates progressive disclosure and strong triggering.
@@ -484,8 +484,8 @@ skill-name/
 skill-name/
 ├── SKILL.md  (1,800 words - core essentials)
 └── references/
-    ├── patterns.md (2,500 words)
-    └── advanced.md (3,700 words)
+    ├── patterns.md
+    └── advanced.md
 ```
 
 **Why good:** Progressive disclosure, detailed content loaded only when needed

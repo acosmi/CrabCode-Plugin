@@ -91,7 +91,8 @@ You are an expert plugin validator specializing in comprehensive validation of C
        - Frontmatter with `name`, `description`, `model`, `color`
        - Name format (lowercase, hyphens, 3-50 chars)
        - Description includes `<example>` blocks
-       - Model is valid (inherit/<model-id>/<model-id>/<model-id>)
+       - Model, if present, is `inherit`, `best`, `planmode`, or a full model id
+         (the field is optional; absence is not an error)
        - Color is valid (blue/cyan/green/yellow/magenta/red)
        - System prompt exists and is substantial (>20 chars)
 

@@ -18,7 +18,7 @@ This skill provides knowledge about:
 
 ## Skill Structure
 
-### SKILL.md (~2,470 words)
+### SKILL.md
 
 Core skill content covering:
 
@@ -95,16 +95,16 @@ CrabCode activates this skill when users:
 
 The skill uses progressive disclosure:
 
-1. **SKILL.md** (~2,470 words): Core concepts, common patterns, and plugin features overview
-2. **References** (~13,500 words total): Detailed specifications
-   - frontmatter-reference.md (~1,200 words)
-   - plugin-features-reference.md (~1,800 words)
-   - interactive-commands.md (~2,500 words)
-   - advanced-workflows.md (~1,700 words)
-   - testing-strategies.md (~2,200 words)
-   - documentation-patterns.md (~2,000 words)
-   - marketplace-considerations.md (~2,200 words)
-3. **Examples** (~6,000 words total): Complete working command examples
+1. **SKILL.md**: Core concepts, common patterns, and plugin features overview
+2. **References**: Detailed specifications
+   - frontmatter-reference.md
+   - plugin-features-reference.md
+   - interactive-commands.md
+   - advanced-workflows.md
+   - testing-strategies.md
+   - documentation-patterns.md
+   - marketplace-considerations.md
+3. **Examples**: Complete working command examples
    - simple-commands.md
    - plugin-commands.md
 
@@ -151,7 +151,7 @@ Command prompt content with:
 |-------|---------|---------|
 | `description` | Brief description for /help | `"Review code for issues"` |
 | `allowed-tools` | Restrict tool access | `Read, Bash(git:*)` |
-| `model` | Specify model | `<model-id>`, `<model-id>`, `<model-id>` |
+| `model` | Specify model | `inherit`, `best`, `planmode` |
 | `argument-hint` | Document arguments | `[pr-number] [priority]` |
 | `disable-model-invocation` | Manual-only command | `true` |
 

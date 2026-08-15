@@ -665,9 +665,9 @@ If language is Python:
 Questions adapt to project context.
 ```
 
-## Real-World Example: Multi-Agent Swarm Launch
+## Worked Example: Launching a Multi-Agent Run
 
-**From multi-agent-swarm plugin:**
+**Illustrative — not taken from a shipped plugin:**
 
 ```markdown
 ---
@@ -772,7 +772,7 @@ After collecting all agent task details:
 
 1. Ask for project name
 2. Generate task list in proper format
-3. Save to `.daisy/swarm/tasks.md`
+3. Save to `.crabcode/tasks.md`
 4. Show user the file path
 5. Proceed with launch using generated task list
 ```

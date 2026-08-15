@@ -56,10 +56,14 @@ Use AskUserQuestion to gather configuration:
 
 ### Step 2: Parse Answers
 
-Extract answers from AskUserQuestion result:
+The result's `answers` object is keyed by the **question text**, not by a
+numeric index — `answers["0"]` reads nothing:
 
-- answers["0"]: enabled (Yes/No)
-- answers["1"]: mode (Strict/Standard/Lenient)
+- `answers["Enable plugin for this project?"]` → `"Yes"` or `"No"`
+- `answers["Validation mode?"]` → `"Strict"`, `"Standard"` or `"Lenient"`
+
+Keep the question strings identical between the call and the lookup: reword a
+question and you must update its key too.
 
 ### Step 3: Create Settings File
 
