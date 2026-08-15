@@ -6,7 +6,7 @@ import { basename, join, resolve } from 'node:path'
 const root = resolve(import.meta.dir, '..')
 const EXPECTED_WORKFLOW_SKILLS = 315
 const EXPECTED_INVOCATION_SET_SHA256 = 'f7b0838eba63cdf4c8e37e00a86c91185d3af4d98a3bdb816d406477e9e036af'
-const EXPECTED_MODEL_CONTENT_SHA256 = 'c7c1ae2cf1ecd43791221cdafe533d7ffaf7502bf5415a2ddac0b1c0c93a188a'
+const EXPECTED_MODEL_CONTENT_SHA256 = 'a1f8a9f52b1699719cbc5505a38dd9f3dd85542f06472041c9d34cfb2a1d3fcd'
 const HAN = /[\u3400-\u9fff]/u
 
 function sha256(value: string): string {

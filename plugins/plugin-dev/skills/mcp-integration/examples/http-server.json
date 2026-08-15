@@ -11,9 +11,9 @@
   },
   "internal-service": {
     "type": "http",
-    "url": "https://api.example.com/mcp",
+    "url": "https://internal.example.com/mcp",
     "headers": {
-      "Authorization": "Bearer ${API_TOKEN}",
+      "Authorization": "Bearer ${INTERNAL_API_TOKEN}",
       "X-Service-Name": "crabcode-plugin"
     }
   }

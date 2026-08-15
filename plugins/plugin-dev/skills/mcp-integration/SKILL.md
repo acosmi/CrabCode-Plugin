@@ -192,23 +192,31 @@ All MCP configurations support environment variable substitution:
 
 When MCP servers provide tools, they're automatically prefixed:
 
-**Format:** `mcp__plugin_<plugin-name>_<server-name>__<tool-name>`
+**Format:** `mcp__<server-namespace>__<tool-name>`
 
-**Example:**
-- Plugin: `asana`
-- Server: `asana`
-- Tool: `create_task`
-- **Full name:** `mcp__plugin_asana_asana__asana_create_task`
+For a **plugin-provided** server the namespace is not the plugin name. It is
+`p_` followed by a hash of the server's internal runtime identity:
+
+```
+mcp__p_<24-hex-digest>__<tool-name>
+```
+
+**You cannot derive this by hand, and you should not try.** Run `/mcp` and
+copy the tool names it prints. That is the only supported way to learn them —
+a hand-assembled name like `mcp__plugin_asana_asana__create_task` matches
+nothing and fails silently at allowlist time, because an entry that never
+matches simply never grants anything.
 
 ### Using MCP Tools in Commands
 
-Pre-allow specific MCP tools in command frontmatter:
+Pre-allow specific MCP tools in command frontmatter, pasting the exact names
+from `/mcp`:
 
 ```markdown
 ---
 allowed-tools: [
-  "mcp__plugin_asana_asana__asana_create_task",
-  "mcp__plugin_asana_asana__asana_search_tasks"
+  "mcp__p_1f4c9a2be70d5836a1b4c7e2__create_task",
+  "mcp__p_1f4c9a2be70d5836a1b4c7e2__search_tasks"
 ]
 ---
 ```
@@ -216,25 +224,38 @@ allowed-tools: [
 **Wildcard (use sparingly):**
 ```markdown
 ---
-allowed-tools: ["mcp__plugin_asana_asana__*"]
+allowed-tools: ["mcp__p_1f4c9a2be70d5836a1b4c7e2__*"]
 ---
 ```
+
+The digest above is illustrative — yours will differ. Because the namespace is
+derived rather than authored, prefer the wildcard form when you genuinely want
+every tool from one server, and re-check the names with `/mcp` after renaming
+a server.
 
 **Best practice:** Pre-allow specific tools, not wildcards, for security.
 
 ## Lifecycle Management
 
 **Automatic startup:**
-- MCP servers start when plugin enables
-- Connection established before first tool use
-- Restart required for configuration changes
+- Enabling the plugin registers its MCP servers; the host manages their
+  connections from there
+- Connections are cached and re-established as needed, so a dropped connection
+  does not require user action
+- `/reload-plugins` picks up plugin MCP configuration changes in place — it
+  reports how many plugin MCP servers it loaded
+
+Do not design around a particular connect *moment*. Whether a given server is
+dialled eagerly or on first use is a host scheduling detail; treat `/mcp` as
+the source of truth for what is connected right now. Write servers that
+tolerate being started at any point, and tools that work on first invocation.
 
 **Lifecycle:**
 1. Plugin loads
 2. MCP configuration parsed
 3. Server process started (stdio) or connection established (SSE/HTTP/WS)
 4. Tools discovered and registered
-5. Tools available as `mcp__plugin_...__...`
+5. Tools exposed under a generated `mcp__…__…` name (see "Tool Naming")
 
 **Viewing servers:**
 Use `/mcp` command to see all servers including plugin-provided ones.
@@ -295,12 +316,12 @@ Commands use MCP tools with user interaction:
 ```markdown
 # Command: create-item.md
 ---
-allowed-tools: ["mcp__plugin_name_server__create_item"]
+allowed-tools: ["mcp__p_1f4c9a2be70d5836a1b4c7e2__create_item"]   # exact name from /mcp
 ---
 
 Steps:
 1. Gather item details from user
-2. Use mcp__plugin_name_server__create_item
+2. Use mcp__p_1f4c9a2be70d5836a1b4c7e2__create_item
 3. Confirm creation
 ```
 
@@ -314,7 +335,7 @@ Agents use MCP tools autonomously:
 # Agent: data-analyzer.md
 
 Analysis Process:
-1. Query data via mcp__plugin_db_server__query
+1. Query data via mcp__p_1f4c9a2be70d5836a1b4c7e2__query
 2. Process and analyze results
 3. Generate insights report
 ```
@@ -327,16 +348,18 @@ Integrate multiple MCP servers:
 
 ```json
 {
-  "github": {
+  "issue-tracker": {
     "type": "sse",
-    "url": "https://mcp.github.com/sse"
+    "url": "https://mcp.example.com/issues/sse"
   },
-  "jira": {
+  "docs-service": {
     "type": "sse",
-    "url": "https://mcp.jira.com/sse"
+    "url": "https://mcp.example.com/docs/sse"
   }
 }
 ```
+
+Use each vendor's documented endpoint in place of the placeholders above.
 
 **Use for:** Workflows spanning multiple services.
 
@@ -369,11 +392,11 @@ Pre-allow only necessary MCP tools:
 
 ```markdown
 ✅ allowed-tools: [
-  "mcp__plugin_api_server__read_data",
-  "mcp__plugin_api_server__create_item"
+  "mcp__p_1f4c9a2be70d5836a1b4c7e2__read_data",
+  "mcp__p_1f4c9a2be70d5836a1b4c7e2__create_item"
 ]
 
-❌ allowed-tools: ["mcp__plugin_api_server__*"]
+❌ allowed-tools: ["mcp__p_1f4c9a2be70d5836a1b4c7e2__*"]
 ```
 
 ## Error Handling
@@ -401,12 +424,18 @@ Validate MCP configuration:
 
 ## Performance Considerations
 
-### Lazy Loading
+### Connection Reuse
 
-MCP servers connect on-demand:
-- Not all servers connect at startup
-- First tool use triggers connection
-- Connection pooling managed automatically
+The host does not dial every configured server up front, and connections are
+memoized once established:
+
+- Not every server is connected at startup
+- Connections are reused across tool calls rather than reopened per call
+- A closed connection is re-established on the next invocation
+
+The practical consequence for a server author: your process may be started
+well before or well after the session begins, and it may be asked for tools
+immediately on connect. Do not assume a warm-up window.
 
 ### Batching
 
@@ -488,8 +517,10 @@ Look for:
 
 ### Configuration Checklist
 
-- [ ] Server type specified (stdio/SSE/HTTP/ws)
-- [ ] Type-specific fields complete (command or url)
+- [ ] `type` specified for non-stdio servers (`sse`/`http`/`ws`). It may be
+      omitted for stdio, which is the default — that is why the stdio examples
+      above carry no `type` field
+- [ ] Type-specific fields complete (`command` for stdio, `url` otherwise)
 - [ ] Authentication configured
 - [ ] Environment variables documented
 - [ ] HTTPS/WSS used (not HTTP/WS)
@@ -534,7 +565,6 @@ Working examples in `examples/`:
 ### External Resources
 
 - **Official MCP Docs**: https://modelcontextprotocol.io/
-- **CrabCode MCP Docs**: [upstream documentation reference removed]
 - **MCP SDK**: @modelcontextprotocol/sdk
 - **Testing**: Use `crabcode --debug` and `/mcp` command
 

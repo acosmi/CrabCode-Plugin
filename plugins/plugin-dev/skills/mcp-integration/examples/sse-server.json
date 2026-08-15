@@ -1,12 +1,9 @@
 {
   "_comment": "Example SSE MCP server configuration for hosted cloud services",
+  "_note_on_endpoints": "Hosted MCP endpoints are published by each provider and change over time. Take the URL from that provider's own documentation instead of guessing a hostname - a wrong endpoint surfaces as a connection failure at first use, not as a helpful error.",
   "asana": {
     "type": "sse",
     "url": "https://mcp.asana.com/sse"
-  },
-  "github": {
-    "type": "sse",
-    "url": "https://mcp.github.com/sse"
   },
   "custom-service": {
     "type": "sse",
