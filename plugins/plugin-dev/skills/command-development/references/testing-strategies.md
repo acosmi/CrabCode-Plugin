@@ -93,14 +93,24 @@ if [ -z "$FRONTMATTER" ]; then
   exit 0
 fi
 
-# Check 'model' field if present
+# Check 'model' field if present.
+# Accepted: 'inherit', a semantic alias, or a full model id. Only the first two
+# are stable across catalog releases, so treat a literal id as a soft warning
+# rather than an error — it is legal, just brittle.
 if echo "$FRONTMATTER" | grep -q "^model:"; then
   MODEL=$(echo "$FRONTMATTER" | grep "^model:" | cut -d: -f2 | tr -d ' ')
-  if ! echo "<model-id> <model-id> <model-id>" | grep -qw "$MODEL"; then
-    echo "ERROR: Invalid model '$MODEL' (must be <model-id>, <model-id>, or <model-id>)"
-    exit 1
-  fi
-  echo "✓ Model field valid: $MODEL"
+  case "$MODEL" in
+    inherit|best|planmode)
+      echo "✓ Model field valid: $MODEL"
+      ;;
+    "")
+      echo "ERROR: model field is empty"
+      exit 1
+      ;;
+    *)
+      echo "NOTE: '$MODEL' is treated as a literal model id (prefer inherit/best/planmode)"
+      ;;
+  esac
 fi
 
 # Check 'allowed-tools' field format
