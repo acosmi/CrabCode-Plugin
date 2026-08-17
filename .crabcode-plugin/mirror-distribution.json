@@ -1,0 +1,7 @@
+{
+  "comment": "镜像分发裁剪清单(W-PLUGIN-MIRROR-SLIM, 2026-08-16)。列出的目录前缀不进 CN 镜像 zip(客户端运行时零消费的测试资产;git clone 回退路径仍是全仓)。发布器 acosmi/crabcode-source .github/workflows/sync-plugins-to-mirror.yml 与本仓审计器 .github/workflows/notify-mirror.yml 从同一 SHA 的 checkout 读本文件推导各自的文件集,两侧构造上不可能分叉。安全栅:前缀必须含 /tests/(两侧都强制),清单永远裁不掉运行时内容。改本文件无需改任何 workflow。",
+  "excludePrefixes": [
+    "plugins/crabcode-media-ops/tests/browser/__screenshots__/",
+    "plugins/crabcode-media-publisher/tests/browser/snapshots/"
+  ]
+}

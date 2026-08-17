@@ -226,11 +226,36 @@ jobs:
           unzip -tq "${WORK}/${SHA}.zip" >/dev/null \
             || fail "mirror archive ${SHA}.zip failed CRC validation"
           python3 - "${WORK}/${SHA}.zip" expected-source "${ARCHIVE_PREFIX}" <<'PY'
-          import pathlib, stat, sys, zipfile
+          import json, pathlib, stat, sys, zipfile
 
           archive = pathlib.Path(sys.argv[1])
           source = pathlib.Path(sys.argv[2])
           prefix = sys.argv[3].rstrip("/") + "/"
+
+          # Mirror distribution trim manifest (W-PLUGIN-MIRROR-SLIM, 2026-08-16).
+          # The publisher (acosmi/crabcode-source sync-plugins-to-mirror.yml) reads
+          # the SAME file from the SAME commit it packs; we read it from the exact
+          # checkout of the served SHA, so both sides derive their file sets from
+          # one source and cannot diverge — the opposite of the one-sided contract
+          # upgrades that broke this audit three times before. Absent manifest =
+          # no exclusions = the legacy full-tree contract, byte for byte.
+          # Safety rail (mirrored on the publisher side): every exclude prefix must
+          # contain "/tests/", so the manifest can only ever carve out test assets,
+          # never runtime content (plugin manifests / dist / skills).
+          manifest_path = source / ".crabcode-plugin" / "mirror-distribution.json"
+          exclude_prefixes = []
+          if manifest_path.exists():
+              manifest = json.load(manifest_path.open(encoding="utf-8"))
+              exclude_prefixes = manifest.get("excludePrefixes", [])
+              if not isinstance(exclude_prefixes, list) or not all(
+                  isinstance(p, str) for p in exclude_prefixes
+              ):
+                  raise SystemExit("mirror-distribution excludePrefixes must be a string array")
+              for p in exclude_prefixes:
+                  if "/tests/" not in p:
+                      raise SystemExit(f"mirror-distribution exclude prefix must stay under /tests/: {p}")
+                  if p.startswith("/") or "\\" in p or ".." in p.split("/"):
+                      raise SystemExit(f"mirror-distribution exclude prefix must be repo-relative POSIX: {p}")
           with zipfile.ZipFile(archive) as bundle:
               all_infos = bundle.infolist()
               if not all_infos or len({item.filename for item in all_infos}) != len(all_infos):
@@ -246,16 +271,23 @@ jobs:
                   for info in all_infos if not info.is_dir()
               }
               local = {}
+              excluded_count = 0
               for path in source.rglob("*"):
                   if path.is_symlink():
                       raise SystemExit(f"release source contains unsupported symlink: {path}")
                   if not path.is_file() or ".git" in path.parts:
                       continue
-                  local[path.relative_to(source).as_posix()] = path
+                  rel = path.relative_to(source).as_posix()
+                  if any(rel.startswith(p) for p in exclude_prefixes):
+                      excluded_count += 1
+                      continue
+                  local[rel] = path
               if set(local) != set(archived):
                   missing = sorted(set(local) - set(archived))[:20]
                   extra = sorted(set(archived) - set(local))[:20]
                   raise SystemExit(f"archive file set mismatch; missing={missing} extra={extra}")
+              if exclude_prefixes:
+                  print(f"mirror-distribution trim: {excluded_count} files excluded from the expected set")
               for name, path in local.items():
                   info = archived[name]
                   if path.read_bytes() != bundle.read(info):
