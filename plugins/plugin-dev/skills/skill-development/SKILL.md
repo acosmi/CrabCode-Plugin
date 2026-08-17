@@ -146,7 +146,7 @@ mkdir -p plugin-name/skills/skill-name/{references,examples,scripts}
 touch plugin-name/skills/skill-name/SKILL.md
 ```
 
-**Note:** Unlike the generic skill-creator which uses `init_skill.py`, plugin skills are created directly in the plugin's `skills/` directory with a simpler manual structure.
+**Note:** Plugin skills are created directly in the plugin's `skills/` directory. There is no scaffolding script to run — make the directory and write `SKILL.md`.
 
 ### Step 4: Edit the Skill
 
@@ -171,6 +171,29 @@ description: This skill should be used when the user asks to "specific phrase 1"
 version: 0.1.0
 ---
 ```
+
+**Two scopes, two requirements.** The fields above are what the runtime needs,
+and they are enough for a skill in your own plugin.
+
+Publishing into this marketplace at the **workflow** tier adds a presentation
+contract on top, enforced by the repository's own validator:
+
+- `name` must be a Chinese display name (it is the card title users read)
+- `short-description` is **required**, also Chinese, and 18-72 characters
+- It must describe user value; repeating the trigger template is rejected
+
+```yaml
+---
+name: 插件钩子开发
+short-description: 开发事件驱动的插件钩子，校验工具调用并实现自动化控制
+description: This skill should be used when the user asks to "create a hook", ...
+version: 0.1.0
+---
+```
+
+Every SKILL.md in this plugin is an example of the second form. `description`
+stays English trigger prose in both cases — it is read by the model, while
+`name` and `short-description` are read by people.
 
 **Good description examples:**
 ```yaml
@@ -288,7 +311,7 @@ Test skills by installing plugin locally:
 
 ```bash
 # Test with --plugin-dir
-cc --plugin-dir /path/to/plugin
+crabcode --plugin-dir /path/to/plugin
 
 # Ask questions that should trigger the skill
 # Verify skill loads correctly
@@ -300,20 +323,20 @@ Study the skills in this plugin as examples of best practices:
 
 **hook-development skill:**
 - Excellent trigger phrases: "create a hook", "add a PreToolUse hook", etc.
-- Lean SKILL.md (1,651 words)
+- Lean SKILL.md
 - 3 references/ files for detailed content
 - 3 examples/ of working hooks
 - 3 scripts/ utilities
 
 **agent-development skill:**
 - Strong triggers: "create an agent", "agent frontmatter", etc.
-- Focused SKILL.md (1,438 words)
+- Focused SKILL.md
 - References include the AI generation prompt from CrabCode
 - Complete agent examples
 
 **plugin-settings skill:**
 - Specific triggers: "plugin settings", ".local.md files", "YAML frontmatter"
-- References show real implementations (multi-agent-swarm, ralph-loop)
+- References show a real implementation (ralph-loop)
 - Working parsing scripts
 
 Each demonstrates progressive disclosure and strong triggering.
@@ -329,7 +352,9 @@ Each demonstrates progressive disclosure and strong triggering.
 - Pointers to references/examples/scripts
 - Most common use cases
 
-**Keep under 3,000 words, ideally 1,500-2,000 words**
+**Target 1,500-2,000 words; treat 5,000 as the hard ceiling** (see
+"Progressive Disclosure" — the body is loaded in full whenever the skill
+triggers, so its length is a cost paid on every trigger)
 
 ### What Goes in references/
 
@@ -484,8 +509,8 @@ skill-name/
 skill-name/
 ├── SKILL.md  (1,800 words - core essentials)
 └── references/
-    ├── patterns.md (2,500 words)
-    └── advanced.md (3,700 words)
+    ├── patterns.md
+    └── advanced.md
 ```
 
 **Why good:** Progressive disclosure, detailed content loaded only when needed
@@ -619,7 +644,6 @@ Plugin-dev's skills demonstrate best practices:
 ### Reference Files
 
 For complete skill-creator methodology:
-- **`references/skill-creator-original.md`** - Full original skill-creator content
 
 ## Implementation Workflow
 

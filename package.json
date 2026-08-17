@@ -18,6 +18,7 @@
     "lint:refs": "bun run scripts/validate-references.ts",
     "lint:versions": "bun run scripts/validate-versions.ts",
     "lint:mcp-contract": "bun run scripts/validate-mcp-contract.ts",
+    "lint:doc-facts": "bun run scripts/lint-doc-facts.ts",
     "validate": "bun run scripts/validate-all.ts",
     "test": "bun test ./tests/",
     "typecheck": "tsc --noEmit"

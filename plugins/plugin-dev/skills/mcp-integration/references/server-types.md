@@ -171,10 +171,12 @@ CrabCode handles OAuth flow:
 
 ### Use Cases
 
-**Official Services:**
-- Asana: `https://mcp.asana.com/sse`
-- GitHub: `https://mcp.github.com/sse`
-- Other hosted MCP servers
+**Hosted Services:**
+
+Several vendors publish hosted MCP endpoints (Asana's, for example, is
+`https://mcp.asana.com/sse`). Endpoints are announced and versioned by each
+vendor, so take the URL from their documentation rather than inferring an
+`mcp.<vendor>.com` hostname — a guessed endpoint simply fails to connect.
 
 **Custom Hosted Servers:**
 Deploy your own MCP server and expose via HTTPS + SSE.

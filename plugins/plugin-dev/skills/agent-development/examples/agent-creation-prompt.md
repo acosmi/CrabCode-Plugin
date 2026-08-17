@@ -47,7 +47,7 @@ Create `agents/[identifier].md`:
 name: [identifier from JSON]
 description: [whenToUse from JSON]
 model: inherit
-color: [choose: blue/cyan/green/yellow/magenta/red]
+color: [optional; choose: red/blue/green/yellow/purple/orange/pink/cyan]
 tools: ["Read", "Write", "Grep"]  # Optional: restrict tools
 ---
 
@@ -185,7 +185,7 @@ Always validate generated agents:
 
 ```bash
 # Validate structure
-./scripts/validate-agent.sh agents/your-agent.md
+./skills/agent-development/scripts/validate-agent.sh agents/your-agent.md
 
 # Check triggering works
 # Test with realistic invocation phrasings

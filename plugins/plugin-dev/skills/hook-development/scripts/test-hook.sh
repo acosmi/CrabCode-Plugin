@@ -33,7 +33,7 @@ create_sample() {
   "session_id": "test-session",
   "transcript_path": "/tmp/transcript.txt",
   "cwd": "/tmp/test-project",
-  "permission_mode": "ask",
+  "permission_mode": "default",
   "hook_event_name": "PreToolUse",
   "tool_name": "Write",
   "tool_input": {
@@ -49,22 +49,43 @@ EOF
   "session_id": "test-session",
   "transcript_path": "/tmp/transcript.txt",
   "cwd": "/tmp/test-project",
-  "permission_mode": "ask",
+  "permission_mode": "default",
   "hook_event_name": "PostToolUse",
   "tool_name": "Bash",
-  "tool_result": "Command executed successfully"
+  "tool_input": {
+    "command": "echo hello"
+  },
+  "tool_response": "Command executed successfully",
+  "tool_use_id": "toolu_test"
 }
 EOF
       ;;
-    Stop|AgentStop)
+    Stop)
       cat <<'EOF'
 {
   "session_id": "test-session",
   "transcript_path": "/tmp/transcript.txt",
   "cwd": "/tmp/test-project",
-  "permission_mode": "ask",
+  "permission_mode": "default",
   "hook_event_name": "Stop",
-  "reason": "Task appears complete"
+  "stop_hook_active": false,
+  "last_assistant_message": "I have finished the requested change."
+}
+EOF
+      ;;
+    SubagentStop)
+      cat <<'EOF'
+{
+  "session_id": "test-session",
+  "transcript_path": "/tmp/transcript.txt",
+  "cwd": "/tmp/test-project",
+  "permission_mode": "default",
+  "hook_event_name": "SubagentStop",
+  "stop_hook_active": false,
+  "agent_id": "agent-test",
+  "agent_transcript_path": "/tmp/agent-transcript.txt",
+  "agent_type": "general-purpose",
+  "last_assistant_message": "Subagent task complete."
 }
 EOF
       ;;
@@ -74,26 +95,40 @@ EOF
   "session_id": "test-session",
   "transcript_path": "/tmp/transcript.txt",
   "cwd": "/tmp/test-project",
-  "permission_mode": "ask",
+  "permission_mode": "default",
   "hook_event_name": "UserPromptSubmit",
-  "user_prompt": "Test user prompt"
+  "prompt": "Test user prompt"
 }
 EOF
       ;;
-    SessionStart|SessionEnd)
+    SessionStart)
       cat <<'EOF'
 {
   "session_id": "test-session",
   "transcript_path": "/tmp/transcript.txt",
   "cwd": "/tmp/test-project",
-  "permission_mode": "ask",
-  "hook_event_name": "SessionStart"
+  "permission_mode": "default",
+  "hook_event_name": "SessionStart",
+  "source": "startup"
+}
+EOF
+      ;;
+    SessionEnd)
+      cat <<'EOF'
+{
+  "session_id": "test-session",
+  "transcript_path": "/tmp/transcript.txt",
+  "cwd": "/tmp/test-project",
+  "permission_mode": "default",
+  "hook_event_name": "SessionEnd",
+  "reason": "clear"
 }
 EOF
       ;;
     *)
       echo "Unknown event type: $event_type"
-      echo "Valid types: PreToolUse, PostToolUse, Stop, AgentStop, UserPromptSubmit, SessionStart, SessionEnd"
+      echo "Valid types: PreToolUse, PostToolUse, Stop, SubagentStop, UserPromptSubmit, SessionStart, SessionEnd"
+      echo "(these are the commonly hooked events; run /hooks to see the full set)"
       exit 1
       ;;
   esac

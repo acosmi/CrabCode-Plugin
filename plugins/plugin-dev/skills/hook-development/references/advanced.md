@@ -19,7 +19,7 @@ Combine command and prompt hooks for layered validation:
         },
         {
           "type": "prompt",
-          "prompt": "Deep analysis of bash command: $TOOL_INPUT",
+          "prompt": "Deep analysis of the bash command in .tool_input.command. $ARGUMENTS",
           "timeout": 15
         }
       ]
@@ -84,17 +84,23 @@ input=$(cat)
 
 ## Hook Chaining via State
 
-Share state between hooks using temporary files:
+Share state between hooks using temporary files keyed by `session_id`.
+
+**Do not key the file on `$$`.** Every hook runs in its own process, so `$$`
+differs between the writer and the reader — the reader looks for a filename
+that never exists and silently takes its fallback branch. Use `session_id`
+from the payload: every hook in the same session receives the same value.
 
 ```bash
 # Hook 1: Analyze and save state
 #!/bin/bash
 input=$(cat)
+session_id=$(echo "$input" | jq -r '.session_id')
 command=$(echo "$input" | jq -r '.tool_input.command')
 
 # Analyze command
 risk_level=$(calculate_risk "$command")
-echo "$risk_level" > /tmp/hook-state-$$
+echo "$risk_level" > "/tmp/hook-state-$session_id"
 
 exit 0
 ```
@@ -102,7 +108,9 @@ exit 0
 ```bash
 # Hook 2: Use saved state
 #!/bin/bash
-risk_level=$(cat /tmp/hook-state-$$ 2>/dev/null || echo "unknown")
+input=$(cat)
+session_id=$(echo "$input" | jq -r '.session_id')
+risk_level=$(cat "/tmp/hook-state-$session_id" 2>/dev/null || echo "unknown")
 
 if [ "$risk_level" = "high" ]; then
   echo "High risk operation detected" >&2
@@ -111,6 +119,10 @@ fi
 ```
 
 **Important:** This only works for sequential hook events (e.g., PreToolUse then PostToolUse), not parallel hooks.
+
+Test the reader against a value the writer actually wrote. A broken chain
+returns the fallback, which is indistinguishable from a legitimate "unknown" —
+it fails silently, not loudly.
 
 ## Dynamic Hook Configuration
 
@@ -185,8 +197,11 @@ if [ -f "$cache_file" ]; then
   fi
 fi
 
-# Perform validation
-result='{"decision": "approve"}'
+# Perform validation.
+# PreToolUse answers with hookSpecificOutput.permissionDecision, not the
+# top-level `decision` field — `decision` is the Stop/PostToolUse shape and
+# its only values are "approve" and "block".
+result='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "allow"}}'
 
 # Cache result
 echo "$result" > "$cache_file"
@@ -230,25 +245,33 @@ All three hooks run simultaneously, reducing total latency.
 
 Coordinate hooks across different events:
 
+All three hooks key their state on `session_id`, which is the only identifier
+they share. `$$` would give each of them a different filename.
+
 **SessionStart - Set up tracking:**
 ```bash
 #!/bin/bash
+input=$(cat)
+session_id=$(echo "$input" | jq -r '.session_id')
+
 # Initialize session tracking
-echo "0" > /tmp/test-count-$$
-echo "0" > /tmp/build-count-$$
+echo "0" > "/tmp/test-count-$session_id"
+echo "0" > "/tmp/build-count-$session_id"
 ```
 
 **PostToolUse - Track events:**
 ```bash
 #!/bin/bash
 input=$(cat)
+session_id=$(echo "$input" | jq -r '.session_id')
 tool_name=$(echo "$input" | jq -r '.tool_name')
 
 if [ "$tool_name" = "Bash" ]; then
-  command=$(echo "$input" | jq -r '.tool_result')
-  if [[ "$command" == *"test"* ]]; then
-    count=$(cat /tmp/test-count-$$ 2>/dev/null || echo "0")
-    echo $((count + 1)) > /tmp/test-count-$$
+  # PostToolUse carries the tool output as .tool_response
+  output=$(echo "$input" | jq -r '.tool_response')
+  if [[ "$output" == *"test"* ]]; then
+    count=$(cat "/tmp/test-count-$session_id" 2>/dev/null || echo "0")
+    echo $((count + 1)) > "/tmp/test-count-$session_id"
   fi
 fi
 ```
@@ -256,10 +279,12 @@ fi
 **Stop - Verify based on tracking:**
 ```bash
 #!/bin/bash
-test_count=$(cat /tmp/test-count-$$ 2>/dev/null || echo "0")
+input=$(cat)
+session_id=$(echo "$input" | jq -r '.session_id')
+test_count=$(cat "/tmp/test-count-$session_id" 2>/dev/null || echo "0")
 
 if [ "$test_count" -eq 0 ]; then
-  echo '{"decision": "block", "reason": "No tests were run"}' >&2
+  echo "No tests were run" >&2
   exit 2
 fi
 ```
@@ -280,7 +305,7 @@ curl -X POST "$SLACK_WEBHOOK" \
   -d "{\"text\": \"Hook ${decision} ${tool_name} operation\"}" \
   2>/dev/null
 
-echo '{"decision": "deny"}' >&2
+echo "Blocked by hook" >&2
 exit 2
 ```
 
@@ -317,10 +342,13 @@ exit 0
 ```bash
 #!/bin/bash
 input=$(cat)
+session_id=$(echo "$input" | jq -r '.session_id')
 command=$(echo "$input" | jq -r '.tool_input.command')
 
-# Track command frequency
-rate_file="/tmp/hook-rate-$$"
+# Track command frequency. Keyed by session_id, not $$: a per-process file
+# would be fresh on every invocation, so the counter could never exceed 1 and
+# the limit would never trigger.
+rate_file="/tmp/hook-rate-$session_id"
 current_minute=$(date +%Y%m%d%H%M)
 
 if [ -f "$rate_file" ]; then
@@ -329,7 +357,7 @@ if [ -f "$rate_file" ]; then
 
   if [ "$current_minute" = "$last_minute" ]; then
     if [ "$count" -gt 10 ]; then
-      echo '{"decision": "deny", "reason": "Rate limit exceeded"}' >&2
+      echo "Rate limit exceeded" >&2
       exit 2
     fi
     count=$((count + 1))
@@ -369,7 +397,7 @@ content=$(echo "$input" | jq -r '.tool_input.content')
 
 # Check for common secret patterns
 if echo "$content" | grep -qE "(api[_-]?key|password|secret|token).{0,20}['\"]?[A-Za-z0-9]{20,}"; then
-  echo '{"decision": "deny", "reason": "Potential secret detected in content"}' >&2
+  echo "Potential secret detected in content" >&2
   exit 2
 fi
 
@@ -466,10 +494,12 @@ cat "$file_path"  # Fails if file doesn't exist
 ### ✅ Proper Error Handling
 
 ```bash
-# GOOD: Handles errors gracefully
+# GOOD: Handles errors gracefully.
+# The JSON goes to stdout — on stderr it would be ignored, since only stdout
+# is parsed as hook output.
 file_path=$(echo "$input" | jq -r '.tool_input.file_path')
 if [ ! -f "$file_path" ]; then
-  echo '{"continue": true, "systemMessage": "File not found, skipping check"}' >&2
+  echo '{"continue": true, "systemMessage": "File not found, skipping check"}'
   exit 0
 fi
 ```

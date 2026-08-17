@@ -99,17 +99,23 @@ Which model the agent should use.
 
 **Options:**
 - `inherit` - Use same model as parent (recommended)
-- `<model-id>` - CrabCode <model-id> (balanced)
-- `<model-id>` - CrabCode <model-id> (most capable, expensive)
-- `<model-id>` - CrabCode <model-id> (fast, cheap)
+- `inherit` - use the session's model (recommended, and the effective default)
+- `best` - ask for the strongest model available
+- `planmode` - the model configured for planning work
+
+A full model id is also accepted, but do not ship one: it pins the agent to a
+single catalog entry that will eventually be retired.
 
 **Recommendation:** Use `inherit` unless agent needs specific model capabilities.
 
-### color (required)
+### color (optional)
 
-Visual identifier for agent in UI.
+Visual identifier for the agent in the UI. Omit it and one is assigned.
 
-**Options:** `blue`, `cyan`, `green`, `yellow`, `magenta`, `red`
+**Options:** `red`, `blue`, `green`, `yellow`, `purple`, `orange`, `pink`,
+`cyan` — these eight and no others. An unrecognised value (there is no
+`magenta`) does not fail the load, it is simply ignored, so a typo here is
+silent.
 
 **Guidelines:**
 - Choose distinct colors for different agents in same plugin
@@ -118,7 +124,8 @@ Visual identifier for agent in UI.
 - Green: Success-oriented tasks
 - Yellow: Caution, validation
 - Red: Critical, security
-- Magenta: Creative, generation
+- Purple/pink: Creative, generation
+- Orange: Long-running or background work
 
 ### tools (optional)
 
@@ -338,7 +345,7 @@ Output: [What to provide]
 |-------|----------|--------|---------|
 | name | Yes | lowercase-hyphens | code-reviewer |
 | description | Yes | Prose triggers | Use when... Typical triggers include... |
-| model | Yes | inherit/<model-id>/<model-id>/<model-id> | inherit |
+| model | No | `inherit` / `best` / `planmode` / full model id | inherits session model |
 | color | Yes | Color name | blue |
 | tools | No | Array of tool names | ["Read", "Grep"] |
 
@@ -383,7 +390,6 @@ Working examples in `examples/`:
 Development tools in `scripts/`:
 
 - **`validate-agent.sh`** - Validate agent file structure
-- **`test-agent-trigger.sh`** - Test if agent triggers correctly
 
 ## Implementation Workflow
 
@@ -395,7 +401,7 @@ To create an agent for a plugin:
 4. Write frontmatter with all required fields
 5. Write system prompt following best practices
 6. Name 2-4 trigger scenarios in description (prose) and detail them in a "When to invoke" body section
-7. Validate with `scripts/validate-agent.sh`
+7. Validate with `skills/agent-development/scripts/validate-agent.sh`
 8. Test triggering with real scenarios
 9. Document agent in plugin README
 
