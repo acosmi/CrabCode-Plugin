@@ -10,12 +10,12 @@
 
 | 类别 | 占位符 | 内置服务 | 其它可选 |
 |---|---|---|---|
-| 日历 | `~~calendar` | Google Calendar、Microsoft 365 | — |
+| 日历 | `~~calendar` | Microsoft 365 | Google Calendar |
 | 聊天 | `~~chat` | Slack | Microsoft Teams |
 | 竞争情报 | `~~competitive intelligence` | Similarweb | Crayon、Klue |
 | CRM | `~~CRM` | HubSpot、Close | Salesforce、Pipedrive、Copper |
 | 数据增强 | `~~data enrichment` | Clay、ZoomInfo、Apollo | Clearbit、Lusha |
-| 邮件 | `~~email` | Gmail、Microsoft 365 | — |
+| 邮件 | `~~email` | Microsoft 365 | Gmail |
 | 知识库 | `~~knowledge base` | Notion | Confluence、Guru |
 | 会议转录 | `~~conversation intelligence` | Fireflies | Gong、Chorus、Otter.ai |
 | 项目管理 | `~~project tracker` | Atlassian(Jira/Confluence) | Linear、Asana |

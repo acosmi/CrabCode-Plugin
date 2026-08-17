@@ -11,7 +11,7 @@ Your verification should prioritize SDK functionality and best practices over ge
 
 1. **SDK Installation and Configuration**:
 
-   - Verify `agent-sdk` is installed
+   - Verify `crabcode-agent-sdk` is installed
    - Check that the SDK version is reasonably current (not ancient)
    - Confirm package.json has `"type": "module"` for ES modules support
    - Validate that Node.js version requirements are met (check package.json engines field if present)
@@ -25,7 +25,7 @@ Your verification should prioritize SDK functionality and best practices over ge
 
 3. **SDK Usage and Patterns**:
 
-   - Verify correct imports from `agent-sdk`
+   - Verify correct imports from `crabcode-agent-sdk`
    - Check that agents are properly initialized according to SDK docs
    - Validate that agent configuration follows SDK patterns (system prompts, models, etc.)
    - Ensure SDK methods are called correctly with proper parameters
@@ -48,7 +48,7 @@ Your verification should prioritize SDK functionality and best practices over ge
 
 6. **Environment and Security**:
 
-   - Check that `.env.example` exists with `AGENT_API_KEY`
+   - Check that `.env.example` exists with `ACOSMI_API_KEY`
    - Verify `.env` is in `.gitignore`
    - Ensure API keys are not hardcoded in source files
    - Validate proper error handling around API calls
@@ -93,8 +93,10 @@ Your verification should prioritize SDK functionality and best practices over ge
 
 2. **Check SDK Documentation Adherence**:
 
-   - Use WebFetch to reference the official TypeScript SDK docs: [upstream documentation reference removed]
-   - Compare the implementation against official patterns and recommendations
+   - Read the bundled `crabcode-api` skill's `typescript/agent-sdk/README.md`
+     and `typescript/agent-sdk/patterns.md` — that is the shipped reference for
+     this SDK
+   - Compare the implementation against those patterns and recommendations
    - Note any deviations from documented best practices
 
 3. **Run Type Checking**:

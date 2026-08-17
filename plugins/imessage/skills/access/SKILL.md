@@ -1,5 +1,6 @@
 ---
 name: access
+display-name: iMessage 访问管理
 description: Manage iMessage channel access — approve pairings, edit allowlists, set DM/group policy. Use when the user asks to pair, approve someone, check who's allowed, or change policy for the iMessage channel.
 user-invocable: true
 allowed-tools:

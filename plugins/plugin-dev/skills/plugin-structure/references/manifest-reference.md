@@ -208,6 +208,30 @@ Tags for plugin discovery and categorization.
 
 ### Component Path Fields
 
+#### skills
+
+**Type**: String or Array of strings
+**Default**: `["./skills"]`
+**Example**: `"./extra-skills"`
+
+Additional skill directories, each holding a `SKILL.md`. Paths are relative to
+the plugin root.
+
+```json
+{
+  "skills": [
+    "./skills/agent-development",
+    "./skills/command-development"
+  ]
+}
+```
+
+**Behavior**: Supplements the default `skills/` directory (does not replace it).
+
+Listing skills explicitly also fixes their order, which is how they appear to
+the user — auto-discovery alone gives no ordering guarantee. This plugin's own
+manifest lists all seven of its skills for exactly that reason.
+
 #### commands
 
 **Type**: String or Array of strings

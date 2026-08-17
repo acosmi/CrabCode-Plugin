@@ -77,7 +77,7 @@ if [[ ! -f "$STATE_FILE" ]]; then
 fi
 
 # Parse YAML frontmatter (between --- markers)
-FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$STATE_FILE")
+FRONTMATTER=$(awk 'NR==1 && /^---$/ {c=1; next} c==1 && /^---$/ {exit} c==1' "$STATE_FILE")
 
 # Extract individual fields
 ENABLED=$(echo "$FRONTMATTER" | grep '^enabled:' | sed 's/enabled: *//' | sed 's/^"\(.*\)"$/\1/')
@@ -140,7 +140,7 @@ If present, parse YAML frontmatter and adapt behavior according to:
 
 ```bash
 # Extract everything between --- markers
-FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$FILE")
+FRONTMATTER=$(awk 'NR==1 && /^---$/ {c=1; next} c==1 && /^---$/ {exit} c==1' "$FILE")
 ```
 
 ### Read Individual Fields
@@ -168,7 +168,7 @@ Extract content after second `---`:
 
 ```bash
 # Get everything after closing ---
-BODY=$(awk '/^---$/{i++; next} i>=2' "$FILE")
+BODY=$(awk 'c==2{print; next} /^---$/{c++}' "$FILE")
 ```
 
 ## Common Patterns
@@ -187,7 +187,7 @@ if [[ ! -f "$STATE_FILE" ]]; then
 fi
 
 # Read enabled flag
-FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$STATE_FILE")
+FRONTMATTER=$(awk 'NR==1 && /^---$/ {c=1; next} c==1 && /^---$/ {exit} c==1' "$STATE_FILE")
 ENABLED=$(echo "$FRONTMATTER" | grep '^enabled:' | sed 's/enabled: *//')
 
 if [[ "$ENABLED" != "true" ]]; then
@@ -204,7 +204,7 @@ fi
 
 Store agent-specific state and configuration:
 
-**.crabcode/multi-agent-swarm.local.md:**
+**.crabcode/my-plugin.local.md:**
 ```markdown
 ---
 agent_name: auth-agent
@@ -376,12 +376,16 @@ Document in your README:
 
 After editing `.crabcode/my-plugin.local.md`:
 1. Save the file
-2. Exit CrabCode
-3. Restart: `crabcode` or `cc`
-4. New settings will be loaded
+2. That is all — the next hook invocation reads the new values
 ```
 
-Hooks cannot be hot-swapped within a session.
+Settings changes take effect immediately, because a settings-driven hook reads
+its `.local.md` **every time it runs**. That is the point of the pattern: the
+file is data read at execution time, not configuration baked in at load time.
+
+A reload matters only when you change `hooks/hooks.json` itself — registering a
+different command or matcher — and even then `/reload-plugins` applies it
+without leaving the session.
 
 ## Security Considerations
 
@@ -422,50 +426,33 @@ Settings files should be:
 - Not committed to git
 - Not shared between users
 
-## Real-World Examples
-
-### multi-agent-swarm Plugin
-
-**.crabcode/multi-agent-swarm.local.md:**
-```markdown
----
-agent_name: auth-implementation
-task_number: 3.5
-pr_number: 1234
-coordinator_session: team-leader
-enabled: true
-dependencies: ["Task 3.4"]
-additional_instructions: Use JWT tokens, not sessions
----
-
-# Task: Implement Authentication
-
-Build JWT-based authentication for the REST API.
-Coordinate with auth-agent on shared types.
-```
-
-**Hook usage (agent-stop-notification.sh):**
-- Checks if file exists (line 15-18: quick exit if not)
-- Parses frontmatter to get coordinator_session, agent_name, enabled
-- Sends notifications to coordinator if enabled
-- Allows quick activation/deactivation via `enabled: true/false`
+## Real-World Example
 
 ### ralph-loop Plugin
+
+The one worked example below is a plugin that ships in this marketplace. Its
+fields come from `plugins/ralph-loop/src/state.ts`.
 
 **.crabcode/ralph-loop.local.md:**
 ```markdown
 ---
+active: true
 iteration: 1
-max_iterations: 10
+session_id: "01JB2Z0Q4S8N7M6K5J4H3G2F1E"
+max_iterations: 5
 completion_promise: "All tests passing and build successful"
+started_at: "2026-08-15T14:30:00Z"
 ---
 
 Fix all the linting errors in the project.
 Make sure tests pass after each fix.
 ```
 
-**Hook usage (stop-hook.sh):**
-- Checks if file exists (line 15-18: quick exit if not active)
+`max_iterations` defaults to 5 (`DEFAULT_MAX_ITERATIONS`) and is capped at 200.
+`completion_promise` and `session_id` hold the literal `null` when unset.
+
+**Hook usage (`src/stopHook.ts`, registered via `hooks/hooks.json`):**
+- Checks whether the state file exists, and exits immediately if not
 - Reads iteration count and max_iterations
 - Extracts completion_promise for loop termination
 - Reads body as the prompt to feed back
@@ -485,7 +472,7 @@ project-root/
 
 ```bash
 # Extract frontmatter
-FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$FILE")
+FRONTMATTER=$(awk 'NR==1 && /^---$/ {c=1; next} c==1 && /^---$/ {exit} c==1' "$FILE")
 
 # Read field
 VALUE=$(echo "$FRONTMATTER" | grep '^field:' | sed 's/field: *//' | sed 's/^"\(.*\)"$/\1/')
@@ -495,7 +482,7 @@ VALUE=$(echo "$FRONTMATTER" | grep '^field:' | sed 's/field: *//' | sed 's/^"\(.
 
 ```bash
 # Extract body (after second ---)
-BODY=$(awk '/^---$/{i++; next} i>=2' "$FILE")
+BODY=$(awk 'c==2{print; next} /^---$/{c++}' "$FILE")
 ```
 
 ### Quick Exit Pattern
@@ -513,7 +500,7 @@ fi
 For detailed implementation patterns:
 
 - **`references/parsing-techniques.md`** - Complete guide to parsing YAML frontmatter and markdown bodies
-- **`references/real-world-examples.md`** - Deep dive into multi-agent-swarm and ralph-loop implementations
+- **`references/real-world-examples.md`** - Deep dive into the ralph-loop implementation
 
 ### Example Files
 

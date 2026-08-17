@@ -42,7 +42,7 @@
     },
     "benchling": {
       "type": "http",
-      "url": ""
+      "url": "https://${user_config.benchling_tenant}.mcp.benchling.com/mcp"
     }
   }
 }

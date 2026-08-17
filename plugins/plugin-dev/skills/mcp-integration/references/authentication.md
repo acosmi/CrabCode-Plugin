@@ -56,11 +56,13 @@ This plugin requires the following Asana permissions:
 
 ### Token Storage
 
-Tokens are stored securely by CrabCode:
-- Not accessible to plugins
-- Encrypted at rest
-- Automatic refresh
+Tokens are held by CrabCode, not by your plugin:
+- Not exposed to plugin code or plugin configuration
+- Refreshed automatically
 - Cleared on sign-out
+
+Design on that basis: never ask the user to paste an OAuth token into plugin
+config, and never write one to a file of your own.
 
 ### Troubleshooting OAuth
 

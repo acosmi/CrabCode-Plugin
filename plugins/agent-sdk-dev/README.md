@@ -136,7 +136,7 @@ The command automatically runs `agent-sdk-verifier-ts` to ensure everything is c
 4. **Start developing:**
 ```bash
 # Set your API key
-echo "AGENT_API_KEY=your_key_here" > .env
+echo "ACOSMI_API_KEY=your_key_here" > .env
 
 # Run your agent
 npm start
@@ -149,10 +149,13 @@ npm start
 
 ## Installation
 
-This plugin is included in the CrabCode repository. To use it:
+Install from the official marketplace:
 
-1. Ensure CrabCode is installed
-2. The plugin commands and agents are automatically available
+```bash
+/plugin install agent-sdk-dev@crabcode-plugins-official
+```
+
+Its command and agents become available once the plugin is enabled.
 
 ## Best Practices
 
@@ -165,10 +168,15 @@ This plugin is included in the CrabCode repository. To use it:
 
 ## Resources
 
-- Agent SDK Overview
-- TypeScript SDK Reference
-- Python SDK Reference
-- Agent SDK Examples
+The SDK reference ships inside the product as the bundled `crabcode-api` skill.
+Invoke `/crabcode-api`; the Agent SDK material lives at:
+
+- `typescript/agent-sdk/README.md` — install, `Agent` / `Tool` surface, built-in tool table
+- `typescript/agent-sdk/patterns.md` — custom tools, guardrails
+- `python/agent-sdk/README.md` and `python/agent-sdk/patterns.md` — the same, for Python
+
+The surrounding `{lang}/crabcode-api/*.md` and `shared/*.md` files cover the
+underlying API: streaming, tool use, prompt caching, batches, error codes.
 
 ## Troubleshooting
 
@@ -183,12 +191,14 @@ This plugin is included in the CrabCode repository. To use it:
 
 ### Python import errors
 
-**Issue**: Cannot import from `agent_sdk`
+**Issue**: Cannot import from `crabcode_agent_sdk`
 
 **Solution**:
 - Ensure you've installed dependencies: `pip install -r requirements.txt`
 - Activate your virtual environment if using one
-- Check that the SDK is installed: `pip show agent-sdk`
+- Check that the SDK is installed: `pip show crabcode-agent-sdk`
+- Note the spelling difference: the distribution is `crabcode-agent-sdk`
+  (hyphens), the import is `crabcode_agent_sdk` (underscores)
 
 ### Verification fails with warnings
 
@@ -205,4 +215,4 @@ Adapted from upstream open-source plugin source. See `docs/legal/THIRD_PARTY_NOT
 
 ## Version
 
-1.0.0
+0.1.1

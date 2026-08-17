@@ -2,11 +2,11 @@
   "mcpServers": {
     "snowflake": {
       "type": "http",
-      "url": ""
+      "url": "https://${user_config.snowflake_account}.snowflakecomputing.com/api/v2/databases/${user_config.snowflake_database}/schemas/${user_config.snowflake_schema}/mcp-servers/${user_config.snowflake_mcp_server}"
     },
     "databricks": {
       "type": "http",
-      "url": ""
+      "url": "https://${user_config.databricks_workspace_hostname}/api/2.0/mcp/sql"
     },
     "bigquery": {
       "type": "http",

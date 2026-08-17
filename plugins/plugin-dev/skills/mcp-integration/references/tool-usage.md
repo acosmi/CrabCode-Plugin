@@ -4,27 +4,40 @@ Complete guide to using MCP tools effectively in CrabCode plugin commands and ag
 
 ## Overview
 
-Once an MCP server is configured, its tools become available with the prefix `mcp__plugin_<plugin-name>_<server-name>__<tool-name>`. Use these tools in commands and agents just like built-in CrabCode tools.
+Once an MCP server is configured, its tools become available under a generated
+`mcp__…__…` name. Use them in commands and agents just like built-in CrabCode
+tools.
 
 ## Tool Naming Convention
 
 ### Format
 
 ```
-mcp__plugin_<plugin-name>_<server-name>__<tool-name>
+mcp__<server-namespace>__<tool-name>
 ```
+
+For plugin-provided servers the namespace is **derived, not authored**: `p_`
+followed by a 24-character hash of the server's internal runtime identity.
+
+```
+mcp__p_<24-hex-digest>__<tool-name>
+```
+
+You therefore cannot assemble the name from the plugin and server names. Read
+it from `/mcp` and paste it verbatim. The digests below are illustrative
+placeholders — yours will differ.
 
 ### Examples
 
 **Asana plugin with asana server:**
-- `mcp__plugin_asana_asana__asana_create_task`
-- `mcp__plugin_asana_asana__asana_search_tasks`
-- `mcp__plugin_asana_asana__asana_get_project`
+- `mcp__p_1f4c9a2be70d5836a1b4c7e2__create_task`
+- `mcp__p_1f4c9a2be70d5836a1b4c7e2__search_tasks`
+- `mcp__p_1f4c9a2be70d5836a1b4c7e2__get_project`
 
 **Custom plugin with database server:**
-- `mcp__plugin_myplug_database__query`
-- `mcp__plugin_myplug_database__execute`
-- `mcp__plugin_myplug_database__list_tables`
+- `mcp__p_47ac1d90fe6b28c3705ea8b1__query`
+- `mcp__p_47ac1d90fe6b28c3705ea8b1__execute`
+- `mcp__p_47ac1d90fe6b28c3705ea8b1__list_tables`
 
 ### Discovering Tool Names
 
@@ -49,7 +62,7 @@ Specify MCP tools in command frontmatter:
 ---
 description: Create a new Asana task
 allowed-tools: [
-  "mcp__plugin_asana_asana__asana_create_task"
+  "mcp__p_1f4c9a2be70d5836a1b4c7e2__create_task"
 ]
 ---
 
@@ -57,7 +70,7 @@ allowed-tools: [
 
 To create a task:
 1. Gather task details from user
-2. Use mcp__plugin_asana_asana__asana_create_task with the details
+2. Use mcp__p_1f4c9a2be70d5836a1b4c7e2__create_task with the details
 3. Confirm creation to user
 ```
 
@@ -66,9 +79,9 @@ To create a task:
 ```markdown
 ---
 allowed-tools: [
-  "mcp__plugin_asana_asana__asana_create_task",
-  "mcp__plugin_asana_asana__asana_search_tasks",
-  "mcp__plugin_asana_asana__asana_get_project"
+  "mcp__p_1f4c9a2be70d5836a1b4c7e2__create_task",
+  "mcp__p_1f4c9a2be70d5836a1b4c7e2__search_tasks",
+  "mcp__p_1f4c9a2be70d5836a1b4c7e2__get_project"
 ]
 ---
 ```
@@ -77,7 +90,7 @@ allowed-tools: [
 
 ```markdown
 ---
-allowed-tools: ["mcp__plugin_asana_asana__*"]
+allowed-tools: ["mcp__p_1f4c9a2be70d5836a1b4c7e2__*"]
 ---
 ```
 
@@ -90,8 +103,8 @@ allowed-tools: ["mcp__plugin_asana_asana__*"]
 ---
 description: Search and create Asana tasks
 allowed-tools: [
-  "mcp__plugin_asana_asana__asana_search_tasks",
-  "mcp__plugin_asana_asana__asana_create_task"
+  "mcp__p_1f4c9a2be70d5836a1b4c7e2__search_tasks",
+  "mcp__p_1f4c9a2be70d5836a1b4c7e2__create_task"
 ]
 ---
 
@@ -100,7 +113,7 @@ allowed-tools: [
 ## Searching Tasks
 
 To search for tasks:
-1. Use mcp__plugin_asana_asana__asana_search_tasks
+1. Use mcp__p_1f4c9a2be70d5836a1b4c7e2__search_tasks
 2. Provide search filters (assignee, project, etc.)
 3. Display results to user
 
@@ -113,7 +126,7 @@ To create a task:
    - Project
    - Assignee
    - Due date
-2. Use mcp__plugin_asana_asana__asana_create_task
+2. Use mcp__p_1f4c9a2be70d5836a1b4c7e2__create_task
 3. Show confirmation with task link
 ```
 
@@ -137,10 +150,10 @@ Autonomous agent for generating Asana project status reports.
 
 ## Process
 
-1. **Query tasks**: Use mcp__plugin_asana_asana__asana_search_tasks to get all tasks
+1. **Query tasks**: Use mcp__p_1f4c9a2be70d5836a1b4c7e2__search_tasks to get all tasks
 2. **Analyze progress**: Calculate completion rates and identify blockers
 3. **Generate report**: Create formatted status update
-4. **Update Asana**: Use mcp__plugin_asana_asana__asana_create_comment to post report
+4. **Update Asana**: Use mcp__p_1f4c9a2be70d5836a1b4c7e2__create_comment to post report
 
 ## Available Tools
 
@@ -149,10 +162,15 @@ The agent has access to all Asana MCP tools without pre-approval.
 
 ### Agent Tool Access
 
-Agents have broader tool access than commands:
-- Can use any tool CrabCode determines is necessary
-- Don't need pre-allowed lists
-- Should document which tools they typically use
+Agents are scoped by their own frontmatter, not by a command's allowlist:
+
+- Omit `tools` and the agent may use any available tool, MCP tools included
+- Declare `tools` and the agent is restricted to exactly that list — an MCP
+  tool left out of it is not reachable
+- Either way, document which tools the agent typically uses
+
+The choice is a real one: an unrestricted agent adapts, a restricted agent is
+predictable. Prefer declaring `tools` for agents that touch external services.
 
 ## Tool Call Patterns
 
@@ -163,7 +181,7 @@ Single tool call with validation:
 ```markdown
 Steps:
 1. Validate user provided required fields
-2. Call mcp__plugin_api_server__create_item with validated data
+2. Call mcp__p_9b3e70c4d128af56be0913da__create_item with validated data
 3. Check for errors
 4. Display confirmation
 ```
@@ -174,9 +192,9 @@ Chain multiple tool calls:
 
 ```markdown
 Steps:
-1. Search for existing items: mcp__plugin_api_server__search
-2. If not found, create new: mcp__plugin_api_server__create
-3. Add metadata: mcp__plugin_api_server__update_metadata
+1. Search for existing items: mcp__p_9b3e70c4d128af56be0913da__search
+2. If not found, create new: mcp__p_9b3e70c4d128af56be0913da__create
+3. Add metadata: mcp__p_9b3e70c4d128af56be0913da__update_metadata
 4. Return final item ID
 ```
 
@@ -188,7 +206,7 @@ Multiple calls with same tool:
 Steps:
 1. Get list of items to process
 2. For each item:
-   - Call mcp__plugin_api_server__update_item
+   - Call mcp__p_9b3e70c4d128af56be0913da__update_item
    - Track success/failure
 3. Report results summary
 ```
@@ -199,7 +217,7 @@ Graceful error handling:
 
 ```markdown
 Steps:
-1. Try to call mcp__plugin_api_server__get_data
+1. Try to call mcp__p_9b3e70c4d128af56be0913da__get_data
 2. If error (rate limit, network, etc.):
    - Wait and retry (max 3 attempts)
    - If still failing, inform user
@@ -241,21 +259,24 @@ Each MCP tool has a schema defining its parameters. View with `/mcp`.
 
 ### Calling Tools with Parameters
 
-CrabCode automatically structures tool calls based on schema:
+The model fills in the tool's parameters from its schema, the same way it does
+for built-in tools — you do not hand-write the call. Conceptually the tool is
+invoked with the arguments its schema declares:
 
-```typescript
-// CrabCode generates this internally
+```jsonc
+// Illustrative shape only — not an internal format you can rely on
 {
-  toolName: "mcp__plugin_asana_asana__asana_create_task",
-  input: {
-    name: "Review PR #123",
-    notes: "Code review for new feature",
-    workspace: "12345",
-    assignee: "67890",
-    due_on: "2025-01-15"
-  }
+  "name": "Review PR #123",
+  "notes": "Code review for new feature",
+  "workspace": "12345",
+  "assignee": "67890",
+  "due_on": "2025-01-15"
 }
 ```
+
+What you control is the schema your server publishes and the instructions in
+your command or agent. Make required parameters required in the schema and
+describe them well; that is what makes the call come out right.
 
 ### Parameter Validation
 
@@ -317,7 +338,7 @@ Steps:
 **Good: Single query with filters**
 ```markdown
 Steps:
-1. Call mcp__plugin_api_server__search with filters:
+1. Call mcp__p_9b3e70c4d128af56be0913da__search with filters:
    - project_id: "123"
    - status: "active"
    - limit: 100
@@ -328,7 +349,7 @@ Steps:
 ```markdown
 Steps:
 1. For each item ID:
-   - Call mcp__plugin_api_server__get_item
+   - Call mcp__p_9b3e70c4d128af56be0913da__get_item
    - Process item
 ```
 
@@ -336,25 +357,29 @@ Steps:
 
 ```markdown
 Steps:
-1. Call expensive MCP operation: mcp__plugin_api_server__analyze
+1. Call expensive MCP operation: mcp__p_9b3e70c4d128af56be0913da__analyze
 2. Store results in variable for reuse
 3. Use cached results for subsequent operations
 4. Only re-fetch if data changes
 ```
 
-### Parallel Tool Calls
+### Independent Tool Calls
 
-When tools don't depend on each other, call in parallel:
+When calls do not depend on each other, say so — an instruction to fetch them
+together is what makes concurrency possible:
 
 ```markdown
 Steps:
-1. Make parallel calls (CrabCode handles this automatically):
-   - mcp__plugin_api_server__get_project
-   - mcp__plugin_api_server__get_users
-   - mcp__plugin_api_server__get_tags
-2. Wait for all to complete
-3. Combine results
+1. These three are independent; request them in one batch:
+   - mcp__p_9b3e70c4d128af56be0913da__get_project
+   - mcp__p_9b3e70c4d128af56be0913da__get_users
+   - mcp__p_9b3e70c4d128af56be0913da__get_tags
+2. Combine the results
 ```
+
+Whether they actually overlap depends on the model and the server; write the
+instruction so that batching is possible, and do not depend on it for
+correctness. Anything that must happen in order should be stated in order.
 
 ## Integration Best Practices
 
@@ -364,7 +389,7 @@ Steps:
 ```markdown
 Steps:
 1. Inform user: "Searching Asana tasks..."
-2. Call mcp__plugin_asana_asana__asana_search_tasks
+2. Call mcp__p_1f4c9a2be70d5836a1b4c7e2__search_tasks
 3. Show progress: "Found 15 tasks, analyzing..."
 4. Present results
 ```
@@ -452,10 +477,10 @@ Steps:
 ```markdown
 ---
 allowed-tools: [
-  "mcp__plugin_api_server__create_item",
-  "mcp__plugin_api_server__read_item",
-  "mcp__plugin_api_server__update_item",
-  "mcp__plugin_api_server__delete_item"
+  "mcp__p_9b3e70c4d128af56be0913da__create_item",
+  "mcp__p_9b3e70c4d128af56be0913da__read_item",
+  "mcp__p_9b3e70c4d128af56be0913da__update_item",
+  "mcp__p_9b3e70c4d128af56be0913da__delete_item"
 ]
 ---
 
@@ -478,7 +503,7 @@ Use delete_item with item ID (ask for confirmation first)...
 
 ```markdown
 Steps:
-1. **Search**: mcp__plugin_api_server__search with filters
+1. **Search**: mcp__p_9b3e70c4d128af56be0913da__search with filters
 2. **Filter**: Apply additional local filtering if needed
 3. **Transform**: Process each result
 4. **Present**: Format and display to user

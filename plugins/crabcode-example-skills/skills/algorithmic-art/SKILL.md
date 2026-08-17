@@ -1,5 +1,6 @@
 ---
 name: algorithmic-art
+display-name: 算法生成艺术
 description: "Create algorithmic art with p5.js, seeded randomness, and parameter exploration. Use this skill when the user requests generative art, flow fields, particle systems, or any code-driven aesthetic piece. Produce original algorithmic art rather than imitating any specific human artist's style."
 license: Apache-2.0. See ../../docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---

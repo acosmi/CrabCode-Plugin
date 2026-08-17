@@ -6,16 +6,33 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   verify:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: oven-sh/setup-bun@v2
+      - name: Lint GitHub Actions workflows
+        env:
+          ACTIONLINT_VERSION: 1.7.12
+          ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+        run: |
+          set -euo pipefail
+          ARCHIVE="${RUNNER_TEMP}/actionlint.tar.gz"
+          curl -fsSL --retry 4 --retry-all-errors \
+            -o "${ARCHIVE}" \
+            "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          printf '%s  %s\n' "${ACTIONLINT_SHA256}" "${ARCHIVE}" | sha256sum -c -
+          tar -xzf "${ARCHIVE}" -C "${RUNNER_TEMP}" actionlint
+          "${RUNNER_TEMP}/actionlint" .github/workflows/*.yml
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
-          bun-version: latest
+          bun-version: 1.3.11
 
       - run: bun install --frozen-lockfile
       - run: bun run typecheck
@@ -30,6 +47,97 @@ jobs:
       - name: Verify media-ops standalone bundle is committed
         run: git ls-files --error-unmatch plugins/crabcode-media-ops/dist/server.js
 
+  security-plugin:
+    runs-on: ${{ matrix.os }}
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+        python-version:
+          - "3.9"
+          - "3.13"
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.3.11
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - run: bun install --frozen-lockfile
+      - name: Fetch the immutable upstream source snapshot
+        env:
+          # Force the https transport so a tampered lock cannot select a
+          # remote-helper transport (e.g. ext::) that would execute a command.
+          GIT_ALLOW_PROTOCOL: https
+        run: |
+          # SOURCE-LOCK.json is repository-tracked and therefore attacker-controllable
+          # on a fork pull_request. Validate its values before handing them to git:
+          # require an https github.com URL free of shell/transport metacharacters and a
+          # bare 40-hex commit id. This blocks SSRF to arbitrary hosts, ext:: remote-helper
+          # execution, and argument/refspec injection via git fetch; well-formed but wrong
+          # content is still rejected downstream by the provenance verifier.
+          UPSTREAM_REPOSITORY="$(jq -r '.upstream.repository' plugins/crabcode-security/docs/legal/SOURCE-LOCK.json)"
+          UPSTREAM_COMMIT="$(jq -r '.upstream.commit' plugins/crabcode-security/docs/legal/SOURCE-LOCK.json)"
+          case "${UPSTREAM_REPOSITORY}" in
+            https://github.com/*) : ;;
+            *) echo "::error::Refusing to fetch: upstream.repository must be an https://github.com/ URL." >&2; exit 1 ;;
+          esac
+          case "${UPSTREAM_REPOSITORY}" in
+            *[!A-Za-z0-9:/._-]*) echo "::error::Refusing to fetch: upstream.repository has unexpected characters." >&2; exit 1 ;;
+          esac
+          case "${UPSTREAM_COMMIT}" in
+            "" | *[!0-9a-f]*) echo "::error::Refusing to fetch: upstream.commit must be a lowercase 40-hex commit id." >&2; exit 1 ;;
+          esac
+          if [ "${#UPSTREAM_COMMIT}" -ne 40 ]; then
+            echo "::error::Refusing to fetch: upstream.commit must be a lowercase 40-hex commit id." >&2
+            exit 1
+          fi
+          git init "${RUNNER_TEMP}/crabcode-security-upstream"
+          git -C "${RUNNER_TEMP}/crabcode-security-upstream" remote add origin "${UPSTREAM_REPOSITORY}"
+          git -C "${RUNNER_TEMP}/crabcode-security-upstream" -c protocol.ext.allow=never fetch --depth=1 origin "${UPSTREAM_COMMIT}"
+          git -C "${RUNNER_TEMP}/crabcode-security-upstream" checkout --detach FETCH_HEAD
+      - name: Verify upstream provenance and the complete target port
+        run: >-
+          bun run scripts/verify-crabcode-security-port.ts
+          "${RUNNER_TEMP}/crabcode-security-upstream"
+      - name: Verify the full port patch is reproducible
+        run: >-
+          bun run scripts/build-crabcode-security-port-patch.ts
+          --check
+          "${RUNNER_TEMP}/crabcode-security-upstream"
+      - run: bun test ./tests/crabcode-security/
+        env:
+          CRABCODE_SECURITY_UPSTREAM_CHECKOUT: ${{ runner.temp }}/crabcode-security-upstream
+      - run: sh -n plugins/crabcode-security/hooks/banner_hook.sh
+      - name: Byte-compile the plugin's Python sources
+        env:
+          # runner.temp is available at step scope (not job scope); keep py_compile
+          # bytecode out of the checked-out workspace.
+          PYTHONPYCACHEPREFIX: ${{ runner.temp }}/crabcode-security-pycache
+        run: >-
+          python -m py_compile
+          plugins/crabcode-security/hooks/banner_notice.py
+          plugins/crabcode-security/scripts/patch_artifacts.py
+          plugins/crabcode-security/scripts/render_report.py
+          plugins/crabcode-security/scripts/write_scan_meta.py
+      - name: Verify executable source files keep mode 100755
+        run: |
+          test "$(git ls-files -s plugins/crabcode-security/hooks/banner_hook.sh | cut -d' ' -f1)" = "100755"
+          test "$(git ls-files -s plugins/crabcode-security/hooks/banner_notice.py | cut -d' ' -f1)" = "100755"
+          test "$(git ls-files -s plugins/crabcode-security/scripts/patch_artifacts.py | cut -d' ' -f1)" = "100755"
+          test "$(git ls-files -s plugins/crabcode-security/scripts/render_report.py | cut -d' ' -f1)" = "100755"
+          test "$(git ls-files -s plugins/crabcode-security/scripts/write_scan_meta.py | cut -d' ' -f1)" = "100755"
+
   html-video-plugin:
     runs-on: ubuntu-latest
 
@@ -38,9 +146,9 @@ jobs:
         working-directory: plugins/crabcode-html-video
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: 1.3.11
 
@@ -65,17 +173,17 @@ jobs:
         working-directory: plugins/crabcode-media-ops
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # The Playwright container image ships without unzip, which oven-sh/setup-bun
       # needs to unpack the bun release archive. Without it setup-bun fails and the
       # whole job (check:distribution + QA) never runs on Linux. Install it first.
       # Verified against the pinned image by local container reproduction (audit 2026-07-18).
       - name: Install unzip (Playwright image lacks it; required by setup-bun)
         run: apt-get update && apt-get install -y --no-install-recommends unzip
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: 1.3.11
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
         with:
           distribution: temurin
           java-version: '21'
@@ -91,8 +199,46 @@ jobs:
       - run: bun run validate
       - name: Upload media QA evidence on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: media-ops-qa-evidence
           path: plugins/crabcode-media-ops/test-results
+          if-no-files-found: ignore
+
+  media-publisher-fixture:
+    runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
+      options: --ipc=host
+
+    defaults:
+      run:
+        working-directory: plugins/crabcode-media-publisher
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install unzip (required by setup-bun)
+        run: apt-get update && apt-get install -y --no-install-recommends unzip
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.3.11
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: bun install --frozen-lockfile
+      - run: bun run lint
+      - run: bun run test
+      - run: bun run qa:nu
+      - name: Run browser flows in the pinned Playwright runtime
+        env:
+          CRABPUBLISH_SKIP_VISUAL: '1'
+          PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+        run: bun run test:browser
+      - name: Upload publisher browser evidence on failure
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: media-publisher-browser-evidence
+          path: plugins/crabcode-media-publisher/test-results
           if-no-files-found: ignore

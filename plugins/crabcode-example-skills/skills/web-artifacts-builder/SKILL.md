@@ -1,5 +1,6 @@
 ---
 name: web-artifacts-builder
+display-name: 网页作品构建
 description: "Build complex, multi-component HTML artifacts using a modern frontend stack (React + Tailwind CSS + shadcn/ui). Use this skill when an artifact needs state management, routing, or shadcn/ui components. Avoid this skill for simple single-file HTML or JSX artifacts; those should ship as-is."
 license: Apache-2.0. See ../../docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---

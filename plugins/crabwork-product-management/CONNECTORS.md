@@ -10,11 +10,11 @@
 
 | 类别 | 占位符 | 内置服务 | 其它可选 |
 |---|---|---|---|
-| 日历 | `~~calendar` | Google Calendar | Microsoft 365 |
+| 日历 | `~~calendar` | — | Google Calendar、Microsoft 365 |
 | 聊天 | `~~chat` | Slack | Microsoft Teams |
 | 竞争情报 | `~~competitive intelligence` | Similarweb | Crayon、Klue |
 | 设计 | `~~design` | Figma | Sketch、Adobe XD |
-| 邮箱 | `~~email` | Gmail | Microsoft 365 |
+| 邮箱 | `~~email` | — | Gmail、Microsoft 365 |
 | 知识库 | `~~knowledge base` | Notion | Confluence、Guru、Coda |
 | 会议转录 | `~~meeting transcription` | Fireflies | Gong、Dovetail、Otter.ai |
 | 产品分析 | `~~product analytics` | Amplitude、Pendo | Mixpanel、Heap、FullStory |

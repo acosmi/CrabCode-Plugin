@@ -29,6 +29,11 @@ import {
   formatPresentationIssues,
   validatePresentation,
 } from "../src/policy/presentationValidator.ts";
+import {
+  formatVersionConsistencyIssues,
+  validateVersionConsistency,
+} from "../src/policy/versionConsistencyValidator.ts";
+import { formatDocFactsIssues, validateDocFacts } from "../src/policy/docFactsValidator.ts";
 
 const root = path.resolve(process.argv[2] ?? ".");
 
@@ -58,6 +63,13 @@ if (marketplace.length > 0) {
   hasOutput = true;
   process.stderr.write(`[marketplace]\n${formatMarketplaceIssues(marketplace, root)}\n`);
   if (marketplace.some((issue) => issue.severity === "error")) hasError = true;
+}
+
+const versions = await validateVersionConsistency(root);
+if (versions.length > 0) {
+  hasOutput = true;
+  process.stderr.write(`[versions]\n${formatVersionConsistencyIssues(versions, root)}\n`);
+  if (versions.some((issue) => issue.severity === "error")) hasError = true;
 }
 
 const presentation = await validatePresentation(root);
@@ -93,6 +105,13 @@ if (mcpContract.length > 0) {
   hasOutput = true;
   process.stderr.write(`[mcp-contract]\n${formatMcpContractIssues(mcpContract, root)}\n`);
   if (mcpContract.some((issue) => issue.severity === "error")) hasError = true;
+}
+
+const docFacts = await validateDocFacts(root);
+if (docFacts.length > 0) {
+  hasOutput = true;
+  process.stderr.write(`[doc-facts]\n${formatDocFactsIssues(docFacts, root)}\n`);
+  if (docFacts.some((issue) => issue.severity === "error")) hasError = true;
 }
 
 if (!hasOutput) {

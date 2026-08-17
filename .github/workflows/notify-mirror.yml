@@ -1,44 +1,377 @@
-name: Notify CN mirror (plugins)
+name: Audit CN mirror freshness
 
-# 推送 main 后即时通知 acosmi/crabcode-source 运行 sync-plugins-to-mirror,
-# 把本仓打包同步到中国镜像 updates.acosmi.com/crabcode/plugins/crabcode-plugins-official/
-# ({sha}.zip + latest 指针 + marketplace.json)。
-#
-# 双轨触发(与 crabcode TUI 镜像同构,见 cloud-agent infra/mirror/crabcode/README.md):
-#   - 本 workflow(即时):需要 secret `MIRROR_DISPATCH_TOKEN`——对 acosmi/crabcode-source
-#     有 contents:write 的 fine-grained PAT(或 repo scope 的 classic PAT)。
-#     未配置时安静跳过(绿色,不阻塞 CI),同步退化为下面的轮询兜底。
-#   - crabcode-source 的 30 分钟轮询(兜底):无需本仓任何 secret,镜像最迟 30 分钟追平。
-#
-# 配置即时触发(可选,一次性):
-#   gh secret set MIRROR_DISPATCH_TOKEN -R acosmi/CrabCode-Plugin
+# The deployment credentials stay in the private acosmi/crabcode-source repository.
+# This public workflow is deliberately read-only. Manual audits require the newest
+# successful main CI release immediately; scheduled audits allow an explicit eight-hour
+# publication SLO, then fail hard. Every accepted pointer is still checked against a
+# successful CI run and byte-compared with its exact source commit.
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch: {}
+  # The private publisher polls at 01:23/07:23/13:23/19:23 UTC. Audit after it has
+  # had ample time to publish while keeping public and private schedules decoupled.
+  schedule:
+    - cron: '47 2,8,14,20 * * *'
 
 permissions:
+  actions: read
   contents: read
 
+concurrency:
+  group: audit-cn-plugin-mirror
+  cancel-in-progress: true
+
 jobs:
-  dispatch:
+  audit:
+    name: Verify latest green release on CN mirror
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
+    env:
+      MIRROR_BASE: https://updates.acosmi.com/crabcode/plugins/crabcode-plugins-official
+      ARCHIVE_PREFIX: marketplaces/crabcode-plugins-official/
+      FRESHNESS_SLO_SECONDS: 28800
+
     steps:
-      - name: Dispatch sync-plugins-to-mirror @ crabcode-source
+      - name: Resolve the latest successful main CI release
+        id: release
         env:
-          TOKEN: ${{ secrets.MIRROR_DISPATCH_TOKEN }}
-          SHA: ${{ github.sha }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          if [ -z "${TOKEN}" ]; then
-            echo "::notice::MIRROR_DISPATCH_TOKEN 未配置 → 跳过即时触发;crabcode-source 每 30 分钟轮询会自动追平镜像。配置该 secret 后推送即秒级同步。"
-            exit 0
+          RUNS="${RUNNER_TEMP}/ci-runs.json"
+          curl -fsSL --retry 4 --retry-all-errors \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -o "${RUNS}" \
+            'https://api.github.com/repos/acosmi/CrabCode-Plugin/actions/workflows/ci.yml/runs?branch=main&event=push&per_page=100'
+          read -r SHA CI_URL < <(python3 - "${RUNS}" <<'PY'
+          import json, re, sys
+          runs = json.load(open(sys.argv[1], encoding="utf-8")).get("workflow_runs", [])
+          successful = [
+              item for item in runs
+              if item.get("status") == "completed" and item.get("conclusion") == "success"
+          ]
+          successful.sort(key=lambda item: item.get("created_at", ""), reverse=True)
+          run = successful[0] if successful else None
+          if run is None or not re.fullmatch(r"[0-9a-f]{40}", str(run.get("head_sha", ""))):
+              raise SystemExit("no successful main push CI run with a valid SHA")
+          print(run["head_sha"], run["html_url"])
+          PY
+          )
+          {
+            echo "latest_sha=${SHA}"
+            echo "latest_ci_url=${CI_URL}"
+          } >> "${GITHUB_OUTPUT}"
+          echo "Latest successful release is ${SHA} from ${CI_URL}"
+
+      - name: Validate the served pointer and freshness SLO
+        id: target
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          LATEST_SHA: ${{ steps.release.outputs.latest_sha }}
+        run: |
+          set -euo pipefail
+          WORK="${RUNNER_TEMP}/mirror-audit"
+          mkdir -p "${WORK}"
+          curl -fsSL --proto '=https' --proto-redir '=https' \
+            --retry 5 --retry-all-errors --connect-timeout 10 --max-time 120 \
+            -H 'Cache-Control: no-cache' \
+            -D "${WORK}/latest.headers" -o "${WORK}/latest" "${MIRROR_BASE}/latest"
+          POINTER="$(python3 - "${WORK}/latest" <<'PY'
+          import pathlib, re, sys
+          raw = pathlib.Path(sys.argv[1]).read_bytes()
+          if re.fullmatch(b"[0-9a-f]{40}", raw) is None:
+              raise SystemExit(f"mirror latest is not exactly one 40-byte lowercase SHA: {raw!r}")
+          print(raw.decode("ascii"))
+          PY
+          )"
+          read -r TARGET_SHA TARGET_CI_URL FRESHNESS PENDING_SHA PENDING_AGE < <(
+            python3 - "${RUNNER_TEMP}/ci-runs.json" "${POINTER}" "${EVENT_NAME}" \
+              "${FRESHNESS_SLO_SECONDS}" "${LATEST_SHA}" <<'PY'
+          import datetime, json, re, sys
+          runs_path, pointer, event_name, slo_raw, latest_sha = sys.argv[1:]
+          if not re.fullmatch(r"[0-9a-f]{40}", pointer):
+              raise SystemExit(f"mirror latest is not a valid SHA: {pointer!r}")
+          runs = json.load(open(runs_path, encoding="utf-8")).get("workflow_runs", [])
+          successful = [
+              item for item in runs
+              if item.get("status") == "completed" and item.get("conclusion") == "success"
+          ]
+          successful.sort(key=lambda item: item.get("created_at", ""), reverse=True)
+          target_index = next((i for i, item in enumerate(successful) if item.get("head_sha") == pointer), None)
+          if target_index is None:
+              raise SystemExit("mirror pointer does not identify a successful main push CI run in the last 100 runs")
+          target = successful[target_index]
+          freshness = "exact"
+          pending_sha = "none"
+          pending_age = 0
+          if pointer != latest_sha:
+              if event_name == "workflow_dispatch":
+                  raise SystemExit(f"manual audit requires latest green {latest_sha}, mirror serves {pointer}")
+              newer = [item for item in successful[:target_index] if item.get("head_sha") != pointer]
+              if not newer:
+                  raise SystemExit("latest green differs from mirror but no newer successful run was found")
+              oldest_pending = newer[-1]
+              completed = datetime.datetime.fromisoformat(oldest_pending["updated_at"].replace("Z", "+00:00"))
+              pending_age = max(0, int((datetime.datetime.now(datetime.timezone.utc) - completed).total_seconds()))
+              pending_sha = oldest_pending["head_sha"]
+              slo = int(slo_raw)
+              if pending_age > slo:
+                  raise SystemExit(f"mirror is stale: pending green {pending_sha} has waited {pending_age}s (SLO {slo}s)")
+              freshness = f"publication-grace-{pending_age}s"
+          print(pointer, target["html_url"], freshness, pending_sha, pending_age)
+          PY
+          )
+          {
+            echo "sha=${TARGET_SHA}"
+            echo "ci_url=${TARGET_CI_URL}"
+            echo "freshness=${FRESHNESS}"
+            echo "pending_sha=${PENDING_SHA}"
+            echo "pending_age=${PENDING_AGE}"
+          } >> "${GITHUB_OUTPUT}"
+          if [ "${FRESHNESS}" != exact ]; then
+            echo "::warning::Mirror serves ${TARGET_SHA}; pending green ${PENDING_SHA} has waited ${PENDING_AGE}s within the ${FRESHNESS_SLO_SECONDS}s publication SLO."
           fi
-          curl -fsS -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${TOKEN}" \
-            https://api.github.com/repos/acosmi/crabcode-source/dispatches \
-            -d "{\"event_type\":\"crabcode-plugins-updated\",\"client_payload\":{\"sha\":\"${SHA}\"}}"
-          echo "已派发 crabcode-plugins-updated (sha=${SHA})"
+
+      - name: Check out the exact release for byte-level comparison
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.target.outputs.sha }}
+          path: expected-source
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Verify mirror pointer, index, archive, and path safety
+        env:
+          SHA: ${{ steps.target.outputs.sha }}
+          CI_URL: ${{ steps.target.outputs.ci_url }}
+          FRESHNESS: ${{ steps.target.outputs.freshness }}
+          PENDING_SHA: ${{ steps.target.outputs.pending_sha }}
+          PENDING_AGE: ${{ steps.target.outputs.pending_age }}
+          LATEST_SHA: ${{ steps.release.outputs.latest_sha }}
+          LATEST_CI_URL: ${{ steps.release.outputs.latest_ci_url }}
+        run: |
+          set -euo pipefail
+          WORK="${RUNNER_TEMP}/mirror-audit"
+          mkdir -p "${WORK}"
+          FAIL_HINT="Run: gh workflow run sync-plugins-to-mirror.yml -R acosmi/crabcode-source"
+          fetch() {
+            curl -fsSL --proto '=https' --proto-redir '=https' \
+              --retry 5 --retry-all-errors --connect-timeout 10 --max-time 120 "$@"
+          }
+          fail() {
+            echo "::error::$1"
+            echo "${FAIL_HINT}"
+            exit 1
+          }
+
+          fetch -D "${WORK}/marketplace.headers" -o "${WORK}/marketplace.json" "${MIRROR_BASE}/marketplace.json" \
+            || fail "mirror marketplace.json is unreachable"
+          cmp -s expected-source/.crabcode-plugin/marketplace.json "${WORK}/marketplace.json" \
+            || fail "mirror marketplace.json does not byte-match ${SHA}"
+
+          fetch -D "${WORK}/zip.headers" -o "${WORK}/${SHA}.zip" "${MIRROR_BASE}/${SHA}.zip" \
+            || fail "mirror archive ${SHA}.zip is unreachable"
+          fetch -o "${WORK}/${SHA}.zip.sha256" "${MIRROR_BASE}/${SHA}.zip.sha256" \
+            || fail "mirror archive checksum ${SHA}.zip.sha256 is unreachable"
+          fetch -D "${WORK}/marketplace-checksum.headers" -o "${WORK}/marketplace.json.sha256" "${MIRROR_BASE}/marketplace.json.sha256" \
+            || fail "mirror marketplace checksum is unreachable"
+          python3 - "${WORK}/latest.headers" "${WORK}/marketplace.headers" "${WORK}/marketplace-checksum.headers" <<'PY' \
+            || fail "mutable mirror responses advertise an unsafe cache lifetime"
+          import pathlib, re, sys
+          for raw_path in sys.argv[1:]:
+              path = pathlib.Path(raw_path)
+              headers = path.read_text(encoding="iso-8859-1").lower()
+              cache_lines = re.findall(r"^cache-control:\s*(.+)$", headers, flags=re.MULTILINE)
+              directives = ",".join(cache_lines)
+              parts = {part.strip() for part in directives.split(",")}
+              if "immutable" in directives:
+                  raise SystemExit(f"mutable response is immutable: {path.name}")
+              ages = [
+                  int(value)
+                  for value in re.findall(r"(?:s-maxage|max-age)\s*=\s*\"?(\d+)\"?", directives)
+              ]
+              if not ({"no-store", "no-cache"} & parts) and not ages:
+                  raise SystemExit(f"mutable response lacks an explicit safe freshness policy: {path.name}")
+              if ages and max(ages) > 300:
+                  raise SystemExit(f"mutable response cache lifetime exceeds 300s: {path.name}")
+              if path.name == "latest.headers" and not ({"no-store", "no-cache"} & parts):
+                  raise SystemExit("latest must require revalidation via no-cache or no-store")
+          PY
+          python3 - "${WORK}/zip.headers" <<'PY' \
+            || fail "content-addressed ZIP lacks a one-year immutable cache policy"
+          import pathlib, re, sys
+          headers = pathlib.Path(sys.argv[1]).read_text(encoding="iso-8859-1").lower()
+          directives = ",".join(re.findall(r"^cache-control:\s*(.+)$", headers, flags=re.MULTILINE))
+          ages = [int(value) for value in re.findall(r"max-age\s*=\s*\"?(\d+)\"?", directives)]
+          if "immutable" not in directives or not ages or min(ages) < 31_536_000:
+              raise SystemExit("unsafe ZIP cache policy")
+          PY
+          python3 - "${WORK}" "${SHA}" <<'PY' \
+            || fail "published checksum files are unsafe or do not match mirror bytes"
+          import hashlib, pathlib, re, sys
+          work, sha = pathlib.Path(sys.argv[1]), sys.argv[2]
+          for checksum_name, payload_name in (
+              (f"{sha}.zip.sha256", f"{sha}.zip"),
+              ("marketplace.json.sha256", "marketplace.json"),
+          ):
+              line = (work / checksum_name).read_text(encoding="ascii")
+              match = re.fullmatch(r"([0-9a-f]{64})  ([A-Za-z0-9._-]+)\n?", line)
+              if match is None or match.group(2) != payload_name:
+                  raise SystemExit(f"invalid checksum record: {checksum_name}")
+              actual = hashlib.sha256((work / payload_name).read_bytes()).hexdigest()
+              if actual != match.group(1):
+                  raise SystemExit(f"checksum mismatch: {payload_name}")
+          PY
+          unzip -tq "${WORK}/${SHA}.zip" >/dev/null \
+            || fail "mirror archive ${SHA}.zip failed CRC validation"
+          python3 - "${WORK}/${SHA}.zip" expected-source "${ARCHIVE_PREFIX}" <<'PY'
+          import json, pathlib, stat, sys, zipfile
+
+          archive = pathlib.Path(sys.argv[1])
+          source = pathlib.Path(sys.argv[2])
+          prefix = sys.argv[3].rstrip("/") + "/"
+
+          # Mirror distribution trim manifest (W-PLUGIN-MIRROR-SLIM, 2026-08-16).
+          # The publisher (acosmi/crabcode-source sync-plugins-to-mirror.yml) reads
+          # the SAME file from the SAME commit it packs; we read it from the exact
+          # checkout of the served SHA, so both sides derive their file sets from
+          # one source and cannot diverge — the opposite of the one-sided contract
+          # upgrades that broke this audit three times before. Absent manifest =
+          # no exclusions = the legacy full-tree contract, byte for byte.
+          # Safety rail (mirrored on the publisher side): every exclude prefix must
+          # contain "/tests/", so the manifest can only ever carve out test assets,
+          # never runtime content (plugin manifests / dist / skills).
+          manifest_path = source / ".crabcode-plugin" / "mirror-distribution.json"
+          exclude_prefixes = []
+          if manifest_path.exists():
+              manifest = json.load(manifest_path.open(encoding="utf-8"))
+              exclude_prefixes = manifest.get("excludePrefixes", [])
+              if not isinstance(exclude_prefixes, list) or not all(
+                  isinstance(p, str) for p in exclude_prefixes
+              ):
+                  raise SystemExit("mirror-distribution excludePrefixes must be a string array")
+              for p in exclude_prefixes:
+                  if "/tests/" not in p:
+                      raise SystemExit(f"mirror-distribution exclude prefix must stay under /tests/: {p}")
+                  if p.startswith("/") or "\\" in p or ".." in p.split("/"):
+                      raise SystemExit(f"mirror-distribution exclude prefix must be repo-relative POSIX: {p}")
+          with zipfile.ZipFile(archive) as bundle:
+              all_infos = bundle.infolist()
+              if not all_infos or len({item.filename for item in all_infos}) != len(all_infos):
+                  raise SystemExit("archive is empty or contains duplicate names")
+              for info in all_infos:
+                  pure = pathlib.PurePosixPath(info.filename)
+                  mode = info.external_attr >> 16
+                  if (info.filename.startswith("/") or "\\" in info.filename or ".." in pure.parts
+                          or not info.filename.startswith(prefix) or stat.S_ISLNK(mode)):
+                      raise SystemExit(f"unsafe archive entry: {info.filename}")
+              archived = {
+                  info.filename[len(prefix):]: info
+                  for info in all_infos if not info.is_dir()
+              }
+              local = {}
+              excluded_count = 0
+              for path in source.rglob("*"):
+                  if path.is_symlink():
+                      raise SystemExit(f"release source contains unsupported symlink: {path}")
+                  if not path.is_file() or ".git" in path.parts:
+                      continue
+                  rel = path.relative_to(source).as_posix()
+                  if any(rel.startswith(p) for p in exclude_prefixes):
+                      excluded_count += 1
+                      continue
+                  local[rel] = path
+              if set(local) != set(archived):
+                  missing = sorted(set(local) - set(archived))[:20]
+                  extra = sorted(set(archived) - set(local))[:20]
+                  raise SystemExit(f"archive file set mismatch; missing={missing} extra={extra}")
+              if exclude_prefixes:
+                  print(f"mirror-distribution trim: {excluded_count} files excluded from the expected set")
+              for name, path in local.items():
+                  info = archived[name]
+                  if path.read_bytes() != bundle.read(info):
+                      raise SystemExit(f"archive content mismatch: {name}")
+                  local_exec = bool(path.stat().st_mode & stat.S_IXUSR)
+                  archive_exec = bool((info.external_attr >> 16) & stat.S_IXUSR)
+                  if local_exec != archive_exec:
+                      raise SystemExit(f"archive executable mode mismatch: {name}")
+          print(f"verified archive files={len(local)} prefix={prefix}")
+          PY
+
+          fetch -D "${WORK}/marketplace.final.headers" \
+            -o "${WORK}/marketplace.final.json" \
+            "${MIRROR_BASE}/marketplace.json" \
+            || fail "mirror marketplace.json became unreachable during the audit"
+          fetch -D "${WORK}/marketplace-checksum.final.headers" \
+            -o "${WORK}/marketplace.final.json.sha256" \
+            "${MIRROR_BASE}/marketplace.json.sha256" \
+            || fail "mirror marketplace checksum became unreachable during the audit"
+          cmp -s expected-source/.crabcode-plugin/marketplace.json "${WORK}/marketplace.final.json" \
+            || fail "mirror marketplace.json changed during the audit"
+          python3 - "${WORK}/marketplace.final.json" "${WORK}/marketplace.final.json.sha256" <<'PY' \
+            || fail "mirror marketplace checksum changed during the audit"
+          import hashlib, pathlib, re, sys
+          payload = pathlib.Path(sys.argv[1])
+          checksum = pathlib.Path(sys.argv[2]).read_text(encoding="ascii")
+          match = re.fullmatch(r"([0-9a-f]{64})  marketplace\.json\n?", checksum)
+          if match is None or match.group(1) != hashlib.sha256(payload.read_bytes()).hexdigest():
+              raise SystemExit("final marketplace checksum mismatch")
+          PY
+          fetch -H 'Cache-Control: no-cache' \
+            -D "${WORK}/latest.final.headers" \
+            -o "${WORK}/latest.final" \
+            "${MIRROR_BASE}/latest" \
+            || fail "mirror latest became unreachable during the audit"
+          python3 - \
+            "${WORK}/latest.final" \
+            "${WORK}/latest.final.headers" \
+            "${WORK}/marketplace.final.headers" \
+            "${WORK}/marketplace-checksum.final.headers" \
+            "${SHA}" <<'PY' \
+            || fail "mutable mirror state or cache policy changed during the audit"
+          import pathlib, re, sys
+          pointer_path = pathlib.Path(sys.argv[1])
+          latest_headers_path = pathlib.Path(sys.argv[2])
+          mutable_headers = [pathlib.Path(value) for value in sys.argv[2:5]]
+          expected = sys.argv[5]
+          raw = pointer_path.read_bytes()
+          if raw != expected.encode("ascii"):
+              raise SystemExit(f"mirror latest changed during audit: {raw!r}")
+          for headers_path in mutable_headers:
+              headers = headers_path.read_text(encoding="iso-8859-1").lower()
+              cache_lines = re.findall(r"^cache-control:\s*(.+)$", headers, flags=re.MULTILINE)
+              directives = ",".join(cache_lines)
+              parts = {part.strip() for part in directives.split(",")}
+              ages = [
+                  int(value)
+                  for value in re.findall(r"(?:s-maxage|max-age)\s*=\s*\"?(\d+)\"?", directives)
+              ]
+              if "immutable" in directives:
+                  raise SystemExit(f"mutable response became immutable: {headers_path.name}")
+              if not ({"no-store", "no-cache"} & parts) and not ages:
+                  raise SystemExit(f"mutable response lost explicit freshness: {headers_path.name}")
+              if ages and max(ages) > 300:
+                  raise SystemExit(f"mutable response cache lifetime exceeds 300s: {headers_path.name}")
+              if headers_path == latest_headers_path and not ({"no-store", "no-cache"} & parts):
+                  raise SystemExit("mirror latest no longer requires revalidation")
+          PY
+
+          ZIP_SHA256="$(sha256sum "${WORK}/${SHA}.zip" | cut -d' ' -f1)"
+          INDEX_SHA256="$(sha256sum "${WORK}/marketplace.json" | cut -d' ' -f1)"
+          PLUGINS="$(python3 -c 'import json,sys; print(len(json.load(open(sys.argv[1]))["plugins"]))' "${WORK}/marketplace.json")"
+          {
+            echo '## CN plugin mirror audit'
+            echo
+            echo "- served source CI: ${CI_URL}"
+            echo "- served release SHA: \`${SHA}\`"
+            echo "- newest successful CI: ${LATEST_CI_URL}"
+            echo "- newest successful SHA: \`${LATEST_SHA}\`"
+            echo "- freshness state: \`${FRESHNESS}\`"
+            echo "- oldest pending SHA: \`${PENDING_SHA}\`"
+            echo "- oldest pending age (seconds): \`${PENDING_AGE}\`"
+            echo "- plugins: ${PLUGINS}"
+            echo "- ZIP SHA-256: \`${ZIP_SHA256}\`"
+            echo "- marketplace SHA-256: \`${INDEX_SHA256}\`"
+          } >> "${GITHUB_STEP_SUMMARY}"
+          echo "Mirror is healthy and matches ${SHA}."

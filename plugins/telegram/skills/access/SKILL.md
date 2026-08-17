@@ -1,5 +1,6 @@
 ---
 name: access
+display-name: Telegram 访问管理
 description: Manage Telegram channel access — approve pairings, edit allowlists, set DM/group policy. Use when the user asks to pair, approve someone, check who's allowed, or change policy for the Telegram channel.
 user-invocable: true
 allowed-tools:

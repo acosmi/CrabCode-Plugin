@@ -14,7 +14,7 @@ Block dangerous file writes using prompt-based hooks:
       "hooks": [
         {
           "type": "prompt",
-          "prompt": "File path: $TOOL_INPUT.file_path. Verify: 1) Not in /etc or system directories 2) Not .env or credentials 3) Path doesn't contain '..' traversal. Return 'approve' or 'deny'."
+          "prompt": "Read .tool_input.file_path from the payload below. Verify: 1) Not in /etc or system directories 2) Not .env or credentials 3) Path doesn't contain '..' traversal. Answer approve or block. $ARGUMENTS"
         }
       ]
     }
@@ -161,7 +161,7 @@ Ask user before dangerous operations:
       "hooks": [
         {
           "type": "prompt",
-          "prompt": "Command: $TOOL_INPUT.command. If command contains 'rm', 'delete', 'drop', or other destructive operations, return 'ask' to confirm with user. Otherwise 'approve'."
+          "prompt": "Read .tool_input.command from the payload below. If it contains 'rm', 'delete', 'drop', or other destructive operations, answer ask to confirm with the user. Otherwise answer approve. $ARGUMENTS"
         }
       ]
     }
@@ -295,7 +295,10 @@ rm .enable-security-scan
 - Project-specific validation that's opt-in
 - Performance-intensive checks only when needed
 
-**Note:** Must restart CrabCode after creating/removing flag files for hooks to recognize changes.
+**Note:** No restart is needed. The hook tests for the flag file every time it
+runs, so creating or removing the file takes effect on the next invocation —
+that immediacy is the point of the pattern. A reload (`/reload-plugins`) is
+only needed when you change `hooks.json` itself.
 
 ## Pattern 10: Configuration-Driven Hooks
 
@@ -325,7 +328,7 @@ input=$(cat)
 file_size=$(echo "$input" | jq -r '.tool_input.content | length')
 
 if [ "$file_size" -gt "$max_file_size" ]; then
-  echo '{"decision": "deny", "reason": "File exceeds configured size limit"}' >&2
+  echo "File exceeds configured size limit" >&2
   exit 2
 fi
 ```

@@ -1,6 +1,6 @@
 {
   "name": "hookify",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CrabCode hookify plugin (TypeScript port).",
   "license": "MIT",
   "type": "module",

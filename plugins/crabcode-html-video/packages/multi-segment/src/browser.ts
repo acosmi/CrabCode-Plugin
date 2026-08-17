@@ -2,16 +2,11 @@ import { accessSync, constants, existsSync, mkdirSync, readdirSync, statSync } f
 import { join } from 'node:path'
 import { delimiter } from 'node:path'
 import { spawnSync } from 'node:child_process'
+import { EXTERNAL_BINARY_PROBE_TIMEOUT_MS } from './probeTimeout.ts'
 
 // Keep this aligned with puppeteer-core's PUPPETEER_REVISIONS in the frozen
 // @hyperframes/producer dependency graph.
 export const PINNED_CHROME_VERSION = '150.0.7871.24'
-
-export interface BrowserResolveResult {
-  path: string | null
-  source: 'env' | 'cache' | 'system' | 'missing'
-  message: string
-}
 
 export interface BrowserProbeResult {
   ok: boolean
@@ -19,11 +14,38 @@ export interface BrowserProbeResult {
   error?: string
 }
 
+export interface BrowserResolveResult {
+  path: string | null
+  source: 'env' | 'cache' | 'system' | 'missing'
+  message: string
+  /**
+   * The successful `--version` probe that qualified `path`, or null when no
+   * browser was resolved. Resolution never returns a binary it has not probed,
+   * so callers that need the version line must read it from here instead of
+   * spawning the browser a second time.
+   */
+  probe: BrowserProbeResult | null
+}
+
+interface ProbedBinary {
+  path: string
+  probe: BrowserProbeResult
+}
+
+/** Accept a candidate only if it identifies itself as Chrome/Chromium, keeping the probe. */
+function probeCandidate(path: string): ProbedBinary | null {
+  const probe = probeBrowserExecutable(path)
+  return probe.ok ? { path, probe } : null
+}
+
 /** Reject arbitrary executable files masquerading as a configured browser. */
 export function probeBrowserExecutable(path: string): BrowserProbeResult {
   if (!isExecutableFile(path)) return { ok: false, versionLine: null, error: 'not an executable file' }
   try {
-    const result = spawnSync(path, ['--version'], { encoding: 'utf8', timeout: 10_000 })
+    const result = spawnSync(path, ['--version'], {
+      encoding: 'utf8',
+      timeout: EXTERNAL_BINARY_PROBE_TIMEOUT_MS,
+    })
     const versionLine = `${result.stdout || ''}\n${result.stderr || ''}`
       .split('\n')
       .map((line) => line.trim())
@@ -60,8 +82,9 @@ export function resolveBrowserPath(cacheDir?: string): BrowserResolveResult {
     process.env.PRODUCER_HEADLESS_SHELL_PATH ||
     process.env.PUPPETEER_EXECUTABLE_PATH ||
     process.env.CHROME_PATH
-  if (env && probeBrowserExecutable(env).ok) {
-    return { path: env, source: 'env', message: `Using browser from env: ${env}` }
+  const fromEnv = env ? probeCandidate(env) : null
+  if (fromEnv) {
+    return { ...fromEnv, source: 'env', message: `Using browser from env: ${fromEnv.path}` }
   }
 
   const roots = [
@@ -72,7 +95,7 @@ export function resolveBrowserPath(cacheDir?: string): BrowserResolveResult {
   for (const root of roots) {
     const found = findBinary(root, CHROME_NAMES, PINNED_CHROME_VERSION)
     if (found) {
-      return { path: found, source: 'cache', message: `Found browser in cache: ${found}` }
+      return { ...found, source: 'cache', message: `Found browser in cache: ${found.path}` }
     }
   }
 
@@ -83,8 +106,10 @@ export function resolveBrowserPath(cacheDir?: string): BrowserResolveResult {
     'google-chrome',
     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
   ]) {
-    const executable = name.startsWith('/') ? (probeBrowserExecutable(name).ok ? name : null) : findExecutableOnPath(name)
-    if (executable) return { path: executable, source: 'system', message: `Using system browser: ${executable}` }
+    const executable = name.startsWith('/') ? probeCandidate(name) : findExecutableOnPath(name)
+    if (executable) {
+      return { ...executable, source: 'system', message: `Using system browser: ${executable.path}` }
+    }
   }
 
   return {
@@ -92,10 +117,11 @@ export function resolveBrowserPath(cacheDir?: string): BrowserResolveResult {
     source: 'missing',
     message:
       'No browser found. Run doctor to download chrome-headless-shell (npmmirror mirror supported), or set HYPERFRAMES_BROWSER_PATH.',
+    probe: null,
   }
 }
 
-function findBinary(root: string, names: string[], requiredVersion?: string): string | null {
+function findBinary(root: string, names: string[], requiredVersion?: string): ProbedBinary | null {
   if (!existsSync(root)) return null
   const wanted = new Set(names)
   const pending = [root]
@@ -114,20 +140,22 @@ function findBinary(root: string, names: string[], requiredVersion?: string): st
       if (
         entry.isFile() &&
         wanted.has(entry.name) &&
-        (!requiredVersion || candidate.includes(requiredVersion)) &&
-        probeBrowserExecutable(candidate).ok
-      ) return candidate
+        (!requiredVersion || candidate.includes(requiredVersion))
+      ) {
+        const probed = probeCandidate(candidate)
+        if (probed) return probed
+      }
       if (entry.isDirectory()) pending.push(candidate)
     }
   }
   return null
 }
 
-function findExecutableOnPath(name: string): string | null {
+function findExecutableOnPath(name: string): ProbedBinary | null {
   for (const root of (process.env.PATH || '').split(delimiter)) {
     if (!root) continue
-    const candidate = join(root, process.platform === 'win32' ? `${name}.exe` : name)
-    if (probeBrowserExecutable(candidate).ok) return candidate
+    const probed = probeCandidate(join(root, process.platform === 'win32' ? `${name}.exe` : name))
+    if (probed) return probed
   }
   return null
 }
@@ -192,16 +220,18 @@ export async function ensureBrowser(opts: EnsureBrowserOptions): Promise<Browser
         if (total > 0) log(`download ${Math.floor((downloaded / total) * 100)}%`)
       },
     })
-    if (installed.executablePath && probeBrowserExecutable(installed.executablePath).ok) {
-      process.env.HYPERFRAMES_BROWSER_PATH = installed.executablePath
-      process.env.PRODUCER_HEADLESS_SHELL_PATH = installed.executablePath
-      return { path: installed.executablePath, source: 'cache', message: `Installed browser: ${installed.executablePath}` }
+    const probed = installed.executablePath ? probeCandidate(installed.executablePath) : null
+    if (probed) {
+      process.env.HYPERFRAMES_BROWSER_PATH = probed.path
+      process.env.PRODUCER_HEADLESS_SHELL_PATH = probed.path
+      return { ...probed, source: 'cache', message: `Installed browser: ${probed.path}` }
     }
   } catch (error) {
     return {
       path: null,
       source: 'missing',
       message: `Browser install failed: ${error instanceof Error ? error.message : String(error)}. Set HYPERFRAMES_BROWSER_PATH or install chromium manually.`,
+      probe: null,
     }
   }
 
@@ -217,6 +247,7 @@ export async function ensureBrowser(opts: EnsureBrowserOptions): Promise<Browser
     path: null,
     source: 'missing',
     message: 'Browser install reported success but binary not found in cache.',
+    probe: null,
   }
 }
 

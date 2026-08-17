@@ -1,5 +1,6 @@
 ---
 name: video-frames
+display-name: 视频帧生成
 description: >
   按 content-graph 拓扑顺序为每个节点生成独立单文件 HTML 帧。
   动画必须可 seek（作者侧仅 CSS @keyframes）；禁止脚本、rAF/setTimeout。渲染前用 lintFrame/previewFrame 自检。

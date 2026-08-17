@@ -1,5 +1,6 @@
 ---
 name: brand-guidelines
+display-name: 品牌视觉规范
 description: "Apply a project-specific visual identity (color palette, typography, accent shapes) to an artifact such as a presentation, document, slide deck, or HTML page. Use this skill when the user asks to apply a brand or style guide, when artifacts must follow a corporate visual identity, or when a deck needs consistent post-processing for colors and fonts. This skill is a workflow template; supply the actual brand assets through configuration."
 license: Apache-2.0. See ../../docs/legal/THIRD_PARTY_NOTICES.md for source attribution.
 ---

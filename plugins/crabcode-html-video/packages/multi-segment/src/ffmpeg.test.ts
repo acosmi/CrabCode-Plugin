@@ -10,8 +10,19 @@ import {
   resolveFfmpegPath,
   runFfmpeg,
 } from './ffmpeg.ts'
+import { EXTERNAL_BINARY_PROBE_TIMEOUT_MS } from './probeTimeout.ts'
 
-const ffmpegAvailable = spawnSync(resolveFfmpegPath(), ['-version'], { timeout: 5000 }).status === 0
+const ffmpegAvailable =
+  spawnSync(resolveFfmpegPath(), ['-version'], { timeout: EXTERNAL_BINARY_PROBE_TIMEOUT_MS }).status === 0
+// Skipping is how this file loses coverage, and a skipped test never turns the
+// job red. On CI a missing ffmpeg is a broken image rather than an environment
+// difference worth tolerating, so say so loudly instead of covering less in
+// silence. Locally (no CI) the skip stands.
+if (process.env.CI && !ffmpegAvailable) {
+  throw new Error(
+    'CI requires a runnable ffmpeg: a failed probe here means lost coverage, not a benign environment difference',
+  )
+}
 const mediaTest = ffmpegAvailable ? test : test.skip
 
 describe('audio mux duration contract', () => {

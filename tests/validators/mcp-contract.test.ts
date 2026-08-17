@@ -79,22 +79,70 @@ describe("mcp contract validator", () => {
     expect(messages).toContain("raw LSP proxy");
   });
 
+  // Anchored on LSP_PROXY_BASELINE rather than EMPTY_URL_BASELINE: the empty-URL
+  // baseline is being ratcheted to zero as the crabwork connectors get real URLs,
+  // and a fixture that names a member of an emptied baseline would break the moment
+  // the last entry is removed. The downgrade/stale machinery is shared by all five
+  // baselines, so any populated one exercises it.
   test("downgrades legacy baseline members to warnings and flags stale entries only when the plugin is present", async () => {
     const root = await makeTempRoot();
-    await writePlugin(root, "crabwork-data", {
-      ".crabcode-plugin/plugin.json": { name: "crabwork-data", version: "0.1.0" },
-      ".mcp.json": { mcpServers: { snowflake: { type: "http", url: "" } } },
+    await writePlugin(root, "clangd-lsp", {
+      ".crabcode-plugin/plugin.json": { name: "clangd-lsp", version: "0.1.0" },
+      ".mcp.json": { mcpServers: { "clangd-lsp": { type: "stdio", command: "bun", args: ["run", "src/lsp-wrapper.ts"] } } },
     });
-    const withPlaceholder = await validateMcpContract(root);
-    expect(errorsOf(withPlaceholder)).toEqual([]);
-    expect(withPlaceholder.some((issue) => issue.severity === "warning" && issue.message.includes("legacy baseline"))).toBe(true);
+    const withProxy = await validateMcpContract(root);
+    expect(errorsOf(withProxy)).toEqual([]);
+    expect(withProxy.some((issue) => issue.severity === "warning" && issue.message.includes("legacy baseline"))).toBe(true);
 
     const fixedRoot = await makeTempRoot();
-    await writePlugin(fixedRoot, "crabwork-data", {
-      ".crabcode-plugin/plugin.json": { name: "crabwork-data", version: "0.1.0" },
-      ".mcp.json": { mcpServers: { snowflake: { type: "http", url: "https://example.invalid/mcp" } } },
+    await writePlugin(fixedRoot, "clangd-lsp", {
+      ".crabcode-plugin/plugin.json": { name: "clangd-lsp", version: "0.1.0" },
+      ".mcp.json": { mcpServers: { clangd: { type: "http", url: "https://example.invalid/mcp" } } },
     });
     const stale = await validateMcpContract(fixedRoot);
-    expect(errorsOf(stale).some((issue) => issue.message.includes("stale EMPTY_URL_BASELINE"))).toBe(true);
+    expect(errorsOf(stale).some((issue) => issue.message.includes("stale LSP_PROXY_BASELINE"))).toBe(true);
+  });
+
+  // The defect this pins: version consistency used to run inside the .mcp.json
+  // loop under `requiredMcpServers.length > 0`, which is two plugins out of ~76.
+  // A plugin with neither an .mcp.json nor a required server could disagree with
+  // itself indefinitely — that is how four plugins drifted on 2026-07-24 while CI
+  // stayed green. Both fixtures deliberately ship no .mcp.json, one drifting on
+  // each axis.
+  test("flags version drift on plugins that declare no MCP server at all", async () => {
+    const root = await makeTempRoot();
+    await writeMarketplace(root, [
+      { name: "epsilon", version: "0.2.0" },
+      { name: "zeta", version: "3.0.0" },
+    ]);
+    await writePlugin(root, "epsilon", {
+      ".crabcode-plugin/plugin.json": { name: "epsilon", version: "0.2.0" },
+      "package.json": { name: "epsilon", version: "0.1.0" },
+    });
+    await writePlugin(root, "zeta", {
+      ".crabcode-plugin/plugin.json": { name: "zeta", version: "3.1.0" },
+    });
+    const messages = errorsOf(await validateMcpContract(root)).map((issue) => issue.message).sort();
+    expect(messages).toEqual([
+      "plugin version mismatch: manifest=0.2.0, package.json=0.1.0",
+      "plugin version mismatch: manifest=3.1.0, marketplace=3.0.0",
+    ]);
+  });
+
+  // Absent is not mismatched. Most plugins ship no package.json, and a
+  // staged-not-active plugin is deliberately missing from the active marketplace
+  // — reporting either as drift would make the rule unadoptable and would
+  // contradict the promotion snapshot that records the zero match on purpose.
+  test("treats an absent package.json or marketplace entry as silent, not as drift", async () => {
+    const root = await makeTempRoot();
+    await writeMarketplace(root, [{ name: "eta", version: "1.0.0" }]);
+    await writePlugin(root, "eta", {
+      ".crabcode-plugin/plugin.json": { name: "eta", version: "1.0.0" },
+    });
+    await writePlugin(root, "staged", {
+      ".crabcode-plugin/plugin.json": { name: "staged", version: "9.9.9" },
+      "package.json": { name: "staged", version: "9.9.9" },
+    });
+    expect(await validateMcpContract(root)).toEqual([]);
   });
 });

@@ -10,7 +10,7 @@ YAML frontmatter is optional metadata at the start of command files:
 ---
 description: Brief description
 allowed-tools: Read, Write
-model: <model-id>
+model: inherit
 argument-hint: [arg1] [arg2]
 ---
 
@@ -131,67 +131,69 @@ allowed-tools: "*"
 
 **Type:** String
 **Required:** No
-**Default:** Inherits from conversation
-**Values:** `<model-id>`, `<model-id>`, `<model-id>`
+**Default:** Inherits from the conversation
+**Values:** `inherit`, the semantic aliases `best` and `planmode`, or a full
+model id
 
-**Purpose:** Specify which CrabCode model executes the command
+**Purpose:** Choose which model executes the command.
+
+Prefer the semantic values. A literal model id is legal, but it pins the
+command to one catalog entry: when that entry is retired the pin goes stale,
+and a stale pin is worse than no pin because it fails at load rather than
+degrading. The semantic values keep meaning across catalog changes.
 
 **Examples:**
 ```yaml
-model: <model-id>    # Fast, efficient for simple tasks
+model: inherit     # Same model as the conversation (equivalent to omitting it)
 ```
 ```yaml
-model: <model-id>   # Balanced performance (default)
+model: best        # Ask for the strongest model available
 ```
 ```yaml
-model: <model-id>     # Maximum capability for complex tasks
+model: planmode    # The model configured for planning work
 ```
 
 **When to use:**
 
-**Use `<model-id>` for:**
-- Simple, formulaic commands
-- Fast execution needed
-- Low complexity tasks
-- Frequent invocations
+**Omit `model` (or use `inherit`) for:**
+- Almost every command
+- Anything that should respect the user's own model choice
+- Commands whose cost profile should match the rest of the session
 
 ```yaml
 ---
 description: Format code file
-model: <model-id>
 ---
 ```
 
-**Use `<model-id>` for:**
-- Standard commands (default)
-- Balanced speed/quality
-- Most common use cases
-
-```yaml
----
-description: Review code changes
-model: <model-id>
----
-```
-
-**Use `<model-id>` for:**
-- Complex analysis
-- Architectural decisions
-- Deep code understanding
-- Critical tasks
+**Use `best` for:**
+- Complex analysis and architectural judgement
+- Work where a weaker model's answer would be actively misleading
+- Rare, high-stakes commands
 
 ```yaml
 ---
 description: Analyze system architecture
-model: <model-id>
+model: best
+---
+```
+
+**Use `planmode` for:**
+- Commands that produce a plan rather than perform an edit
+- Staying consistent with how the user has configured planning
+
+```yaml
+---
+description: Draft a migration plan
+model: planmode
 ---
 ```
 
 **Best practices:**
-- Omit unless specific need
-- Use `<model-id>` for speed when possible
-- Reserve `<model-id>` for genuinely complex tasks
-- Test with different models to find right balance
+- Omit unless there is a specific need — inheriting is the right default
+- Reach for `best` only where the extra capability changes the outcome
+- Do not hard-code a literal model id in a shipped plugin; the user's catalog
+  is not yours to assume
 
 ### argument-hint
 
@@ -244,7 +246,7 @@ description: Fix issue by number
 argument-hint: [issue-number]
 ---
 
-Fix issue #$1...
+Fix issue #$0...
 ```
 
 **Multi-argument:**
@@ -254,7 +256,7 @@ description: Deploy to environment
 argument-hint: [app-name] [environment] [version]
 ---
 
-Deploy $1 to $2 using version $3...
+Deploy $0 to $1 using version $2...
 ```
 
 **With options:**
@@ -264,7 +266,7 @@ description: Run tests with options
 argument-hint: [test-pattern] [options]
 ---
 
-Run tests matching $1 with options: $2
+Run tests matching $0 with options: $1
 ```
 
 ### disable-model-invocation
@@ -370,15 +372,15 @@ All common fields:
 description: Deploy application to environment
 argument-hint: [app-name] [environment] [version]
 allowed-tools: Bash(kubectl:*), Bash(helm:*), Read
-model: <model-id>
+model: best
 ---
 
-Deploy $1 to $2 environment using version $3
+Deploy $0 to $1 environment using version $2
 
 Pre-deployment checks:
-- Verify $2 configuration
+- Verify $1 configuration
 - Check cluster status: !`kubectl cluster-info`
-- Validate version $3 exists
+- Validate version $2 exists
 
 Proceed with deployment following deployment runbook.
 ```
@@ -400,9 +402,9 @@ MANUAL APPROVAL REQUIRED
 This command requires human judgment and cannot be automated.
 -->
 
-Review deployment $1 for production approval:
+Review deployment $0 for production approval:
 
-Deployment details: !`gh api /deployments/$1`
+Deployment details: !`gh api /deployments/$0`
 
 Verify:
 - All tests passed
@@ -422,7 +424,7 @@ Type "APPROVED" to confirm deployment.
 ---
 description: Missing quote
 allowed-tools: Read, Write
-model: <model-id>
+model: inherit
 ---  # ❌ Missing closing quote above
 ```
 
@@ -440,7 +442,8 @@ allowed-tools: Bash  # ❌ Missing command filter
 model: gpt4  # ❌ Not a valid CrabCode model
 ```
 
-**Fix:** Use `<model-id>`, `<model-id>`, or `<model-id>`
+**Fix:** Use `inherit`, `best`, or `planmode` — or a full model id from the
+user's own catalog, though a shipped plugin should not assume one.
 
 ### Validation Checklist
 
@@ -457,7 +460,7 @@ Before committing command:
 1. **Start minimal:** Add frontmatter only when needed
 2. **Document arguments:** Always use argument-hint with arguments
 3. **Restrict tools:** Use most restrictive allowed-tools that works
-4. **Choose right model:** Use <model-id> for speed, <model-id> for complexity
+4. **Choose right model:** omit it to inherit; reserve `best` for genuinely complex work
 5. **Manual-only sparingly:** Only use disable-model-invocation when necessary
 6. **Clear descriptions:** Make commands discoverable in `/help`
 7. **Test thoroughly:** Verify frontmatter works as expected

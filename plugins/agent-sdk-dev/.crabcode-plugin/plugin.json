@@ -1,6 +1,6 @@
 {
   "name": "agent-sdk-dev",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Agent SDK development guidance, verifier agents, and project bootstrap command (genericized for CrabCode product surface).",
   "author": {
     "name": "CrabCode"

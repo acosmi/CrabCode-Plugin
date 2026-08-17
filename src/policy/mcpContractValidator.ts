@@ -29,12 +29,13 @@ const CHANNEL_DECLARATION_BASELINE = new Set(["discord", "fakechat", "imessage",
 /** Plugins whose sidecar start script still runs an installer (forbidden for anything required/auto-activated). */
 const INSTALL_ON_START_BASELINE = new Set(["discord", "fakechat", "imessage", "telegram"]);
 
-/** crabwork connectors shipped with empty placeholder URLs. */
-const EMPTY_URL_BASELINE = new Set([
-  "crabwork-bio-research", "crabwork-customer-support", "crabwork-data", "crabwork-design",
-  "crabwork-engineering", "crabwork-enterprise-search", "crabwork-hr", "crabwork-marketing",
-  "crabwork-operations", "crabwork-product-management", "crabwork-productivity", "crabwork-sales",
-]);
+/**
+ * crabwork connectors shipped with empty placeholder URLs.
+ * Ratcheted to zero on 2026-07-24 — every empty URL is now a hard error. Keep the
+ * set (and its stale check) so a future legacy import can be baselined explicitly
+ * rather than by loosening the rule.
+ */
+const EMPTY_URL_BASELINE = new Set<string>([]);
 
 /** Plugins with floating (@latest / versionless npx / unpinned git) launcher versions. */
 const FLOATING_VERSION_BASELINE = new Set([
@@ -113,6 +114,39 @@ export async function validateMcpContract(root: string): Promise<McpContractIssu
     if (typeof entry.name === "string" && typeof entry.version === "string") marketplaceVersions.set(entry.name, entry.version);
   }
 
+  // A plugin states its version in up to three places, and a batch bump that
+  // updates the manifest and the marketplace entry but forgets package.json
+  // leaves the plugin describing two different versions of itself. This ran
+  // inside the .mcp.json loop under `requiredMcpServers.length > 0`, which is
+  // two plugins out of ~76 — so the identical defect elsewhere passed silently
+  // until one of those plugins declared a required server. It is a per-plugin
+  // rule, so it runs per plugin.
+  //
+  // Each comparison is skipped when a side is absent rather than reported: most
+  // plugins ship no package.json, and a staged-not-active plugin is deliberately
+  // missing from the active marketplace.
+  for (const pluginName of entries) {
+    const pluginRoot = path.join(pluginsRoot, pluginName);
+    const manifestPath = existsSync(path.join(pluginRoot, ".crabcode-plugin", "plugin.json"))
+      ? path.join(pluginRoot, ".crabcode-plugin", "plugin.json")
+      : path.join(pluginRoot, "plugin.json");
+    if (!existsSync(manifestPath)) continue;
+    const manifest = await readJson(manifestPath) as { version?: unknown } | null;
+    const manifestVersion = typeof manifest?.version === "string" ? manifest.version : null;
+    if (!manifestVersion) continue;
+
+    const packageJson = await readJson(path.join(pluginRoot, "package.json")) as { version?: unknown } | null;
+    const packageVersion = typeof packageJson?.version === "string" ? packageJson.version : null;
+    if (packageVersion && manifestVersion !== packageVersion) {
+      issues.push({ severity: "error", path: path.relative(root, manifestPath), message: `plugin version mismatch: manifest=${manifestVersion}, package.json=${packageVersion}` });
+    }
+
+    const marketVersion = marketplaceVersions.get(pluginName) ?? null;
+    if (marketVersion && manifestVersion !== marketVersion) {
+      issues.push({ severity: "error", path: path.relative(root, manifestPath), message: `plugin version mismatch: manifest=${manifestVersion}, marketplace=${marketVersion}` });
+    }
+  }
+
   const triggeredBaselines = {
     lsp: new Set<string>(),
     channel: new Set<string>(),
@@ -154,18 +188,6 @@ export async function validateMcpContract(root: string): Promise<McpContractIssu
     const packageJson = await readJson(path.join(pluginRoot, "package.json")) as { version?: unknown; scripts?: Record<string, unknown> } | null;
     const startScript = typeof packageJson?.scripts?.start === "string" ? packageJson.scripts.start : "";
     const startInstalls = /\b(?:bun|npm|pnpm|yarn)\s+install\b/.test(startScript);
-
-    if (required.length > 0) {
-      const manifestVersion = typeof manifest.version === "string" ? manifest.version : null;
-      const packageVersion = typeof packageJson?.version === "string" ? packageJson.version : null;
-      const marketVersion = marketplaceVersions.get(pluginName) ?? null;
-      if (manifestVersion && packageVersion && manifestVersion !== packageVersion) {
-        issues.push({ severity: "error", path: path.relative(root, manifestPath), message: `required-MCP plugin version mismatch: manifest=${manifestVersion}, package.json=${packageVersion}` });
-      }
-      if (manifestVersion && marketVersion && manifestVersion !== marketVersion) {
-        issues.push({ severity: "error", path: path.relative(root, manifestPath), message: `required-MCP plugin version mismatch: manifest=${manifestVersion}, marketplace=${marketVersion}` });
-      }
-    }
 
     for (const [serverName, definition] of Object.entries(servers)) {
       const parts = serverArgStrings(definition);
