@@ -7,7 +7,7 @@ Comprehensive guidance on creating CrabCode slash commands, including file forma
 This skill provides knowledge about:
 - Slash command file format and structure
 - YAML frontmatter configuration fields
-- Dynamic arguments ($ARGUMENTS, $1, $2, etc.)
+- Dynamic arguments ($ARGUMENTS, $0, $1, etc.)
 - File references with @ syntax
 - Bash execution with !` syntax
 - Command organization and namespacing
@@ -18,7 +18,7 @@ This skill provides knowledge about:
 
 ## Skill Structure
 
-### SKILL.md (~2,470 words)
+### SKILL.md
 
 Core skill content covering:
 
@@ -95,16 +95,16 @@ CrabCode activates this skill when users:
 
 The skill uses progressive disclosure:
 
-1. **SKILL.md** (~2,470 words): Core concepts, common patterns, and plugin features overview
-2. **References** (~13,500 words total): Detailed specifications
-   - frontmatter-reference.md (~1,200 words)
-   - plugin-features-reference.md (~1,800 words)
-   - interactive-commands.md (~2,500 words)
-   - advanced-workflows.md (~1,700 words)
-   - testing-strategies.md (~2,200 words)
-   - documentation-patterns.md (~2,000 words)
-   - marketplace-considerations.md (~2,200 words)
-3. **Examples** (~6,000 words total): Complete working command examples
+1. **SKILL.md**: Core concepts, common patterns, and plugin features overview
+2. **References**: Detailed specifications
+   - frontmatter-reference.md
+   - plugin-features-reference.md
+   - interactive-commands.md
+   - advanced-workflows.md
+   - testing-strategies.md
+   - documentation-patterns.md
+   - marketplace-considerations.md
+3. **Examples**: Complete working command examples
    - simple-commands.md
    - plugin-commands.md
 
@@ -122,7 +122,7 @@ allowed-tools: Read, Bash(git:*)
 ---
 
 Command prompt content with:
-- Arguments: $1, $2, or $ARGUMENTS
+- Arguments: $0, $1, or $ARGUMENTS
 - Files: @path/to/file
 - Bash: !`command here`
 ```
@@ -137,7 +137,7 @@ Command prompt content with:
 
 **Dynamic arguments:**
 - `$ARGUMENTS` - All arguments as single string
-- `$1`, `$2`, `$3` - Positional arguments
+- `$0`, `$1`, `$2` - Positional arguments (zero-based: `$0` is the first)
 
 **File references:**
 - `@path/to/file` - Include file contents
@@ -151,7 +151,7 @@ Command prompt content with:
 |-------|---------|---------|
 | `description` | Brief description for /help | `"Review code for issues"` |
 | `allowed-tools` | Restrict tool access | `Read, Bash(git:*)` |
-| `model` | Specify model | `<model-id>`, `<model-id>`, `<model-id>` |
+| `model` | Specify model | `inherit`, `best`, `planmode` |
 | `argument-hint` | Document arguments | `[pr-number] [priority]` |
 | `disable-model-invocation` | Manual-only command | `true` |
 
@@ -175,7 +175,7 @@ description: Deploy to environment
 argument-hint: [environment] [version]
 ---
 
-Deploy to $1 environment using version $2
+Deploy to $0 environment using version $1
 ```
 
 ### Command with File Reference
@@ -186,7 +186,7 @@ description: Document file
 argument-hint: [file-path]
 ---
 
-Generate documentation for @$1
+Generate documentation for @$0
 ```
 
 ### Command with Bash Execution
@@ -265,8 +265,10 @@ To update this skill:
 
 ## Version History
 
-**v0.1.0** (2025-01-15):
-- Initial release with basic command fundamentals
-- Frontmatter field reference
+A skill carries no version of its own — it ships inside the plugin, so the
+number below is the `plugin-dev` release this content belongs to.
+
+**plugin-dev 0.2.2**:
+- Command fundamentals and frontmatter field reference
 - 10 simple command examples
-- Ready for plugin-specific pattern additions
+- Runtime claims re-checked against the product source (2026-08-15)

@@ -1,19 +1,40 @@
-# Migrating from Basic to Advanced Hooks
+# Choosing Between Command Hooks and Prompt Hooks
 
-This guide shows how to migrate from basic command hooks to advanced prompt-based hooks for better maintainability and flexibility.
+Command hooks and prompt hooks are both current, fully supported types —
+neither supersedes the other, and there is no deprecated format to move off of.
+(`agent` and `http` hooks exist as well; see the main skill.) This guide is
+about picking the right type, and about what a rewrite looks like when the one
+you picked turns out not to fit.
 
-## Why Migrate?
+Read it as a selection guide, not a migration mandate. Plenty of good hooks
+should stay exactly as they are.
 
-Prompt-based hooks offer several advantages:
+## What each type is good at
 
-- **Natural language reasoning**: LLM understands context and intent
-- **Better edge case handling**: Adapts to unexpected scenarios
-- **No bash scripting required**: Simpler to write and maintain
-- **More flexible validation**: Can handle complex logic without coding
+Prompt hooks judge; command hooks decide.
 
-## Migration Example: Bash Command Validation
+**Prompt hooks** suit judgement calls whose criteria are easier to state in
+language than in code:
 
-### Before (Basic Command Hook)
+- **Natural language reasoning**: the model weighs context and intent
+- **Better edge case handling**: adapts to variations you did not enumerate
+- **No bash scripting required**: simpler to write and maintain
+- **More flexible validation**: complex criteria without encoding them
+
+**Command hooks** suit anything that must be exact, fast, or offline:
+
+- **Deterministic**: same input, same verdict, every time
+- **Fast**: no model round-trip, so no latency added to the tool call
+- **Offline**: no token cost, and it works when no model call is possible
+- **Precise**: correct when the rule genuinely is a regex or a size threshold
+
+A rule that is objectively checkable — a file size, an extension, an exact path
+prefix — belongs in a command hook. Asking a model to re-derive it adds latency
+and a chance of being wrong about something arithmetic.
+
+## Rewrite Example: Bash Command Validation
+
+### Starting point (Command Hook)
 
 **Configuration:**
 ```json
@@ -52,7 +73,7 @@ fi
 - No context awareness
 - Requires bash scripting knowledge
 
-### After (Advanced Prompt Hook)
+### Rewritten as a Prompt Hook
 
 **Configuration:**
 ```json
@@ -63,7 +84,7 @@ fi
       "hooks": [
         {
           "type": "prompt",
-          "prompt": "Command: $TOOL_INPUT.command. Analyze for: 1) Destructive operations (rm -rf, dd, mkfs, etc) 2) Privilege escalation (sudo) 3) Network operations without user consent. Return 'approve' or 'deny' with explanation.",
+          "prompt": "Read .tool_input.command from the payload below. Analyze for: 1) Destructive operations (rm -rf, dd, mkfs, etc) 2) Privilege escalation (sudo) 3) Network operations without user consent. Answer approve or block with an explanation. $ARGUMENTS",
           "timeout": 15
         }
       ]
@@ -80,9 +101,9 @@ fi
 - Context-aware decisions
 - Natural language explanation in denial
 
-## Migration Example: File Write Validation
+## Rewrite Example: File Write Validation
 
-### Before (Basic Command Hook)
+### Starting point (Command Hook)
 
 **Configuration:**
 ```json
@@ -109,13 +130,13 @@ file_path=$(echo "$input" | jq -r '.tool_input.file_path')
 
 # Check for path traversal
 if [[ "$file_path" == *".."* ]]; then
-  echo '{"decision": "deny", "reason": "Path traversal detected"}' >&2
+  echo "Path traversal detected" >&2
   exit 2
 fi
 
 # Check for system paths
 if [[ "$file_path" == "/etc/"* ]] || [[ "$file_path" == "/sys/"* ]]; then
-  echo '{"decision": "deny", "reason": "System file"}' >&2
+  echo "System file" >&2
   exit 2
 fi
 ```
@@ -126,7 +147,7 @@ fi
 - Missing edge cases (e.g., `/etc` vs `/etc/`)
 - No consideration of file content
 
-### After (Advanced Prompt Hook)
+### Rewritten as a Prompt Hook
 
 **Configuration:**
 ```json
@@ -137,7 +158,7 @@ fi
       "hooks": [
         {
           "type": "prompt",
-          "prompt": "File path: $TOOL_INPUT.file_path. Content preview: $TOOL_INPUT.content (first 200 chars). Verify: 1) Not system directories (/etc, /sys, /usr) 2) Not credentials (.env, tokens, secrets) 3) No path traversal 4) Content doesn't expose secrets. Return 'approve' or 'deny'."
+          "prompt": "Read .tool_input.file_path and .tool_input.content from the payload below. Verify: 1) Not system directories (/etc, /sys, /usr) 2) Not credentials (.env, tokens, secrets) 3) No path traversal 4) Content doesn't expose secrets. Answer approve or block. $ARGUMENTS"
         }
       ]
     }
@@ -152,7 +173,7 @@ fi
 - Can detect secrets in content
 - Easy to extend criteria
 
-## When to Keep Command Hooks
+## When a Command Hook Is the Right Answer
 
 Command hooks still have their place:
 
@@ -165,7 +186,7 @@ file_path=$(echo "$input" | jq -r '.tool_input.file_path')
 size=$(stat -f%z "$file_path" 2>/dev/null || stat -c%s "$file_path" 2>/dev/null)
 
 if [ "$size" -gt 10000000 ]; then
-  echo '{"decision": "deny", "reason": "File too large"}' >&2
+  echo "File too large" >&2
   exit 2
 fi
 ```
@@ -219,7 +240,7 @@ Combine both for multi-stage validation:
         },
         {
           "type": "prompt",
-          "prompt": "Deep analysis of bash command: $TOOL_INPUT",
+          "prompt": "Deep analysis of the bash command in .tool_input.command. $ARGUMENTS",
           "timeout": 15
         }
       ]
@@ -230,9 +251,9 @@ Combine both for multi-stage validation:
 
 The command hook does fast deterministic checks, while the prompt hook handles complex reasoning.
 
-## Migration Checklist
+## Rewrite Checklist
 
-When migrating hooks:
+When converting a command hook to a prompt hook:
 
 - [ ] Identify the validation logic in the command hook
 - [ ] Convert hard-coded patterns to natural language criteria
@@ -240,19 +261,19 @@ When migrating hooks:
 - [ ] Verify LLM understands the intent
 - [ ] Set appropriate timeout (usually 15-30s for prompt hooks)
 - [ ] Document the new hook in README
-- [ ] Remove or archive old script files
+- [ ] Leave the old script in place until the replacement is proven in practice
 
-## Migration Tips
+## Rewrite Tips
 
-1. **Start with one hook**: Don't migrate everything at once
+1. **Convert one hook at a time**: never convert them all at once
 2. **Test thoroughly**: Verify prompt hook catches what command hook caught
-3. **Look for improvements**: Use migration as opportunity to enhance validation
-4. **Keep scripts for reference**: Archive old scripts in case you need to reference the logic
-5. **Document reasoning**: Explain why prompt hook is better in README
+3. **Look for improvements**: use the rewrite as an opportunity to widen coverage
+4. **Keep the old script**: it is the specification of what the replacement must still catch
+5. **Document reasoning**: record why this hook is better as a prompt hook
 
-## Complete Migration Example
+## Complete Rewrite Example
 
-### Original Plugin Structure
+### Before
 
 ```
 my-plugin/
@@ -264,60 +285,60 @@ my-plugin/
     └── check-tests.sh
 ```
 
-### After Migration
+### After
 
 ```
 my-plugin/
 ├── .crabcode-plugin/plugin.json
-├── hooks/hooks.json      # Now uses prompt hooks
-└── scripts/              # Archive or delete
-    └── archive/
-        ├── validate-bash.sh
-        ├── validate-write.sh
-        └── check-tests.sh
+├── hooks/hooks.json      # Bash/Write validation now uses prompt hooks
+└── scripts/              # check-tests.sh stays: it is a fast, exact check
+    └── check-tests.sh
 ```
 
 ### Updated hooks.json
 
 ```json
 {
-  "PreToolUse": [
-    {
-      "matcher": "Bash",
-      "hooks": [
-        {
-          "type": "prompt",
-          "prompt": "Validate bash command safety: destructive ops, privilege escalation, network access"
-        }
-      ]
-    },
-    {
-      "matcher": "Write|Edit",
-      "hooks": [
-        {
-          "type": "prompt",
-          "prompt": "Validate file write safety: system paths, credentials, path traversal, content secrets"
-        }
-      ]
-    }
-  ],
-  "Stop": [
-    {
-      "matcher": "*",
-      "hooks": [
-        {
-          "type": "prompt",
-          "prompt": "Verify tests were run if code was modified"
-        }
-      ]
-    }
-  ]
+  "description": "Validation hooks for bash, file writes, and completion",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Validate bash command safety: destructive ops, privilege escalation, network access"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Validate file write safety: system paths, credentials, path traversal, content secrets"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Verify tests were run if code was modified"
+          }
+        ]
+      }
+    ]
+  }
 }
 ```
 
 **Result:** Simpler, more maintainable, more powerful.
 
-## Common Migration Patterns
+## Common Rewrite Patterns
 
 ### Pattern: String Contains → Natural Language
 
@@ -366,4 +387,8 @@ fi
 
 ## Conclusion
 
-Migrating to prompt-based hooks makes plugins more maintainable, flexible, and powerful. Reserve command hooks for deterministic checks and external tool integration.
+Pick the type that matches the decision. Prompt hooks earn their latency on
+judgement calls where the criteria are easier to state than to encode; command
+hooks stay the right answer for anything deterministic, fast, or offline. Most
+non-trivial plugins end up with both, and a hook that already does its job
+well does not need rewriting at all.

@@ -19,13 +19,13 @@ argument-hint: [pr-number]
 allowed-tools: Bash(gh:*), Read, Grep
 ---
 
-# PR Review Workflow for #$1
+# PR Review Workflow for #$0
 
 ## Step 1: Fetch PR Details
-!`gh pr view $1 --json title,body,author,files`
+!`gh pr view $0 --json title,body,author,files`
 
 ## Step 2: Review Files
-Files changed: !`gh pr diff $1 --name-only`
+Files changed: !`gh pr diff $0 --name-only`
 
 For each file:
 - Check code quality
@@ -33,7 +33,7 @@ For each file:
 - Review documentation
 
 ## Step 3: Run Checks
-Test status: !`gh pr checks $1`
+Test status: !`gh pr checks $0`
 
 Verify:
 - All tests passing
@@ -83,16 +83,16 @@ Deployment state saved to `.crabcode/deployment-state.local.md`:
 \`\`\`markdown
 ---
 initialized: true
-branch: $(git branch --show-current)
-commit: $(git log -1 --format=%H)
-timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+branch: !`git branch --show-current`
+commit: !`git log -1 --format=%H`
+timestamp: !`date -u +%Y-%m-%dT%H:%M:%SZ`
 status: initialized
 ---
 
 # Deployment Tracking
 
-Branch: $(git branch --show-current)
-Started: $(date)
+Branch: !`git branch --show-current`
+Started: !`date`
 
 Next steps:
 1. Run tests: /deploy-test
@@ -136,7 +136,7 @@ argument-hint: [environment]
 allowed-tools: Bash(git:*), Bash(npm:*), Read
 ---
 
-# Deploy to $1
+# Deploy to $0
 
 ## Pre-flight Checks
 
@@ -156,9 +156,9 @@ Status: !`git status --short`
    - If tests pass: Continue
 
 3. Environment:
-   - If $1 = 'production': Extra validation
-   - If $1 = 'staging': Standard process
-   - If $1 = 'dev': Minimal checks
+   - If $0 = 'production': Extra validation
+   - If $0 = 'staging': Standard process
+   - If $0 = 'dev': Minimal checks
 
 **Workflow decision:**
 Based on above, proceeding with: [determined workflow]
@@ -394,11 +394,10 @@ allowed-tools: Read, Bash(git:*)
 
 Checking for completed features...
 
-if [ -f .crabcode/feature-complete.flag ]; then
-  Feature ready for release notes
-fi
+Flag present: !`test -f .crabcode/feature-complete.flag && echo yes || echo no`
 
-[Include in release notes]
+If the flag is present, the feature is ready for release notes — include it.
+If not, skip it and say nothing further about it.
 ```
 
 ### Workflow Locking
@@ -415,20 +414,17 @@ allowed-tools: Read, Write, Bash
 
 Checking for active deployments...
 
-if [ -f .crabcode/deployment.lock ]; then
-  ERROR: Deployment already in progress
-  Started: [timestamp from lock file]
+Existing lock: !`cat .crabcode/deployment.lock 2>/dev/null`
 
-  Cannot start concurrent deployment.
-  Wait for completion or run /deployment-abort
+If a lock already exists, stop and report it, quoting its timestamp:
 
-  Exit.
-fi
+> ERROR: Deployment already in progress
+>
+> Cannot start a concurrent deployment. Wait for it to finish, or run
+> /deployment-abort.
 
-Creating deployment lock...
-
-Deployment started. Lock created.
-[Proceed with deployment]
+Otherwise write `.crabcode/deployment.lock` with the current timestamp, confirm
+the lock was created, and proceed with the deployment.
 ```
 
 **Lock cleanup:**
@@ -457,10 +453,11 @@ description: Deploy with optional version
 argument-hint: [environment] [version]
 ---
 
-Environment: ${1:-staging}
-Version: ${2:-latest}
+Environment: $0
+Version: $1
 
-Deploying ${2:-latest} to ${1:-staging}...
+Deploying $1 to $0. If either is empty, treat the environment as "staging"
+and the version as "latest", and say so before proceeding.
 
 Note: Using defaults for missing arguments:
 - Environment defaults to 'staging'
@@ -475,18 +472,18 @@ description: Deploy to validated environment
 argument-hint: [environment]
 ---
 
-Environment: $1
+Environment: $0
 
 Validating environment...
 
-valid_envs="dev staging production"
-if ! echo "$valid_envs" | grep -w "$1" > /dev/null; then
-  ERROR: Invalid environment '$1'
-  Valid options: dev, staging, production
-  Exit.
-fi
+The only valid environments are `dev`, `staging` and `production`. If `$0` is
+not one of those, stop and report:
 
-Environment validated. Proceeding...
+> ERROR: Invalid environment
+>
+> Valid options: dev, staging, production
+
+Otherwise confirm the environment is valid and proceed.
 ```
 
 ### Argument Transformation
@@ -497,21 +494,16 @@ description: Deploy with shorthand
 argument-hint: [env-shorthand]
 ---
 
-Input: $1
+Input: $0
 
-Expanding shorthand:
-- d/dev → development
-- s/stg → staging
-- p/prod → production
+Expand the shorthand before deploying:
 
-case "$1" in
-  d|dev) ENV="development";;
-  s|stg) ENV="staging";;
-  p|prod) ENV="production";;
-  *) ENV="$1";;
-esac
+- `d` or `dev` → development
+- `s` or `stg` → staging
+- `p` or `prod` → production
 
-Deploying to: $ENV
+Anything else is already a full environment name; use it unchanged. State which
+environment you resolved `$0` to, then deploy there.
 ```
 
 ## Error Handling in Workflows
@@ -530,21 +522,20 @@ Running steps with error handling...
 ## Step 1: Tests
 !`npm test`
 
-if [ $? -ne 0 ]; then
-  ERROR: Tests failed
+If the tests above failed, do not continue to Step 2. Report the failure and
+ask how to proceed:
 
-  Options:
-  1. Fix tests and retry
-  2. Skip tests (NOT recommended)
-  3. Abort deployment
+> ERROR: Tests failed
+>
+> Options:
+> 1. Fix tests and retry
+> 2. Skip tests (NOT recommended)
+> 3. Abort deployment
 
-  What would you like to do?
-
-  [Wait for user input before continuing]
-fi
+Wait for the user's answer before doing anything else.
 
 ## Step 2: Build
-[Continue only if Step 1 succeeded]
+Run this only once Step 1 has succeeded.
 ```
 
 ### Rollback on Failure
@@ -563,17 +554,11 @@ Deploying new version...
 
 !`deploy.sh`
 
-if [ $? -ne 0 ]; then
-  DEPLOYMENT FAILED
+If the deployment above failed, roll back before reporting anything else: run
+`rollback.sh` with the Bash tool, confirm the previous version is restored, and
+point the user at the logs for the failure details.
 
-  Initiating automatic rollback...
-  !`rollback.sh`
-
-  Rolled back to previous version.
-  Check logs for failure details.
-fi
-
-Deployment complete.
+If it succeeded, report that the deployment is complete.
 ```
 
 ### Checkpoint Recovery
@@ -645,14 +630,14 @@ argument-hint: [environment]
 allowed-tools: Write, Bash(git:*)
 ---
 
-# Initialize Deployment to $1
+# Initialize Deployment to $0
 
 Creating workflow state...
 
 \`\`\`yaml
 ---
 workflow: deployment
-environment: $1
+environment: $0
 branch: !`git branch --show-current`
 commit: !`git rev-parse HEAD`
 stage: initialized

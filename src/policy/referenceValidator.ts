@@ -48,9 +48,19 @@ const TYPED_CALL_PATTERN = /\b(Agent|Workflow)\(([^)]*)\)/g;
 const TYPED_FQN_PATTERN = /^([a-z0-9][a-z0-9-]*):([a-z0-9][a-z0-9-]*)$/;
 
 // Bare `mcp__<server>__` tool references must match a server declared in the
-// owning plugin's .mcp.json. `mcp__plugin_...` names document CrabCode's
-// plugin-tool namespace and cannot be resolved statically, so they are skipped.
+// owning plugin's .mcp.json.
+//
+// Plugin-provided servers are the documented exception: their wire namespace is
+// derived at runtime as `p_` + a 24-hex digest of the server's internal runtime
+// identity, so it can never be matched against an authored .mcp.json key. Docs
+// showing that shape describe the namespace itself rather than claiming to own
+// a server, so they are skipped.
+//
+// The legacy `plugin_...` spelling is skipped as well, but only so that stale
+// prose does not fail the build. It is not a real namespace — nothing at
+// runtime ever produces it.
 const MCP_TOOL_PATTERN = /mcp__([a-z0-9_-]+)__/g;
+const MCP_DERIVED_PLUGIN_NAMESPACE = /^p_[0-9a-f]{24}$/;
 
 // Upstream container mount that never exists in a CrabCode environment.
 const CONTAINER_PATH = "/mnt/skills";
@@ -272,6 +282,7 @@ async function checkMcpToolRefs(
   for (const match of content.matchAll(MCP_TOOL_PATTERN)) {
     const server = match[1] ?? "";
     if (server.startsWith("plugin_")) continue;
+    if (MCP_DERIVED_PLUGIN_NAMESPACE.test(server)) continue;
     servers.add(server);
   }
   if (servers.size === 0) return;

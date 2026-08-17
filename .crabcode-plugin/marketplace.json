@@ -331,7 +331,7 @@
     {
       "name": "agent-sdk-dev",
       "source": "./plugins/agent-sdk-dev",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "displayName": "Agent SDK 开发",
       "shortDescription": "Agent SDK 开发指引、验证者智能体与项目脚手架命令",
       "longDescription": "面向 Agent SDK 开发的指引、验证者(verifier)智能体与项目初始化命令,支持 Python 与 TypeScript,帮助快速搭建并校验基于 SDK 的智能体应用。",
@@ -628,7 +628,7 @@
     {
       "name": "plugin-dev",
       "source": "./plugins/plugin-dev",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "displayName": "插件开发",
       "shortDescription": "CrabCode 插件开发工具箱:智能体、命令、钩子、MCP 集成与插件结构指引",
       "longDescription": "CrabCode 插件开发工具箱,提供创建智能体、命令、钩子、MCP 集成与插件结构的技能与指引,帮助从零开发一个完整的 CrabCode 插件。",

@@ -86,21 +86,31 @@ echo "✓ Command file structure valid"
 COMMAND_FILE="$1"
 
 # Extract YAML frontmatter
-FRONTMATTER=$(sed -n '/^---$/,/^---$/p' "$COMMAND_FILE" | sed '1d;$d')
+FRONTMATTER=$(awk 'NR==1 && /^---$/ {c=1; next} c==1 && /^---$/ {exit} c==1' "$COMMAND_FILE")
 
 if [ -z "$FRONTMATTER" ]; then
   echo "No frontmatter to validate"
   exit 0
 fi
 
-# Check 'model' field if present
+# Check 'model' field if present.
+# Accepted: 'inherit', a semantic alias, or a full model id. Only the first two
+# are stable across catalog releases, so treat a literal id as a soft warning
+# rather than an error — it is legal, just brittle.
 if echo "$FRONTMATTER" | grep -q "^model:"; then
   MODEL=$(echo "$FRONTMATTER" | grep "^model:" | cut -d: -f2 | tr -d ' ')
-  if ! echo "<model-id> <model-id> <model-id>" | grep -qw "$MODEL"; then
-    echo "ERROR: Invalid model '$MODEL' (must be <model-id>, <model-id>, or <model-id>)"
-    exit 1
-  fi
-  echo "✓ Model field valid: $MODEL"
+  case "$MODEL" in
+    inherit|best|planmode)
+      echo "✓ Model field valid: $MODEL"
+      ;;
+    "")
+      echo "ERROR: model field is empty"
+      exit 1
+      ;;
+    *)
+      echo "NOTE: '$MODEL' is treated as a literal model id (prefer inherit/best/planmode)"
+      ;;
+  esac
 fi
 
 # Check 'allowed-tools' field format
@@ -149,14 +159,14 @@ crabcode --debug
 # Verify expected behavior
 
 # 5. Check debug logs
-tail -f ~/.crabcode/debug-logs/latest
+tail -f ~/.crabcode/debug/latest
 # Look for errors or warnings
 ```
 
 ### Level 4: Argument Testing
 
 **What to test:**
-- Positional arguments work ($1, $2, etc.)
+- Positional arguments work ($0, $1, etc. — numbering starts at zero)
 - $ARGUMENTS captures all arguments
 - Missing arguments handled gracefully
 - Invalid arguments detected
@@ -166,8 +176,8 @@ tail -f ~/.crabcode/debug-logs/latest
 | Test Case | Command | Expected Result |
 |-----------|---------|-----------------|
 | No args | `/cmd` | Graceful handling or useful message |
-| One arg | `/cmd arg1` | $1 substituted correctly |
-| Two args | `/cmd arg1 arg2` | $1 and $2 substituted |
+| One arg | `/cmd arg1` | $0 substituted correctly |
+| Two args | `/cmd arg1 arg2` | $0 and $1 substituted |
 | Extra args | `/cmd a b c d` | All captured or extras ignored appropriately |
 | Special chars | `/cmd "arg with spaces"` | Quotes handled correctly |
 | Empty arg | `/cmd ""` | Empty string handled |
@@ -656,12 +666,12 @@ crabcode --debug
 **Issue: Arguments not substituting**
 
 ```bash
-# Verify syntax
-grep '\$1' .crabcode/commands/my-command.md
+# Verify syntax — $0 is the FIRST argument, so that is what to look for
+grep '\$0' .crabcode/commands/my-command.md
 grep '\$ARGUMENTS' .crabcode/commands/my-command.md
 
 # Test with simple command first
-echo "Test: \$1 and \$2" > .crabcode/commands/test-args.md
+echo "Test: \$0 and \$1" > .crabcode/commands/test-args.md
 ```
 
 **Issue: Bash commands not executing**

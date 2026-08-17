@@ -60,13 +60,13 @@ Use this workflow for structured, high-quality plugin development from concept t
 **What it covers:**
 - Prompt-based hooks (recommended) with LLM decision-making
 - Command hooks for deterministic validation
-- All hook events: PreToolUse, PostToolUse, Stop, AgentStop, SessionStart, SessionEnd, UserPromptSubmit, PreCompact, Notification
+- Commonly used hook events: PreToolUse, PostToolUse, Stop, SubagentStop, SessionStart, SessionEnd, UserPromptSubmit, PreCompact, Notification (run `/hooks` for the full set)
 - Hook output formats and JSON schemas
 - Security best practices and input validation
 - ${CRABCODE_PLUGIN_ROOT} for portable paths
 
 **Resources:**
-- Core SKILL.md (1,619 words)
+- Core SKILL.md
 - 3 example hook scripts (validate-write, validate-bash, load-context)
 - 3 reference docs: patterns, migration, advanced techniques
 - 3 utility scripts: validate-hook-schema.sh, test-hook.sh, hook-linter.sh
@@ -86,7 +86,7 @@ Use this workflow for structured, high-quality plugin development from concept t
 - Integration patterns and performance optimization
 
 **Resources:**
-- Core SKILL.md (1,666 words)
+- Core SKILL.md
 - 3 example configurations (stdio, SSE, HTTP)
 - 3 reference docs: server-types (~3,200w), authentication (~2,800w), tool-usage (~2,600w)
 
@@ -105,7 +105,7 @@ Use this workflow for structured, high-quality plugin development from concept t
 - Minimal, standard, and advanced plugin patterns
 
 **Resources:**
-- Core SKILL.md (1,619 words)
+- Core SKILL.md
 - 3 example structures (minimal, standard, advanced)
 - 2 reference docs: component-patterns, manifest-reference
 
@@ -120,12 +120,12 @@ Use this workflow for structured, high-quality plugin development from concept t
 - YAML frontmatter + markdown body structure
 - Parsing techniques for bash scripts (sed, awk, grep patterns)
 - Temporarily active hooks (flag files and quick-exit)
-- Real-world examples from multi-agent-swarm and ralph-loop plugins
+- Real-world example from the ralph-loop plugin
 - Atomic file updates and validation
 - Gitignore and lifecycle management
 
 **Resources:**
-- Core SKILL.md (1,623 words)
+- Core SKILL.md
 - 3 examples (read-settings hook, create-settings command, templates)
 - 2 reference docs: parsing-techniques, real-world-examples
 - 2 utility scripts: validate-settings.sh, parse-frontmatter.sh
@@ -145,7 +145,7 @@ Use this workflow for structured, high-quality plugin development from concept t
 - Best practices for command development
 
 **Resources:**
-- Core SKILL.md (1,535 words)
+- Core SKILL.md
 - Examples and reference documentation
 - Command organization patterns
 
@@ -165,7 +165,7 @@ Use this workflow for structured, high-quality plugin development from concept t
 - Complete production-ready agent examples
 
 **Resources:**
-- Core SKILL.md (1,438 words)
+- Core SKILL.md
 - 2 examples: agent-creation-prompt (AI-assisted workflow), complete-agent-examples (4 full agents)
 - 3 reference docs: agent-creation-system-prompt (from CrabCode), system-prompt-design (~4,000w), triggering-examples (~2,500w)
 - 1 utility script: validate-agent.sh
@@ -186,7 +186,7 @@ Use this workflow for structured, high-quality plugin development from concept t
 - Based on skill-creator methodology adapted for CrabCode plugins
 
 **Resources:**
-- Core SKILL.md (1,232 words)
+- Core SKILL.md
 - References: skill-creator methodology, plugin-dev patterns
 - Examples: Study plugin-dev's own skills as templates
 
@@ -195,16 +195,16 @@ Use this workflow for structured, high-quality plugin development from concept t
 
 ## Installation
 
-Install from crabcode-marketplace:
+Install from the official marketplace:
 
 ```bash
-/plugin install plugin-dev@crabcode-marketplace
+/plugin install plugin-dev@crabcode-plugins-official
 ```
 
 Or for development, use directly:
 
 ```bash
-cc --plugin-dir /path/to/plugin-dev
+crabcode --plugin-dir /path/to/plugin-dev
 ```
 
 ## Quick Start
@@ -273,14 +273,20 @@ This keeps CrabCode's context focused while providing deep knowledge when needed
 The hook-development skill includes production-ready utilities:
 
 ```bash
-# Validate hooks.json structure
-./validate-hook-schema.sh hooks/hooks.json
+# Paths are relative to the plugin root
+SCRIPTS=skills/hook-development/scripts
+
+# Validate hooks.json structure (expects the wrapped plugin form)
+"$SCRIPTS"/validate-hook-schema.sh hooks/hooks.json
 
 # Test hooks before deployment
-./test-hook.sh my-hook.sh test-input.json
+"$SCRIPTS"/test-hook.sh my-hook.sh test-input.json
+
+# Generate a sample payload for any event
+"$SCRIPTS"/test-hook.sh --create-sample PreToolUse
 
 # Lint hook scripts for best practices
-./hook-linter.sh my-hook.sh
+"$SCRIPTS"/hook-linter.sh my-hook.sh
 ```
 
 ### Working Examples
@@ -303,10 +309,10 @@ All skills follow consistent standards:
 
 ## Total Content
 
-- **Core Skills**: ~11,065 words across 7 SKILL.md files
-- **Reference Docs**: ~10,000+ words of detailed guides
-- **Examples**: 12+ working examples (hook scripts, MCP configs, plugin layouts, settings files)
-- **Utilities**: 6 production-ready validation/testing/parsing scripts
+- **Core Skills**: 7 SKILL.md files
+- **Reference Docs**: detailed guides per skill
+- **Examples**: working examples (hook scripts, MCP configs, plugin layouts, settings files)
+- **Utilities**: validation/testing/parsing scripts
 
 ## Use Cases
 
@@ -378,16 +384,16 @@ All skills emphasize:
 
 ## Contributing
 
-This plugin is part of the crabcode-marketplace. To contribute improvements:
+This plugin is part of the crabcode-plugins-official marketplace. To contribute improvements:
 
 1. Fork the marketplace repository
 2. Make changes to plugin-dev/
-3. Test locally with `cc --plugin-dir`
+3. Test locally with `crabcode --plugin-dir`
 4. Create PR following marketplace-publishing guidelines
 
 ## Version
 
-0.1.0 - Initial release with seven comprehensive skills and three validation agents
+0.2.2 - Seven skills plus three agents (agent-creator generates, plugin-validator and skill-reviewer verify)
 
 ## Provenance
 
@@ -395,7 +401,7 @@ Adapted from upstream open-source plugin source. See `docs/legal/THIRD_PARTY_NOT
 
 ## License
 
-MIT License - See repository for details
+Apache-2.0 - See repository for details
 
 ---
 

@@ -1,0 +1,37 @@
+{
+  "$comment": [
+    "Subcommands the /plugin command actually parses.",
+    "",
+    "Hand-exported from the product repository. The parser falls through to the",
+    "interactive menu on an unrecognised subcommand rather than reporting an",
+    "error, so a documented-but-nonexistent subcommand fails silently: the user",
+    "sees a menu and assumes they mistyped. That silence is why this list is",
+    "checked mechanically.",
+    "",
+    "Note `update`: there is no top-level `/plugin update`. Updating is reached",
+    "as `/plugin marketplace update`. Documentation that shows the top-level",
+    "form is describing a command that does not exist.",
+    "",
+    "Source: src/commands/plugin/parseArgs.ts :: parsePluginArgs",
+    "Product commit: 4c2635a95b8eb611c0cc9c241a263c6f9cfd1050",
+    "Exported: 2026-08-15"
+  ],
+  "source": "src/commands/plugin/parseArgs.ts::parsePluginArgs",
+  "sourceCommit": "4c2635a95b8eb611c0cc9c241a263c6f9cfd1050",
+  "exportedOn": "2026-08-15",
+  "subcommands": [
+    "help",
+    "--help",
+    "-h",
+    "install",
+    "i",
+    "manage",
+    "uninstall",
+    "enable",
+    "disable",
+    "validate",
+    "marketplace",
+    "market"
+  ],
+  "marketplaceActions": ["add", "remove", "rm", "update", "list"]
+}

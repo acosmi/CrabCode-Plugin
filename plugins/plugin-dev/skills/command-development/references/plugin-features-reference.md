@@ -116,7 +116,7 @@ description: Run custom linter from plugin
 allowed-tools: Bash(node:*)
 ---
 
-Lint results: !`node ${CRABCODE_PLUGIN_ROOT}/bin/lint.js $1`
+Lint results: !`node ${CRABCODE_PLUGIN_ROOT}/bin/lint.js $0`
 
 Review the linting output and suggest fixes.
 ```
@@ -131,7 +131,7 @@ allowed-tools: Read, Bash(*)
 
 Configuration: @${CRABCODE_PLUGIN_ROOT}/config/deploy-config.json
 
-Deploy application using the configuration above for $1 environment.
+Deploy application using the configuration above for $0 environment.
 ```
 
 #### 3. Accessing Plugin Resources
@@ -143,7 +143,7 @@ description: Generate report from template
 
 Use this template: @${CRABCODE_PLUGIN_ROOT}/templates/api-report.md
 
-Generate a report for @$1 following the template format.
+Generate a report for @$0 following the template format.
 ```
 
 #### 4. Multi-Step Plugin Workflows
@@ -154,9 +154,9 @@ description: Complete plugin workflow
 allowed-tools: Bash(*), Read
 ---
 
-Step 1 - Prepare: !`bash ${CRABCODE_PLUGIN_ROOT}/scripts/prepare.sh $1`
-Step 2 - Config: @${CRABCODE_PLUGIN_ROOT}/config/$1.json
-Step 3 - Execute: !`${CRABCODE_PLUGIN_ROOT}/bin/execute $1`
+Step 1 - Prepare: !`bash ${CRABCODE_PLUGIN_ROOT}/scripts/prepare.sh $0`
+Step 2 - Config: @${CRABCODE_PLUGIN_ROOT}/config/$0.json
+Step 3 - Execute: !`${CRABCODE_PLUGIN_ROOT}/bin/execute $0`
 
 Review results and report status.
 ```
@@ -198,7 +198,7 @@ Review results and report status.
 
 4. **Combine with arguments:**
    ```markdown
-   Run: !`${CRABCODE_PLUGIN_ROOT}/bin/process.sh $1 $2`
+   Run: !`${CRABCODE_PLUGIN_ROOT}/bin/process.sh $0 $1`
    ```
 
 ### Troubleshooting
@@ -232,7 +232,7 @@ allowed-tools: Read, Bash(*)
 
 Load configuration: @${CRABCODE_PLUGIN_ROOT}/deploy-config.json
 
-Deploy to $1 environment using:
+Deploy to $0 environment using:
 1. Configuration settings above
 2. Current git branch: !`git branch --show-current`
 3. Application version: !`cat package.json | grep version`
@@ -254,7 +254,7 @@ argument-hint: [component-name]
 
 Template: @${CRABCODE_PLUGIN_ROOT}/templates/component-docs.md
 
-Generate documentation for $1 component following the template structure.
+Generate documentation for $0 component following the template structure.
 Include:
 - Component purpose and usage
 - API reference
@@ -297,11 +297,11 @@ description: Deploy based on environment
 argument-hint: [dev|staging|prod]
 ---
 
-Environment config: @${CRABCODE_PLUGIN_ROOT}/config/$1.json
+Environment config: @${CRABCODE_PLUGIN_ROOT}/config/$0.json
 
-Environment check: !`echo "Deploying to: $1"`
+Environment check: !`echo "Deploying to: $0"`
 
-Deploy application using $1 environment configuration.
+Deploy application using $0 environment configuration.
 Verify deployment and run smoke tests.
 ```
 
@@ -319,7 +319,7 @@ allowed-tools: Bash(*), Read, Write
 
 Cache directory: ${CRABCODE_PLUGIN_ROOT}/cache/
 
-Analyze @$1 and save results to cache:
+Analyze @$0 and save results to cache:
 !`mkdir -p ${CRABCODE_PLUGIN_ROOT}/cache && date > ${CRABCODE_PLUGIN_ROOT}/cache/last-run.txt`
 
 Store analysis for future reference and comparison.
@@ -339,7 +339,7 @@ description: Deep analysis using plugin agent
 argument-hint: [file-path]
 ---
 
-Initiate deep code analysis of @$1 using the code-analyzer agent.
+Initiate deep code analysis of @$0 using the code-analyzer agent.
 
 The agent will:
 1. Analyze code structure
@@ -365,7 +365,7 @@ description: API documentation with best practices
 argument-hint: [api-file]
 ---
 
-Document the API in @$1 following our API documentation standards.
+Document the API in @$0 following our API documentation standards.
 
 Use the api-docs-standards skill to ensure documentation includes:
 - Endpoint descriptions
@@ -392,9 +392,9 @@ description: Commit with pre-commit validation
 allowed-tools: Bash(git:*)
 ---
 
-Stage changes: !\`git add $1\`
+Stage changes: !\`git add $0\`
 
-Commit changes: !\`git commit -m "$2"\`
+Commit changes: !\`git commit -m "$1"\`
 
 Note: This commit will trigger the plugin's pre-commit hook for validation.
 Review hook output for any issues.
@@ -415,12 +415,12 @@ description: Comprehensive code review workflow
 argument-hint: [file-path]
 ---
 
-File to review: @$1
+File to review: @$0
 
 Execute comprehensive review:
 
 1. **Static Analysis** (via plugin scripts)
-   !`node ${CRABCODE_PLUGIN_ROOT}/scripts/lint.js $1`
+   !`node ${CRABCODE_PLUGIN_ROOT}/scripts/lint.js $0`
 
 2. **Deep Review** (via plugin agent)
    Launch the code-reviewer agent for detailed analysis.
@@ -448,12 +448,14 @@ description: Deploy to environment with validation
 argument-hint: [environment]
 ---
 
-Validate environment: !`echo "$1" | grep -E "^(dev|staging|prod)$" || echo "INVALID"`
+Validate environment: !`echo "$0" | grep -E "^(dev|staging|prod)$" || echo "INVALID"`
 
-$IF($1 in [dev, staging, prod],
-  Deploy to $1 environment using validated configuration,
-  ERROR: Invalid environment '$1'. Must be one of: dev, staging, prod
-)
+The line above runs before the model reads the body, so its output is already
+in front of the model. Instruct on it:
+
+If the validation printed INVALID, stop and tell the user that '$0' is not a
+valid environment and that it must be one of: dev, staging, prod.
+Otherwise deploy to the $0 environment using the validated configuration.
 ```
 
 **Validation approaches:**
@@ -471,9 +473,9 @@ description: Process configuration file
 argument-hint: [config-file]
 ---
 
-Check file: !`test -f $1 && echo "EXISTS" || echo "MISSING"`
+Check file: !`test -f $0 && echo "EXISTS" || echo "MISSING"`
 
-Process configuration if file exists: @$1
+Process configuration if file exists: @$0
 
 If file doesn't exist, explain:
 - Expected location
@@ -491,12 +493,10 @@ description: Create deployment with version
 argument-hint: [environment] [version]
 ---
 
-Validate inputs: !`test -n "$1" -a -n "$2" && echo "OK" || echo "MISSING"`
+Validate inputs: !`test -n "$0" -a -n "$1" && echo "OK" || echo "MISSING"`
 
-$IF($1 AND $2,
-  Deploy version $2 to $1 environment,
-  ERROR: Both environment and version required. Usage: /deploy [env] [version]
-)
+If the check printed MISSING, stop and reply with the usage:
+/deploy [env] [version]. Otherwise deploy version $1 to the $0 environment.
 ```
 
 ### Plugin Resource Validation
@@ -548,7 +548,7 @@ description: Process file with error handling
 argument-hint: [file-path]
 ---
 
-Try processing: !`node ${CRABCODE_PLUGIN_ROOT}/scripts/process.js $1 2>&1 || echo "ERROR: $?"`
+Try processing: !`node ${CRABCODE_PLUGIN_ROOT}/scripts/process.js $0 2>&1 || echo "ERROR: $?"`
 
 If processing succeeded:
 - Report results

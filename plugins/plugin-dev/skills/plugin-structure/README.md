@@ -14,7 +14,7 @@ This skill provides detailed knowledge about:
 
 ## Skill Structure
 
-### SKILL.md (1,619 words)
+### SKILL.md
 
 Core skill content covering:
 - Directory structure overview
@@ -86,9 +86,9 @@ CrabCode activates this skill when users:
 
 The skill uses progressive disclosure to manage context:
 
-1. **SKILL.md** (~1600 words): Core concepts and workflows
-2. **References** (~6000 words): Detailed field references and patterns
-3. **Examples** (~8000 words): Complete working examples
+1. **SKILL.md**: Core concepts and workflows
+2. **References**: Detailed field references and patterns
+3. **Examples**: Complete working examples
 
 CrabCode loads references and examples only as needed based on the task.
 
