@@ -131,14 +131,18 @@ After test completion, offer to:
 
 ```markdown
 ---
-description: Expert code reviewer specializing in identifying bugs, security issues, and improvement opportunities
-capabilities:
-  - Analyze code for potential bugs and logic errors
-  - Identify security vulnerabilities
-  - Suggest performance improvements
-  - Ensure code follows project standards
-  - Review test coverage adequacy
+name: code-reviewer
+description: Use this agent when the user asks to review code, check a diff for bugs, or audit changes before merging. Typical triggers include post-implementation review, security review of a patch, and test-coverage checks.
+model: inherit
 ---
+
+## Responsibilities
+
+- Analyze code for potential bugs and logic errors
+- Identify security vulnerabilities
+- Suggest performance improvements
+- Ensure code follows project standards
+- Review test coverage adequacy
 
 # Code Reviewer Agent
 
@@ -178,18 +182,22 @@ For each file reviewed:
 
 ```markdown
 ---
-description: Generates comprehensive test suites from code analysis
-capabilities:
-  - Analyze code structure and logic flow
-  - Generate unit tests for functions and methods
-  - Create integration tests for modules
-  - Design edge case and error condition tests
-  - Suggest test fixtures and mocks
+name: test-generator
+description: Use this agent when the user asks to generate tests, add coverage for a module, or write edge-case tests. Typical triggers include a newly written function with no tests, a module with thin coverage, and a request for integration tests.
+model: inherit
 ---
 
 # Test Generator Agent
 
 Specialized agent for generating comprehensive test suites.
+
+## Responsibilities
+
+- Analyze code structure and logic flow
+- Generate unit tests for functions and methods
+- Create integration tests for modules
+- Design edge case and error condition tests
+- Suggest test fixtures and mocks
 
 ## Expertise
 

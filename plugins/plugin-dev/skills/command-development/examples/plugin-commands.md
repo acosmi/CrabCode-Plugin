@@ -30,9 +30,9 @@ argument-hint: [file-path]
 allowed-tools: Bash(node:*), Read
 ---
 
-Analyze @$1 using plugin's quality checker:
+Analyze @$0 using plugin's quality checker:
 
-!`node ${CRABCODE_PLUGIN_ROOT}/scripts/quality-check.js $1`
+!`node ${CRABCODE_PLUGIN_ROOT}/scripts/quality-check.js $0`
 
 Review the analysis output and provide:
 1. Summary of findings
@@ -59,19 +59,19 @@ Review the analysis output and provide:
 description: Complete code audit using plugin suite
 argument-hint: [directory]
 allowed-tools: Bash(*)
-model: <model-id>
+model: inherit
 ---
 
-Running complete audit on $1:
+Running complete audit on $0:
 
 **Security scan:**
-!`bash ${CRABCODE_PLUGIN_ROOT}/scripts/security-scan.sh $1`
+!`bash ${CRABCODE_PLUGIN_ROOT}/scripts/security-scan.sh $0`
 
 **Performance analysis:**
-!`bash ${CRABCODE_PLUGIN_ROOT}/scripts/perf-analyze.sh $1`
+!`bash ${CRABCODE_PLUGIN_ROOT}/scripts/perf-analyze.sh $0`
 
 **Best practices check:**
-!`bash ${CRABCODE_PLUGIN_ROOT}/scripts/best-practices.sh $1`
+!`bash ${CRABCODE_PLUGIN_ROOT}/scripts/best-practices.sh $0`
 
 Analyze all results and create comprehensive report including:
 - Critical issues requiring immediate attention
@@ -102,7 +102,7 @@ argument-hint: [api-file]
 
 Template structure: @${CRABCODE_PLUGIN_ROOT}/templates/api-documentation.md
 
-API implementation: @$1
+API implementation: @$0
 
 Generate complete API documentation following the template format above.
 
@@ -138,19 +138,19 @@ argument-hint: [version]
 allowed-tools: Bash(*), Read
 ---
 
-Executing release workflow for version $1:
+Executing release workflow for version $0:
 
 **Step 1 - Pre-release validation:**
-!`bash ${CRABCODE_PLUGIN_ROOT}/scripts/pre-release-check.sh $1`
+!`bash ${CRABCODE_PLUGIN_ROOT}/scripts/pre-release-check.sh $0`
 
 **Step 2 - Build artifacts:**
-!`bash ${CRABCODE_PLUGIN_ROOT}/scripts/build-release.sh $1`
+!`bash ${CRABCODE_PLUGIN_ROOT}/scripts/build-release.sh $0`
 
 **Step 3 - Run test suite:**
 !`bash ${CRABCODE_PLUGIN_ROOT}/scripts/run-tests.sh`
 
 **Step 4 - Package release:**
-!`bash ${CRABCODE_PLUGIN_ROOT}/scripts/package.sh $1`
+!`bash ${CRABCODE_PLUGIN_ROOT}/scripts/package.sh $0`
 
 Review all step outputs and report:
 1. Any failures or warnings
@@ -181,17 +181,17 @@ argument-hint: [environment]
 allowed-tools: Read, Bash(*)
 ---
 
-Deployment configuration for $1: @${CRABCODE_PLUGIN_ROOT}/config/$1-deploy.json
+Deployment configuration for $0: @${CRABCODE_PLUGIN_ROOT}/config/$0-deploy.json
 
 Current git state: !`git rev-parse --short HEAD`
 
 Build info: !`cat package.json | grep -E '(name|version)'`
 
-Execute deployment to $1 environment using configuration above.
+Execute deployment to $0 environment using configuration above.
 
 Deployment checklist:
 1. Validate configuration settings
-2. Build application for $1
+2. Build application for $0
 3. Run pre-deployment tests
 4. Deploy to target environment
 5. Run smoke tests
@@ -221,7 +221,7 @@ description: Deep code review using plugin agent
 argument-hint: [file-or-directory]
 ---
 
-Initiate comprehensive code review of @$1 using the code-reviewer agent.
+Initiate comprehensive code review of @$0 using the code-reviewer agent.
 
 The agent will perform:
 1. **Static analysis** - Check for code smells and anti-patterns
@@ -258,7 +258,7 @@ description: Document API following plugin standards
 argument-hint: [api-file]
 ---
 
-API source code: @$1
+API source code: @$0
 
 Generate API documentation following the plugin's API documentation standards.
 
@@ -299,12 +299,12 @@ argument-hint: [file-path]
 allowed-tools: Bash(node:*), Read
 ---
 
-Target file: @$1
+Target file: @$0
 
 Execute comprehensive review workflow:
 
 **Phase 1: Automated Analysis**
-Run plugin analyzer: !`node ${CRABCODE_PLUGIN_ROOT}/scripts/analyze.js $1`
+Run plugin analyzer: !`node ${CRABCODE_PLUGIN_ROOT}/scripts/analyze.js $0`
 
 **Phase 2: Deep Review (Agent)**
 Launch the code-quality-reviewer agent for detailed analysis.
@@ -356,19 +356,19 @@ argument-hint: [environment]
 allowed-tools: Bash(*)
 ---
 
-Validate environment argument: !`echo "$1" | grep -E "^(dev|staging|prod)$" && echo "VALID" || echo "INVALID"`
+Validate environment argument: !`echo "$0" | grep -E "^(dev|staging|prod)$" && echo "VALID" || echo "INVALID"`
 
 Check build script exists: !`test -x ${CRABCODE_PLUGIN_ROOT}/scripts/build.sh && echo "EXISTS" || echo "MISSING"`
 
-Verify configuration available: !`test -f ${CRABCODE_PLUGIN_ROOT}/config/$1.json && echo "FOUND" || echo "NOT_FOUND"`
+Verify configuration available: !`test -f ${CRABCODE_PLUGIN_ROOT}/config/$0.json && echo "FOUND" || echo "NOT_FOUND"`
 
 If all validations pass:
 
-**Configuration:** @${CRABCODE_PLUGIN_ROOT}/config/$1.json
+**Configuration:** @${CRABCODE_PLUGIN_ROOT}/config/$0.json
 
-**Execute build:** !`bash ${CRABCODE_PLUGIN_ROOT}/scripts/build.sh $1 2>&1`
+**Execute build:** !`bash ${CRABCODE_PLUGIN_ROOT}/scripts/build.sh $0 2>&1`
 
-**Validation results:** !`bash ${CRABCODE_PLUGIN_ROOT}/scripts/validate-build.sh $1 2>&1`
+**Validation results:** !`bash ${CRABCODE_PLUGIN_ROOT}/scripts/validate-build.sh $0 2>&1`
 
 Report build status and any issues.
 
@@ -401,11 +401,11 @@ argument-hint: [environment]
 allowed-tools: Bash(*), Read
 ---
 
-Environment: $1
+Environment: $0
 
-Load environment configuration: @${CRABCODE_PLUGIN_ROOT}/config/$1-checks.json
+Load environment configuration: @${CRABCODE_PLUGIN_ROOT}/config/$0-checks.json
 
-Determine check level: !`echo "$1" | grep -E "^prod$" && echo "FULL" || echo "BASIC"`
+Determine check level: !`echo "$0" | grep -E "^prod$" && echo "FULL" || echo "BASIC"`
 
 **For production environment:**
 - Full test suite: !`bash ${CRABCODE_PLUGIN_ROOT}/scripts/test-full.sh`
@@ -438,7 +438,7 @@ Report status and recommend proceed/block decision.
 
 ### Pattern: Plugin Script Execution
 ```markdown
-!`node ${CRABCODE_PLUGIN_ROOT}/scripts/script-name.js $1`
+!`node ${CRABCODE_PLUGIN_ROOT}/scripts/script-name.js $0`
 ```
 Use for: Running plugin-provided Node.js scripts
 
@@ -468,7 +468,7 @@ Use for: Leveraging plugin skills for specialized knowledge
 
 ### Pattern: Input Validation
 ```markdown
-Validate input: !`echo "$1" | grep -E "^pattern$" && echo "OK" || echo "ERROR"`
+Validate input: !`echo "$0" | grep -E "^pattern$" && echo "OK" || echo "ERROR"`
 ```
 Use for: Validating command arguments
 
@@ -535,11 +535,11 @@ Use for: Verifying required plugin files exist
 3. **Not validating inputs:**
    ```markdown
    # Risky - no validation
-   Deploy to $1 environment
+   Deploy to $0 environment
 
    # Better - with validation
-   Validate: !`echo "$1" | grep -E "^(dev|staging|prod)$" || echo "INVALID"`
-   Deploy to $1 environment (if valid)
+   Validate: !`echo "$0" | grep -E "^(dev|staging|prod)$" || echo "INVALID"`
+   Deploy to $0 environment (if valid)
    ```
 
 4. **Hardcoding plugin paths:**

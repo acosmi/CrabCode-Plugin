@@ -1,8 +1,9 @@
 {
   "_comment": "Example stdio MCP server configuration for local file system access",
+  "_note_on_variables": "MCP configs get ${CRABCODE_PLUGIN_ROOT} and ${CRABCODE_PLUGIN_DATA}; every other ${VAR} is read from the user's environment. ${CRABCODE_PROJECT_DIR} is NOT available here - it is injected into hook subprocesses, not into MCP configuration - so a path that must point at the project has to come from a variable the user sets.",
   "filesystem": {
     "command": "npx",
-    "args": ["-y", "@modelcontextprotocol/server-filesystem", "${CRABCODE_PROJECT_DIR}"],
+    "args": ["-y", "@modelcontextprotocol/server-filesystem", "${MCP_ALLOWED_ROOT}"],
     "env": {
       "LOG_LEVEL": "info"
     }

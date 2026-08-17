@@ -1,6 +1,19 @@
 #!/bin/bash
 # Example PreToolUse hook for validating Bash commands
 # This script demonstrates bash command validation patterns
+#
+# Two output channels, and they are not interchangeable:
+#
+#   1. Structured decision — print JSON on STDOUT and exit 0.
+#      Only stdout is parsed, and hookSpecificOutput.hookEventName is
+#      required. This is the only way to return "ask", and the only way a
+#      permissionDecision is honoured at all.
+#
+#   2. Plain blocking feedback — write the reason to STDERR and exit 2.
+#      The stderr text is surfaced verbatim; it is NOT parsed as JSON.
+#
+# Printing JSON to stderr combines the worst of both: the decision is
+# silently discarded and the raw JSON is shown to the model as prose.
 
 set -euo pipefail
 
@@ -21,22 +34,33 @@ if [[ "$command" =~ ^(ls|pwd|echo|date|whoami)(\s|$) ]]; then
   exit 0
 fi
 
+# Emit a structured PreToolUse decision on stdout, then exit 0.
+emit_decision() {
+  jq -cn \
+    --arg decision "$1" \
+    --arg reason "$2" \
+    '{hookSpecificOutput: {
+        hookEventName: "PreToolUse",
+        permissionDecision: $decision,
+        permissionDecisionReason: $reason
+      }}'
+  exit 0
+}
+
 # Check for destructive operations
 if [[ "$command" == *"rm -rf"* ]] || [[ "$command" == *"rm -fr"* ]]; then
-  echo '{"hookSpecificOutput": {"permissionDecision": "deny"}, "systemMessage": "Dangerous command detected: rm -rf"}' >&2
-  exit 2
+  emit_decision deny "Dangerous command detected: rm -rf"
 fi
 
 # Check for other dangerous commands
 if [[ "$command" == *"dd if="* ]] || [[ "$command" == *"mkfs"* ]] || [[ "$command" == *"> /dev/"* ]]; then
-  echo '{"hookSpecificOutput": {"permissionDecision": "deny"}, "systemMessage": "Dangerous system operation detected"}' >&2
-  exit 2
+  emit_decision deny "Dangerous system operation detected"
 fi
 
-# Check for privilege escalation
+# Check for privilege escalation. This must be a structured "ask": exiting 2
+# would block outright, which is a different answer than asking the user.
 if [[ "$command" == sudo* ]] || [[ "$command" == su* ]]; then
-  echo '{"hookSpecificOutput": {"permissionDecision": "ask"}, "systemMessage": "Command requires elevated privileges"}' >&2
-  exit 2
+  emit_decision ask "Command requires elevated privileges"
 fi
 
 # Approve the operation

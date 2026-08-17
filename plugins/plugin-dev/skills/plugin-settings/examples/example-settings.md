@@ -48,7 +48,7 @@ Contact @team-lead with questions about this configuration.
 
 ## Template: Agent State File
 
-**.crabcode/multi-agent-swarm.local.md:**
+**.crabcode/my-plugin.local.md:**
 
 ```markdown
 ---
@@ -123,7 +123,7 @@ if [[ ! -f ".crabcode/my-plugin.local.md" ]]; then
 fi
 
 # Read settings
-FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' ".crabcode/my-plugin.local.md")
+FRONTMATTER=$(awk 'NR==1 && /^---$/ {c=1; next} c==1 && /^---$/ {exit} c==1' ".crabcode/my-plugin.local.md")
 ENABLED=$(echo "$FRONTMATTER" | grep '^enabled:' | sed 's/enabled: *//')
 
 # Apply settings

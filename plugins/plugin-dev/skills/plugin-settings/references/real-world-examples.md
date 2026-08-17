@@ -2,129 +2,12 @@
 
 Detailed analysis of how production plugins use the `.crabcode/plugin-name.local.md` pattern.
 
-## multi-agent-swarm Plugin
+## About these examples
 
-### Settings File Structure
-
-**.crabcode/multi-agent-swarm.local.md:**
-
-```markdown
----
-agent_name: auth-implementation
-task_number: 3.5
-pr_number: 1234
-coordinator_session: team-leader
-enabled: true
-dependencies: ["Task 3.4"]
-additional_instructions: "Use JWT tokens, not sessions"
----
-
-# Task: Implement Authentication
-
-Build JWT-based authentication for the REST API.
-
-## Requirements
-- JWT token generation and validation
-- Refresh token flow
-- Secure password hashing
-
-## Success Criteria
-- Auth endpoints implemented
-- Tests passing (100% coverage)
-- PR created and CI green
-- Documentation updated
-
-## Coordination
-Depends on Task 3.4 (user model).
-Report status to 'team-leader' session.
-```
-
-### How It's Used
-
-**File:** `hooks/agent-stop-notification.sh`
-
-**Purpose:** Send notifications to coordinator when agent becomes idle
-
-**Implementation:**
-
-```bash
-#!/bin/bash
-set -euo pipefail
-
-SWARM_STATE_FILE=".crabcode/multi-agent-swarm.local.md"
-
-# Quick exit if no swarm active
-if [[ ! -f "$SWARM_STATE_FILE" ]]; then
-  exit 0
-fi
-
-# Parse frontmatter
-FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$SWARM_STATE_FILE")
-
-# Extract configuration
-COORDINATOR_SESSION=$(echo "$FRONTMATTER" | grep '^coordinator_session:' | sed 's/coordinator_session: *//' | sed 's/^"\(.*\)"$/\1/')
-AGENT_NAME=$(echo "$FRONTMATTER" | grep '^agent_name:' | sed 's/agent_name: *//' | sed 's/^"\(.*\)"$/\1/')
-TASK_NUMBER=$(echo "$FRONTMATTER" | grep '^task_number:' | sed 's/task_number: *//' | sed 's/^"\(.*\)"$/\1/')
-PR_NUMBER=$(echo "$FRONTMATTER" | grep '^pr_number:' | sed 's/pr_number: *//' | sed 's/^"\(.*\)"$/\1/')
-ENABLED=$(echo "$FRONTMATTER" | grep '^enabled:' | sed 's/enabled: *//')
-
-# Check if enabled
-if [[ "$ENABLED" != "true" ]]; then
-  exit 0
-fi
-
-# Send notification to coordinator
-NOTIFICATION="🤖 Agent ${AGENT_NAME} (Task ${TASK_NUMBER}, PR #${PR_NUMBER}) is idle."
-
-if tmux has-session -t "$COORDINATOR_SESSION" 2>/dev/null; then
-  tmux send-keys -t "$COORDINATOR_SESSION" "$NOTIFICATION" Enter
-  sleep 0.5
-  tmux send-keys -t "$COORDINATOR_SESSION" Enter
-fi
-
-exit 0
-```
-
-**Key patterns:**
-1. **Quick exit** (line 7-9): Returns immediately if file doesn't exist
-2. **Field extraction** (lines 11-17): Parses each frontmatter field
-3. **Enabled check** (lines 19-21): Respects enabled flag
-4. **Action based on settings** (lines 23-29): Uses coordinator_session to send notification
-
-### Creation
-
-**File:** `commands/launch-swarm.md`
-
-Settings files are created during swarm launch with:
-
-```bash
-cat > "$WORKTREE_PATH/.crabcode/multi-agent-swarm.local.md" <<EOF
----
-agent_name: $AGENT_NAME
-task_number: $TASK_ID
-pr_number: TBD
-coordinator_session: $COORDINATOR_SESSION
-enabled: true
-dependencies: [$DEPENDENCIES]
-additional_instructions: "$EXTRA_INSTRUCTIONS"
----
-
-# Task: $TASK_DESCRIPTION
-
-$TASK_DETAILS
-EOF
-```
-
-### Updates
-
-PR number updated after PR creation:
-
-```bash
-# Update pr_number field
-sed "s/^pr_number: .*/pr_number: $PR_NUM/" \
-  ".crabcode/multi-agent-swarm.local.md" > temp.md
-mv temp.md ".crabcode/multi-agent-swarm.local.md"
-```
+One worked example, taken from a plugin that ships in this marketplace. The
+frontmatter fields and defaults below are read from
+`plugins/ralph-loop/src/state.ts`, not paraphrased — if they ever disagree with
+that file, the file is right.
 
 ## ralph-loop Plugin
 
@@ -134,10 +17,12 @@ mv temp.md ".crabcode/multi-agent-swarm.local.md"
 
 ```markdown
 ---
+active: true
 iteration: 1
-max_iterations: 10
+session_id: "01JB2Z0Q4S8N7M6K5J4H3G2F1E"
+max_iterations: 5
 completion_promise: "All tests passing and build successful"
-started_at: "2025-01-15T14:30:00Z"
+started_at: "2026-08-15T14:30:00Z"
 ---
 
 Fix all the linting errors in the project.
@@ -145,11 +30,25 @@ Make sure tests pass after each fix.
 Document any changes needed in CRABCODE.md.
 ```
 
+Field notes, from `src/state.ts`:
+
+- `max_iterations` defaults to `DEFAULT_MAX_ITERATIONS` (**5**) and is capped at
+  `HARD_MAX_ITERATIONS` (200)
+- `completion_promise` and `session_id` are the literal string `null` when unset
+  — the parser treats `null` and empty as "absent", so a bare empty value is
+  not an error
+- `active: true` is written by `renderStateFile` but never read back by
+  `parseStateFile`; treat it as a human-facing marker, not a control flag
+- The body after the frontmatter is the prompt, and it is **required** — the
+  parser rejects a state file with an empty body
+
 ### How It's Used
 
-**File:** `hooks/stop-hook.sh`
+**Files:** `src/stopHook.ts`, `src/state.ts`, `src/setupRalphLoop.ts`
+(the plugin is implemented in TypeScript; `hooks/hooks.json` registers the Stop
+hook that runs it)
 
-**Purpose:** Prevent session exit and loop CrabCode's output back as input
+**Purpose:** Prevent session exit and re-feed the stored prompt as input
 
 **Implementation:**
 
@@ -165,7 +64,7 @@ if [[ ! -f "$RALPH_STATE_FILE" ]]; then
 fi
 
 # Parse frontmatter
-FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$RALPH_STATE_FILE")
+FRONTMATTER=$(awk 'NR==1 && /^---$/ {c=1; next} c==1 && /^---$/ {exit} c==1' "$RALPH_STATE_FILE")
 
 # Extract configuration
 ITERATION=$(echo "$FRONTMATTER" | grep '^iteration:' | sed 's/iteration: *//')
@@ -198,7 +97,7 @@ fi
 NEXT_ITERATION=$((ITERATION + 1))
 
 # Extract prompt from markdown body
-PROMPT_TEXT=$(awk '/^---$/{i++; next} i>=2' "$RALPH_STATE_FILE")
+PROMPT_TEXT=$(awk 'c==2{print; next} /^---$/{c++}' "$RALPH_STATE_FILE")
 
 # Update iteration counter
 TEMP_FILE="${RALPH_STATE_FILE}.tmp.$$"
@@ -251,23 +150,27 @@ EOF
 echo "Ralph loop initialized: .crabcode/ralph-loop.local.md"
 ```
 
-## Pattern Comparison
+## What the shape buys you
 
-| Feature | multi-agent-swarm | ralph-loop |
-|---------|-------------------|--------------|
-| **File** | `.crabcode/multi-agent-swarm.local.md` | `.crabcode/ralph-loop.local.md` |
-| **Purpose** | Agent coordination state | Loop iteration state |
-| **Frontmatter** | Agent metadata | Loop configuration |
-| **Body** | Task assignment | Prompt to loop |
-| **Updates** | PR number, status | Iteration counter |
-| **Deletion** | Manual or on completion | On loop exit |
-| **Hook** | Stop (notifications) | Stop (loop control) |
+| Aspect | How ralph-loop uses it |
+|---|---|
+| **File** | `.crabcode/ralph-loop.local.md` |
+| **Purpose** | Loop iteration state |
+| **Frontmatter** | Loop configuration (counter, cap, promise, session) |
+| **Body** | The prompt to re-feed |
+| **Updates** | Iteration counter, rewritten each pass |
+| **Deletion** | On loop exit |
+| **Hook** | Stop (loop control) |
+
+The split is the point: machine-readable settings in frontmatter, free-form
+content in the body. A counter belongs above the fence; a paragraph of prompt
+does not.
 
 ## Best Practices from Real Plugins
 
 ### 1. Quick Exit Pattern
 
-Both plugins check file existence first:
+Check file existence first:
 
 ```bash
 if [[ ! -f "$STATE_FILE" ]]; then
@@ -277,19 +180,23 @@ fi
 
 **Why:** Avoids errors when plugin isn't configured and performs fast.
 
-### 2. Enabled Flag
+### 2. A Presence-or-Flag Decision
 
-Both use an `enabled` field for explicit control:
+ralph-loop treats **file existence** as the on/off switch: no state file means
+no loop. It also writes `active: true`, but nothing reads that back.
+
+Either convention works; pick one and be consistent:
 
 ```yaml
-enabled: true
+enabled: true    # only meaningful if your hook actually reads it
 ```
 
-**Why:** Allows temporary deactivation without deleting file.
+**Why it matters:** a flag that no code reads is worse than no flag, because it
+looks like a control the user can turn off. If you write `enabled`, read it.
 
 ### 3. Atomic Updates
 
-Both use temp file + atomic move:
+Write to a temp file, then move it into place:
 
 ```bash
 TEMP_FILE="${FILE}.tmp.$$"
@@ -377,10 +284,10 @@ MAX=${MAX:-10}
 
 ```bash
 # BAD: Assumes exactly 2 --- markers
-sed -n '/^---$/,/^---$/{ /^---$/d; p; }'
+awk 'NR==1 && /^---$/ {c=1; next} c==1 && /^---$/ {exit} c==1'
 
 # GOOD: Handles --- in body
-awk '/^---$/{i++; next} i>=2'  # For body
+awk 'c==2{print; next} /^---$/{c++}'  # For body
 ```
 
 ## Conclusion

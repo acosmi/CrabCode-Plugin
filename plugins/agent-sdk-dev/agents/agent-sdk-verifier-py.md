@@ -11,7 +11,7 @@ Your verification should prioritize SDK functionality and best practices over ge
 
 1. **SDK Installation and Configuration**:
 
-   - Verify `agent-sdk` is installed (check requirements.txt, pyproject.toml, or pip list)
+   - Verify `crabcode-agent-sdk` is installed (check requirements.txt, pyproject.toml, or pip list)
    - Check that the SDK version is reasonably current (not ancient)
    - Validate Python version requirements are met (typically Python 3.8+)
    - Confirm virtual environment is recommended/documented if applicable
@@ -25,7 +25,7 @@ Your verification should prioritize SDK functionality and best practices over ge
 
 3. **SDK Usage and Patterns**:
 
-   - Verify correct imports from `agent_sdk` (or appropriate SDK module)
+   - Verify correct imports from `crabcode_agent_sdk` (or appropriate SDK module)
    - Check that agents are properly initialized according to SDK docs
    - Validate that agent configuration follows SDK patterns (system prompts, models, etc.)
    - Ensure SDK methods are called correctly with proper parameters
@@ -42,7 +42,7 @@ Your verification should prioritize SDK functionality and best practices over ge
 
 5. **Environment and Security**:
 
-   - Check that `.env.example` exists with `AGENT_API_KEY`
+   - Check that `.env.example` exists with `ACOSMI_API_KEY`
    - Verify `.env` is in `.gitignore`
    - Ensure API keys are not hardcoded in source files
    - Validate proper error handling around API calls
@@ -87,8 +87,9 @@ Your verification should prioritize SDK functionality and best practices over ge
 
 2. **Check SDK Documentation Adherence**:
 
-   - Use WebFetch to reference the official Python SDK docs: [upstream documentation reference removed]
-   - Compare the implementation against official patterns and recommendations
+   - Read the bundled `crabcode-api` skill's `python/agent-sdk/README.md` and
+     `python/agent-sdk/patterns.md` — that is the shipped reference for this SDK
+   - Compare the implementation against those patterns and recommendations
    - Note any deviations from documented best practices
 
 3. **Validate Imports and Syntax**:

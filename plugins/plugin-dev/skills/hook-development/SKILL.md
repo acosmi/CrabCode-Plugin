@@ -1,7 +1,7 @@
 ---
 name: 插件钩子开发
 short-description: 开发事件驱动的插件钩子，校验工具调用并实现自动化控制
-description: This skill should be used when the user asks to "create a hook", "add a PreToolUse/PostToolUse/Stop hook", "validate tool use", "implement prompt-based hooks", "use ${CRABCODE_PLUGIN_ROOT}", "set up event-driven automation", "block dangerous commands", or mentions hook events (PreToolUse, PostToolUse, Stop, AgentStop, SessionStart, SessionEnd, UserPromptSubmit, PreCompact, Notification). Provides comprehensive guidance for creating and implementing CrabCode plugin hooks with focus on advanced prompt-based hooks API.
+description: This skill should be used when the user asks to "create a hook", "add a PreToolUse/PostToolUse/Stop hook", "validate tool use", "implement prompt-based hooks", "use ${CRABCODE_PLUGIN_ROOT}", "set up event-driven automation", "block dangerous commands", or mentions hook events (PreToolUse, PostToolUse, Stop, SubagentStop, SessionStart, SessionEnd, UserPromptSubmit, PreCompact, Notification). Provides comprehensive guidance for creating and implementing CrabCode plugin hooks with focus on advanced prompt-based hooks API.
 version: 0.1.0
 ---
 
@@ -14,7 +14,7 @@ Hooks are event-driven automation scripts that execute in response to CrabCode e
 **Key capabilities:**
 - Validate tool calls before execution (PreToolUse)
 - React to tool results (PostToolUse)
-- Enforce completion standards (Stop, AgentStop)
+- Enforce completion standards (Stop, SubagentStop)
 - Load project context (SessionStart)
 - Automate workflows across the development lifecycle
 
@@ -27,12 +27,12 @@ Use LLM-driven decision making for context-aware validation:
 ```json
 {
   "type": "prompt",
-  "prompt": "Evaluate if this tool use is appropriate: $TOOL_INPUT",
+  "prompt": "Evaluate whether this tool use is appropriate. The full hook payload follows. $ARGUMENTS",
   "timeout": 30
 }
 ```
 
-**Supported events:** Stop, AgentStop, UserPromptSubmit, PreToolUse
+**Supported events:** Stop, SubagentStop, UserPromptSubmit, PreToolUse
 
 **Benefits:**
 - Context-aware decisions based on natural language reasoning
@@ -102,7 +102,10 @@ Execute bash commands for deterministic checks:
 
 ### Settings Format (Direct)
 
-**For user settings** in `.crabcode/settings.json`, use direct format:
+**For settings files**, use the direct format. There are two scopes and they
+are different files: project settings live in `.crabcode/settings.json` inside
+the repo, user settings in `~/.crabcode/settings.json`. Both take the same
+shape:
 
 ```json
 {
@@ -146,12 +149,19 @@ Execute before any tool runs. Use to approve, deny, or modify tool calls.
 ```json
 {
   "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
     "permissionDecision": "allow|deny|ask",
+    "permissionDecisionReason": "Why this decision was made",
     "updatedInput": {"field": "modified_value"}
   },
   "systemMessage": "Explanation for CrabCode"
 }
 ```
+
+`hookSpecificOutput.hookEventName` is **required** — it is the discriminator
+that tells the host which shape it is reading, and the object is rejected
+without it. Print it on **stdout and exit 0**; see "Hook Output Format" below
+for why stderr is a different channel.
 
 ### PostToolUse
 
@@ -209,7 +219,7 @@ Execute when main agent considers stopping. Use to validate completeness.
 }
 ```
 
-### AgentStop
+### SubagentStop
 
 Execute when agent considers stopping. Use to ensure agent completed its task.
 
@@ -249,7 +259,7 @@ Execute when CrabCode session begins. Use to load context and set environment.
       "hooks": [
         {
           "type": "command",
-          "command": "bash ${CRABCODE_PLUGIN_ROOT}/scripts/load-context.sh"
+          "command": "bash ${CRABCODE_PLUGIN_ROOT}/examples/load-context.sh"
         }
       ]
     }
@@ -298,6 +308,22 @@ Execute when CrabCode sends notifications. Use to react to user notifications.
 - `2` - Blocking error (stderr fed back to CrabCode)
 - Other - Non-blocking error
 
+### Which channel carries what
+
+This is the single most common hook bug, so state it plainly:
+
+| You want to | Write to | Exit |
+|---|---|---|
+| Return a structured decision | **stdout**, as JSON | `0` |
+| Block with a human-readable reason | **stderr**, as plain text | `2` |
+
+Only **stdout** is parsed as JSON, and only when the hook exits `0`. Text on
+stderr is surfaced verbatim and is never parsed.
+
+So JSON printed to stderr is the worst of both: the decision is discarded, and
+the raw JSON is handed to the model as if it were prose. If you find yourself
+writing `echo '{"...":"..."}' >&2`, you meant one of the two rows above.
+
 ## Hook Input Format
 
 All hooks receive JSON via stdin with common fields:
@@ -307,27 +333,75 @@ All hooks receive JSON via stdin with common fields:
   "session_id": "abc123",
   "transcript_path": "/path/to/transcript.txt",
   "cwd": "/current/working/dir",
-  "permission_mode": "ask|allow",
+  "permission_mode": "default",
   "hook_event_name": "PreToolUse"
 }
 ```
 
+`permission_mode` is one of `default`, `acceptEdits`, `bypassPermissions`,
+`dontAsk`, `plan`. Subagent invocations additionally carry `agent_id` and
+`agent_type`.
+
 **Event-specific fields:**
 
-- **PreToolUse/PostToolUse:** `tool_name`, `tool_input`, `tool_result`
-- **UserPromptSubmit:** `user_prompt`
-- **Stop/AgentStop:** `reason`
+- **PreToolUse:** `tool_name`, `tool_input`, `tool_use_id`
+- **PostToolUse:** `tool_name`, `tool_input`, `tool_response`, `tool_use_id`
+- **UserPromptSubmit:** `prompt`
+- **Stop:** `stop_hook_active`, `last_assistant_message`
+- **SubagentStop:** `stop_hook_active`, `last_assistant_message`, `agent_id`,
+  `agent_transcript_path`, `agent_type`
+- **SessionStart:** `source`, `agent_type`, `model`
+- **SessionEnd:** `reason`
 
-Access fields in prompts using `$TOOL_INPUT`, `$TOOL_RESULT`, `$USER_PROMPT`, etc.
+Note the asymmetry that trips people up: the post-tool payload is
+`tool_response` (not `tool_result`), the submitted prompt is `prompt` (not
+`user_prompt`), and `reason` belongs to **SessionEnd** — a Stop hook gets
+`stop_hook_active` and `last_assistant_message` instead.
+
+### Reading fields from a prompt hook
+
+Prompt hooks substitute exactly one placeholder: **`$ARGUMENTS`**, which
+expands to the entire stdin JSON as a string. There are no per-field
+placeholders — `$TOOL_INPUT`, `$TOOL_RESULT` and `$USER_PROMPT` are not <!-- doc-facts-allow: fictional-hook-placeholder -->
+substituted and would reach the model as literal text.
+
+If a prompt contains no placeholder at all, the JSON is appended automatically
+as `ARGUMENTS: {...}`, so the data still arrives — which is why a prompt
+written against a non-existent placeholder can look like it works.
+
+Write prompts that name the field to read out of the payload:
+
+```json
+{
+  "type": "prompt",
+  "prompt": "Evaluate the PreToolUse payload below. Read .tool_input.command and decide whether it is safe.\n\n$ARGUMENTS",
+  "timeout": 30
+}
+```
+
+Command hooks parse stdin themselves, normally with `jq`:
+
+```bash
+input=$(cat)
+command=$(echo "$input" | jq -r '.tool_input.command // empty')
+```
 
 ## Environment Variables
 
-Available in all command hooks:
+Injected into command hooks:
 
-- `$CRABCODE_PROJECT_DIR` - Project root path
-- `$CRABCODE_PLUGIN_ROOT` - Plugin directory (use for portable paths)
-- `$CRABCODE_ENV_FILE` - SessionStart only: persist env vars here
-- `$CRABCODE_REMOTE` - Set if running in remote context
+- `$CRABCODE_PROJECT_DIR` - Project root path (the stable repo root, not the
+  worktree path)
+- `$CRABCODE_PLUGIN_ROOT` - Plugin directory (use for portable paths); set for
+  plugin and skill hooks
+- `$CRABCODE_ENV_FILE` - Path to a `.sh` file whose exports are applied to
+  subsequent Bash commands. Set only for `SessionStart`, `Setup`, `CwdChanged`
+  and `FileChanged`, and only for bash hooks — PowerShell hooks do not get it,
+  because PowerShell export syntax is not parseable by bash.
+
+Hooks also inherit the environment CrabCode itself was launched with, so
+externally-set variables such as `CRABCODE_REMOTE` are visible. Those are
+inherited, not injected — do not rely on the hook runtime to define them.
 
 **Always use ${CRABCODE_PLUGIN_ROOT} in hook commands for portability:**
 
@@ -372,7 +446,7 @@ In plugins, define hooks in `hooks/hooks.json`:
       "hooks": [
         {
           "type": "command",
-          "command": "bash ${CRABCODE_PLUGIN_ROOT}/scripts/load-context.sh",
+          "command": "bash ${CRABCODE_PLUGIN_ROOT}/examples/load-context.sh",
           "timeout": 10
         }
       ]
@@ -415,8 +489,10 @@ Plugin hooks merge with user's hooks and run in parallel.
 // All MCP tools
 "matcher": "mcp__.*"
 
-// Specific plugin's MCP tools
-"matcher": "mcp__plugin_asana_.*"
+// A specific MCP server's tools. Plugin-provided servers are exposed under a
+// generated prefix, not the plugin name — run /mcp to read the actual tool
+// names first, then match on what you see. Do not hand-assemble the prefix.
+"matcher": "mcp__p_[a-z0-9]+__.*"
 
 // All file operations
 "matcher": "Read|Write|Edit"
@@ -440,7 +516,7 @@ tool_name=$(echo "$input" | jq -r '.tool_name')
 
 # Validate tool name format
 if [[ ! "$tool_name" =~ ^[a-zA-Z0-9_]+$ ]]; then
-  echo '{"decision": "deny", "reason": "Invalid tool name"}' >&2
+  echo "Invalid tool name" >&2
   exit 2
 fi
 ```
@@ -454,13 +530,13 @@ file_path=$(echo "$input" | jq -r '.tool_input.file_path')
 
 # Deny path traversal
 if [[ "$file_path" == *".."* ]]; then
-  echo '{"decision": "deny", "reason": "Path traversal detected"}' >&2
+  echo "Path traversal detected" >&2
   exit 2
 fi
 
 # Deny sensitive files
 if [[ "$file_path" == *".env"* ]]; then
-  echo '{"decision": "deny", "reason": "Sensitive file"}' >&2
+  echo "Sensitive file" >&2
   exit 2
 fi
 ```
@@ -489,7 +565,13 @@ cd $CRABCODE_PROJECT_DIR
 }
 ```
 
-**Defaults:** Command hooks (60s), Prompt hooks (30s)
+**Default:** 600s (10 minutes) for tool-lifecycle hooks. `SessionEnd` is the
+exception at 1.5s — shutdown cannot be held up, so cleanup there must be near
+instant. `timeout` is in seconds and only narrows the window; it is not capped
+at the default.
+
+A generous default is not licence to be slow: every matching hook runs before
+the tool call proceeds, so the user waits for the slowest one.
 
 ## Performance Considerations
 
@@ -572,22 +654,28 @@ input=$(cat)
 
 ## Hook Lifecycle and Limitations
 
-### Hooks Load at Session Start
+### Applying Hook Changes
 
-**Important:** Hooks are loaded when CrabCode session starts. Changes to hook configuration require restarting CrabCode.
+Hooks are loaded with the plugin at session start, but you do **not** have to
+restart to pick up changes — `/reload-plugins` re-reads plugins in place and
+reports how many hooks it loaded.
 
-**Cannot hot-swap hooks:**
-- Editing `hooks/hooks.json` won't affect current session
-- Adding new hook scripts won't be recognized
-- Changing hook commands/prompts won't update
-- Must restart CrabCode: exit and run `crabcode` again
+**What needs a reload:**
+- Editing `hooks/hooks.json` (adding events, changing matchers, commands or prompts)
+- Registering a new hook script that the config did not previously reference
+
+**What does not:**
+- Editing the *body* of a script that `hooks.json` already points at. The
+  command is executed fresh each time the event fires, so the new code runs on
+  the next invocation.
+- Data a hook reads at run time (settings files, flag files). Those are read
+  per invocation, so changes take effect immediately.
 
 **To test hook changes:**
 1. Edit hook configuration or scripts
-2. Exit CrabCode session
-3. Restart: `crabcode` or `cc`
-4. New hook configuration loads
-5. Test hooks with `crabcode --debug`
+2. Run `/reload-plugins`
+3. Trigger the event and observe
+4. Inspect details with `crabcode --debug`
 
 ### Hook Validation at Startup
 
@@ -632,17 +720,28 @@ echo "$output" | jq .
 
 ### Hook Events Summary
 
+The commonly used subset. This is **not** the full event list — run `/hooks`
+to see every event the installed version accepts, and treat that as the source
+of truth before writing a matcher.
+
 | Event | When | Use For |
 |-------|------|---------|
 | PreToolUse | Before tool | Validation, modification |
 | PostToolUse | After tool | Feedback, logging |
 | UserPromptSubmit | User input | Context, validation |
 | Stop | Agent stopping | Completeness check |
-| AgentStop | Agent done | Task validation |
+| SubagentStop | Subagent done | Task validation |
 | SessionStart | Session begins | Context loading |
 | SessionEnd | Session ends | Cleanup, logging |
 | PreCompact | Before compact | Preserve context |
 | Notification | User notified | Logging, reactions |
+
+Beyond these, the runtime also emits lifecycle events such as `Setup`,
+`CwdChanged`, `FileChanged`, `PostToolUseFailure`, `StopFailure`,
+`SubagentStart`, `PostCompact`, `PermissionRequest`, `PermissionDenied`,
+`TaskCreated`, `TaskCompleted`, `WorktreeCreate`, `WorktreeRemove`,
+`InstructionsLoaded`, `ConfigChange`, `TeammateIdle`, `Elicitation` and
+`ElicitationResult`.
 
 ### Best Practices
 
@@ -691,7 +790,6 @@ Development tools in `scripts/`:
 
 ### External Resources
 
-- **Official Docs**: [upstream documentation reference removed]
 - **Examples**: See security-guidance plugin in marketplace
 - **Testing**: Use `crabcode --debug` for detailed logs
 - **Validation**: Use `jq` to validate hook JSON output
