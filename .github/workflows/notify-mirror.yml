@@ -1,15 +1,18 @@
 name: Audit CN mirror freshness
 
-# The deployment credentials stay in the private acosmi/crabcode-source repository.
-# This public workflow is deliberately read-only. Manual audits require the newest
+# The mirror deploy credential now lives in this repository's secrets: a dedicated
+# write-only (restrict + rrsync -wo) key used only by publish-to-cn-mirror.yml
+# (publishing migrated here from acosmi/crabcode-source on 2026-08-17). This audit
+# workflow itself stays deliberately read-only and uses no secrets.
+# Manual audits require the newest
 # successful main CI release immediately; scheduled audits allow an explicit eight-hour
 # publication SLO, then fail hard. Every accepted pointer is still checked against a
 # successful CI run and byte-compared with its exact source commit.
 
 on:
   workflow_dispatch: {}
-  # The private publisher polls at 01:23/07:23/13:23/19:23 UTC. Audit after it has
-  # had ample time to publish while keeping public and private schedules decoupled.
+  # The publisher (publish-to-cn-mirror.yml) runs on every push to main — nothing
+  # polls anywhere anymore. This cadence exists only to enforce the freshness SLO.
   schedule:
     - cron: '47 2,8,14,20 * * *'
 

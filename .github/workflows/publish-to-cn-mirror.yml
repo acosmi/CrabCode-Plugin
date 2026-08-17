@@ -1,0 +1,273 @@
+name: Publish official plugin marketplace to China mirror
+
+# 把本仓(官方插件市场)打成 content-addressed zip,发布到中国镜像
+# updates.acosmi.com/crabcode/plugins/crabcode-plugins-official/{latest,<sha>.zip},
+# 并把同一 checkout 的 marketplace.json 发布到同一前缀(acosmi.com/skill 插件页
+# 同源主源与 updates.acosmi.com 远程兜底都读它)。
+#
+# 迁移史(2026-08-17 用户裁决):此工作流原住企业源码仓
+# acosmi/crabcode-source(.github/workflows/sync-plugins-to-mirror.yml),
+# 因为镜像部署密钥当时只在那边。用户裁定「插件发版应住插件仓」,遂迁入本仓,
+# 配**专用**部署密钥(见下),旧工作流同日退役。发布语义逐字节继承,含:
+#   - zip 布局契约(zip 内所有文件前缀 = marketplaces/crabcode-plugins-official/,
+#     客户端 strip 该前缀提取;exec 位经 zip 中央目录 external_attr 恢复,故必须
+#     用 `zip` 命令而非纯 deflate)
+#   - latest = 本仓 HEAD SHA(纯文本指针);{sha}.zip content-addressed 可永久缓存
+#   - 镜像瘦身清单 .crabcode-plugin/mirror-distribution.json(三方同源:本发布器
+#     与审计器 notify-mirror.yml 从同一个被审 SHA 的 checkout 读同一份清单)
+#   - 先落 zip+json+.sha256,最后切 latest 指针(原子)
+#
+# 密钥边界(为什么公开仓可以持有这个 secret):MIRROR_SSH_KEY 是**专用**
+# 写单向部署钥,服务器侧 authorized_keys 以
+#   restrict,command="rrsync -wo /var/www/updates/crabcode"
+# 锁死 —— 无 shell、无端口转发、只能 rsync 写入镜像内容目录。其爆炸半径
+# (改写镜像插件内容)与「本仓 main 被合入恶意内容后被如实发布」完全同阶,
+# 不引入任何新的信任面;它**不是**企业仓 CI 的那把钥匙,两把可独立吊销。
+# fork PR 天然读不到 secrets(GitHub 默认),workflow_dispatch 需要写权限。
+#
+# 触发:push main(合并即发布,content-addressed 幂等)+ workflow_dispatch 手动
+# 补发。**刻意无 schedule**(2026-07-27 教训:每 30 分钟轮询单独吃掉整月
+# Actions 额度)。
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+
+# 手动补发与 push 触发可能撞车 → 串行不取消,保证 latest 指针切换有序。
+concurrency:
+  group: publish-cn-mirror
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Pack + publish official marketplace
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # fork 里不跑(fork 也读不到 secrets,这里让它连 runner 都不占)
+    if: github.repository == 'acosmi/CrabCode-Plugin'
+    permissions:
+      contents: read
+    env:
+      MIRROR_HOST: ${{ secrets.MIRROR_HOST }}
+      MIRROR_PATH: ${{ secrets.MIRROR_PATH }}
+      MIRROR_USER: crabdeploy
+      MIRROR_PUBLIC_BASE: https://updates.acosmi.com/crabcode
+      ARC_PREFIX: marketplaces/crabcode-plugins-official
+
+    steps:
+      - name: Checkout this marketplace at the pushed commit
+        uses: actions/checkout@v6
+        with:
+          path: marketplace-src
+          fetch-depth: 1
+
+      - name: Validate marketplace.json (防半包发布给网站)
+        run: |
+          set -euo pipefail
+          python3 - marketplace-src/.crabcode-plugin/marketplace.json <<'PY'
+          import json, sys
+          d = json.load(open(sys.argv[1]))
+          plugins = d.get("plugins")
+          assert isinstance(plugins, list) and len(plugins) > 0, "plugins 为空"
+          miss = [p["name"] for p in plugins if not p.get("displayName")]
+          meta = d.get("metadata") or {}
+          print(f"plugins={len(plugins)} version={meta.get('version')} missing_displayName={len(miss)}")
+          PY
+
+      - name: Build content-addressed zip
+        id: pack
+        run: |
+          set -euo pipefail
+          SHA="$(git -C marketplace-src rev-parse HEAD)"
+          echo "sha=${SHA}" >> "$GITHUB_OUTPUT"
+          echo "Official marketplace HEAD: ${SHA}"
+          # zip 内布局:全部文件挪到 ARC_PREFIX/ 下(剔除 .git);保留可执行位。
+          STAGE="zipstage/${ARC_PREFIX}"
+          mkdir -p "${STAGE}"
+          rsync -a --exclude='.git' marketplace-src/ "${STAGE}/"
+          # 镜像分发裁剪(W-PLUGIN-MIRROR-SLIM):可选清单
+          # .crabcode-plugin/mirror-distribution.json 声明「不进镜像 zip」的目录
+          # 前缀。三方同源契约:本发布器与审计器 notify-mirror.yml 都从**同一个
+          # checkout(同一 SHA)**读同一份清单推导文件集,构造上不可能分叉 ——
+          # 刻意不在两个 workflow 里各写一份排除表。清单不存在时两侧同样为空 =
+          # 与旧行为逐字节一致。
+          # 安全栅(两侧同款):每个前缀必须含 "/tests/" —— 清单只许裁测试资产,
+          # 构造上裁不掉运行时内容(插件 manifest / dist / skills);违规当场 fail。
+          python3 - marketplace-src/.crabcode-plugin/mirror-distribution.json "${STAGE}" <<'PY'
+          import json, pathlib, sys
+          manifest_path, stage = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
+          if not manifest_path.exists():
+              print("mirror-distribution.json 不存在 → 不裁剪(与旧行为一致)")
+              raise SystemExit(0)
+          data = json.load(manifest_path.open(encoding="utf-8"))
+          prefixes = data.get("excludePrefixes", [])
+          if not isinstance(prefixes, list) or not all(isinstance(p, str) for p in prefixes):
+              raise SystemExit("excludePrefixes 必须是字符串数组")
+          for p in prefixes:
+              if "/tests/" not in p:
+                  raise SystemExit(f"排除前缀必须含 /tests/(清单只许裁测试资产): {p}")
+              if p.startswith("/") or "\\" in p or ".." in p.split("/"):
+                  raise SystemExit(f"排除前缀必须是仓内相对 POSIX 路径: {p}")
+          removed_files = removed_bytes = 0
+          per_prefix = {p: 0 for p in prefixes}
+          for path in sorted(stage.rglob("*")):
+              if not path.is_file():
+                  continue
+              rel = path.relative_to(stage).as_posix()
+              for p in prefixes:
+                  if rel.startswith(p):
+                      removed_bytes += path.stat().st_size
+                      removed_files += 1
+                      per_prefix[p] += 1
+                      path.unlink()
+                      break
+          for path in sorted(
+              (d for d in stage.rglob("*") if d.is_dir()),
+              key=lambda d: len(d.parts),
+              reverse=True,
+          ):
+              try:
+                  path.rmdir()  # 只删空目录,防 zip 里残留幽灵目录项
+              except OSError:
+                  pass
+          for p, n in per_prefix.items():
+              mark = "⚠️ 0 命中(前缀已陈旧?清单该清理了)" if n == 0 else "✓"
+              print(f"{mark} {p} → 裁剪 {n} 个文件")
+          print(f"镜像裁剪合计: {removed_files} 文件 / {removed_bytes/1048576:.2f} MB(未压缩)")
+          PY
+          # ⚠️ 打包目标必须是 ${ARC_PREFIX} 整串,不能只写顶层的 "marketplaces"
+          # (W-PLUGIN-MIRROR-ARCPREFIX):`zip -ry … marketplaces` 会额外存一条
+          # **裸目录项** `marketplaces/`,不满足布局契约,被审计器判
+          # `unsafe archive entry` 而整单红。实测:
+          #   `zip -ry … marketplaces` → 条目含 `marketplaces/`;
+          #   `zip -ry … marketplaces/crabcode-plugins-official` → 不含,其余逐条相同。
+          ( cd zipstage && zip -ry "${GITHUB_WORKSPACE}/${SHA}.zip" "${ARC_PREFIX}" )
+          printf '%s' "${SHA}" > latest
+          echo "zip 大小:" && ls -la "${SHA}.zip"
+          # 自检用审计器的真判据(全称量词):**每一条**条目都必须带 ARC_PREFIX。
+          # 「至少有一条带前缀」在有无越界项两种状态下给同一个答案,照不到 bug。
+          python3 - "${SHA}.zip" "${ARC_PREFIX}/" <<'PY'
+          import sys, zipfile
+          archive, prefix = sys.argv[1], sys.argv[2]
+          with zipfile.ZipFile(archive) as bundle:
+              names = [item.filename for item in bundle.infolist()]
+          if not names:
+              raise SystemExit("zip 为空")
+          bad = [name for name in names if not name.startswith(prefix)]
+          if bad:
+              raise SystemExit(f"zip 含 {len(bad)} 条越界项(客户端会丢弃/审计器会判 unsafe): {bad[:10]}")
+          print(f"✓ 全部 {len(names)} 条条目均以 {prefix} 开头")
+          PY
+
+      - name: Setup deploy SSH
+        env:
+          MIRROR_SSH_KEY: ${{ secrets.MIRROR_SSH_KEY }}
+          MIRROR_KNOWN_HOSTS: ${{ secrets.MIRROR_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          for v in MIRROR_SSH_KEY MIRROR_KNOWN_HOSTS MIRROR_HOST; do
+            if [ -z "${!v:-}" ]; then
+              echo "::error::${v} secret 未设置"
+              exit 1
+            fi
+          done
+          mkdir -p "${HOME}/.ssh"
+          printf '%s\n' "${MIRROR_SSH_KEY}" > "${HOME}/.ssh/mirror_deploy"
+          chmod 600 "${HOME}/.ssh/mirror_deploy"
+          printf '%s\n' "${MIRROR_KNOWN_HOSTS}" > "${HOME}/.ssh/known_hosts"
+          echo "RSYNC_RSH=ssh -i ${HOME}/.ssh/mirror_deploy -o IdentitiesOnly=yes -o UserKnownHostsFile=${HOME}/.ssh/known_hosts -o StrictHostKeyChecking=yes" >> "$GITHUB_ENV"
+
+      - name: rsync to mirror plugins/ (content zip first, latest pointer last)
+        run: |
+          set -euo pipefail
+          SHA="${{ steps.pack.outputs.sha }}"
+          DEST_BASE="${MIRROR_PATH:-.}"
+          DEST="${MIRROR_USER}@${MIRROR_HOST}"
+          PLUGIN_DIR="plugins/crabcode-plugins-official"
+          RSYNC() {
+            local attempt
+            for attempt in 1 2 3; do
+              if rsync -rtv --chmod=D755,F644 -e "${RSYNC_RSH}" "$@"; then
+                return 0
+              fi
+              echo "::warning::rsync 第 ${attempt} 次失败,$((attempt * 20))s 后重试"
+              sleep $((attempt * 20))
+            done
+            return 1
+          }
+          # crabdeploy 的 key 被 rrsync(-wo)forced command 锁死,只准 rsync、拒绝
+          # 任意 ssh(mkdir → "is not rsync")。rsync 默认不创建多级父目录,故同步
+          # **顶层 plugins 目录**(源不带尾斜杠)到 DEST_BASE → rsync 在限定目录内
+          # 递归创建子路径,这是 rrsync 允许的标准行为,无需预建目录。
+          # ① 先传 content-addressed zip + 同 commit 的 marketplace.json
+          #    (latest 指向它们之前内容必须已就位 = 原子)
+          mkdir -p "stage/${PLUGIN_DIR}"
+          cp "${SHA}.zip" "stage/${PLUGIN_DIR}/"
+          cp marketplace-src/.crabcode-plugin/marketplace.json "stage/${PLUGIN_DIR}/marketplace.json"
+          # 校验和(W-PLUGIN-MIRROR-CHECKSUM):审计器 notify-mirror.yml 必需这两个
+          # 文件,缺任一即 fail-closed。解析正则 `([0-9a-f]{64})  ([A-Za-z0-9._-]+)\n?`:
+          # **恰两个空格 + 纯 basename**。
+          # ⚠️ 不直接重定向 `sha256sum` 原生输出:其分隔符随平台变(POSIX 文本模式
+          # `<hash>␠␠<file>` 合规;Windows/MSYS 二进制模式 `<hash>␠*<file>` 不合规)。
+          # 「靠平台默认值恰好对」会在换执行池那天静默变红 —— 故只取第一字段,
+          # printf 显式拼出审计器要的形态。与各自载荷同一次 RSYNC 上传,让
+          # 「载荷与摘要不一致」的窗口最小。
+          emit_sha256() {
+            printf '%s  %s\n' "$(sha256sum "$1" | cut -d' ' -f1)" "$1"
+          }
+          (
+            cd "stage/${PLUGIN_DIR}"
+            emit_sha256 "${SHA}.zip" > "${SHA}.zip.sha256"
+            emit_sha256 marketplace.json > marketplace.json.sha256
+          )
+          RSYNC "stage/plugins" "${DEST}:${DEST_BASE}/"
+          echo "✓ ${SHA}.zip + marketplace.json + 两个 .sha256 已就位"
+          # ② 最后切 latest 指针(原子切换;不带 --delete,不影响已传的 zip)
+          mkdir -p "stage-latest/${PLUGIN_DIR}"
+          cp latest "stage-latest/${PLUGIN_DIR}/"
+          RSYNC "stage-latest/plugins" "${DEST}:${DEST_BASE}/"
+          echo "✓ latest 指针已切换 → ${SHA}"
+
+      - name: Verify URLs (200 + pointer + marketplace.json + 校验和真伪)
+        run: |
+          set -euo pipefail
+          SHA="${{ steps.pack.outputs.sha }}"
+          BASE="${MIRROR_PUBLIC_BASE}/plugins/crabcode-plugins-official"
+          WORK="${RUNNER_TEMP}/mirror-verify"
+          mkdir -p "${WORK}"
+          for url in "${BASE}/latest" "${BASE}/${SHA}.zip" \
+                     "${BASE}/${SHA}.zip.sha256" "${BASE}/marketplace.json.sha256"; do
+            CODE="$(curl -fsS -o /dev/null -w '%{http_code}' -I "${url}")" || {
+              echo "::error::不可达 ${url}"
+              exit 1
+            }
+            echo "✓ ${CODE} ${url}"
+          done
+          POINTER="$(curl -fsSL "${BASE}/latest")"
+          [ "${POINTER}" = "${SHA}" ] || { echo "::error::latest='${POINTER}' != ${SHA}"; exit 1; }
+          MP_COUNT="$(curl -fsSL "${BASE}/marketplace.json" | python3 -c 'import json,sys; print(len(json.load(sys.stdin)["plugins"]))')"
+          [ "${MP_COUNT}" -gt 0 ] || { echo "::error::镜像 marketplace.json plugins 为空"; exit 1; }
+          echo "✓ marketplace.json plugins=${MP_COUNT}"
+          # 校验和必须**真的**校验:只断言 200 等于只证明「有个文件在那」。这里把
+          # 审计器的两条判据(正则形态 + 摘要匹配真实字节)前移到发布当场。
+          for name in "${SHA}.zip" marketplace.json; do
+            curl -fsSL -o "${WORK}/${name}" "${BASE}/${name}"
+            curl -fsSL -o "${WORK}/${name}.sha256" "${BASE}/${name}.sha256"
+          done
+          python3 - "${WORK}" "${SHA}" <<'PY'
+          import hashlib, pathlib, re, sys
+          work, sha = pathlib.Path(sys.argv[1]), sys.argv[2]
+          for payload in (f"{sha}.zip", "marketplace.json"):
+              record = (work / f"{payload}.sha256").read_text(encoding="ascii")
+              match = re.fullmatch(r"([0-9a-f]{64})  ([A-Za-z0-9._-]+)\n?", record)
+              if match is None:
+                  raise SystemExit(f"校验和记录形态不合审计器正则: {payload}.sha256 -> {record!r}")
+              if match.group(2) != payload:
+                  raise SystemExit(f"校验和记录指向了别的文件名: {match.group(2)} != {payload}")
+              actual = hashlib.sha256((work / payload).read_bytes()).hexdigest()
+              if actual != match.group(1):
+                  raise SystemExit(f"校验和与镜像字节不符: {payload}")
+              print(f"✓ {payload}.sha256 形态合规且与镜像字节相符")
+          PY
+          echo "官方插件市场镜像已就位,国内客户端启动将走镜像而非 GitHub git clone。"
