@@ -12,7 +12,7 @@ name: Publish official plugin marketplace to China mirror
 #   - zip 布局契约(zip 内所有文件前缀 = marketplaces/crabcode-plugins-official/,
 #     客户端 strip 该前缀提取;exec 位经 zip 中央目录 external_attr 恢复,故必须
 #     用 `zip` 命令而非纯 deflate)
-#   - latest = 本仓 HEAD SHA(纯文本指针);{sha}.zip content-addressed 可永久缓存
+#   - latest = 被发布的那个源 SHA(纯文本指针);{sha}.zip content-addressed 可永久缓存
 #   - 镜像瘦身清单 .crabcode-plugin/mirror-distribution.json(三方同源:本发布器
 #     与审计器 notify-mirror.yml 从同一个被审 SHA 的 checkout 读同一份清单)
 #   - 先落 zip+json+.sha256,最后切 latest 指针(原子)
@@ -25,41 +25,155 @@ name: Publish official plugin marketplace to China mirror
 # 不引入任何新的信任面;它**不是**企业仓 CI 的那把钥匙,两把可独立吊销。
 # fork PR 天然读不到 secrets(GitHub 默认),workflow_dispatch 需要写权限。
 #
-# 触发:push main(合并即发布,content-addressed 幂等)+ workflow_dispatch 手动
-# 补发。**刻意无 schedule**(2026-07-27 教训:每 30 分钟轮询单独吃掉整月
-# Actions 额度)。
+# 触发(W-PUBLISH-PROVENANCE-GATE PR-1,2026-08-17 改):
+#   - `workflow_run`:CI 在 main 的 push 上**跑完且绿**才触发。此前是裸 `push: main`,
+#     发布器与 CI 同时起跑 ⇒ 发布器把一个还没测完(甚至已经红了)的 commit 发出去,
+#     而审计器 notify-mirror.yml 只接受绿 SHA ⇒ 生产侧无门、消费侧要门,镜像会卡在
+#     一个审计器永远判红的状态,直到有人再推一个绿 commit。**那正是本立项的病本身**,
+#     只不过迁仓之后缩小到了一个仓里。
+#     刻意不选「push 触发 + 原地等 CI」:那要让 runner 空转整段 CI 时长,而 Actions
+#     额度是本仓的硬约束(2026-07-27 已为额度删过一次 schedule)。
+#   - `workflow_dispatch`:手动补发,目标同样走「最近一个绿的 main push commit」,
+#     不是 HEAD。
+#   **刻意无 schedule**(2026-07-27 教训:每 30 分钟轮询单独吃掉整月 Actions 额度)。
+#
+# 「发哪个 commit」的判据只写一份:.crabcode-plugin/latest-green-main.py,审计器
+# notify-mirror.yml 调的是**同一个文件**。把「加一道门」翻转成「两边用同一条规则算
+# 同一个答案」—— 门会挡人(本仓 main 若哪天红了,fail-closed 就是永远发不出去),
+# 同源不会。
+#
+# 幂等:目标 SHA 的字节已经在镜像上且自洽就整段早退(resolve job 的 preflight)。
+# 这**不是省事项**:zip 按源 SHA 定址 + zip 字节对 mtime 敏感 + 镜像给 zip 发一年
+# `immutable` ⇒ 重跑同一个 SHA = 同名对象换字节 = 「缓存 zip × 新 sidecar」撕裂对,
+# 客户端摘要校验 fail-closed 回退 git。判据与发布后验收共用同一个
+# .crabcode-plugin/verify-mirror-bundle.py。
 
 on:
   workflow_dispatch: {}
-  push:
-    branches: [main]
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
 
-# 手动补发与 push 触发可能撞车 → 串行不取消,保证 latest 指针切换有序。
+# 手动补发与 workflow_run 触发可能撞车 → 串行不取消,保证 latest 指针切换有序。
 concurrency:
   group: publish-cn-mirror
   cancel-in-progress: false
 
+# 两个 job 都要问镜像同一个基址 —— 提到 workflow 级,免得同一个常量在一个文件里写两遍。
+env:
+  MIRROR_PUBLIC_BASE: https://updates.acosmi.com/crabcode
+
 jobs:
+  resolve:
+    name: Resolve latest green main commit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # fork 里不跑(fork 也读不到 secrets,这里让它连 runner 都不占)。
+    # workflow_run 会为**每一次** CI run 触发,包括 PR 上的和红的 —— 只放行
+    # 「main 上的 push 且绿」那一类;选择器本身也会再验一遍这四条(fail-closed)。
+    if: >-
+      github.repository == 'acosmi/CrabCode-Plugin'
+      && (github.event_name == 'workflow_dispatch'
+          || (github.event.workflow_run.conclusion == 'success'
+              && github.event.workflow_run.event == 'push'
+              && github.event.workflow_run.head_branch == 'main'))
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      sha: ${{ steps.pick.outputs.sha }}
+      ci_url: ${{ steps.pick.outputs.ci_url }}
+      skip: ${{ steps.preflight.outputs.skip }}
+    steps:
+      # 规则文本从默认分支 HEAD 读 —— 这一步是**构造上不可避免**的:规则要选出
+      # SHA_G,就不可能从「被它选出的那个 SHA」里读规则(与瘦身清单相反,那份清单
+      # 作用在选定**之后**,所以它从被审 SHA 读)。这段 HEAD 依赖只覆盖规则文本本身,
+      # 内容打包用的是下面 publish job 里 `ref: SHA_G` 的钉死 checkout。
+      - name: Checkout the selection rule (default branch HEAD)
+        uses: actions/checkout@v6
+        with:
+          path: rule-src
+          fetch-depth: 1
+
+      - name: Pick the latest green main push commit
+        id: pick
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # workflow_dispatch 时是 "null";选择器会忽略。带上它是为了消掉
+          # 「触发本次发布的那条 run 还没出现在 REST 列表里」的最终一致性缝隙 ——
+          # 少了这一手,最坏情况是新绿 commit 永远轮不到发布(静默漏发)。
+          TRIGGER_RUN: ${{ toJSON(github.event.workflow_run) }}
+        run: |
+          set -euo pipefail
+          RUNS="${RUNNER_TEMP}/ci-runs.json"
+          TRIGGER="${RUNNER_TEMP}/trigger-run.json"
+          printf '%s' "${TRIGGER_RUN}" > "${TRIGGER}"
+          curl -fsSL --retry 4 --retry-all-errors \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -o "${RUNS}" \
+            'https://api.github.com/repos/acosmi/CrabCode-Plugin/actions/workflows/ci.yml/runs?branch=main&event=push&per_page=100'
+          read -r SHA CI_URL < <(
+            python3 rule-src/.crabcode-plugin/latest-green-main.py \
+              --runs "${RUNS}" --extra-run "${TRIGGER}"
+          )
+          {
+            echo "sha=${SHA}"
+            echo "ci_url=${CI_URL}"
+          } >> "${GITHUB_OUTPUT}"
+          echo "将发布 ${SHA}(CI: ${CI_URL})"
+
+      - name: Skip when the mirror already serves this commit
+        id: preflight
+        run: |
+          set -euo pipefail
+          BASE="${MIRROR_PUBLIC_BASE}/plugins/crabcode-plugins-official"
+          if python3 rule-src/.crabcode-plugin/verify-mirror-bundle.py \
+               --base "${BASE}" --sha "${{ steps.pick.outputs.sha }}"; then
+            echo "skip=true" >> "${GITHUB_OUTPUT}"
+            echo "镜像已在该 commit 上自洽 → 整段早退,一个字节都不重传。" >> "${GITHUB_STEP_SUMMARY}"
+          else
+            echo "skip=false" >> "${GITHUB_OUTPUT}"
+            echo "镜像未就位或不自洽 → 继续发布。"
+          fi
+
   publish:
     name: Pack + publish official marketplace
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    # fork 里不跑(fork 也读不到 secrets,这里让它连 runner 都不占)
-    if: github.repository == 'acosmi/CrabCode-Plugin'
+    needs: resolve
+    # fork 守卫由 resolve 承担(needs 链上游被 skip ⇒ 本 job 也 skip),这里重述一遍
+    # 是为了单看这个 job 也能读出「公开仓 fork 里不跑」。
+    if: >-
+      github.repository == 'acosmi/CrabCode-Plugin'
+      && needs.resolve.outputs.skip != 'true'
     permissions:
       contents: read
     env:
       MIRROR_HOST: ${{ secrets.MIRROR_HOST }}
       MIRROR_PATH: ${{ secrets.MIRROR_PATH }}
       MIRROR_USER: crabdeploy
-      MIRROR_PUBLIC_BASE: https://updates.acosmi.com/crabcode
       ARC_PREFIX: marketplaces/crabcode-plugins-official
+      TARGET_SHA: ${{ needs.resolve.outputs.sha }}
 
     steps:
-      - name: Checkout this marketplace at the pushed commit
+      # `ref:` 钉死 resolve 选出的绿 SHA —— 顺带关掉 TOCTOU:旧形态是「解析 HEAD」
+      # 与「checkout」之间 HEAD 可以前进,zip、latest 指针与绿判据可能落在三个不同的
+      # commit 上。现在三者对同一个 SHA。
+      - name: Checkout this marketplace at the resolved green commit
         uses: actions/checkout@v6
         with:
+          ref: ${{ needs.resolve.outputs.sha }}
           path: marketplace-src
+          fetch-depth: 1
+
+      # 验收脚本是**工具**不是契约输入,从默认分支 HEAD 取(与 resolve job 同一份);
+      # 而下面打包用的瘦身清单 mirror-distribution.json 是契约输入,仍从被打包的那个
+      # SHA 的 checkout 读 —— 它必须与审计器读的是同一个 commit 的同一份清单。
+      - name: Checkout the verification tooling (default branch HEAD)
+        uses: actions/checkout@v6
+        with:
+          path: rule-src
           fetch-depth: 1
 
       - name: Validate marketplace.json (防半包发布给网站)
@@ -79,9 +193,17 @@ jobs:
         id: pack
         run: |
           set -euo pipefail
-          SHA="$(git -C marketplace-src rev-parse HEAD)"
+          # SHA 来自 resolve job 的绿判据,**不是** `git rev-parse HEAD` —— 后者正是
+          # 本立项在改的东西(「此刻是什么就发什么」)。这里再自证一次 checkout 真的
+          # 落在那个 commit 上:两者对不上说明 ref: 没生效,当场停,别发。
+          SHA="${TARGET_SHA}"
+          CHECKED_OUT="$(git -C marketplace-src rev-parse HEAD)"
+          if [ "${CHECKED_OUT}" != "${SHA}" ]; then
+            echo "::error::checkout 落在 ${CHECKED_OUT},与解析出的绿 SHA ${SHA} 不符"
+            exit 1
+          fi
           echo "sha=${SHA}" >> "$GITHUB_OUTPUT"
-          echo "Official marketplace HEAD: ${SHA}"
+          echo "Official marketplace green commit: ${SHA}"
           # zip 内布局:全部文件挪到 ARC_PREFIX/ 下(剔除 .git);保留可执行位。
           STAGE="zipstage/${ARC_PREFIX}"
           mkdir -p "${STAGE}"
@@ -229,45 +351,12 @@ jobs:
           RSYNC "stage-latest/plugins" "${DEST}:${DEST_BASE}/"
           echo "✓ latest 指针已切换 → ${SHA}"
 
-      - name: Verify URLs (200 + pointer + marketplace.json + 校验和真伪)
+      # 发布后验收 = 发布前幂等判据的**同一个脚本**(校验和必须真的校验:只断言 200
+      # 等于只证明「有个文件在那」)。写成两份就是本立项在治的病缩小到一个文件之内。
+      - name: Verify the published bundle (same predicate as the pre-flight skip)
         run: |
           set -euo pipefail
-          SHA="${{ steps.pack.outputs.sha }}"
-          BASE="${MIRROR_PUBLIC_BASE}/plugins/crabcode-plugins-official"
-          WORK="${RUNNER_TEMP}/mirror-verify"
-          mkdir -p "${WORK}"
-          for url in "${BASE}/latest" "${BASE}/${SHA}.zip" \
-                     "${BASE}/${SHA}.zip.sha256" "${BASE}/marketplace.json.sha256"; do
-            CODE="$(curl -fsS -o /dev/null -w '%{http_code}' -I "${url}")" || {
-              echo "::error::不可达 ${url}"
-              exit 1
-            }
-            echo "✓ ${CODE} ${url}"
-          done
-          POINTER="$(curl -fsSL "${BASE}/latest")"
-          [ "${POINTER}" = "${SHA}" ] || { echo "::error::latest='${POINTER}' != ${SHA}"; exit 1; }
-          MP_COUNT="$(curl -fsSL "${BASE}/marketplace.json" | python3 -c 'import json,sys; print(len(json.load(sys.stdin)["plugins"]))')"
-          [ "${MP_COUNT}" -gt 0 ] || { echo "::error::镜像 marketplace.json plugins 为空"; exit 1; }
-          echo "✓ marketplace.json plugins=${MP_COUNT}"
-          # 校验和必须**真的**校验:只断言 200 等于只证明「有个文件在那」。这里把
-          # 审计器的两条判据(正则形态 + 摘要匹配真实字节)前移到发布当场。
-          for name in "${SHA}.zip" marketplace.json; do
-            curl -fsSL -o "${WORK}/${name}" "${BASE}/${name}"
-            curl -fsSL -o "${WORK}/${name}.sha256" "${BASE}/${name}.sha256"
-          done
-          python3 - "${WORK}" "${SHA}" <<'PY'
-          import hashlib, pathlib, re, sys
-          work, sha = pathlib.Path(sys.argv[1]), sys.argv[2]
-          for payload in (f"{sha}.zip", "marketplace.json"):
-              record = (work / f"{payload}.sha256").read_text(encoding="ascii")
-              match = re.fullmatch(r"([0-9a-f]{64})  ([A-Za-z0-9._-]+)\n?", record)
-              if match is None:
-                  raise SystemExit(f"校验和记录形态不合审计器正则: {payload}.sha256 -> {record!r}")
-              if match.group(2) != payload:
-                  raise SystemExit(f"校验和记录指向了别的文件名: {match.group(2)} != {payload}")
-              actual = hashlib.sha256((work / payload).read_bytes()).hexdigest()
-              if actual != match.group(1):
-                  raise SystemExit(f"校验和与镜像字节不符: {payload}")
-              print(f"✓ {payload}.sha256 形态合规且与镜像字节相符")
-          PY
+          python3 rule-src/.crabcode-plugin/verify-mirror-bundle.py \
+            --base "${MIRROR_PUBLIC_BASE}/plugins/crabcode-plugins-official" \
+            --sha "${{ steps.pack.outputs.sha }}"
           echo "官方插件市场镜像已就位,国内客户端启动将走镜像而非 GitHub git clone。"
