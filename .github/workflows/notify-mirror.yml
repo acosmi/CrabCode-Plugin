@@ -11,8 +11,10 @@ name: Audit CN mirror freshness
 
 on:
   workflow_dispatch: {}
-  # The publisher (publish-to-cn-mirror.yml) runs on every push to main — nothing
-  # polls anywhere anymore. This cadence exists only to enforce the freshness SLO.
+  # The publisher (publish-to-cn-mirror.yml) fires off CI's own `workflow_run`
+  # completion for main pushes — nothing polls anywhere. This cadence exists only
+  # to enforce the freshness SLO, which now covers exactly one real delay: the CI
+  # duration between a merge and its green verdict.
   schedule:
     - cron: '47 2,8,14,20 * * *'
 
@@ -35,6 +37,20 @@ jobs:
       FRESHNESS_SLO_SECONDS: 28800
 
     steps:
+      # The "which commit is green" rule lives in ONE file that the publisher
+      # (publish-to-cn-mirror.yml) calls too — W-PUBLISH-PROVENANCE-GATE PR-1.
+      # Before that, the producer had no rule at all (it shipped whatever HEAD
+      # was) while this consumer demanded a green SHA; two sides evolving two
+      # criteria is exactly the shape that broke this chain three times. Checked
+      # out at the default branch HEAD on purpose: a rule that *selects* a SHA
+      # cannot be read from the SHA it is about to select.
+      - name: Checkout the selection rule (default branch HEAD)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: rule-src
+          fetch-depth: 1
+          persist-credentials: false
+
       - name: Resolve the latest successful main CI release
         id: release
         env:
@@ -47,19 +63,8 @@ jobs:
             -H "Authorization: Bearer ${GH_TOKEN}" \
             -o "${RUNS}" \
             'https://api.github.com/repos/acosmi/CrabCode-Plugin/actions/workflows/ci.yml/runs?branch=main&event=push&per_page=100'
-          read -r SHA CI_URL < <(python3 - "${RUNS}" <<'PY'
-          import json, re, sys
-          runs = json.load(open(sys.argv[1], encoding="utf-8")).get("workflow_runs", [])
-          successful = [
-              item for item in runs
-              if item.get("status") == "completed" and item.get("conclusion") == "success"
-          ]
-          successful.sort(key=lambda item: item.get("created_at", ""), reverse=True)
-          run = successful[0] if successful else None
-          if run is None or not re.fullmatch(r"[0-9a-f]{40}", str(run.get("head_sha", ""))):
-              raise SystemExit("no successful main push CI run with a valid SHA")
-          print(run["head_sha"], run["html_url"])
-          PY
+          read -r SHA CI_URL < <(
+            python3 rule-src/.crabcode-plugin/latest-green-main.py --runs "${RUNS}"
           )
           {
             echo "latest_sha=${SHA}"
@@ -88,19 +93,20 @@ jobs:
           print(raw.decode("ascii"))
           PY
           )"
+          # The green set comes from the SAME selector the publisher uses, so the
+          # two sides cannot disagree about which runs count. Only the freshness
+          # SLO policy below is this workflow's own business.
+          GREEN="${RUNNER_TEMP}/green-runs.json"
+          python3 rule-src/.crabcode-plugin/latest-green-main.py \
+            --runs "${RUNNER_TEMP}/ci-runs.json" --format json > "${GREEN}"
           read -r TARGET_SHA TARGET_CI_URL FRESHNESS PENDING_SHA PENDING_AGE < <(
-            python3 - "${RUNNER_TEMP}/ci-runs.json" "${POINTER}" "${EVENT_NAME}" \
+            python3 - "${GREEN}" "${POINTER}" "${EVENT_NAME}" \
               "${FRESHNESS_SLO_SECONDS}" "${LATEST_SHA}" <<'PY'
           import datetime, json, re, sys
           runs_path, pointer, event_name, slo_raw, latest_sha = sys.argv[1:]
           if not re.fullmatch(r"[0-9a-f]{40}", pointer):
               raise SystemExit(f"mirror latest is not a valid SHA: {pointer!r}")
-          runs = json.load(open(runs_path, encoding="utf-8")).get("workflow_runs", [])
-          successful = [
-              item for item in runs
-              if item.get("status") == "completed" and item.get("conclusion") == "success"
-          ]
-          successful.sort(key=lambda item: item.get("created_at", ""), reverse=True)
+          successful = json.load(open(runs_path, encoding="utf-8"))
           target_index = next((i for i, item in enumerate(successful) if item.get("head_sha") == pointer), None)
           if target_index is None:
               raise SystemExit("mirror pointer does not identify a successful main push CI run in the last 100 runs")
@@ -157,7 +163,11 @@ jobs:
           set -euo pipefail
           WORK="${RUNNER_TEMP}/mirror-audit"
           mkdir -p "${WORK}"
-          FAIL_HINT="Run: gh workflow run sync-plugins-to-mirror.yml -R acosmi/crabcode-source"
+          # 2026-08-17: this used to name sync-plugins-to-mirror.yml in
+          # acosmi/crabcode-source — a workflow that was deleted the same day
+          # publishing moved here. A failure hint that tells the operator to run
+          # something that no longer exists is the audit failing twice.
+          FAIL_HINT="Run: gh workflow run publish-to-cn-mirror.yml -R acosmi/CrabCode-Plugin"
           fetch() {
             curl -fsSL --proto '=https' --proto-redir '=https' \
               --retry 5 --retry-all-errors --connect-timeout 10 --max-time 120 "$@"
@@ -236,7 +246,7 @@ jobs:
           prefix = sys.argv[3].rstrip("/") + "/"
 
           # Mirror distribution trim manifest (W-PLUGIN-MIRROR-SLIM, 2026-08-16).
-          # The publisher (acosmi/crabcode-source sync-plugins-to-mirror.yml) reads
+          # The publisher (this repo's publish-to-cn-mirror.yml) reads
           # the SAME file from the SAME commit it packs; we read it from the exact
           # checkout of the served SHA, so both sides derive their file sets from
           # one source and cannot diverge — the opposite of the one-sided contract
