@@ -191,3 +191,7 @@ presentation contract 还要求 `short-description` 和 `argument-hint`，两者
 本机最终验收已覆盖根仓库、Security 锁定上游差分、HTML Video、Media Ops、
 Media Publisher 和 actionlint；详细计数、环境差异及本机依赖修复均记录在上述补充
 审计文档。本轮未调用远端 CI。
+
+交付后最终复核结论：
+
+- `docs/audit/2026-08-22-crablaw-cn-v0.3.0-交付后复核审计.md`
