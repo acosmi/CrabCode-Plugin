@@ -1,10 +1,12 @@
 name: CI
 
+# Repository policy: CI does not run automatically on pushes or pull requests.
+# Maintainers run the complete suite locally first. When remote, commit-bound
+# evidence is needed, dispatch this workflow explicitly through the Actions API:
+# POST /repos/acosmi/CrabCode-Plugin/actions/workflows/ci.yml/dispatches
+# with a JSON body such as {"ref":"main"}.
 on:
-  pull_request:
-  push:
-    branches:
-      - main
+  workflow_dispatch: {}
 
 permissions:
   contents: read

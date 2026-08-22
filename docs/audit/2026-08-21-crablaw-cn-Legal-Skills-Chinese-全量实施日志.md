@@ -177,3 +177,17 @@ presentation contract 还要求 `short-description` 和 `argument-hint`，两者
 - 未发送、提交或发布任何法律材料；
 - 法律专业复核和外发批准仍为人工门；
 - PR 必须由管理员复核，自动化不得合并。
+
+## 9. CI 触发策略补充
+
+根据用户追加决策，仓库 CI 已从自动 `pull_request` / `push main` 改为仅
+`workflow_dispatch`。完整影响分析、人工 API、关联方和本机测试基线见：
+
+- `docs/audit/2026-08-21-全仓CI自动触发暂停与本机验证补充审计.md`
+
+镜像发布和镜像健康审计不是 CI 测试，原触发方式保持不变；镜像审计对 CI 运行记录的
+查询已取消 `event=push` 限定，以兼容人工调度和历史运行。
+
+本机最终验收已覆盖根仓库、Security 锁定上游差分、HTML Video、Media Ops、
+Media Publisher 和 actionlint；详细计数、环境差异及本机依赖修复均记录在上述补充
+审计文档。本轮未调用远端 CI。

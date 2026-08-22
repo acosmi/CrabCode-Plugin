@@ -4,10 +4,11 @@ name: Audit CN mirror freshness
 # write-only (restrict + rrsync -wo) key used only by publish-to-cn-mirror.yml
 # (publishing migrated here from acosmi/crabcode-source on 2026-08-17). This audit
 # workflow itself stays deliberately read-only and uses no secrets.
-# Manual audits require the newest
-# successful main CI release immediately; scheduled audits allow an explicit eight-hour
-# publication SLO, then fail hard. Every accepted pointer is still checked against a
-# successful CI run and byte-compared with its exact source commit.
+# Manual audits require the newest successful manually dispatched main CI release
+# immediately; scheduled audits allow an explicit eight-hour publication SLO, then
+# fail hard. Legacy successful runs remain readable during migration. Every accepted
+# pointer is still checked against a successful CI run and byte-compared with its
+# exact source commit.
 
 on:
   workflow_dispatch: {}
@@ -46,7 +47,7 @@ jobs:
             -H 'Accept: application/vnd.github+json' \
             -H "Authorization: Bearer ${GH_TOKEN}" \
             -o "${RUNS}" \
-            'https://api.github.com/repos/acosmi/CrabCode-Plugin/actions/workflows/ci.yml/runs?branch=main&event=push&per_page=100'
+            'https://api.github.com/repos/acosmi/CrabCode-Plugin/actions/workflows/ci.yml/runs?branch=main&per_page=100'
           read -r SHA CI_URL < <(python3 - "${RUNS}" <<'PY'
           import json, re, sys
           runs = json.load(open(sys.argv[1], encoding="utf-8")).get("workflow_runs", [])
@@ -57,7 +58,7 @@ jobs:
           successful.sort(key=lambda item: item.get("created_at", ""), reverse=True)
           run = successful[0] if successful else None
           if run is None or not re.fullmatch(r"[0-9a-f]{40}", str(run.get("head_sha", ""))):
-              raise SystemExit("no successful main push CI run with a valid SHA")
+              raise SystemExit("no successful main CI run with a valid SHA")
           print(run["head_sha"], run["html_url"])
           PY
           )
@@ -103,7 +104,7 @@ jobs:
           successful.sort(key=lambda item: item.get("created_at", ""), reverse=True)
           target_index = next((i for i, item in enumerate(successful) if item.get("head_sha") == pointer), None)
           if target_index is None:
-              raise SystemExit("mirror pointer does not identify a successful main push CI run in the last 100 runs")
+              raise SystemExit("mirror pointer does not identify a successful main CI run in the last 100 runs")
           target = successful[target_index]
           freshness = "exact"
           pending_sha = "none"

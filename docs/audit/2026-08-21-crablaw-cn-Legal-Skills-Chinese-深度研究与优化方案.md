@@ -921,3 +921,4 @@ skills/legal-workbench/SKILL.md
 - 字段兼容契约：`docs/handoff/2026-08-21-crablaw-cn-v0.3.0-字段契约.md`
 - v0.3.0 发布说明：`docs/releases/2026-08-21-crablaw-cn-v0.3.0.md`
 - 评测查看器：`docs/audit/2026-08-21-crablaw-cn-v0.3.0-eval-review.html`
+- CI 人工触发与本机验证补充审计：`docs/audit/2026-08-21-全仓CI自动触发暂停与本机验证补充审计.md`
