@@ -5,7 +5,7 @@ description: 审查中国公司存续期合规并建立带期限的合规台账(
 argument-hint: "[公司主体信息、章程或合规资料路径]"
 ---
 
-# /cn-corporate:entity-compliance
+# crablaw-cn:entity-compliance
 
 【AI 辅助草稿，需律师复核】
 
@@ -37,6 +37,6 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 需作出决议办理变更的：转交 `/cn-corporate:board-minutes` 或 `/cn-corporate:written-consent`。
+- 需作出决议办理变更的：转交 `crablaw-cn:board-minutes` 或 `crablaw-cn:written-consent`。
 - 涉及许可续展或行政申报的具体合规期限管理可在本 skill 内迭代。
-- 并购重组后的存续合规衔接：转交 `/cn-corporate:integration-management`。
+- 并购重组后的存续合规衔接：转交 `crablaw-cn:integration-management`。

@@ -18,6 +18,10 @@ import {
   validateMatterGate,
 } from "../src/policy/matterGateValidator.ts";
 import {
+  formatCrabLawRegistryIssues,
+  validateCrabLawRegistry,
+} from "../src/policy/crabLawRegistryValidator.ts";
+import {
   formatReferenceIssues,
   validateReferences,
 } from "../src/policy/referenceValidator.ts";
@@ -91,6 +95,13 @@ if (matterGate.length > 0) {
   hasOutput = true;
   process.stderr.write(`[tool-scope]\n${formatMatterGateIssues(matterGate, root)}\n`);
   if (matterGate.some((issue) => issue.severity === "error")) hasError = true;
+}
+
+const crabLawRegistry = await validateCrabLawRegistry(root);
+if (crabLawRegistry.length > 0) {
+  hasOutput = true;
+  process.stderr.write(`[crablaw-registry]\n${formatCrabLawRegistryIssues(crabLawRegistry, root)}\n`);
+  if (crabLawRegistry.some((issue) => issue.severity === "error")) hasError = true;
 }
 
 const references = await validateReferences(root);

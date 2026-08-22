@@ -5,7 +5,7 @@ description: 法律援助申请受理与受援人信息收集,产出受援人(cl
 argument-hint: "[受援人身份、争议事实、诉求或已有材料]"
 ---
 
-# /cn-legal-aid:aid-intake
+# crablaw-cn:aid-intake
 
 【AI 辅助草稿，需律师复核】
 
@@ -21,7 +21,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 2. 申请方式与代为申请：记录申请系本人提出还是由法定代理人、近亲属代为提出，或由法院指定、值班律师转介；核查代为申请人的资格与授权材料。
 3. 争议与诉求采集：按时间顺序梳理基础事实、法律关系（如劳动报酬、工伤、赡养扶养、人身损害、刑事辩护/代理等）与核心诉求，区分已有材料支持的事实与仅为受援人陈述。
 4. 事项类型与紧迫性：初步判断事项属民事、行政还是刑事援助，是否涉及诉讼时效、起诉/上诉期限、申请仲裁期限或刑事诉讼阶段等紧迫节点，需提示尽快处置。
-5. 事项范围线索：初步对照法律援助法关于援助事项范围的规定，标记本事项是否属于可申请援助的情形（详细判断移交 `/cn-legal-aid:eligibility-check`）。
+5. 事项范围线索：初步对照法律援助法关于援助事项范围的规定，标记本事项是否属于可申请援助的情形（详细判断移交 `crablaw-cn:eligibility-check`）。
 6. 经济状况线索：收集受援人经济困难相关信息（收入、家庭人口、是否享受社会救助/最低生活保障等），作为经济困难审查的事实基础；是否属于依法免予审查经济困难的情形一并标记（详细判断移交 eligibility-check）。
 7. 材料盘点：列出已有/待补材料（身份证明、经济困难证明或承诺、争议相关证据、授权委托材料等）及缺口。
 8. 来源标注：每条法律或事实断言按 `[已核验-来源]`/`[用户提供]`/`[模型知识-待核]` 标注。无核验来源的法律点写入 `sources.jsonl` 的 `source-record`，`status: source-needs-check`，`effectiveStatus` 说明待核内容。
@@ -41,7 +41,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 资格是否符合：移交 `/cn-legal-aid:eligibility-check`。
-- 生成申请表/受理登记表：移交 `/cn-legal-aid:aid-application-form`。
-- 已识别明确期限需管理：移交 `/cn-legal-aid:deadlines`。
+- 资格是否符合：移交 `crablaw-cn:eligibility-check`。
+- 生成申请表/受理登记表：移交 `crablaw-cn:aid-application-form`。
+- 已识别明确期限需管理：移交 `crablaw-cn:deadlines`。
 - 需冲突检查或新建事项：移交 matter-core 相应流程。

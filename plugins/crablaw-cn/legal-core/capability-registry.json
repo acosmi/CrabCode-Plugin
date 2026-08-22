@@ -1,0 +1,236 @@
+{
+  "version": 1,
+  "plugin": "crablaw-cn",
+  "controlPlane": "legal-workbench",
+  "flagship": "matter-deep-analysis",
+  "practice": {
+    "matterGate": "matter-core/PRACTICE.md",
+    "legalCore": "legal-core/PRACTICE.md",
+    "officialSources": "legal-core/references/official-source-policy.md"
+  },
+  "intakeCapabilities": [
+    "legal-workbench",
+    "new-client",
+    "new-matter",
+    "conflict-check",
+    "review-queue",
+    "matter-archive",
+    "cold-start-interview"
+  ],
+  "coreModes": [
+    {
+      "id": "legal-research",
+      "profile": "legal-core/references/official-source-policy.md",
+      "agents": ["legal-researcher"]
+    },
+    {
+      "id": "fact-issue-evidence",
+      "profile": "legal-core/PRACTICE.md",
+      "agents": ["diligence-reader"]
+    },
+    {
+      "id": "legal-reasoning",
+      "profile": "legal-core/references/legal-reasoning-modes.md",
+      "agents": ["diligence-analyzer"]
+    },
+    {
+      "id": "argument-quality",
+      "profile": "legal-core/references/argument-quality-policy.md",
+      "agents": ["diligence-reviewer"]
+    },
+    {
+      "id": "risk-prioritization",
+      "profile": "legal-core/references/argument-quality-policy.md",
+      "agents": ["diligence-analyzer", "diligence-reviewer"]
+    }
+  ],
+  "deepAnalysisArtifacts": [
+    "analysis-plan",
+    "document-index",
+    "fact-chronology",
+    "issue-tree",
+    "claim-evidence-map",
+    "case-comparison",
+    "analysis-findings",
+    "specialist-findings",
+    "run-manifest",
+    "memo",
+    "review-item"
+  ],
+  "legacyNamespaces": {
+    "matter-core": "crablaw-cn",
+    "cn-contract": "crablaw-cn",
+    "cn-data-compliance": "crablaw-cn",
+    "cn-labor-employment": "crablaw-cn",
+    "cn-corporate": "crablaw-cn",
+    "cn-litigation": "crablaw-cn",
+    "cn-ip": "crablaw-cn",
+    "cn-regulatory": "crablaw-cn",
+    "cn-ai-governance": "crablaw-cn",
+    "cn-product": "crablaw-cn",
+    "cn-legal-aid": "crablaw-cn"
+  },
+  "domains": [
+    {
+      "id": "legal-core",
+      "displayName": "法律总控",
+      "defaultCapability": "legal-workbench",
+      "capabilities": ["legal-workbench"]
+    },
+    {
+      "id": "matter-core",
+      "displayName": "案件管理",
+      "defaultCapability": "new-matter",
+      "capabilities": [
+        "compliance-deadline-watcher",
+        "conflict-check",
+        "matter-archive",
+        "matter-deep-analysis",
+        "new-client",
+        "new-matter",
+        "review-queue"
+      ]
+    },
+    {
+      "id": "cn-contract",
+      "matterType": "contract",
+      "displayName": "中国合同审查",
+      "defaultCapability": "review",
+      "capabilities": ["clause-redraft", "cold-start-interview", "nda-review", "review", "risk-summary"]
+    },
+    {
+      "id": "cn-data-compliance",
+      "matterType": "data-compliance",
+      "displayName": "中国数据合规",
+      "defaultCapability": "data-activity-triage",
+      "capabilities": [
+        "cross-border-transfer-check",
+        "data-activity-triage",
+        "data-processing-review",
+        "pia-generation",
+        "privacy-policy-review"
+      ]
+    },
+    {
+      "id": "cn-labor-employment",
+      "matterType": "labor-employment",
+      "displayName": "中国劳动用工",
+      "defaultCapability": "employment-contract-review",
+      "capabilities": [
+        "employee-handbook-review",
+        "employment-contract-review",
+        "labor-dispute-summary",
+        "non-compete-review",
+        "termination-risk-review"
+      ]
+    },
+    {
+      "id": "cn-corporate",
+      "matterType": "corporate",
+      "displayName": "中国公司与并购",
+      "defaultCapability": "diligence-issue-extraction",
+      "capabilities": [
+        "ai-tool-handoff",
+        "board-minutes",
+        "closing-checklist",
+        "deal-team-summary",
+        "diligence-issue-extraction",
+        "entity-compliance",
+        "integration-management",
+        "material-contract-schedule",
+        "tabular-review",
+        "written-consent"
+      ]
+    },
+    {
+      "id": "cn-litigation",
+      "matterType": "litigation",
+      "displayName": "中国民商事诉讼",
+      "defaultCapability": "matter-intake",
+      "capabilities": [
+        "brief-section-drafter",
+        "chronology",
+        "claim-chart",
+        "demand-draft",
+        "demand-intake",
+        "demand-received",
+        "deposition-prep",
+        "legal-hold",
+        "matter-briefing",
+        "matter-close",
+        "matter-intake",
+        "matter-update",
+        "oc-status",
+        "portfolio-status",
+        "privilege-log-review",
+        "subpoena-triage"
+      ]
+    },
+    {
+      "id": "cn-ip",
+      "matterType": "ip",
+      "displayName": "中国知识产权",
+      "defaultCapability": "infringement-triage",
+      "capabilities": [
+        "cease-desist",
+        "clearance",
+        "fto-triage",
+        "infringement-triage",
+        "invention-intake",
+        "ip-clause-review",
+        "oss-review",
+        "portfolio",
+        "takedown"
+      ]
+    },
+    {
+      "id": "cn-regulatory",
+      "matterType": "regulatory",
+      "displayName": "中国行政监管合规",
+      "defaultCapability": "gap-surfacer",
+      "capabilities": ["comments", "gap-surfacer", "gaps", "policy-diff", "policy-redraft", "reg-feed-watcher"]
+    },
+    {
+      "id": "cn-ai-governance",
+      "matterType": "ai-governance",
+      "displayName": "中国AI合规治理",
+      "defaultCapability": "use-case-triage",
+      "capabilities": [
+        "ai-inventory",
+        "aia-generation",
+        "policy-monitor",
+        "policy-starter",
+        "reg-gap-analysis",
+        "use-case-triage",
+        "vendor-ai-review"
+      ]
+    },
+    {
+      "id": "cn-product",
+      "matterType": "product",
+      "displayName": "中国产品与营销合规",
+      "defaultCapability": "is-this-a-problem",
+      "capabilities": ["feature-risk-assessment", "is-this-a-problem", "launch-review", "marketing-claims-review"]
+    },
+    {
+      "id": "cn-legal-aid",
+      "matterType": "legal-aid",
+      "displayName": "中国法律援助",
+      "defaultCapability": "aid-intake",
+      "capabilities": [
+        "aid-application-form",
+        "aid-intake",
+        "case-closure",
+        "case-memo",
+        "case-status",
+        "client-comms-log",
+        "deadlines",
+        "document-draft",
+        "eligibility-check",
+        "plain-language-letter",
+        "research-start",
+        "supervisor-review-queue"
+      ]
+    }
+  ]
+}

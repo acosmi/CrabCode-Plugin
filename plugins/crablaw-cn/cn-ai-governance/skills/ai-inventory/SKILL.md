@@ -5,7 +5,7 @@ description: 盘点并登记企业 AI 用例/算法系统,逐条产出 ai-usecas
 argument-hint: "[AI 用例/系统清单、产品线或部门范围]"
 ---
 
-# /cn-ai-governance:ai-inventory
+# crablaw-cn:ai-inventory
 
 【AI 辅助草稿，需律师复核】
 
@@ -24,7 +24,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
    - `aiCategory` — AI 类型(生成式文本/生成式图像音视频/决策辅助/自动化决策/算法推荐/生物识别)。
    - `dataTypes` — 处理的数据类别(个人信息/敏感个人信息/重要数据/公开数据等)。
    - `filingStatus` — 现有备案状态(无需备案/需备案未备案/算法备案/深度合成备案/生成式AI上线登记)。
-3. 对每条用例先填 `riskLevel: unassessed`,正式分级分流交由 `/cn-ai-governance:use-case-triage`,本技能不下风险结论。
+3. 对每条用例先填 `riskLevel: unassessed`,正式分级分流交由 `crablaw-cn:use-case-triage`,本技能不下风险结论。
 4. 识别中国监管触发信号(向公众提供生成式AI服务、具有舆论属性或社会动员能力的算法、深度合成/换脸换声、自动化决策、生物识别),记入 `notes` 供后续分级。
 5. 为每条记录标 `citationTag`(`[已核验-来源]`/`[用户提供]`/`[模型知识-待核]`);`[已核验-来源]` 须填 `sourceRef`。
 6. Record verified sources in `sources.jsonl`. For any unverifiable point, mark it `[需核验]` AND write a paired `source-record` (`status: source-needs-check`; `effectiveStatus` describing the gap). The bundle check enforces that `[需核验]` and `source-needs-check` co-occur.
@@ -42,6 +42,6 @@ Return:
 
 ## Next Steps
 
-- 对已登记用例做风险分级分流:hand off to `/cn-ai-governance:use-case-triage` with the usecase id。
-- 第三方/供应商提供(`deploymentContext: vendor-provided`):hand off to `/cn-ai-governance:vendor-ai-review`。
-- 涉及个人信息/敏感个人信息处理:escalate to `/cn-data-compliance:data-activity-triage`。
+- 对已登记用例做风险分级分流:hand off to `crablaw-cn:use-case-triage` with the usecase id。
+- 第三方/供应商提供(`deploymentContext: vendor-provided`):hand off to `crablaw-cn:vendor-ai-review`。
+- 涉及个人信息/敏感个人信息处理:escalate to `crablaw-cn:data-activity-triage`。

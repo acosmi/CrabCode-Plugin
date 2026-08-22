@@ -5,7 +5,7 @@ description: 将中国法合同复核底稿转化为面向内部业务方的风�
 argument-hint: "[review output path or pasted review]"
 ---
 
-# /cn-contract:risk-summary
+# crablaw-cn:risk-summary
 
 【AI 辅助草稿，需律师复核】
 

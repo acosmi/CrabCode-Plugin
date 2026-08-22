@@ -5,7 +5,7 @@ description: 审查中国法员工手册或制度修订的法律与民主程序�
 argument-hint: "[handbook text, policy text, or change request]"
 ---
 
-# /cn-labor-employment:employee-handbook-review
+# crablaw-cn:employee-handbook-review
 
 【AI 辅助草稿，需律师复核】
 

@@ -5,7 +5,7 @@ description: 编制中国股权收购/增资交易的交割清单,作为律师�
 argument-hint: "[交易类型、交易文件路径或交易要点]"
 ---
 
-# /cn-corporate:closing-checklist
+# crablaw-cn:closing-checklist
 
 【AI 辅助草稿，需律师复核】
 
@@ -37,10 +37,10 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 各方内部决议起草/审查：转交 `/cn-corporate:board-minutes` 或 `/cn-corporate:written-consent`。
-- 交易文件条款审查：转交 `/cn-contract:review`。
-- 尽调缺口转化为交割条件时：转交 `/cn-corporate:diligence-issue-extraction`。
-- 交割后整合：转交 `/cn-corporate:integration-management`。
+- 各方内部决议起草/审查：转交 `crablaw-cn:board-minutes` 或 `crablaw-cn:written-consent`。
+- 交易文件条款审查：转交 `crablaw-cn:review`。
+- 尽调缺口转化为交割条件时：转交 `crablaw-cn:diligence-issue-extraction`。
+- 交割后整合：转交 `crablaw-cn:integration-management`。
 
 ## 产出物路由
 

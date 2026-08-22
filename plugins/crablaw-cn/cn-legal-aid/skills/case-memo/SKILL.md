@@ -5,7 +5,7 @@ description: 起草法律援助案件法律分析备忘,梳理法律关系、争
 argument-hint: "[受援人 matter id 与争议事实、诉求、已有证据]"
 ---
 
-# /cn-legal-aid:case-memo
+# crablaw-cn:case-memo
 
 【AI 辅助草稿，需律师复核】
 
@@ -42,10 +42,10 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 需起草文书：移交 `/cn-legal-aid:document-draft`。
-- 需补充法律检索：移交 `/cn-legal-aid:research-start`。
-- 期限需纳入管理：移交 `/cn-legal-aid:deadlines`。
-- 需向受援人通俗说明结论：移交 `/cn-legal-aid:plain-language-letter`。
+- 需起草文书：移交 `crablaw-cn:document-draft`。
+- 需补充法律检索：移交 `crablaw-cn:research-start`。
+- 期限需纳入管理：移交 `crablaw-cn:deadlines`。
+- 需向受援人通俗说明结论：移交 `crablaw-cn:plain-language-letter`。
 
 ## 产出物路由
 

@@ -1,6 +1,6 @@
 # CrabLaw-CN 中国法律执业工作台
 
-面向中国法执业场景的 CrabCode 伞形插件:案件管理、合同、诉讼、知识产权、公司、劳动、数据合规、AI 治理、监管、产品与法律援助,共 11 个板块 86 个技能。
+面向中国法执业场景的 CrabCode 工作台:统一法律总控、案件管理、合同、诉讼、知识产权、公司、劳动、数据合规、AI 治理、监管、产品与法律援助,共 12 个展示分组 87 个技能。
 
 ## 安装
 
@@ -10,6 +10,7 @@
 
 | 板块 | 技能数 | 覆盖 |
 |---|---|---|
+| `legal-core` | 1 | 法律总控:任务识别、Matter 前提、能力注册表与跨板块编排 |
 | `matter-core` | 7 | 案件系统核心:立卷、利冲检索、归档、复核队列、深度分析、合规期限 |
 | `cn-contract` | 5 | 合同:审查、条款改写、NDA、风险摘要、冷启动访谈 |
 | `cn-litigation` | 16 | 诉讼:案件简报、时间线、争点图、催告函、证据保全、庭前准备 |
@@ -32,4 +33,12 @@
 
 ## 使用入口
 
-直接描述法律任务(如"审查这份采购合同""起草一份催告函"),CrabCode 会自动匹配技能;新案件先经 `new-client`/`new-matter`/`conflict-check` 建立前提。
+不确定任务路径或涉及多个板块时使用 `crablaw-cn:legal-workbench`;多份案卷和复杂争点使用
+`crablaw-cn:matter-deep-analysis`。直接描述单一法律任务仍可匹配既有叶子技能。新案件先经
+`crablaw-cn:new-client` / `crablaw-cn:new-matter` / `crablaw-cn:conflict-check` 建立前提。
+
+## 确定性运行工具
+
+Matter Store、Schema 和深度分析运行可使用 `${CRABCODE_PLUGIN_ROOT}/matter-core/scripts/` 下
+无第三方依赖的 Python 3.9+ 工具。脚本默认使用本地私有目录、拒绝路径逃逸和无意覆盖;工程校验
+通过不等于法律专业复核通过。

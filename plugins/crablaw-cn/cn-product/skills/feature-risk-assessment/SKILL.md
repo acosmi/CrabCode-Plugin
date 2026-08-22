@@ -5,7 +5,7 @@ description: 评估产品功能在中国法下的综合合规风险(跨数据、
 argument-hint: "[功能说明、产品方案或交互稿]"
 ---
 
-# /cn-product:feature-risk-assessment
+# crablaw-cn:feature-risk-assessment
 
 【AI 辅助草稿，需律师复核】
 
@@ -53,9 +53,9 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 按识别结果转交:
 
-- 数据/个人信息风险:转交 `/cn-data-compliance:data-activity-triage`。
+- 数据/个人信息风险:转交 `crablaw-cn:data-activity-triage`。
 - 算法推荐、自动化决策、AI 生成内容:转交 `/cn-ai-governance`(对应 AI 用例评估技能),涉 AI 功能可选生成 `ai-usecase` 记录。
-- 宣传用语/营销话术风险:转交 `/cn-product:marketing-claims-review`。
+- 宣传用语/营销话术风险:转交 `crablaw-cn:marketing-claims-review`。
 - 知识产权侵权风险:转交 `/cn-ip`(对应侵权/权属审查技能)。
-- 仅需快速研判某一做法是否有问题:转交 `/cn-product:is-this-a-problem`。
-- 功能即将整体上线、需汇总各专项给放行/整改结论:转交 `/cn-product:launch-review`。
+- 仅需快速研判某一做法是否有问题:转交 `crablaw-cn:is-this-a-problem`。
+- 功能即将整体上线、需汇总各专项给放行/整改结论:转交 `crablaw-cn:launch-review`。

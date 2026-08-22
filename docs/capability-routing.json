@@ -56,7 +56,12 @@
         {
           "plugin": "crablaw-cn",
           "skill": "matter-deep-analysis",
-          "scope": "案件文档深度尽调(基于案卷材料,非联网检索),CrabLaw 域内专用,不与通用插件合并——保持三层信任隔离设计"
+          "scope": "案件文档深度尽调与按争点法律核验,CrabLaw 域内专用,不与通用插件合并——保持案卷读取/法律研究分离、离线分析、红队与写入边界"
+        },
+        {
+          "plugin": "crablaw-cn",
+          "agent": "legal-researcher",
+          "scope": "仅服务 active matter 的按争点中国法律来源/效力/类案核验;不是通用 Web 深度调研,只向案件深度分析返回结构化来源候选"
         },
         {
           "plugin": "crabcode-media-ops",

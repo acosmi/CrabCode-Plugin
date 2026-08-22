@@ -5,7 +5,7 @@ description: 起草或审查中国公司董事会会议纪要与决议,作为律
 argument-hint: "[会议事项、决议草稿文件路径或粘贴文本]"
 ---
 
-# /cn-corporate:board-minutes
+# crablaw-cn:board-minutes
 
 【AI 辅助草稿，需律师复核】
 
@@ -37,10 +37,10 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 若决议事项实为股东会法定职权：转交 `/cn-corporate:written-consent`（如拟以书面决议方式）或提示改提股东会。
-- 若决议指向股权收购/增资交割：转交 `/cn-corporate:closing-checklist`。
-- 若涉及工商变更登记或存续合规义务：转交 `/cn-corporate:entity-compliance`。
-- 决议涉及重大合同审批时：转交 `/cn-contract:review`。
+- 若决议事项实为股东会法定职权：转交 `crablaw-cn:written-consent`（如拟以书面决议方式）或提示改提股东会。
+- 若决议指向股权收购/增资交割：转交 `crablaw-cn:closing-checklist`。
+- 若涉及工商变更登记或存续合规义务：转交 `crablaw-cn:entity-compliance`。
+- 决议涉及重大合同审批时：转交 `crablaw-cn:review`。
 
 ## 产出物路由
 

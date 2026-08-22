@@ -5,7 +5,7 @@ description: 对 AI 用例做风险分级分流并判定备案路径,更新 ai-u
 argument-hint: "[AI 用例事实或已登记的 ai-usecase id]"
 ---
 
-# /cn-ai-governance:use-case-triage
+# crablaw-cn:use-case-triage
 
 【AI 辅助草稿，需律师复核】
 
@@ -17,7 +17,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Workflow
 
-1. 载入已登记的 `ai-usecase`(来自 `/cn-ai-governance:ai-inventory`)或采集用例事实。
+1. 载入已登记的 `ai-usecase`(来自 `crablaw-cn:ai-inventory`)或采集用例事实。
 2. 判定监管适用面(默认中国法):
    - 是否向中华人民共和国境内公众提供生成式人工智能服务(《生成式人工智能服务管理暂行办法》)。
    - 是否为具有舆论属性或社会动员能力的算法推荐服务(《互联网信息服务算法推荐管理规定》)。
@@ -50,7 +50,7 @@ Return:
 
 Route based on the triage:
 
-- 需算法备案/安全评估/个人信息保护影响评估:hand off to `/cn-ai-governance:aia-generation` with the usecase id。
-- 第三方/供应商提供的 AI 服务:hand off to `/cn-ai-governance:vendor-ai-review`。
-- 需逐条对照法规找差距:hand off to `/cn-ai-governance:reg-gap-analysis`。
-- 触及个人信息/重要数据处理:escalate to `/cn-data-compliance:data-activity-triage`。
+- 需算法备案/安全评估/个人信息保护影响评估:hand off to `crablaw-cn:aia-generation` with the usecase id。
+- 第三方/供应商提供的 AI 服务:hand off to `crablaw-cn:vendor-ai-review`。
+- 需逐条对照法规找差距:hand off to `crablaw-cn:reg-gap-analysis`。
+- 触及个人信息/重要数据处理:escalate to `crablaw-cn:data-activity-triage`。

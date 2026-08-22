@@ -5,7 +5,7 @@ description: 在中国尽职调查中识别并编制目标公司重大合同清�
 argument-hint: "[合同文件路径、合同清单或粘贴文本]"
 ---
 
-# /cn-corporate:material-contract-schedule
+# crablaw-cn:material-contract-schedule
 
 【AI 辅助草稿，需律师复核】
 
@@ -35,10 +35,10 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 单份合同条款深审：转交 `/cn-contract:review`。
-- 大批量同类合同：转交 `/cn-corporate:tabular-review`。
-- 触发条款转化为交割条件：转交 `/cn-corporate:closing-checklist`。
-- 纳入整体尽调发现：转交 `/cn-corporate:diligence-issue-extraction`。
+- 单份合同条款深审：转交 `crablaw-cn:review`。
+- 大批量同类合同：转交 `crablaw-cn:tabular-review`。
+- 触发条款转化为交割条件：转交 `crablaw-cn:closing-checklist`。
+- 纳入整体尽调发现：转交 `crablaw-cn:diligence-issue-extraction`。
 
 ## 产出物路由
 

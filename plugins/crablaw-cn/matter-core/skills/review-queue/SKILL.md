@@ -5,7 +5,7 @@ description: 创建、列出、更新或查看 CrabLaw-CN 各项产出的律师�
 argument-hint: "<new | list | update | show> [matter id] [item id]"
 ---
 
-# /matter-core:review-queue
+# crablaw-cn:review-queue
 
 【AI 辅助草稿，需律师复核】
 
@@ -46,4 +46,13 @@ Validate each written record against the schema before treating the queue update
 
 - `matters/<matter-id>/review-queue.jsonl` (one JSON per line) → `matter-core/schemas/review-queue.schema.json`
 
-Repo-local validation per record: `npm run validate:schema -- <record-file> matter-core/schemas/review-queue.schema.json`.
+Validate each candidate record before appending it:
+
+```text
+python3 ${CRABCODE_PLUGIN_ROOT}/matter-core/scripts/validate_json.py \
+  --schema ${CRABCODE_PLUGIN_ROOT}/matter-core/schemas/review-queue.schema.json \
+  --file <record-file>
+```
+
+New items should add canonical `sourceCapability: crablaw-cn:<skill>` while retaining the legacy
+`sourcePlugin` board and `sourceSkill` basename for existing consumers.

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crablaw.local/schemas/legal-core/specialist-findings.schema.json",
+  "title": "CrabLaw-CN Specialist Task Ledger",
+  "type": "object",
+  "required": ["schemaVersion", "matterId", "runId", "tasks"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "matterId": { "type": "string", "minLength": 2 },
+    "runId": { "type": "string", "minLength": 2 },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["taskId", "issueId", "targetDomain", "capability", "status", "requestSummary", "returnedFindingIds", "createdAt", "updatedAt"],
+        "properties": {
+          "taskId": { "type": "string", "minLength": 2 },
+          "issueId": { "type": "string", "minLength": 2 },
+          "targetDomain": { "type": "string", "minLength": 1 },
+          "capability": { "type": "string", "pattern": "^crablaw-cn:[a-z0-9-]+$" },
+          "status": { "enum": ["identified", "routed", "accepted", "specialist-returned", "integrated", "reviewed", "closed", "blocked"] },
+          "requestSummary": { "type": "string", "minLength": 1 },
+          "returnedFindingIds": { "type": "array", "items": { "type": "string", "minLength": 2 }, "uniqueItems": true },
+          "limitation": { "type": "string", "minLength": 1 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

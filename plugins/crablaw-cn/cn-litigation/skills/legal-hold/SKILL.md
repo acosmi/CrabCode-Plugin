@@ -5,7 +5,7 @@ description: 证据保全与留存,覆盖诉前/诉中证据保全申请、证�
 argument-hint: "[案件 caseId、待固定证据或灭失风险情形]"
 ---
 
-# /cn-litigation:legal-hold
+# crablaw-cn:legal-hold
 
 【AI 辅助草稿，需律师复核】
 
@@ -23,7 +23,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 2. 选择保全路径：
    - 诉前证据保全——情况紧急、证据可能灭失或难以取得时，向证据所在地/被申请人住所地/对案件有管辖权的法院申请；仲裁中可经仲裁机构向法院转交申请。
    - 诉中证据保全——立案后由当事人申请或法院依职权采取。
-   - 区分证据保全与财产保全（财产保全属 `/cn-litigation:matter-update`/litigation-matter 的 preservation 范畴），勿混用。
+   - 区分证据保全与财产保全（财产保全属 `crablaw-cn:matter-update`/litigation-matter 的 preservation 范畴），勿混用。
 3. 申请要件：梳理需准备的材料——保全申请书、待保全证据及证明对象、灭失风险说明、担保（如法院要求）；标注法律依据并按三值标注。
 4. 自行证据固定：对己方掌握的证据，指导通过合法方式固定——电子数据的完整性留存（哈希校验、原始载体保存）、公证保全证据、时间戳等；记录固定方式与保管链（chain of custody），保管限于本地/机构内部，不接境外数据库/SaaS。
 5. 内部留存通知：向相关业务/IT/保管人员发出内部书面通知，要求暂停删改与争议相关的文件、邮件、电子数据与实物，明确范围、起止与责任人；该通知为内部管理文件，非对外法律文书。
@@ -44,7 +44,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 固定的证据并入事实脉络：移交 `/cn-litigation:chronology`。
-- 保全后进展（起诉/裁定）：移交 `/cn-litigation:matter-update`。
-- 涉财产保全：在 `/cn-litigation:matter-update` 更新 litigation-matter 的 preservation。
+- 固定的证据并入事实脉络：移交 `crablaw-cn:chronology`。
+- 保全后进展（起诉/裁定）：移交 `crablaw-cn:matter-update`。
+- 涉财产保全：在 `crablaw-cn:matter-update` 更新 litigation-matter 的 preservation。
 - 期限监测：交由 matter-core 的 compliance-deadline-watcher。

@@ -5,7 +5,7 @@ description: 法律援助案件状态跟踪,汇总当前阶段、近期进展、
 argument-hint: "[受援人 matter id 与最新进展]"
 ---
 
-# /cn-legal-aid:case-status
+# crablaw-cn:case-status
 
 【AI 辅助草稿，需律师复核】
 
@@ -40,7 +40,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 临近期限：移交 `/cn-legal-aid:deadlines` 核对登记。
-- 需出新文书：移交 `/cn-legal-aid:document-draft`。
-- 需向受援人通报：移交 `/cn-legal-aid:plain-language-letter`。
-- 案件具备结案条件：移交 `/cn-legal-aid:case-closure`。
+- 临近期限：移交 `crablaw-cn:deadlines` 核对登记。
+- 需出新文书：移交 `crablaw-cn:document-draft`。
+- 需向受援人通报：移交 `crablaw-cn:plain-language-letter`。
+- 案件具备结案条件：移交 `crablaw-cn:case-closure`。

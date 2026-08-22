@@ -5,7 +5,7 @@ description: 做自由实施(FTO)分析分流草稿,判断产品/技术是否落
 argument-hint: "[产品/技术方案描述、关键技术特征、目标市场、已知相关专利(如有)]"
 ---
 
-# /cn-ip:fto-triage
+# crablaw-cn:fto-triage
 
 【AI 辅助草稿，需律师复核】
 
@@ -40,9 +40,9 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 需申请前清除分析(我方拟申请):转 `/cn-ip:clearance`。
-- 已收到对方侵权指控:转 `/cn-ip:infringement-triage`(我方被指侵权分支)。
-- 拟向对方发函或回应:转 `/cn-ip:cease-desist`(由律师决定是否发函)。
+- 需申请前清除分析(我方拟申请):转 `crablaw-cn:clearance`。
+- 已收到对方侵权指控:转 `crablaw-cn:infringement-triage`(我方被指侵权分支)。
+- 拟向对方发函或回应:转 `crablaw-cn:cease-desist`(由律师决定是否发函)。
 - 需正式 FTO 报告与无效检索:由律师统筹官方检索,本草稿不替代正式 FTO 结论。
 
 ## 调研升级路径

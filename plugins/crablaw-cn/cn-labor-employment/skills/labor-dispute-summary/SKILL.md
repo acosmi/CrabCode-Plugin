@@ -5,7 +5,7 @@ description: 梳理中国法劳动争议的事实、证据、请求、抗辩、�
 argument-hint: "[dispute materials or facts]"
 ---
 
-# /cn-labor-employment:labor-dispute-summary
+# crablaw-cn:labor-dispute-summary
 
 【AI 辅助草稿，需律师复核】
 

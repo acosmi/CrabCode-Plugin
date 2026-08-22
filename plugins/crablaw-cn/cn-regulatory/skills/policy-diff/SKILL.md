@@ -5,7 +5,7 @@ description: 对比同一政策法规修订前后的版本差异及对业务的�
 argument-hint: "[修订前后两版政策法规文本或 reg-policy 条目]"
 ---
 
-# /cn-regulatory:policy-diff
+# crablaw-cn:policy-diff
 
 【AI 辅助草稿，需律师复核】
 
@@ -35,6 +35,6 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 内部制度需据差异改写：转交 `/cn-regulatory:policy-redraft`。
-- 现状与新版要求的合规差距：转交 `/cn-regulatory:gaps`。
-- 若新版仍为征求意见稿且需提交意见：转交 `/cn-regulatory:comments`。
+- 内部制度需据差异改写：转交 `crablaw-cn:policy-redraft`。
+- 现状与新版要求的合规差距：转交 `crablaw-cn:gaps`。
+- 若新版仍为征求意见稿且需提交意见：转交 `crablaw-cn:comments`。

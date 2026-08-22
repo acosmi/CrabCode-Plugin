@@ -5,7 +5,7 @@ description: 审查中国法竞业限制条款、限制范围、经济补偿与�
 argument-hint: "[clause, agreement, employee facts, or dispute facts]"
 ---
 
-# /cn-labor-employment:non-compete-review
+# crablaw-cn:non-compete-review
 
 【AI 辅助草稿，需律师复核】
 

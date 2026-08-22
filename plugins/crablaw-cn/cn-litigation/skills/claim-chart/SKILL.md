@@ -5,7 +5,7 @@ description: 构建中国民商事诉讼/仲裁的争点与诉讼请求对照表
 argument-hint: "[案件事实、双方主张、已有证据清单，或文件路径/粘贴文本]"
 ---
 
-# /cn-litigation:claim-chart
+# crablaw-cn:claim-chart
 
 【AI 辅助草稿，需律师复核】
 
@@ -40,10 +40,10 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 需就某争点形成文书分段（事实与理由 / 诉讼请求）：移交 `/cn-litigation:brief-section-drafter`。
-- 需准备庭审发问与质证：移交 `/cn-litigation:deposition-prep`。
-- 涉及不公开材料（国家秘密/商业秘密/个人隐私）的证据分级：移交 `/cn-litigation:privilege-log-review`。
-- 证据缺口需向法院申请调查取证：移交 `/cn-litigation:subpoena-triage`。
+- 需就某争点形成文书分段（事实与理由 / 诉讼请求）：移交 `crablaw-cn:brief-section-drafter`。
+- 需准备庭审发问与质证：移交 `crablaw-cn:deposition-prep`。
+- 涉及不公开材料（国家秘密/商业秘密/个人隐私）的证据分级：移交 `crablaw-cn:privilege-log-review`。
+- 证据缺口需向法院申请调查取证：移交 `crablaw-cn:subpoena-triage`。
 - 跨域问题（合同效力、数据合规、劳动争议）升级至对应板块技能。
 
 ## 产出物路由

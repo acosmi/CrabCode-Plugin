@@ -34,19 +34,19 @@
     {
       "name": "crablaw-cn",
       "source": "./plugins/crablaw-cn",
-      "version": "0.2.1",
+      "version": "0.3.0",
       "displayName": "法律工作流",
       "shortDescription": "中国法律实务工作流:案件管理、合同、诉讼、知产、公司、劳动、数据合规、AI 治理、监管、产品与法援",
-      "longDescription": "CrabLaw-CN 中国法律实务工作流伞插件。一次安装即获得 11 个实务板块(案件管理、合同、数据合规、劳动用工、公司、诉讼、知识产权、监管、AI 治理、产品、法律援助)共 86 项技能,板块以分组形式在能力区展示、按需带入。",
+      "longDescription": "CrabLaw-CN 中国法律实务工作台。以统一 Matter Gate、法律总控和可追溯案件深度分析连接案件管理、合同、数据合规、劳动用工、公司、诉讼、知识产权、监管、AI 治理、产品、法律援助共 87 项技能。",
       "defaultPrompt": [
-        "新建一个案件并做利益冲突筛查",
-        "起草一份符合中国法的合同并审查风险",
-        "梳理这起诉讼的证据清单与时间线"
+        "帮我判断这个法律任务该走哪个工作流",
+        "深度分析这些案卷材料并梳理争点证据",
+        "新建一个案件并做利益冲突筛查"
       ],
       "brandColor": "#b5462f",
       "composerIcon": "./assets/icon.png",
       "logo": "./assets/icon.png",
-      "description": "CrabLaw-CN 中国法律实务工作流伞插件。一次安装即获得 11 个实务板块(案件管理、合同、数据合规、劳动用工、公司、诉讼、知识产权、监管、AI 治理、产品、法律援助)共 86 项技能,板块以分组形式在能力区展示、按需带入。",
+      "description": "中国法律实务工作台:统一案件门禁、总控路由、案件深度分析与 11 个专业板块共 87 项技能。",
       "category": "legal-workflow",
       "tier": "workflow",
       "tags": [
@@ -55,6 +55,13 @@
         "umbrella"
       ],
       "groups": [
+        {
+          "name": "legal-core",
+          "displayName": "法律总控",
+          "skills": [
+            "legal-workbench"
+          ]
+        },
         {
           "name": "matter-core",
           "displayName": "案件管理",

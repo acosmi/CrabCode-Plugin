@@ -5,7 +5,7 @@ description: 法律援助案件结案小结与质量评估归档,记录办案结
 argument-hint: "[受援人 matter id 与结案信息:办案结果/履行情况]"
 ---
 
-# /cn-legal-aid:case-closure
+# crablaw-cn:case-closure
 
 【AI 辅助草稿，需律师复核】
 
@@ -40,7 +40,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 结案质量需督导把关：移交 `/cn-legal-aid:supervisor-review-queue`。
+- 结案质量需督导把关：移交 `crablaw-cn:supervisor-review-queue`。
 - 留存到期提醒：交由 matter-core 的 compliance-deadline-watcher 监测。
-- 受援人尚有后续救济需告知：移交 `/cn-legal-aid:plain-language-letter`。
-- 如执行尚未终结：回到 `/cn-legal-aid:case-status` 跟踪。
+- 受援人尚有后续救济需告知：移交 `crablaw-cn:plain-language-letter`。
+- 如执行尚未终结：回到 `crablaw-cn:case-status` 跟踪。

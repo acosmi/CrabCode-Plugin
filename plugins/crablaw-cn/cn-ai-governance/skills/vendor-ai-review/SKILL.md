@@ -5,7 +5,7 @@ description: 审查第三方/供应商提供的 AI 服务合规性,并登记为 
 argument-hint: "[供应商 AI 服务信息、合同/接口文档或集成场景]"
 ---
 
-# /cn-ai-governance:vendor-ai-review
+# crablaw-cn:vendor-ai-review
 
 【AI 辅助草稿，需律师复核】
 
@@ -48,6 +48,6 @@ Return:
 
 ## Next Steps
 
-- 需对供应商服务做风险分级:hand off to `/cn-ai-governance:use-case-triage` with the usecase id。
-- 涉及个人信息委托处理/出境:escalate to `/cn-data-compliance:data-processing-review` 或 `/cn-data-compliance:cross-border-transfer-check`。
-- 合同条款需逐条审查改写:escalate to `/cn-contract:review`。
+- 需对供应商服务做风险分级:hand off to `crablaw-cn:use-case-triage` with the usecase id。
+- 涉及个人信息委托处理/出境:escalate to `crablaw-cn:data-processing-review` 或 `crablaw-cn:cross-border-transfer-check`。
+- 合同条款需逐条审查改写:escalate to `crablaw-cn:review`。

@@ -5,7 +5,7 @@ description: 分析收到的对方律师函,评估其主张、核查法律依据
 argument-hint: "[对方律师函文本或文件路径，及本方相关事实]"
 ---
 
-# /cn-litigation:demand-received
+# crablaw-cn:demand-received
 
 【AI 辅助草稿，需律师复核】
 
@@ -39,7 +39,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 决定回函反驳并主张权利：移交 `/cn-litigation:demand-draft` 起草回函内部草稿。
-- 预判进入诉讼/仲裁：移交 `/cn-litigation:claim-chart` 梳理争点，`/cn-litigation:brief-section-drafter` 起草答辩状分段。
-- 来函要求提供材料涉及不公开信息：移交 `/cn-litigation:privilege-log-review`。
-- 涉及合同效力/解除的实体判断：升级至 `/cn-contract:review`。
+- 决定回函反驳并主张权利：移交 `crablaw-cn:demand-draft` 起草回函内部草稿。
+- 预判进入诉讼/仲裁：移交 `crablaw-cn:claim-chart` 梳理争点，`crablaw-cn:brief-section-drafter` 起草答辩状分段。
+- 来函要求提供材料涉及不公开信息：移交 `crablaw-cn:privilege-log-review`。
+- 涉及合同效力/解除的实体判断：升级至 `crablaw-cn:review`。

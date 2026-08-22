@@ -5,7 +5,7 @@ description: 跟踪对方当事人与对方代理人的主体、地址、动向�
 argument-hint: "[案件 caseId 与对方当事人/代理人信息或最新动向]"
 ---
 
-# /cn-litigation:oc-status
+# crablaw-cn:oc-status
 
 【AI 辅助草稿，需律师复核】
 
@@ -39,6 +39,6 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 ## Next Steps
 
 - 发现冲突信号：回到 matter-core 冲突检查。
-- 对方动向影响策略：移交 `/cn-litigation:matter-briefing`。
-- 财产线索需保全：移交 `/cn-litigation:legal-hold` 或 `/cn-litigation:matter-update`。
-- 多案件对方汇总：移交 `/cn-litigation:portfolio-status`。
+- 对方动向影响策略：移交 `crablaw-cn:matter-briefing`。
+- 财产线索需保全：移交 `crablaw-cn:legal-hold` 或 `crablaw-cn:matter-update`。
+- 多案件对方汇总：移交 `crablaw-cn:portfolio-status`。

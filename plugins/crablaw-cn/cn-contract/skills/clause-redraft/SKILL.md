@@ -5,7 +5,7 @@ description: 在活跃事项内起草或修订中国法合同条款,产出供律
 argument-hint: "[clause text and objective]"
 ---
 
-# /cn-contract:clause-redraft
+# crablaw-cn:clause-redraft
 
 【AI 辅助草稿，需律师复核】
 

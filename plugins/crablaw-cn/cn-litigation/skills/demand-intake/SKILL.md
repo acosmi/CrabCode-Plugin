@@ -5,7 +5,7 @@ description: 收集中国法律师函起草所需的需求要素(目的、对方
 argument-hint: "[发函目的、对方主体信息、事实经过、拟主张诉求、时限要求]"
 ---
 
-# /cn-litigation:demand-intake
+# crablaw-cn:demand-intake
 
 【AI 辅助草稿，需律师复核】
 
@@ -38,6 +38,6 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 需求齐备：移交 `/cn-litigation:demand-draft` 起草律师函内部草稿。
-- 主张涉及复杂法律依据核查：先行用 `/cn-litigation:claim-chart` 梳理主张-依据-证据。
-- 涉及合同解除/效力的实体判断：升级至 `/cn-contract:review`。
+- 需求齐备：移交 `crablaw-cn:demand-draft` 起草律师函内部草稿。
+- 主张涉及复杂法律依据核查：先行用 `crablaw-cn:claim-chart` 梳理主张-依据-证据。
+- 涉及合同解除/效力的实体判断：升级至 `crablaw-cn:review`。

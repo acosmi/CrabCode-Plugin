@@ -5,7 +5,7 @@ description: 法律援助质量监督/督导复核队列,整理待复核交付�
 argument-hint: "[受援人 matter id 或待复核的 reviewItemId 与复核范围]"
 ---
 
-# /cn-legal-aid:supervisor-review-queue
+# crablaw-cn:supervisor-review-queue
 
 【AI 辅助草稿，需律师复核】
 
@@ -39,7 +39,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 退回整改：交回对应 skill（如 `/cn-legal-aid:document-draft`、`/cn-legal-aid:aid-application-form`）按 decisionNotes 修改。
+- 退回整改：交回对应 skill（如 `crablaw-cn:document-draft`、`crablaw-cn:aid-application-form`）按 decisionNotes 修改。
 - 对外件批准前：确认发送目的地与可发版/完整版选择。
-- 案件整体收尾质量评估：移交 `/cn-legal-aid:case-closure`。
-- 期限相关整改：移交 `/cn-legal-aid:deadlines`。
+- 案件整体收尾质量评估：移交 `crablaw-cn:case-closure`。
+- 期限相关整改：移交 `crablaw-cn:deadlines`。

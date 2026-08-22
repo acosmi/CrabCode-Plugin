@@ -5,7 +5,7 @@ description: 起草网络平台侵权投诉与通知删除草稿(《电子商务
 argument-hint: "[涉案权利、被投诉链接/店铺/内容、平台、权属与侵权证据]"
 ---
 
-# /cn-ip:takedown
+# crablaw-cn:takedown
 
 【AI 辅助草稿，需律师复核】
 
@@ -40,6 +40,6 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 需先判断是否构成侵权:回到 `/cn-ip:infringement-triage`。
-- 平台外直接向对方主张:转 `/cn-ip:cease-desist`(由律师决定是否发函)。
+- 需先判断是否构成侵权:回到 `crablaw-cn:infringement-triage`。
+- 平台外直接向对方主张:转 `crablaw-cn:cease-desist`(由律师决定是否发函)。
 - 收到反通知或平台未采取措施需升级:由律师评估行政投诉/诉讼路径,本草稿不替代提交决定。

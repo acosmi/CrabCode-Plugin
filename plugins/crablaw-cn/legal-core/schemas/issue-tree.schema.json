@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crablaw.local/schemas/legal-core/issue-tree.schema.json",
+  "title": "CrabLaw-CN Issue Tree",
+  "type": "object",
+  "required": ["schemaVersion", "runId", "matterId", "issues"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "runId": { "type": "string", "minLength": 2 },
+    "matterId": { "type": "string", "minLength": 2 },
+    "issues": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["issueId", "title", "priority", "status", "documentIds", "factIds", "evidenceIds", "requiredResearch", "targetDomains", "specialistTaskIds"],
+        "properties": {
+          "issueId": { "type": "string", "minLength": 2 },
+          "parentIssueId": { "type": "string", "minLength": 2 },
+          "title": { "type": "string", "minLength": 1 },
+          "priority": { "enum": ["critical", "high", "medium", "low"] },
+          "status": { "enum": ["open", "researching", "analyzing", "blocked", "resolved-internal", "stale"] },
+          "documentIds": { "type": "array", "items": { "type": "string", "minLength": 2 }, "uniqueItems": true },
+          "factIds": { "type": "array", "items": { "type": "string", "minLength": 2 }, "uniqueItems": true },
+          "evidenceIds": { "type": "array", "items": { "type": "string", "minLength": 2 }, "uniqueItems": true },
+          "requiredResearch": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+          "targetDomains": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+          "specialistTaskIds": { "type": "array", "items": { "type": "string", "minLength": 2 }, "uniqueItems": true },
+          "blockingReason": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

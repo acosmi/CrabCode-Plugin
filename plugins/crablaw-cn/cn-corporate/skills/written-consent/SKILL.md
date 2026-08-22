@@ -5,7 +5,7 @@ description: 起草或审查中国不开会的股东会/董事会书面决议,�
 argument-hint: "[拟决议事项、书面决议草稿文件路径或粘贴文本]"
 ---
 
-# /cn-corporate:written-consent
+# crablaw-cn:written-consent
 
 【AI 辅助草稿，需律师复核】
 
@@ -18,7 +18,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 ## Workflow
 
 1. 确认书面决议的法律前提：核对公司章程是否允许该机关以不召开会议、由全体股东/董事一致表示同意的方式作出决议；章程未授权或法律要求必须开会的事项不得以书面决议替代。
-2. 逐项判断决议事项是否属于该机关的法定/章程职权（股东会职权如修改章程、增减注册资本、合并分立解散、利润分配方案、选举更换非由职工代表担任的董事监事等；董事会职权见 `/cn-corporate:board-minutes`）。
+2. 逐项判断决议事项是否属于该机关的法定/章程职权（股东会职权如修改章程、增减注册资本、合并分立解散、利润分配方案、选举更换非由职工代表担任的董事监事等；董事会职权见 `crablaw-cn:board-minutes`）。
 3. 核查签署主体与表决权：股东会书面决议须全体股东签署（自然人股东本人或授权代表、法人股东加盖印章并由签署代表签字）；按出资比例/章程确认表决权，并标注关联股东回避要求（如涉关联交易）。
 4. 校验决议内容完整性：事项、表决结果（全体一致同意）、生效条件、决议日期、附件（如修改后章程、出资协议）。
 5. 提示后续登记/备案衔接：涉及修改章程、增减资本、董监高变更等需办理工商变更登记的，列明触发事项。
@@ -36,9 +36,9 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 若事项更宜召开会议或需会议记录：转交 `/cn-corporate:board-minutes`（董事会）或提示安排股东会。
-- 若决议触发工商变更登记或存续合规：转交 `/cn-corporate:entity-compliance`。
-- 若决议支撑交易交割：转交 `/cn-corporate:closing-checklist`。
+- 若事项更宜召开会议或需会议记录：转交 `crablaw-cn:board-minutes`（董事会）或提示安排股东会。
+- 若决议触发工商变更登记或存续合规：转交 `crablaw-cn:entity-compliance`。
+- 若决议支撑交易交割：转交 `crablaw-cn:closing-checklist`。
 
 ## 产出物路由
 

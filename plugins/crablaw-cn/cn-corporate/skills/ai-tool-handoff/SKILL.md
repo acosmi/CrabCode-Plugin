@@ -5,7 +5,7 @@ description: 生成事务的结构化交接说明包(已读范围/未决项/红�
 argument-hint: "[拟交接的事务范围或接收方说明]"
 ---
 
-# /cn-corporate:ai-tool-handoff
+# crablaw-cn:ai-tool-handoff
 
 【AI 辅助草稿，需律师复核】
 
@@ -37,5 +37,5 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 ## Next Steps
 
 - 待核验法律点：回溯对应来源核验后更新 citationTag。
-- 未读文件：转交 `/cn-corporate:diligence-issue-extraction` 或 `/cn-corporate:tabular-review`。
-- 业务团队沟通：转交 `/cn-corporate:deal-team-summary`。
+- 未读文件：转交 `crablaw-cn:diligence-issue-extraction` 或 `crablaw-cn:tabular-review`。
+- 业务团队沟通：转交 `crablaw-cn:deal-team-summary`。

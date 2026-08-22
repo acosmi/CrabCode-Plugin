@@ -5,7 +5,7 @@ description: 对某一具体产品/运营做法做快速中国法合规研判,�
 argument-hint: "[一句话描述拟做的做法或拿不准的细节]"
 ---
 
-# /cn-product:is-this-a-problem
+# crablaw-cn:is-this-a-problem
 
 【AI 辅助草稿，需律师复核】
 
@@ -44,9 +44,9 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 按研判结果决定:
 
-- 需系统识别该功能全部风险:转交 `/cn-product:feature-risk-assessment`。
-- 宣传用语问题:转交 `/cn-product:marketing-claims-review`。
-- 数据/个人信息问题:转交 `/cn-data-compliance:data-activity-triage`。
+- 需系统识别该功能全部风险:转交 `crablaw-cn:feature-risk-assessment`。
+- 宣传用语问题:转交 `crablaw-cn:marketing-claims-review`。
+- 数据/个人信息问题:转交 `crablaw-cn:data-activity-triage`。
 - 算法/自动化决策/AI 生成内容问题:转交 `/cn-ai-governance`(对应 AI 用例评估技能)。
 - 知识产权问题:转交 `/cn-ip`(对应侵权/权属审查技能)。
-- 做法属上线前整体审查的一部分:并入 `/cn-product:launch-review`。
+- 做法属上线前整体审查的一部分:并入 `crablaw-cn:launch-review`。

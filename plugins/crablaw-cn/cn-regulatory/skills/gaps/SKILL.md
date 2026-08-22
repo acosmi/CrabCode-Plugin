@@ -5,7 +5,7 @@ description: 针对特定法规或监管要求做合规差距分析(现状 vs �
 argument-hint: "[目标法规/监管要求 + 企业现状资料或 reg-policy 条目]"
 ---
 
-# /cn-regulatory:gaps
+# crablaw-cn:gaps
 
 【AI 辅助草稿，需律师复核】
 
@@ -36,6 +36,6 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 整改涉及内部制度改写：转交 `/cn-regulatory:policy-redraft`。
-- 广度优先扫描更多潜在缺口：转交 `/cn-regulatory:gap-surfacer`。
-- 基准规则近期修订：先转交 `/cn-regulatory:policy-diff`。
+- 整改涉及内部制度改写：转交 `crablaw-cn:policy-redraft`。
+- 广度优先扫描更多潜在缺口：转交 `crablaw-cn:gap-surfacer`。
+- 基准规则近期修订：先转交 `crablaw-cn:policy-diff`。

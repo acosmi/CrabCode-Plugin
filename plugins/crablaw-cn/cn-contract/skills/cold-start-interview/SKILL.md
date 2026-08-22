@@ -5,7 +5,7 @@ description: 为某客户或法务团队采集中国法合同审查偏好、模�
 argument-hint: "[practice facts or seed materials]"
 ---
 
-# /cn-contract:cold-start-interview
+# crablaw-cn:cold-start-interview
 
 【AI 辅助草稿，需律师复核】
 

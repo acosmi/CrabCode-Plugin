@@ -5,7 +5,7 @@ description: 将企业 AI 现状逐条对照生成式AI办法/算法推荐规定
 argument-hint: "[AI 用例/系统现状、已登记 ai-usecase id 或自查范围]"
 ---
 
-# /cn-ai-governance:reg-gap-analysis
+# crablaw-cn:reg-gap-analysis
 
 【AI 辅助草稿，需律师复核】
 
@@ -45,7 +45,7 @@ Return:
 
 ## Next Steps
 
-- 差距指向需出具评估报告:hand off to `/cn-ai-governance:aia-generation`。
-- 差距指向需建/改内部制度:hand off to `/cn-ai-governance:policy-starter`。
-- 差距含备案/上线登记缺口:回到 `/cn-ai-governance:use-case-triage` 确认 `filingStatus` 并登记期限。
-- 涉及个人信息保护影响评估缺口:escalate to `/cn-data-compliance:pia-generation`。
+- 差距指向需出具评估报告:hand off to `crablaw-cn:aia-generation`。
+- 差距指向需建/改内部制度:hand off to `crablaw-cn:policy-starter`。
+- 差距含备案/上线登记缺口:回到 `crablaw-cn:use-case-triage` 确认 `filingStatus` 并登记期限。
+- 涉及个人信息保护影响评估缺口:escalate to `crablaw-cn:pia-generation`。

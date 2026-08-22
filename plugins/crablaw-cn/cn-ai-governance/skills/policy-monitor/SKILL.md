@@ -5,7 +5,7 @@ description: 监控中国 AI/算法/深度合成监管动态,逐条登记为 reg
 argument-hint: "[关注的监管领域、机关或具体法规线索]"
 ---
 
-# /cn-ai-governance:policy-monitor
+# crablaw-cn:policy-monitor
 
 【AI 辅助草稿，需律师复核】
 
@@ -45,7 +45,7 @@ Return:
 
 ## Next Steps
 
-- 影响某用例需重做评估:hand off to `/cn-ai-governance:aia-generation`。
-- 需对照新规找企业差距:hand off to `/cn-ai-governance:reg-gap-analysis`。
-- 需更新内部治理制度:hand off to `/cn-ai-governance:policy-starter`。
-- 截止期登记后:由 `/matter-core:compliance-deadline-watcher` 跟踪。
+- 影响某用例需重做评估:hand off to `crablaw-cn:aia-generation`。
+- 需对照新规找企业差距:hand off to `crablaw-cn:reg-gap-analysis`。
+- 需更新内部治理制度:hand off to `crablaw-cn:policy-starter`。
+- 截止期登记后:由 `crablaw-cn:compliance-deadline-watcher` 跟踪。

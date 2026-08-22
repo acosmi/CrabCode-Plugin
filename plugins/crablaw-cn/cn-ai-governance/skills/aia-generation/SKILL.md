@@ -5,7 +5,7 @@ description: 起草算法影响评估/生成式AI安全评估报告草稿,交叉
 argument-hint: "[AI 用例事实、已登记的 ai-usecase id 或前序分流记录]"
 ---
 
-# /cn-ai-governance:aia-generation
+# crablaw-cn:aia-generation
 
 【AI 辅助草稿，需律师复核】
 
@@ -17,12 +17,12 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Workflow
 
-1. 载入已登记的 `ai-usecase` 与前序分流(`/cn-ai-governance:use-case-triage`),或采集用例事实。
+1. 载入已登记的 `ai-usecase` 与前序分流(`crablaw-cn:use-case-triage`),或采集用例事实。
 2. 确认评估类型(可叠加,默认中国法):
    - 算法安全自评估 / 算法备案材料(《互联网信息服务算法推荐管理规定》)。
    - 生成式AI安全评估(向公众提供且具舆论属性或社会动员能力,《生成式人工智能服务管理暂行办法》)。
    - 深度合成自评估与标识方案(《互联网信息服务深度合成管理规定》)。
-   - 个人信息保护影响评估交叉(自动化决策/处理敏感个人信息时,《个人信息保护法》;PIA 本体由 `/cn-data-compliance:pia-generation` 出具,本技能仅做交叉引用)。
+   - 个人信息保护影响评估交叉(自动化决策/处理敏感个人信息时,《个人信息保护法》;PIA 本体由 `crablaw-cn:pia-generation` 出具,本技能仅做交叉引用)。
 3. 搭建评估报告草稿结构:
    - 服务/算法基本情况与提供方式。
    - 语料/训练数据与数据来源合法性、个人信息处理合法性基础。
@@ -49,10 +49,10 @@ Return:
 
 ## Next Steps
 
-- 报告暴露需逐条对照法规的差距:hand off to `/cn-ai-governance:reg-gap-analysis`。
-- 涉及个人信息保护影响评估本体:hand off to `/cn-data-compliance:pia-generation`。
-- 涉及数据出境:escalate to `/cn-data-compliance:cross-border-transfer-check`。
-- 备案/复评期限登记后:由 `/matter-core:compliance-deadline-watcher` 跟踪。
+- 报告暴露需逐条对照法规的差距:hand off to `crablaw-cn:reg-gap-analysis`。
+- 涉及个人信息保护影响评估本体:hand off to `crablaw-cn:pia-generation`。
+- 涉及数据出境:escalate to `crablaw-cn:cross-border-transfer-check`。
+- 备案/复评期限登记后:由 `crablaw-cn:compliance-deadline-watcher` 跟踪。
 
 ## 产出物路由
 

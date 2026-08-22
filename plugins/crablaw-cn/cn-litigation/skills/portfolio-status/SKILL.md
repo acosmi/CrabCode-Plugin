@@ -5,7 +5,7 @@ description: 批量案件组合状态总览,汇总多案件的审级、进展、
 argument-hint: "[筛选条件：客户/承办律师/审级/状态，或案件 caseId 列表]"
 ---
 
-# /cn-litigation:portfolio-status
+# crablaw-cn:portfolio-status
 
 【AI 辅助草稿，需律师复核】
 
@@ -40,6 +40,6 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 针对单案深入：移交 `/cn-litigation:matter-briefing` 或 `/cn-litigation:matter-update`。
+- 针对单案深入：移交 `crablaw-cn:matter-briefing` 或 `crablaw-cn:matter-update`。
 - 期限集中监测：交由 matter-core 的 compliance-deadline-watcher。
-- 可结案案件：移交 `/cn-litigation:matter-close`。
+- 可结案案件：移交 `crablaw-cn:matter-close`。

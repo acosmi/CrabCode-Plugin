@@ -5,7 +5,7 @@ description: 主动广度扫描业务以浮现潜在合规缺口,产出 diligenc
 argument-hint: "[业务概况、经营范围或待扫描资料范围]"
 ---
 
-# /cn-regulatory:gap-surfacer
+# crablaw-cn:gap-surfacer
 
 【AI 辅助草稿，需律师复核】
 
@@ -36,7 +36,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 对优先级高的单点缺口做深度差距分析：转交 `/cn-regulatory:gaps`。
-- 涉及特定领域需先跟踪适用新规：转交 `/cn-regulatory:reg-feed-watcher`。
-- 整改涉及内部制度改写：转交 `/cn-regulatory:policy-redraft`。
+- 对优先级高的单点缺口做深度差距分析：转交 `crablaw-cn:gaps`。
+- 涉及特定领域需先跟踪适用新规：转交 `crablaw-cn:reg-feed-watcher`。
+- 整改涉及内部制度改写：转交 `crablaw-cn:policy-redraft`。
 - 跨领域缺口落入其他板块（如数据、劳动、公司）时，转交对应板块技能。

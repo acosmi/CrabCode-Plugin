@@ -5,7 +5,7 @@ description: 监控中国监管动态、新规与征求意见稿并登记为 reg
 argument-hint: "[关注领域、发文机关或政策法规线索]"
 ---
 
-# /cn-regulatory:reg-feed-watcher
+# crablaw-cn:reg-feed-watcher
 
 【AI 辅助草稿，需律师复核】
 
@@ -34,7 +34,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 同一规则修订前后差异：转交 `/cn-regulatory:policy-diff`。
-- 征求意见稿需提交意见：转交 `/cn-regulatory:comments`。
-- 新规与现状的合规差距：转交 `/cn-regulatory:gaps`。
-- 内部制度需据新规改写：转交 `/cn-regulatory:policy-redraft`。
+- 同一规则修订前后差异：转交 `crablaw-cn:policy-diff`。
+- 征求意见稿需提交意见：转交 `crablaw-cn:comments`。
+- 新规与现状的合规差距：转交 `crablaw-cn:gaps`。
+- 内部制度需据新规改写：转交 `crablaw-cn:policy-redraft`。

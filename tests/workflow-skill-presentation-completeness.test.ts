@@ -4,9 +4,9 @@ import { readFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 
 const root = resolve(import.meta.dir, '..')
-const EXPECTED_WORKFLOW_SKILLS = 315
-const EXPECTED_INVOCATION_SET_SHA256 = 'f7b0838eba63cdf4c8e37e00a86c91185d3af4d98a3bdb816d406477e9e036af'
-const EXPECTED_MODEL_CONTENT_SHA256 = 'ee493e620f6a0b119d61bf27c362b3156493c2114dbe0b956e036f769295cee5'
+const EXPECTED_WORKFLOW_SKILLS = 316
+const EXPECTED_INVOCATION_SET_SHA256 = '8fdfcd6fdd39d7fa952c6d0f554ed675429597869cac28f9239269588228ab33'
+const EXPECTED_MODEL_CONTENT_SHA256 = '828de09199a19ff8d892e4a2ed2f1bc9e4c7ffa7a83a6a29272a23b1568bbb95'
 const HAN = /[\u3400-\u9fff]/u
 
 function sha256(value: string): string {
@@ -29,7 +29,7 @@ function stableModelContent(text: string): string {
 }
 
 describe('official workflow skill presentation completeness', () => {
-  test('keeps all 315 invocation identities and model-facing contents stable while localizing cards', () => {
+  test('keeps all 316 invocation identities and model-facing contents stable while localizing cards', () => {
     const marketplace = JSON.parse(
       readFileSync(join(root, '.crabcode-plugin', 'marketplace.json'), 'utf8'),
     ) as {

@@ -5,7 +5,7 @@ description: 起草中国法律师函(催告/警告/主张权利)内部草稿,�
 argument-hint: "[demand-intake 需求记录 id，或目的/对方/事实/诉求/时限]"
 ---
 
-# /cn-litigation:demand-draft
+# crablaw-cn:demand-draft
 
 【AI 辅助草稿，需律师复核】
 
@@ -45,8 +45,8 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 ## Next Steps
 
 - 律师定稿后如需对外：通过 matter-core review queue 升级审批（approved-external / sent 需记录 externalDestination），由律师与委托人决定，本技能不执行发送。
-- 预判对方可能回函：可预先用 `/cn-litigation:demand-received` 推演应对。
-- 若发函后转入诉讼：移交 `/cn-litigation:brief-section-drafter` 起草起诉状分段。
+- 预判对方可能回函：可预先用 `crablaw-cn:demand-received` 推演应对。
+- 若发函后转入诉讼：移交 `crablaw-cn:brief-section-drafter` 起草起诉状分段。
 
 ## 产出物路由
 

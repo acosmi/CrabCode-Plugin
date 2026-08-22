@@ -5,7 +5,7 @@ description: 起草知识产权侵权警告函/停止侵害函内部草稿,标�
 argument-hint: "[侵权事实、涉案权利(商标/专利/著作权/商业秘密)、对方主体、诉求]"
 ---
 
-# /cn-ip:cease-desist
+# crablaw-cn:cease-desist
 
 【AI 辅助草稿，需律师复核】
 
@@ -41,9 +41,9 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 需先判断是否真正构成侵权:回到 `/cn-ip:infringement-triage`。
-- 需走平台投诉/通知删除路径:转 `/cn-ip:takedown`。
-- 权利稳定性存疑或对方可能提无效/不侵权抗辩:转 `/cn-ip:fto-triage` 或 `/cn-ip:clearance` 复核。
+- 需先判断是否真正构成侵权:回到 `crablaw-cn:infringement-triage`。
+- 需走平台投诉/通知删除路径:转 `crablaw-cn:takedown`。
+- 权利稳定性存疑或对方可能提无效/不侵权抗辩:转 `crablaw-cn:fto-triage` 或 `crablaw-cn:clearance` 复核。
 - 拟进入诉讼/仲裁:升级至诉讼板块由律师评估,本草稿不作发函决定。
 
 ## 产出物路由

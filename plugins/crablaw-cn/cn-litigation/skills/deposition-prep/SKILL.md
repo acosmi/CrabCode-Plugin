@@ -5,7 +5,7 @@ description: 庭审与质证准备(中国民诉无 deposition,映射为当事人
 argument-hint: "[案件争点、证据清单、拟出庭证人/当事人信息]"
 ---
 
-# /cn-litigation:deposition-prep
+# crablaw-cn:deposition-prep
 
 【AI 辅助草稿，需律师复核】
 
@@ -41,7 +41,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 需逐争点对照主张与证据：回到 `/cn-litigation:claim-chart`。
-- 证据涉及国家秘密/商业秘密/个人隐私不公开处理：移交 `/cn-litigation:privilege-log-review`。
-- 需向法院申请调查取证或申请证人出庭：移交 `/cn-litigation:subpoena-triage`。
-- 需起草代理词或庭审发言分段：移交 `/cn-litigation:brief-section-drafter`。
+- 需逐争点对照主张与证据：回到 `crablaw-cn:claim-chart`。
+- 证据涉及国家秘密/商业秘密/个人隐私不公开处理：移交 `crablaw-cn:privilege-log-review`。
+- 需向法院申请调查取证或申请证人出庭：移交 `crablaw-cn:subpoena-triage`。
+- 需起草代理词或庭审发言分段：移交 `crablaw-cn:brief-section-drafter`。

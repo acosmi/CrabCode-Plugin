@@ -5,7 +5,7 @@ description: 在中国法工作流中审查劳动合同草稿,产出律师复核
 argument-hint: "[contract text, file path, or facts]"
 ---
 
-# /cn-labor-employment:employment-contract-review
+# crablaw-cn:employment-contract-review
 
 【AI 辅助草稿，需律师复核】
 
@@ -37,7 +37,7 @@ Return risk table, clause comments, missing facts, source status, and lawyer rev
 
 Route based on the review findings:
 
-- Termination scenarios surfaced: hand off to `/cn-labor-employment:termination-risk-review` with the matter facts.
-- Non-compete or post-employment restrictions: hand off to `/cn-labor-employment:non-compete-review`.
-- Cross-references to handbook or workplace policies: hand off to `/cn-labor-employment:employee-handbook-review`.
-- Pending or live dispute context: hand off to `/cn-labor-employment:labor-dispute-summary`.
+- Termination scenarios surfaced: hand off to `crablaw-cn:termination-risk-review` with the matter facts.
+- Non-compete or post-employment restrictions: hand off to `crablaw-cn:non-compete-review`.
+- Cross-references to handbook or workplace policies: hand off to `crablaw-cn:employee-handbook-review`.
+- Pending or live dispute context: hand off to `crablaw-cn:labor-dispute-summary`.

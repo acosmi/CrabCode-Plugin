@@ -5,7 +5,7 @@ description: 法院调查取证、调查令、协助调查通知的分流应对(
 argument-hint: "[收到的调查令/协助调查通知/取证文书，或拟申请调取的证据需求]"
 ---
 
-# /cn-litigation:subpoena-triage
+# crablaw-cn:subpoena-triage
 
 【AI 辅助草稿，需律师复核】
 
@@ -41,7 +41,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 调取的材料涉及涉密/隐私分级：移交 `/cn-litigation:privilege-log-review`。
-- 调取证据将用于质证：移交 `/cn-litigation:deposition-prep`。
-- 需起草调查取证申请书分段：移交 `/cn-litigation:brief-section-drafter`。
-- 调取的证据需纳入争点对照：回到 `/cn-litigation:claim-chart`。
+- 调取的材料涉及涉密/隐私分级：移交 `crablaw-cn:privilege-log-review`。
+- 调取证据将用于质证：移交 `crablaw-cn:deposition-prep`。
+- 需起草调查取证申请书分段：移交 `crablaw-cn:brief-section-drafter`。
+- 调取的证据需纳入争点对照：回到 `crablaw-cn:claim-chart`。

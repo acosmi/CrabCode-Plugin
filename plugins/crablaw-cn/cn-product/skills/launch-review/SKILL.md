@@ -5,7 +5,7 @@ description: 产品上线前的中国法综合合规审查,汇总各专项板块
 argument-hint: "[产品/版本说明,及已有的各专项审查记录 id]"
 ---
 
-# /cn-product:launch-review
+# crablaw-cn:launch-review
 
 【AI 辅助草稿，需律师复核】
 
@@ -21,10 +21,10 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 2. 清点已完成的专项审查覆盖度,核对是否各风险域都有结论;缺口即列为待办,不以"未发现"代替"未审查":
    - 数据/个人信息(`/cn-data-compliance`)。
    - 算法/自动化决策/AI 生成内容(`/cn-ai-governance`)。
-   - 宣传用语/营销(`/cn-product:marketing-claims-review`)。
+   - 宣传用语/营销(`crablaw-cn:marketing-claims-review`)。
    - 知识产权(`/cn-ip`)。
    - 资质许可与行业准入(`/cn-regulatory` 或对应资质审查)。
-   - 消保/电商/不正当竞争横向事项(`/cn-product:feature-risk-assessment`)。
+   - 消保/电商/不正当竞争横向事项(`crablaw-cn:feature-risk-assessment`)。
 3. 汇总各专项结论,统一定级 GREEN / YELLOW / RED,并保留各专项原始定级与来源。
 4. 形成放行视图:
    - 放行(全 GREEN)。
@@ -48,7 +48,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 按汇总结果转交:
 
-- 覆盖度缺口的风险域:转交对应专项板块补审(数据 `/cn-data-compliance`、AI `/cn-ai-governance`、宣传 `/cn-product:marketing-claims-review`、知识产权 `/cn-ip`、资质 `/cn-regulatory`)。
-- 单一功能需细化风险识别:转交 `/cn-product:feature-risk-assessment`。
-- 临上线出现的零散拿不准做法:转交 `/cn-product:is-this-a-problem`。
+- 覆盖度缺口的风险域:转交对应专项板块补审(数据 `/cn-data-compliance`、AI `/cn-ai-governance`、宣传 `crablaw-cn:marketing-claims-review`、知识产权 `/cn-ip`、资质 `/cn-regulatory`)。
+- 单一功能需细化风险识别:转交 `crablaw-cn:feature-risk-assessment`。
+- 临上线出现的零散拿不准做法:转交 `crablaw-cn:is-this-a-problem`。
 - 整改后复核:回到本技能重新汇总,更新放行视图。

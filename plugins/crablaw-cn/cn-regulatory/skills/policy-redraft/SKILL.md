@@ -5,7 +5,7 @@ description: 将内部合规制度或政策改写以适配新规要求。当用�
 argument-hint: "[现行内部制度文本 + 适配依据的政策法规或 reg-policy 条目]"
 ---
 
-# /cn-regulatory:policy-redraft
+# crablaw-cn:policy-redraft
 
 【AI 辅助草稿，需律师复核】
 
@@ -36,6 +36,6 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 先厘清新旧规则差异再改写：先转交 `/cn-regulatory:policy-diff`。
-- 改写前需评估现状缺口：先转交 `/cn-regulatory:gaps`。
-- 若依据仍为征求意见稿且企业拟提意见：转交 `/cn-regulatory:comments`。
+- 先厘清新旧规则差异再改写：先转交 `crablaw-cn:policy-diff`。
+- 改写前需评估现状缺口：先转交 `crablaw-cn:gaps`。
+- 若依据仍为征求意见稿且企业拟提意见：转交 `crablaw-cn:comments`。

@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crablaw.local/schemas/legal-core/claim-evidence-map.schema.json",
+  "title": "CrabLaw-CN Claim Evidence Map",
+  "type": "object",
+  "required": ["schemaVersion", "runId", "matterId", "claims", "elements"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "runId": { "type": "string", "minLength": 2 },
+    "matterId": { "type": "string", "minLength": 2 },
+    "claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["claimId", "issueId", "statement", "elementIds", "counterarguments", "confidence", "reviewRequired"],
+        "properties": {
+          "claimId": { "type": "string", "minLength": 2 },
+          "issueId": { "type": "string", "minLength": 2 },
+          "statement": { "type": "string", "minLength": 1 },
+          "elementIds": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 2 }, "uniqueItems": true },
+          "counterarguments": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+          "confidence": { "enum": ["low", "medium", "high"] },
+          "reviewRequired": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "elements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["elementId", "claimId", "statement", "factIds", "evidenceIds", "sourceRecordIds", "status", "missing"],
+        "properties": {
+          "elementId": { "type": "string", "minLength": 2 },
+          "claimId": { "type": "string", "minLength": 2 },
+          "statement": { "type": "string", "minLength": 1 },
+          "factIds": { "type": "array", "items": { "type": "string", "minLength": 2 }, "uniqueItems": true },
+          "evidenceIds": { "type": "array", "items": { "type": "string", "minLength": 2 }, "uniqueItems": true },
+          "sourceRecordIds": { "type": "array", "items": { "type": "string", "minLength": 2 }, "uniqueItems": true },
+          "status": { "enum": ["supported", "partially-supported", "unsupported", "disputed", "unknown"] },
+          "missing": { "type": "boolean" },
+          "notes": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

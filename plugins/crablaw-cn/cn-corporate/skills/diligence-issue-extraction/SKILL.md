@@ -5,7 +5,7 @@ description: 从被尽调文件中提取中国法下的尽职调查风险与缺�
 argument-hint: "[被尽调文件路径或粘贴文本]"
 ---
 
-# /cn-corporate:diligence-issue-extraction
+# crablaw-cn:diligence-issue-extraction
 
 【AI 辅助草稿，需律师复核】
 
@@ -39,7 +39,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 重大合同专项：转交 `/cn-corporate:material-contract-schedule`。
-- 批量同类文件：转交 `/cn-corporate:tabular-review`。
-- 发现转化为交割条件：转交 `/cn-corporate:closing-checklist`。
-- 面向业务团队汇总：转交 `/cn-corporate:deal-team-summary`。
+- 重大合同专项：转交 `crablaw-cn:material-contract-schedule`。
+- 批量同类文件：转交 `crablaw-cn:tabular-review`。
+- 发现转化为交割条件：转交 `crablaw-cn:closing-checklist`。
+- 面向业务团队汇总：转交 `crablaw-cn:deal-team-summary`。

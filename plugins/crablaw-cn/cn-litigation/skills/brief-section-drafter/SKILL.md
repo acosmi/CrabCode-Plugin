@@ -5,7 +5,7 @@ description: 分段起草中国诉讼文书(起诉状/答辩状/上诉状/代理
 argument-hint: "[文书类型、目标分段、案件事实与争点，或 claim-chart 条目 id]"
 ---
 
-# /cn-litigation:brief-section-drafter
+# crablaw-cn:brief-section-drafter
 
 【AI 辅助草稿，需律师复核】
 
@@ -45,9 +45,9 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 需先理清争点与举证责任：回到 `/cn-litigation:claim-chart`。
-- 需准备开庭质证与发问配合本文书：移交 `/cn-litigation:deposition-prep`。
-- 文书涉及证据调取请求：移交 `/cn-litigation:subpoena-triage`。
+- 需先理清争点与举证责任：回到 `crablaw-cn:claim-chart`。
+- 需准备开庭质证与发问配合本文书：移交 `crablaw-cn:deposition-prep`。
+- 文书涉及证据调取请求：移交 `crablaw-cn:subpoena-triage`。
 - 律师定稿后对外提交：通过 matter-core review queue 升级审批，本技能不执行提交或发送。
 
 ## 产出物路由

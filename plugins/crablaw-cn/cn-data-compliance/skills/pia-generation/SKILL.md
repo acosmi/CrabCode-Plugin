@@ -5,7 +5,7 @@ description: 起草中国法个人信息保护影响评估(PIA/PIPIA)工作底�
 argument-hint: "[processing activity or prior triage]"
 ---
 
-# /cn-data-compliance:pia-generation
+# crablaw-cn:pia-generation
 
 【AI 辅助草稿，需律师复核】
 

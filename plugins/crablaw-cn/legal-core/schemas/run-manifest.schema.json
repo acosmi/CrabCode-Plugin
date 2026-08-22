@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crablaw.local/schemas/legal-core/run-manifest.schema.json",
+  "title": "CrabLaw-CN Deep Analysis Run Manifest",
+  "type": "object",
+  "required": ["schemaVersion", "runId", "matterId", "revision", "status", "startedAt", "updatedAt", "documents", "artifacts", "staleIssueIds", "completedStepIds", "reviewState", "externalRelease"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "runId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,120}$" },
+    "matterId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,100}$" },
+    "revision": { "type": "integer", "minimum": 1 },
+    "status": { "enum": ["draft", "in-progress", "blocked", "stale", "ready-for-review", "reviewed-internal", "archived"] },
+    "startedAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "documents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["documentId", "sha256"],
+        "properties": {
+          "documentId": { "type": "string", "minLength": 2 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["artifactId", "type", "path", "sha256", "status", "dependsOnDocumentIds", "dependsOnIssueIds"],
+        "properties": {
+          "artifactId": { "type": "string", "minLength": 2 },
+          "type": { "enum": ["analysis-plan", "document-index", "fact-chronology", "issue-tree", "claim-evidence-map", "case-comparison", "analysis-findings", "specialist-findings", "memo", "review-item"] },
+          "path": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+" },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "status": { "enum": ["draft", "validated", "stale", "superseded"] },
+          "dependsOnDocumentIds": { "type": "array", "items": { "type": "string", "minLength": 2 }, "uniqueItems": true },
+          "dependsOnIssueIds": { "type": "array", "items": { "type": "string", "minLength": 2 }, "uniqueItems": true }
+        },
+        "additionalProperties": false
+      }
+    },
+    "staleIssueIds": { "type": "array", "items": { "type": "string", "minLength": 2 }, "uniqueItems": true },
+    "completedStepIds": { "type": "array", "items": { "type": "string", "minLength": 2 }, "uniqueItems": true },
+    "reviewState": { "enum": ["not-ready", "pending-lawyer-review", "lawyer-reviewed"] },
+    "externalRelease": { "enum": ["prohibited", "pending-explicit-approval", "approved"] },
+    "blockingReasons": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
+  },
+  "additionalProperties": false
+}

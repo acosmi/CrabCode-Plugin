@@ -5,7 +5,7 @@ description: 结案归档,记录裁判结果、履行/执行情况、归档与�
 argument-hint: "[案件 caseId 与结案信息：裁判结果/履行情况]"
 ---
 
-# /cn-litigation:matter-close
+# crablaw-cn:matter-close
 
 【AI 辅助草稿，需律师复核】
 
@@ -40,5 +40,5 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 ## Next Steps
 
 - 留存到期提醒：交由 matter-core 的 compliance-deadline-watcher 监测。
-- 同类案件复盘或组合统计：移交 `/cn-litigation:portfolio-status`。
-- 如执行尚未终结：在执行进展节点回到 `/cn-litigation:matter-update`。
+- 同类案件复盘或组合统计：移交 `crablaw-cn:portfolio-status`。
+- 如执行尚未终结：在执行进展节点回到 `crablaw-cn:matter-update`。
