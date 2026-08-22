@@ -1,7 +1,7 @@
 {
   "name": "crabwork-sales",
-  "version": "0.2.2",
-  "description": "Prospect, craft outreach, and build deal strategy faster. Prep for calls, manage your pipeline, and write personalized messaging that moves deals forward.",
+  "version": "0.2.3",
+  "description": "Prospect, craft outreach, and build deal strategy faster. Prep for calls, manage your pipeline, and write personalized messaging that moves deals forward. Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"
   },

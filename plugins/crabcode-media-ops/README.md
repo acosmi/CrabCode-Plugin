@@ -1,6 +1,14 @@
-# crabcode-media-ops 0.4.2
+# crabcode-media-ops 0.4.3
+
+> **MCP 安全暂停（2026-08-22）**：安全状态：本版本不发布可执行 MCP 配置；安装不会启动该服务或发起网络请求。 本文保留目标能力与后续接入资料，不代表当前版本已连接或可执行。
 
 可审计的新媒体运营插件：参考材料防火墙、联网可信来源研究、独立原创风险复核、创作者风格管理、精排白底 HTML 交付、可信身份约束的审批，以及冻结发布包。
+
+## 0.4.3 变更（MCP 紧急安全暂停）
+
+- **发布面 fail-closed**：当前版本不发布 `.mcp.json`，`requiredMcpServers` 为空；安装或升级不会启动 mediaops sidecar，也不会由插件配置发起网络请求。
+- **能力边界**：sidecar 源码与确定性测试继续保留，供本机验证和后续宿主 principal 合同验收；依赖 `mediaops.*` 的治理步骤必须以 `MCP_INACTIVE` / `GATE_NOT_EXECUTED` 停止，不能把手工替代写成已治理结果。
+- **版本单一真源**：runtime/serverInfo 从 `package.json` 派生 `0.4.3`，manifest、marketplace、package、dist 与 CycloneDX SBOM 同步。
 
 ## 0.4.2 变更（分发验证硬化）
 
@@ -8,7 +16,7 @@
 - **dist Linux 字节确定性确证**：经精确 CI 容器（digest 锁定）本地复现，`check:distribution` 重建的 `dist/server.js` 与入库产物字节一致，像素级黄金截图与全套测试（109 单测 + 全 QA）全绿；本版 `dist/server.js` 以 Linux 容器权威重建。
 - **运行时功能与 0.4.1 等价**：仅 `VERSION` 串更新与 dist 平台权威重建，无工具/schema/存储变化（工具数 38，`SCHEMA_VERSION=2` 不变）。
 
-## 0.4.1 变更（MCP 可用性修复）
+## 0.4.1 历史变更（MCP 可用性修复，已由 0.4.3 暂停）
 
 - **生命周期声明**：manifest 增加 `requiredMcpServers: ["mediaops"]`，CrabCode ≥1.0.16 安装后自动激活本地 sidecar；用户显式 disable 始终优先。旧宿主上退化为 inactive，不崩溃。
 - **自包含发行物**：`.mcp.json` 直接执行入库的 `dist/server.js`（`bun --no-env-file`），启动不再执行任何安装步骤，离线冷启动实测亚秒到 2 秒完成 initialize/tools/list。Playwright/axe/vnu 为交付 QA 的惰性可选依赖，缺失时基础 MCP 全量可用、`delivery.verify` full 模式返回 `DEPENDENCY_NOT_READY`（static 模式始终可用）。`bun run check:distribution` 校验发行物新鲜度并做清洁目录冷启动 smoke。
@@ -71,7 +79,7 @@ reference.register
 1. `mcp_oauth`：宿主在 MCP `authInfo` 中提供未过期的 subject、issuer，以及 scopes 或 roles。这是多用户部署的首选模式。
 2. `host_principal`：受信宿主显式设置 `MEDIAOPS_IDENTITY_MODE=host-principal`、`MEDIAOPS_TRUSTED_PRINCIPAL_ID`、`MEDIAOPS_TRUSTED_PRINCIPAL_ISSUER` 和 `MEDIAOPS_TRUSTED_PRINCIPAL_ROLES`。这是宿主配置断言，不是插件自行完成的登录或强身份认证。
 
-默认 `.mcp.json` 只配置数据目录，不伪造 principal，因此没有宿主身份注入时所有变更操作会安全失败。请求人与批准人、作者与独立核查人等隔离比较的是可信 `issuer:principalId`；一个 host principal 即使拥有多个角色，也不能充当需要不同人的两端。正式多人审批应使用能为每位用户注入不同 subject 的 MCP OAuth 或等价宿主认证。
+0.4.1 历史 `.mcp.json` 只配置数据目录，不伪造 principal；0.4.3 当前安全基线已移除该执行配置。未来恢复时，没有宿主身份注入的变更操作仍必须安全失败。请求人与批准人、作者与独立核查人等隔离比较的是可信 `issuer:principalId`；一个 host principal 即使拥有多个角色，也不能充当需要不同人的两端。正式多人审批应使用能为每位用户注入不同 subject 的 MCP OAuth 或等价宿主认证。
 
 角色按职责最小授权：`author`、`reference_curator`、`researcher`、`fact_checker`、`originality_scanner`、`originality_reviewer`、`editorial_reviewer`、`renderer`、`delivery_reviewer`、`profile_editor`、`profile_approver`、`approval_requester`、`approver`、`publisher`。服务端也识别 `mediaops:<role>`、`mediaops:*` 和 `*`，但多人生产环境不应以通配角色代替职责隔离。
 

@@ -1,7 +1,7 @@
 {
   "name": "crabwork-engineering",
-  "version": "0.2.2",
-  "description": "Streamline engineering workflows — standups, code review, architecture decisions, incident response, and technical documentation. Works with your existing tools or standalone.",
+  "version": "0.2.3",
+  "description": "Streamline engineering workflows — standups, code review, architecture decisions, incident response, and technical documentation. Works with your existing tools or standalone. Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"
   },

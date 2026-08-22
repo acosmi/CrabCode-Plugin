@@ -253577,6 +253577,41 @@ class StdioServerTransport {
 
 // src/server.ts
 import { join as join59 } from "path";
+// package.json
+var package_default = {
+  name: "crabcode-html-video-mcp",
+  version: "0.1.3",
+  license: "Apache-2.0",
+  type: "module",
+  bin: "./dist/bootstrap.js",
+  packageManager: "bun@1.3.11",
+  scripts: {
+    "build:mcp": "bun scripts/build-mcp.ts",
+    "check:distribution": "bun scripts/check-distribution.ts",
+    start: "bun --no-env-file dist/bootstrap.js",
+    typecheck: "tsc -p tsconfig.json && tsc -p packages/content-graph/tsconfig.json && tsc -p packages/seek-shim/tsconfig.json && tsc -p packages/multi-segment/tsconfig.json",
+    test: "bun run build:mcp && bun test ./tests ./packages",
+    validate: "bun run typecheck && bun run test && bun run check:distribution && bun src/doctor-cli.ts --check-only"
+  },
+  dependencies: {
+    "@crabcode/content-graph": "file:./packages/content-graph",
+    "@crabcode/multi-segment": "file:./packages/multi-segment",
+    "@crabcode/seek-shim": "file:./packages/seek-shim",
+    "@hyperframes/producer": "0.7.46",
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "css-tree": "3.1.0",
+    linkedom: "0.18.13",
+    zod: "3.25.76"
+  },
+  optionalDependencies: {
+    "ffmpeg-static": "5.2.0"
+  },
+  devDependencies: {
+    "@types/bun": "1.3.11",
+    "@types/css-tree": "2.3.10",
+    typescript: "5.9.3"
+  }
+};
 
 // src/envelope.ts
 function toToolResult(env) {
@@ -254595,7 +254630,7 @@ async function handler9(raw2, context3 = {}) {
 
 // src/server.ts
 process.env.PRODUCER_HYPERFRAME_MANIFEST_PATH = join59(pluginRoot(), "dist", "hyperframe.manifest.json");
-var server = new McpServer({ name: "html-video", version: "0.1.0" });
+var server = new McpServer({ name: "html-video", version: package_default.version });
 function register(name55, description6, inputSchema6, handler10, annotations6) {
   server.registerTool(name55, { description: description6, inputSchema: inputSchema6, annotations: annotations6 }, async (args, extra) => {
     try {

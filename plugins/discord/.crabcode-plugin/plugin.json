@@ -1,7 +1,7 @@
 {
   "name": "discord",
-  "version": "0.1.1",
-  "description": "Discord channel bridge for CrabCode. Messaging bridge with built-in access control; pairing, allowlist, and policy are managed by the bridge's access skill.",
+  "version": "0.1.2",
+  "description": "Discord channel bridge for CrabCode. Messaging bridge with built-in access control; pairing, allowlist, and policy are managed by the bridge's access skill. Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"
   },

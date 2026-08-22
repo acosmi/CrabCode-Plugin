@@ -1,7 +1,7 @@
 {
   "name": "github",
-  "version": "0.1.0",
-  "description": "GitHub MCP integration for CrabCode. Create issues, manage pull requests, review code, and search repositories against GitHub's hosted MCP endpoint.",
+  "version": "0.1.1",
+  "description": "GitHub MCP integration for CrabCode. Create issues, manage pull requests, review code, and search repositories against GitHub's hosted MCP endpoint. Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"
   },

@@ -1,7 +1,7 @@
 {
   "name": "asana",
-  "version": "0.1.0",
-  "description": "Asana work management integration packaged for CrabCode. Create and manage tasks, search projects, update assignments, and track progress alongside your engineering workflow.",
+  "version": "0.1.1",
+  "description": "Asana work management integration packaged for CrabCode. Create and manage tasks, search projects, update assignments, and track progress alongside your engineering workflow. Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"
   },

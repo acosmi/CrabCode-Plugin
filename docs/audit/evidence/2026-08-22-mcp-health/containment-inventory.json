@@ -1,0 +1,873 @@
+{
+  "schemaVersion": 1,
+  "baselineId": "mcp-emergency-safe-baseline-v1",
+  "auditDate": "2026-08-22",
+  "baselineCommit": "a9dc9abd71e2bdfbf33aafa58bcea0b2d42e3bd3",
+  "marketplaceVersion": {
+    "previous": "0.4.2",
+    "safe": "0.4.3"
+  },
+  "allowedRuntime": {
+    "pluginId": "crabcode-html-video",
+    "serverName": "html-video",
+    "transport": "stdio",
+    "configPath": "plugins/crabcode-html-video/.mcp.json",
+    "configSha256": "a06443a9f592837b584842a2fd77183260ab6af64156da09513c434564ff2cfd",
+    "previousVersion": "0.1.2",
+    "safeVersion": "0.1.3"
+  },
+  "removedConfigurations": [
+    {
+      "pluginId": "asana",
+      "configPath": "plugins/asana/.mcp.json",
+      "configSha256": "2c0f38ce4b463b205aa435692d02db5d1de9e128ce1bd561614ef77c419e664e",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "asana"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 1,
+        "stdio": 0
+      },
+      "primaryBlocker": "endpoint-retired",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "clangd-lsp",
+      "configPath": "plugins/clangd-lsp/.mcp.json",
+      "configSha256": "0dc8dda6b1ca223abd40379860133fc21f9971747d7dce8e1f74daaad6db0c91",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "clangd-lsp"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "protocol-mismatch",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "context7",
+      "configPath": "plugins/context7/.mcp.json",
+      "configSha256": "14b1ca834d9867a3f382a7ebbf7d2f149e1b7ac0d2ae9deef5cdc030e670a546",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "context7"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "distribution-not-self-contained",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "crabcode-example-plugin",
+      "configPath": "plugins/crabcode-example-plugin/.mcp.json",
+      "configSha256": "0ec43f9a48daa81f756d40c8b846625da3a507e3ebf880eb74b6b39394f7409a",
+      "previousVersion": "0.1.1",
+      "safeVersion": "0.1.2",
+      "serverCount": 1,
+      "serverNames": [
+        "example-server"
+      ],
+      "transports": {
+        "http": 1,
+        "sse": 0,
+        "stdio": 0
+      },
+      "primaryBlocker": "non-production-endpoint",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "crabcode-media-ops",
+      "configPath": "plugins/crabcode-media-ops/.mcp.json",
+      "configSha256": "8c94397f2ff5e7793d26f8749a254f1fef4a84f08707e291b1f591f608230428",
+      "previousVersion": "0.4.2",
+      "safeVersion": "0.4.3",
+      "serverCount": 1,
+      "serverNames": [
+        "mediaops"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "principal-config-missing",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "crabwork-bio-research",
+      "configPath": "plugins/crabwork-bio-research/.mcp.json",
+      "configSha256": "cd4ed80f998c940ac7c66f1bbfe53ed0be8dc4562844f67afd5161f4b77e2bd4",
+      "previousVersion": "0.2.2",
+      "safeVersion": "0.2.3",
+      "serverCount": 11,
+      "serverNames": [
+        "benchling",
+        "biorender",
+        "biorxiv",
+        "c-trials",
+        "chembl",
+        "consensus",
+        "ot",
+        "owkin",
+        "pubmed",
+        "synapse",
+        "wiley"
+      ],
+      "transports": {
+        "http": 11,
+        "sse": 0,
+        "stdio": 0
+      },
+      "primaryBlocker": "provider-e2e-unverified",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "crabwork-customer-support",
+      "configPath": "plugins/crabwork-customer-support/.mcp.json",
+      "configSha256": "f26446be37ab7609a9bdd5192369811a6482aaf333308b905615ea3c16cca90c",
+      "previousVersion": "0.2.2",
+      "safeVersion": "0.2.3",
+      "serverCount": 6,
+      "serverNames": [
+        "atlassian",
+        "guru",
+        "hubspot",
+        "intercom",
+        "notion",
+        "slack"
+      ],
+      "transports": {
+        "http": 6,
+        "sse": 0,
+        "stdio": 0
+      },
+      "primaryBlocker": "provider-e2e-unverified",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "crabwork-data",
+      "configPath": "plugins/crabwork-data/.mcp.json",
+      "configSha256": "b0a53a5d441ad8da6252e4031e3d341a970beffd0dc6419cd5c3376fb2a01c78",
+      "previousVersion": "0.2.2",
+      "safeVersion": "0.2.3",
+      "serverCount": 8,
+      "serverNames": [
+        "amplitude",
+        "amplitude-eu",
+        "atlassian",
+        "bigquery",
+        "databricks",
+        "definite",
+        "hex",
+        "snowflake"
+      ],
+      "transports": {
+        "http": 8,
+        "sse": 0,
+        "stdio": 0
+      },
+      "primaryBlocker": "provider-e2e-unverified",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "crabwork-design",
+      "configPath": "plugins/crabwork-design/.mcp.json",
+      "configSha256": "47d26c21ccdee69cb5762901b2e804a37e84f698ad81f5bd4bb88411c031c187",
+      "previousVersion": "0.2.2",
+      "safeVersion": "0.2.3",
+      "serverCount": 7,
+      "serverNames": [
+        "asana",
+        "atlassian",
+        "figma",
+        "intercom",
+        "linear",
+        "notion",
+        "slack"
+      ],
+      "transports": {
+        "http": 7,
+        "sse": 0,
+        "stdio": 0
+      },
+      "primaryBlocker": "provider-e2e-unverified",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "crabwork-engineering",
+      "configPath": "plugins/crabwork-engineering/.mcp.json",
+      "configSha256": "2fbc49bc72e80baf44a845a1fbfd26a088bf8d8a984fafb8b5388a6f20e08773",
+      "previousVersion": "0.2.2",
+      "safeVersion": "0.2.3",
+      "serverCount": 8,
+      "serverNames": [
+        "asana",
+        "atlassian",
+        "datadog",
+        "github",
+        "linear",
+        "notion",
+        "pagerduty",
+        "slack"
+      ],
+      "transports": {
+        "http": 8,
+        "sse": 0,
+        "stdio": 0
+      },
+      "primaryBlocker": "provider-e2e-unverified",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "crabwork-enterprise-search",
+      "configPath": "plugins/crabwork-enterprise-search/.mcp.json",
+      "configSha256": "01f7ffb47e523dfba00e3b09c0b476aa4f289b0a97d9cae6718a8691eeb99289",
+      "previousVersion": "0.2.2",
+      "safeVersion": "0.2.3",
+      "serverCount": 5,
+      "serverNames": [
+        "asana",
+        "atlassian",
+        "guru",
+        "notion",
+        "slack"
+      ],
+      "transports": {
+        "http": 5,
+        "sse": 0,
+        "stdio": 0
+      },
+      "primaryBlocker": "provider-e2e-unverified",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "crabwork-hr",
+      "configPath": "plugins/crabwork-hr/.mcp.json",
+      "configSha256": "0a48f851bb0a090fe73515b4acbc9a808ef07e8a2c895b2edd71b71439fa5705",
+      "previousVersion": "0.2.2",
+      "safeVersion": "0.2.3",
+      "serverCount": 3,
+      "serverNames": [
+        "atlassian",
+        "notion",
+        "slack"
+      ],
+      "transports": {
+        "http": 3,
+        "sse": 0,
+        "stdio": 0
+      },
+      "primaryBlocker": "provider-e2e-unverified",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "crabwork-marketing",
+      "configPath": "plugins/crabwork-marketing/.mcp.json",
+      "configSha256": "b7224587ba8e77b4f08773679154e8545895ded1353343a2ebb7b0be8e67f5f7",
+      "previousVersion": "0.2.2",
+      "safeVersion": "0.2.3",
+      "serverCount": 11,
+      "serverNames": [
+        "ahrefs",
+        "amplitude",
+        "amplitude-eu",
+        "canva",
+        "figma",
+        "hubspot",
+        "klaviyo",
+        "notion",
+        "similarweb",
+        "slack",
+        "supermetrics"
+      ],
+      "transports": {
+        "http": 11,
+        "sse": 0,
+        "stdio": 0
+      },
+      "primaryBlocker": "provider-e2e-unverified",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "crabwork-operations",
+      "configPath": "plugins/crabwork-operations/.mcp.json",
+      "configSha256": "1bee083eb1b249f402d4f8868a0dad05021062367f77ab8b52f7d3624387afa9",
+      "previousVersion": "0.2.2",
+      "safeVersion": "0.2.3",
+      "serverCount": 4,
+      "serverNames": [
+        "asana",
+        "atlassian",
+        "notion",
+        "slack"
+      ],
+      "transports": {
+        "http": 4,
+        "sse": 0,
+        "stdio": 0
+      },
+      "primaryBlocker": "provider-e2e-unverified",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "crabwork-product-management",
+      "configPath": "plugins/crabwork-product-management/.mcp.json",
+      "configSha256": "a8e59098f7a0203f940e5800fe5644828cbe768d2db111ffe571fc396325258e",
+      "previousVersion": "0.2.2",
+      "safeVersion": "0.2.3",
+      "serverCount": 14,
+      "serverNames": [
+        "amplitude",
+        "amplitude-eu",
+        "asana",
+        "atlassian",
+        "clickup",
+        "figma",
+        "fireflies",
+        "intercom",
+        "linear",
+        "monday",
+        "notion",
+        "pendo",
+        "similarweb",
+        "slack"
+      ],
+      "transports": {
+        "http": 14,
+        "sse": 0,
+        "stdio": 0
+      },
+      "primaryBlocker": "provider-e2e-unverified",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "crabwork-productivity",
+      "configPath": "plugins/crabwork-productivity/.mcp.json",
+      "configSha256": "096615620da929acd9db49460bac139a6a380b730bb8742f46f27459e258c6c4",
+      "previousVersion": "0.2.2",
+      "safeVersion": "0.2.3",
+      "serverCount": 7,
+      "serverNames": [
+        "asana",
+        "atlassian",
+        "clickup",
+        "linear",
+        "monday",
+        "notion",
+        "slack"
+      ],
+      "transports": {
+        "http": 7,
+        "sse": 0,
+        "stdio": 0
+      },
+      "primaryBlocker": "provider-e2e-unverified",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "crabwork-sales",
+      "configPath": "plugins/crabwork-sales/.mcp.json",
+      "configSha256": "c970254b2f2d81079f991f2a0798c370793de0e3007fe9cc79cc04f8cef5ef17",
+      "previousVersion": "0.2.2",
+      "safeVersion": "0.2.3",
+      "serverCount": 11,
+      "serverNames": [
+        "apollo",
+        "atlassian",
+        "clay",
+        "close",
+        "fireflies",
+        "hubspot",
+        "notion",
+        "outreach",
+        "similarweb",
+        "slack",
+        "zoominfo"
+      ],
+      "transports": {
+        "http": 11,
+        "sse": 0,
+        "stdio": 0
+      },
+      "primaryBlocker": "provider-e2e-unverified",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "crabwork-small-business",
+      "configPath": "plugins/crabwork-small-business/.mcp.json",
+      "configSha256": "9a4fdaf656fa9966a3fdeb142fcbd109fbe5b7ec24d894f3686c25e3f2318ac2",
+      "previousVersion": "0.2.1",
+      "safeVersion": "0.2.2",
+      "serverCount": 5,
+      "serverNames": [
+        "alipay",
+        "dingtalk",
+        "feishu",
+        "hubspot",
+        "tencent-docs"
+      ],
+      "transports": {
+        "http": 2,
+        "sse": 0,
+        "stdio": 3
+      },
+      "primaryBlocker": "provider-e2e-unverified",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "csharp-lsp",
+      "configPath": "plugins/csharp-lsp/.mcp.json",
+      "configSha256": "e093b08a7f64d5d1d11be65f0fbe2268bcbdaafaaecde16526e084d92231d521",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "csharp-lsp"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "protocol-mismatch",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "discord",
+      "configPath": "plugins/discord/.mcp.json",
+      "configSha256": "bf2c9cd714503906de7bcebb8deff29d10ff6bb5d49fcf551e88b60d9f486c35",
+      "previousVersion": "0.1.1",
+      "safeVersion": "0.1.2",
+      "serverCount": 1,
+      "serverNames": [
+        "discord"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "distribution-not-self-contained",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "fakechat",
+      "configPath": "plugins/fakechat/.mcp.json",
+      "configSha256": "e9227f6d71ceef24ee2f3cf024a19e891a530aa73737d68328d16bee7faeafb5",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "fakechat"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "distribution-not-self-contained",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "firebase",
+      "configPath": "plugins/firebase/.mcp.json",
+      "configSha256": "7ac643ae95a825c2d90b1fccfc54015bee34259b82cac7d66ee03c6be13b1793",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "firebase"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "distribution-not-self-contained",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "github",
+      "configPath": "plugins/github/.mcp.json",
+      "configSha256": "ef5f7e5aac1cbe00e866ab72e472dcd349535a5d14852e4bbfac0dfa5de78085",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "github"
+      ],
+      "transports": {
+        "http": 1,
+        "sse": 0,
+        "stdio": 0
+      },
+      "primaryBlocker": "provider-e2e-unverified",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "gitlab",
+      "configPath": "plugins/gitlab/.mcp.json",
+      "configSha256": "0bb850b1dcca296e2a967e3d39f36f81679d7314becb1682c995880fa216173d",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "gitlab"
+      ],
+      "transports": {
+        "http": 1,
+        "sse": 0,
+        "stdio": 0
+      },
+      "primaryBlocker": "provider-e2e-unverified",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "gopls-lsp",
+      "configPath": "plugins/gopls-lsp/.mcp.json",
+      "configSha256": "26a616148950554317373dff8ce499a9b5595a5e2afdf0e962a8f36a7ee0ac07",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "gopls-lsp"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "protocol-mismatch",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "greptile",
+      "configPath": "plugins/greptile/.mcp.json",
+      "configSha256": "4c6a4c7a3f308b4634c134f7e7b0c716bc2f9efd4d7db49e89d30544f09a02af",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "greptile"
+      ],
+      "transports": {
+        "http": 1,
+        "sse": 0,
+        "stdio": 0
+      },
+      "primaryBlocker": "provider-e2e-unverified",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "imessage",
+      "configPath": "plugins/imessage/.mcp.json",
+      "configSha256": "d4a9eb3d71f8c435bf83cef590d2c653c0c99452ab0be926ea69908ebde3ecbc",
+      "previousVersion": "0.1.1",
+      "safeVersion": "0.1.2",
+      "serverCount": 1,
+      "serverNames": [
+        "imessage"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "distribution-not-self-contained",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "jdtls-lsp",
+      "configPath": "plugins/jdtls-lsp/.mcp.json",
+      "configSha256": "fcd9eb986213c4bc7bcd72da0e78475c0ce66a9f0e357b46e4b830a69f83ce95",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "jdtls-lsp"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "protocol-mismatch",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "kotlin-lsp",
+      "configPath": "plugins/kotlin-lsp/.mcp.json",
+      "configSha256": "ae110bc0b958efd701581d0f72ddaf1bf65bf8874dd66e1758a875da7c79043f",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "kotlin-lsp"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "protocol-mismatch",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "laravel-boost",
+      "configPath": "plugins/laravel-boost/.mcp.json",
+      "configSha256": "473dbdd74ea50dc7487ba5b72775c0511a702d53fb5f74caf68eb45f757a79b8",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "laravel-boost"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "distribution-not-self-contained",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "linear",
+      "configPath": "plugins/linear/.mcp.json",
+      "configSha256": "ed48f61f36a8feba5295e8a86de7aa21489c6a1ebc9bc317601e6f1f7a65e1b1",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "linear"
+      ],
+      "transports": {
+        "http": 1,
+        "sse": 0,
+        "stdio": 0
+      },
+      "primaryBlocker": "provider-e2e-unverified",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "lua-lsp",
+      "configPath": "plugins/lua-lsp/.mcp.json",
+      "configSha256": "fe574fb5dd93338d606ec5be258f5c7ce55637169dafabdcc08921661ac63d72",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "lua-lsp"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "protocol-mismatch",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "php-lsp",
+      "configPath": "plugins/php-lsp/.mcp.json",
+      "configSha256": "7a9886ba09a14b6c07abf362b10ea01672288d75a2919ab0ee37774f4c969ac1",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "php-lsp"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "protocol-mismatch",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "playwright",
+      "configPath": "plugins/playwright/.mcp.json",
+      "configSha256": "59729a07e926a1ea84838d3c9be373e09d70fd83f6c7b56d34e3ef722d2b8d1d",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "playwright"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "distribution-not-self-contained",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "pyright-lsp",
+      "configPath": "plugins/pyright-lsp/.mcp.json",
+      "configSha256": "1064b25c50bc57ae9d566289bf2d1c25dc956adc5eabda18d32b00552d9785de",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "pyright-lsp"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "protocol-mismatch",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "ruby-lsp",
+      "configPath": "plugins/ruby-lsp/.mcp.json",
+      "configSha256": "95cadba5d0c49efb12f5cec1c80043f5d146d7881c809c53ffb572ca4fad79a8",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "ruby-lsp"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "protocol-mismatch",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "rust-analyzer-lsp",
+      "configPath": "plugins/rust-analyzer-lsp/.mcp.json",
+      "configSha256": "81d7054eb43498d47b5f1d07606e0e9f470d01567aa758946b3d9d81c85cf79a",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "rust-analyzer-lsp"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "protocol-mismatch",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "serena",
+      "configPath": "plugins/serena/.mcp.json",
+      "configSha256": "e47cf790f200d985828be50a3830f57e135a6339a7db5c264e4570709e71cff8",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "serena"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "distribution-not-self-contained",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "swift-lsp",
+      "configPath": "plugins/swift-lsp/.mcp.json",
+      "configSha256": "4515dfaf701ba13bab21cc149f90eb334e466cb06174130631e23be751e57505",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "swift-lsp"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "protocol-mismatch",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "telegram",
+      "configPath": "plugins/telegram/.mcp.json",
+      "configSha256": "6a25c844a5e0966d0b193ac9872fa1b0f3a13c5f5919982ad6af8f81e2ee5dc1",
+      "previousVersion": "0.1.1",
+      "safeVersion": "0.1.2",
+      "serverCount": 1,
+      "serverNames": [
+        "telegram"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "distribution-not-self-contained",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "terraform",
+      "configPath": "plugins/terraform/.mcp.json",
+      "configSha256": "06d44d98bbba56633eb5355e5552b86c7b850714844d9fcd710d9eb19272cf6a",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "terraform"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "distribution-not-self-contained",
+      "action": "removed-from-published-plugin"
+    },
+    {
+      "pluginId": "typescript-lsp",
+      "configPath": "plugins/typescript-lsp/.mcp.json",
+      "configSha256": "001b91de8991d309eff0fe81c8af708b5b1d6f852f3e1bbf538779cf16bb0ac6",
+      "previousVersion": "0.1.0",
+      "safeVersion": "0.1.1",
+      "serverCount": 1,
+      "serverNames": [
+        "typescript-lsp"
+      ],
+      "transports": {
+        "http": 0,
+        "sse": 0,
+        "stdio": 1
+      },
+      "primaryBlocker": "protocol-mismatch",
+      "action": "removed-from-published-plugin"
+    }
+  ],
+  "expectedPostContainment": {
+    "mcpConfigFiles": 1,
+    "totalServers": 1,
+    "httpServers": 0,
+    "sseServers": 0,
+    "stdioServers": 1,
+    "nonEmptyRequiredMcpPlugins": 1,
+    "pausedMarketplaceDisclosures": 42
+  }
+}

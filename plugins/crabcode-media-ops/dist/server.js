@@ -10572,6 +10572,58 @@ var init_zod = __esm(() => {
   init_external();
 });
 
+// package.json
+var package_default;
+var init_package = __esm(() => {
+  package_default = {
+    name: "crabcode-media-ops-mcp",
+    version: "0.4.3",
+    license: "Apache-2.0",
+    type: "module",
+    bin: "./dist/server.js",
+    scripts: {
+      start: "bun --no-env-file dist/server.js",
+      typecheck: "tsc --noEmit && bun run typecheck:qa-cli",
+      "typecheck:qa-cli": "tsc --noEmit --allowImportingTsExtensions --exactOptionalPropertyTypes false --lib ES2022,DOM --module ESNext --moduleResolution Bundler --noFallthroughCasesInSwitch --noImplicitOverride --skipLibCheck --strict --target ES2022 --types bun-types scripts/render-release-fixture.ts scripts/check-installed.ts scripts/check-distribution.ts playwright.config.ts",
+      test: "MEDIAOPS_QA_MODE=static bun test --timeout 60000 --max-concurrency 8 $(find tests -maxdepth 1 -name '*.test.ts' ! -name '*.qa.test.ts' | sort)",
+      "test:qa": "MEDIAOPS_QA_MODE=full bun test --timeout 180000 --max-concurrency 1 tests/delivery.qa.test.ts",
+      "test:all": "bun run test && bun run test:qa && bun run qa:release",
+      build: "bun build src/server.ts --outdir dist --target bun --format esm --external @playwright/test --external @axe-core/playwright --external playwright --external playwright-core --external vnu-jar",
+      "check:distribution": "bun scripts/check-distribution.ts",
+      sbom: "bun run scripts/generate-sbom.ts",
+      "sbom:check": "bun run scripts/generate-sbom.ts --check",
+      validate: "bun run sbom:check && bun run scripts/validate-media-plugin.ts",
+      "qa:fixture": "bun run scripts/render-release-fixture.ts",
+      "qa:browser": "playwright test --workers=1 --retries=0 --forbid-only --fail-on-flaky-tests --update-snapshots=none",
+      "qa:release": "bun run qa:fixture && bun run qa:browser",
+      "qa:installed": "bun run scripts/check-installed.ts"
+    },
+    dependencies: {
+      "@axe-core/playwright": "4.12.1",
+      "@modelcontextprotocol/sdk": "1.29.0",
+      "@playwright/test": "1.61.1",
+      "hast-util-to-text": "4.0.2",
+      "rehype-parse": "9.0.1",
+      "rehype-sanitize": "6.0.0",
+      "rehype-stringify": "10.0.1",
+      "remark-gfm": "4.0.1",
+      "remark-parse": "11.0.0",
+      "remark-rehype": "11.1.2",
+      "remark-stringify": "11.0.0",
+      unified: "11.0.5",
+      "vnu-jar": "26.7.15",
+      zod: "3.25.76"
+    },
+    devDependencies: {
+      "@types/bun": "1.3.14",
+      typescript: "5.9.3"
+    },
+    overrides: {
+      hono: "4.12.25"
+    }
+  };
+});
+
 // src/domain.ts
 import { createHash as createHash2 } from "crypto";
 function isSafeHttpUrl(value) {
@@ -10622,9 +10674,11 @@ function assertStoredContentHash(content) {
     throw new Error(`CONTENT_HASH_MISMATCH:${content.contentId}:${content.revisionId}`);
   }
 }
-var VERSION = "0.4.2", SCHEMA_VERSION = 2, Sha256Schema, SafeHttpUrlSchema, BrandIdSchema, ReferenceRoleSchema, ReferenceAllowedUseSchema, ReferenceMaterialSchema, ResearchCaptureSchema, SourceAssessmentSchema, EvidenceSourceSchema, ResearchClaimSchema, ClaimEvidenceLinkSchema, ResearchSearchLogSchema, ResearchReviewSchema, ClaimSchema, VerifiableStatementSchema, StatementCoverageSchema, ReviewSchema, LegalReviewSchema, AiDisclosureSchema, AssetInputSchema, AssetSchema, ArticleNodeTypeSchema, ArticleNodeSchema, CitationSchema, ArticleDocSchema, OriginalityHumanReviewSchema, OriginalityScanSchema, EditorialReviewRecordSchema, BaseContentSchema, ContentManifestV2Schema, LegacyClaimSchema, LegacyReviewSchema, LegacyOriginalityReviewSchema, ContentManifestV1Schema, ContentManifestSchema, DeliveryArtifactSchema, DeliveryQaArtifactSchema, DeliveryQaEvidenceSchema, DeliveryManifestSchema, PackageRelativePathSchema, PrincipalAssuranceSchema, PackageIdentitySchema, PackageManifestSchema;
+var VERSION, SCHEMA_VERSION = 2, Sha256Schema, SafeHttpUrlSchema, BrandIdSchema, ReferenceRoleSchema, ReferenceAllowedUseSchema, ReferenceMaterialSchema, ResearchCaptureSchema, SourceAssessmentSchema, EvidenceSourceSchema, ResearchClaimSchema, ClaimEvidenceLinkSchema, ResearchSearchLogSchema, ResearchReviewSchema, ClaimSchema, VerifiableStatementSchema, StatementCoverageSchema, ReviewSchema, LegalReviewSchema, AiDisclosureSchema, AssetInputSchema, AssetSchema, ArticleNodeTypeSchema, ArticleNodeSchema, CitationSchema, ArticleDocSchema, OriginalityHumanReviewSchema, OriginalityScanSchema, EditorialReviewRecordSchema, BaseContentSchema, ContentManifestV2Schema, LegacyClaimSchema, LegacyReviewSchema, LegacyOriginalityReviewSchema, ContentManifestV1Schema, ContentManifestSchema, DeliveryArtifactSchema, DeliveryQaArtifactSchema, DeliveryQaEvidenceSchema, DeliveryManifestSchema, PackageRelativePathSchema, PrincipalAssuranceSchema, PackageIdentitySchema, PackageManifestSchema;
 var init_domain = __esm(() => {
   init_zod();
+  init_package();
+  VERSION = package_default.version;
   Sha256Schema = exports_external.string().regex(/^[a-f0-9]{64}$/);
   SafeHttpUrlSchema = exports_external.string().refine(isSafeHttpUrl, "URL must use http:// or https://");
   BrandIdSchema = exports_external.string().regex(/^[a-z0-9][a-z0-9-]{0,63}$/, "brandId must be a lowercase slug (a-z, 0-9, hyphens)");

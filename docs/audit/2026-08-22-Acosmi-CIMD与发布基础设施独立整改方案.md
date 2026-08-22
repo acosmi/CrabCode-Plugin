@@ -14,6 +14,8 @@
 >
 > 生产基线：`root@59.110.139.37`，后端制品 `c0af25ab2aa4c285a5c4869d9ff48fda6a9849af`，构建时间 `2026-08-19T04:38:16Z`
 
+> **协调修订（2026-08-22）**：主方案前置审计已否决全局固定 `3118`，CIMD 改用 portless loopback 注册基值，宿主实际授权使用 OS-assigned 临时端口。P0-0A/全局 release-lock 继续作为未来 remote-capable 解锁门，但不再阻断插件仓 remote=0 止血，也不阻断 Acosmi P0-1 的 metadata-safe/CIMD-safe A→B 发布。本文件后文若有冲突，以本修订及主方案前置审计裁决为准。
+
 SSH 凭据继续使用用户指定的本地私钥文件；私钥路径、内容、指纹和可恢复参数不得写入仓库、制品、命令输出或审计证据。
 
 ## 0. 最终裁决与权威边界
@@ -24,7 +26,7 @@ SSH 凭据继续使用用户指定的本地私钥文件；私钥路径、内容�
 | --- | --- | --- | --- |
 | `ACOSMI-SRC-P0-1` | 删除两份 AS metadata 虚假广告，新增 CrabCode CIMD 公共路由及测试 | `Acosmi/nexus-v4/backend` | 是 |
 | `ACOSMI-REL-P0-1` | 两段完整部署 bundle、发布流水线、生产部署、双地点验收与安全回滚 | Acosmi `.github/workflows/deploy-cn-nexus-backend.yml` 与生产 | 是发布自动化改动，不是业务源码 |
-| `ACOSMI-OPS-P0-0A` | 跨云 DR、WORM、OIDC 双人审批、2-of-3 签名和 bootstrap canary | Acosmi Ops/Release | 否，为基础设施子轨 |
+| `ACOSMI-OPS-P0-0A` | 跨云 DR、WORM、OIDC 双人审批、2-of-3 签名和 bootstrap canary；只阻断未来 remote-capable 解锁 | Acosmi Ops/Release | 否，为独立基础设施子轨 |
 
 权威分工固定为：
 
@@ -174,7 +176,7 @@ root.GET("/oauth/crabcode-client-metadata", handler.CrabCodeClientMetadata)
   "client_id": "https://acosmi.com/oauth/crabcode-client-metadata",
   "client_name": "CrabCode",
   "redirect_uris": [
-    "http://127.0.0.1:3118/callback"
+    "http://127.0.0.1/callback"
   ],
   "grant_types": [
     "authorization_code",
@@ -333,7 +335,7 @@ JCS(["acosmi-backend-bundle-approval-v1",{
 }])
 ```
 
-只批 workflow run/environment 而不绑定上述 digest subject 不构成批准。`backend bundle stores + 四个 owner/approver environment + OIDC role + F-A-BIN-01 + F-A-FIXTURE-LIVE-01 + F-B-RBK-01` 共同构成 P0-0A 的最小 `ACOSMI-REL prerequisite`；它未通过时不部署生产 A/B，P0-0A 其余 2-of-3/HMAC/offline-root 门可继续并行。
+只批 workflow run/environment 而不绑定上述 digest subject 不构成批准。`backend bundle stores + 四个 owner/approver environment + OIDC role + F-A-BIN-01 + F-A-FIXTURE-LIVE-01 + F-B-RBK-01` 是 `ACOSMI-REL-P0-1` 自身的发布安全门，不再归入 P0-0A；它未通过时不部署生产 A/B。P0-0A 的 2-of-3/HMAC/offline-root 等全局 trust-path 门独立并行，只阻断未来 genesis/remote-capable lock。
 
 生产 bundle 继续使用 `nexus-v4/backend/Dockerfile` 构建，`GIT_COMMIT=source_commit`，`BUILD_TIME` 只由工作流 UTC 时钟生成。从镜像提取 `server` 与七个 `.so`，生成 payload manifest，打包后按上述 DAG 批准、上传、独立重取并校验 bundle 与内层 manifest，再从已验收 primary 字节部署；禁止直接部署 runner 工作目录或 quarantine 中未双读回的字节。
 
@@ -356,7 +358,7 @@ R 将仓内 `nexus-v4/infra/systemd/nexus-backend.service` 固定改为 `Working
 
 ### 3.3 不可交换的部署顺序
 
-1. 在 P0-0A 最小 `ACOSMI-REL prerequisite`（backend stores+四个 digest-specific approval environments+OIDC role+fixture）已通过后，从 A primary 重取完整 bundle，校验 bundle size/SHA 及内层 manifest，先在不连接生产 DB/Redis/外部服务的隔离 fixture 中验证 health+两份 metadata，再按第 3.2 节原子切换生产 A。P0-0A 其他子门可与 P0-1 继续并行。
+1. 在 `ACOSMI-REL-P0-1` 发布安全门（backend stores+四个 digest-specific approval environments+OIDC role+fixture）已通过后，从 A primary 重取完整 bundle，校验 bundle size/SHA 及内层 manifest，先在不连接生产 DB/Redis/外部服务的隔离 fixture 中验证 health+两份 metadata，再按第 3.2 节原子切换生产 A。P0-0A 全局 trust-path 子轨与 P0-1 并行，不阻断 A/B safe deployment。
 2. 验证 `/opt/acosmi/nexus-backend/current` 解析到 A-BIN-01 的 exact bundle SHA 目录，该目录八个 payload 都匹配 A manifest，`--version`=A commit、health 通过；同时验证普通和 desktop metadata 中 CIMD key 都缺席，且 DCR `registration_endpoint` 仍存在，然后才生成 A-LIVE-01。
 3. 从 B primary 重取完整 bundle，校验 bundle size/SHA 及内层 manifest，部署 B。
 4. 在 Acosmi CN 生产主机使用 loopback/SNI 验收。
@@ -416,7 +418,7 @@ curl --fail-with-body --silent --show-error \
     ] | sort) and
     .client_id == "https://acosmi.com/oauth/crabcode-client-metadata" and
     .client_name == "CrabCode" and
-    .redirect_uris == ["http://127.0.0.1:3118/callback"] and
+    .redirect_uris == ["http://127.0.0.1/callback"] and
     .grant_types == ["authorization_code", "refresh_token"] and
     .response_types == ["code"] and
     .token_endpoint_auth_method == "none"
@@ -461,7 +463,7 @@ curl --fail-with-body --silent --show-error \
     ] | sort) and
     .client_id == "https://acosmi.com/oauth/crabcode-client-metadata" and
     .client_name == "CrabCode" and
-    .redirect_uris == ["http://127.0.0.1:3118/callback"] and
+    .redirect_uris == ["http://127.0.0.1/callback"] and
     .grant_types == ["authorization_code", "refresh_token"] and
     .response_types == ["code"] and
     .token_endpoint_auth_method == "none"
@@ -615,7 +617,7 @@ production validator 只接受 `mcp-release-lock schemaVersion=2,environment=pro
 
 | 交接项 | 固定合同 | Owner | Acosmi 责任 |
 | --- | --- | --- | --- |
-| 输入 callback | `http://127.0.0.1:3118/callback` | `crabcode-mcp` | 只在 CIMD JSON 中按原样输出，不修改宿主 listener |
+| 输入 callback | CIMD 注册基值 `http://127.0.0.1/callback`；实际授权为 `http://127.0.0.1:<os-assigned-port>/callback` | `crabcode-mcp` | CIMD 只输出 portless 注册基值；不修改宿主 listener；不输出 wildcard/模板字符串 |
 | 输出 CIMD | public GET 200、固定 JSON/headers、无重定向 | `acosmi-backend` | 实现、测试、双地点发布验收 |
 | 输出 AS metadata | 两份 metadata 都不含虚假 key | `acosmi-backend` | 实现、测试、先 A 后 B 部署 |
 | 证据 | A/B backend commit/version、双地点 CIMD+AS metadata curl、bundle/inner-manifest size/SHA、primary+DR、双人 attestation | `acosmi-ops` | 生成可验、无 secret 的 evidence record |
@@ -625,7 +627,7 @@ production validator 只接受 `mcp-release-lock schemaVersion=2,environment=pro
 
 P0-1 本身不实现下列下游事项：
 
-- CrabCode 固定 3118 listener、PKCE、auth policy generation/fingerprint、凭据仓和 targeted reconnect；
+- CrabCode OS-assigned loopback listener、PKCE、auth policy generation/fingerprint、凭据仓和 targeted reconnect；
 - CrabCode-Plugin catalog/binding、provider basis、ToolSearch、Skill capability gate、marketplace 发布；
 - Notion/Linear/Canva/Synapse 供应商账号、审批、scope 和 canary tenant。
 

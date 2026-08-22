@@ -1,5 +1,7 @@
 # kotlin-lsp
 
+> **MCP 安全暂停（2026-08-22）**：安全状态：本版本不发布可执行 MCP 配置；安装不会启动该服务或发起网络请求。 本文保留目标能力与后续接入资料，不代表当前版本已连接或可执行。
+
 Kotlin language server bridge for CrabCode, providing code intelligence, refactoring, and analysis.
 
 This plugin is a CrabCode wrapper around the upstream kotlin-lsp language server. It does **not** install the server for you. The TypeScript launcher at `src/lsp-wrapper.ts` spawns `kotlin-lsp` over stdio with no shell interpolation, forwards lifecycle signals, and emits an install hint when the binary is missing.

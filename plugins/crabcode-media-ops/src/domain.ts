@@ -1,7 +1,8 @@
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
+import packageMetadata from '../package.json' with { type: 'json' }
 
-export const VERSION = '0.4.2'
+export const VERSION = packageMetadata.version
 export const SCHEMA_VERSION = 2 as const
 
 const Sha256Schema = z.string().regex(/^[a-f0-9]{64}$/)

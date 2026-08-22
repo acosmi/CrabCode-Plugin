@@ -79,7 +79,7 @@ describe('official workflow skill presentation completeness', () => {
     expect(new Set(invocationKeys).size).toBe(EXPECTED_WORKFLOW_SKILLS)
     expect(sha256(JSON.stringify(invocationKeys))).toBe(EXPECTED_INVOCATION_SET_SHA256)
     expect(sha256(JSON.stringify(modelContentHashes))).toBe(EXPECTED_MODEL_CONTENT_SHA256)
-    expect(marketplace.metadata.version).toBe('0.4.2')
+    expect(marketplace.metadata.version).toBe('0.4.3')
 
     const mediaEntry = workflows.find((entry) => entry.name === 'crabcode-media-ops')
     expect(mediaEntry).toBeDefined()

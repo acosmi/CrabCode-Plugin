@@ -21,7 +21,10 @@ async function writePlugin(
   }
 }
 
-async function writeMarketplace(root: string, plugins: Array<{ name: string; version: string }>): Promise<void> {
+async function writeMarketplace(
+  root: string,
+  plugins: Array<{ name: string; version: string; longDescription?: string }>,
+): Promise<void> {
   const dir = path.join(root, ".crabcode-plugin");
   await mkdir(dir, { recursive: true });
   await writeFile(path.join(dir, "marketplace.json"), JSON.stringify({ plugins }, null, 2));
@@ -31,13 +34,13 @@ const errorsOf = (issues: Awaited<ReturnType<typeof validateMcpContract>>) =>
   issues.filter((issue) => issue.severity === "error");
 
 describe("mcp contract validator", () => {
-  test("accepts a pinned required plugin with a committed distribution artifact", async () => {
+  test("accepts the one pinned required html-video sidecar with a committed distribution artifact", async () => {
     const root = await makeTempRoot();
-    await writeMarketplace(root, [{ name: "alpha", version: "1.0.0" }]);
-    await writePlugin(root, "alpha", {
-      ".crabcode-plugin/plugin.json": { name: "alpha", version: "1.0.0", requiredMcpServers: ["alpha"] },
-      "package.json": { name: "alpha", version: "1.0.0", scripts: { start: "bun --no-env-file dist/server.js" } },
-      ".mcp.json": { mcpServers: { alpha: { command: "bun", args: ["--no-env-file", "${CRABCODE_PLUGIN_ROOT}/dist/server.js"] } } },
+    await writeMarketplace(root, [{ name: "crabcode-html-video", version: "1.0.0" }]);
+    await writePlugin(root, "crabcode-html-video", {
+      ".crabcode-plugin/plugin.json": { name: "crabcode-html-video", version: "1.0.0", requiredMcpServers: ["html-video"] },
+      "package.json": { name: "crabcode-html-video", version: "1.0.0", scripts: { start: "bun --no-env-file dist/server.js" } },
+      ".mcp.json": { mcpServers: { "html-video": { command: "bun", args: ["--no-env-file", "${CRABCODE_PLUGIN_ROOT}/dist/server.js"] } } },
       "dist/server.js": "// bundled",
     });
     expect(await validateMcpContract(root)).toEqual([]);
@@ -59,7 +62,7 @@ describe("mcp contract validator", () => {
     const issues = await validateMcpContract(root);
     const messages = errorsOf(issues).map((issue) => issue.message).join("\n");
     expect(messages).toContain('"ghost" has no matching server');
-    expect(messages).toContain("runs an installer on launch");
+    expect(messages).toContain("installs dependencies on launch");
     expect(messages).toContain("floating version");
     expect(messages).toContain("version mismatch: manifest=2.0.0, package.json=2.0.1");
   });
@@ -79,28 +82,36 @@ describe("mcp contract validator", () => {
     expect(messages).toContain("raw LSP proxy");
   });
 
-  // Anchored on LSP_PROXY_BASELINE rather than EMPTY_URL_BASELINE: the empty-URL
-  // baseline is being ratcheted to zero as the crabwork connectors get real URLs,
-  // and a fixture that names a member of an emptied baseline would break the moment
-  // the last entry is removed. The downgrade/stale machinery is shared by all five
-  // baselines, so any populated one exercises it.
-  test("downgrades legacy baseline members to warnings and flags stale entries only when the plugin is present", async () => {
+  test("hard-fails former LSP legacy-baseline entries", async () => {
     const root = await makeTempRoot();
     await writePlugin(root, "clangd-lsp", {
       ".crabcode-plugin/plugin.json": { name: "clangd-lsp", version: "0.1.0" },
       ".mcp.json": { mcpServers: { "clangd-lsp": { type: "stdio", command: "bun", args: ["run", "src/lsp-wrapper.ts"] } } },
     });
-    const withProxy = await validateMcpContract(root);
-    expect(errorsOf(withProxy)).toEqual([]);
-    expect(withProxy.some((issue) => issue.severity === "warning" && issue.message.includes("legacy baseline"))).toBe(true);
+    const messages = errorsOf(await validateMcpContract(root)).map((issue) => issue.message).join("\n");
+    expect(messages).toContain("permits .mcp.json only");
+    expect(messages).toContain("raw LSP proxy");
+    expect(messages).not.toContain("legacy baseline");
+  });
 
-    const fixedRoot = await makeTempRoot();
-    await writePlugin(fixedRoot, "clangd-lsp", {
-      ".crabcode-plugin/plugin.json": { name: "clangd-lsp", version: "0.1.0" },
-      ".mcp.json": { mcpServers: { clangd: { type: "http", url: "https://example.invalid/mcp" } } },
+  test("requires a visible pause disclosure for marketplace plugins removed from executable MCP", async () => {
+    const root = await makeTempRoot();
+    await writeMarketplace(root, [{ name: "asana", version: "0.1.1", longDescription: "Asana connector" }]);
+    await writePlugin(root, "asana", {
+      ".crabcode-plugin/plugin.json": { name: "asana", version: "0.1.1" },
     });
-    const stale = await validateMcpContract(fixedRoot);
-    expect(errorsOf(stale).some((issue) => issue.message.includes("stale LSP_PROXY_BASELINE"))).toBe(true);
+    const messages = errorsOf(await validateMcpContract(root)).map((issue) => issue.message).join("\n");
+    expect(messages).toContain("must disclose the emergency safe-baseline status");
+  });
+
+  test("rejects a remote server even when it is placed under the allowed plugin", async () => {
+    const root = await makeTempRoot();
+    await writePlugin(root, "crabcode-html-video", {
+      ".crabcode-plugin/plugin.json": { name: "crabcode-html-video", version: "1.0.0", requiredMcpServers: ["html-video"] },
+      ".mcp.json": { mcpServers: { "html-video": { type: "http", url: "https://example.invalid/mcp" } } },
+    });
+    const messages = errorsOf(await validateMcpContract(root)).map((issue) => issue.message).join("\n");
+    expect(messages).toContain("remote/SSE server");
   });
 
   // The defect this pins: version consistency used to run inside the .mcp.json

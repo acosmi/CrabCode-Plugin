@@ -1,14 +1,19 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import {
+  MCP_ALLOWED_PLUGIN,
+  MCP_ALLOWED_SERVER,
+  MCP_PAUSED_MARKETPLACE_MARKER,
+  MCP_PAUSED_PLUGIN_SET,
+} from "./mcpSafeBaseline.ts";
 
 /**
- * Repo-wide MCP contract checks (audit 2026-07-18 §8.5).
+ * Repo-wide MCP executable contract checks.
  *
- * Hard rules apply to every plugin; legacy findings that predate the contract
- * are frozen in shrink-only baselines: existing entries downgrade to warnings,
- * NEW violations and stale baseline entries are errors. That ratchets the repo
- * toward the contract without rewriting 30+ plugins in one batch.
+ * The 2026-08-22 emergency baseline is deliberately small: generation-1 hosts
+ * execute `.mcp.json` directly, so only the fully bundled html-video local
+ * sidecar may ship until host-side connector profiles and release gates exist.
  */
 
 export type McpContractIssue = {
@@ -16,31 +21,6 @@ export type McpContractIssue = {
   path: string;
   message: string;
 };
-
-/** Raw LSP byte-stream proxies mis-filed as MCP servers; migration to a host .lsp.json declaration is pending host schema. */
-const LSP_PROXY_BASELINE = new Set([
-  "clangd-lsp", "csharp-lsp", "gopls-lsp", "jdtls-lsp", "kotlin-lsp", "lua-lsp",
-  "php-lsp", "pyright-lsp", "ruby-lsp", "rust-analyzer-lsp", "swift-lsp", "typescript-lsp",
-]);
-
-/** Channel-notification plugins whose manifests still lack the newer channels declaration. */
-const CHANNEL_DECLARATION_BASELINE = new Set(["discord", "fakechat", "imessage", "telegram"]);
-
-/** Plugins whose sidecar start script still runs an installer (forbidden for anything required/auto-activated). */
-const INSTALL_ON_START_BASELINE = new Set(["discord", "fakechat", "imessage", "telegram"]);
-
-/**
- * crabwork connectors shipped with empty placeholder URLs.
- * Ratcheted to zero on 2026-07-24 — every empty URL is now a hard error. Keep the
- * set (and its stale check) so a future legacy import can be baselined explicitly
- * rather than by loosening the rule.
- */
-const EMPTY_URL_BASELINE = new Set<string>([]);
-
-/** Plugins with floating (@latest / versionless npx / unpinned git) launcher versions. */
-const FLOATING_VERSION_BASELINE = new Set([
-  "context7", "firebase", "playwright", "serena", "crabwork-small-business",
-]);
 
 type ServerDefinition = {
   command?: unknown;
@@ -107,11 +87,15 @@ export async function validateMcpContract(root: string): Promise<McpContractIssu
   }
 
   const marketplace = await readJson(path.join(root, ".crabcode-plugin", "marketplace.json")) as
-    | { plugins?: Array<{ name?: unknown; version?: unknown }> }
+    | { plugins?: Array<{ name?: unknown; version?: unknown; longDescription?: unknown }> }
     | null;
   const marketplaceVersions = new Map<string, string>();
+  const marketplaceLongDescriptions = new Map<string, string>();
   for (const entry of marketplace?.plugins ?? []) {
     if (typeof entry.name === "string" && typeof entry.version === "string") marketplaceVersions.set(entry.name, entry.version);
+    if (typeof entry.name === "string" && typeof entry.longDescription === "string") {
+      marketplaceLongDescriptions.set(entry.name, entry.longDescription);
+    }
   }
 
   // A plugin states its version in up to three places, and a batch bump that
@@ -131,9 +115,9 @@ export async function validateMcpContract(root: string): Promise<McpContractIssu
       ? path.join(pluginRoot, ".crabcode-plugin", "plugin.json")
       : path.join(pluginRoot, "plugin.json");
     if (!existsSync(manifestPath)) continue;
-    const manifest = await readJson(manifestPath) as { version?: unknown } | null;
+    const manifest = await readJson(manifestPath) as { version?: unknown; requiredMcpServers?: unknown } | null;
     const manifestVersion = typeof manifest?.version === "string" ? manifest.version : null;
-    if (!manifestVersion) continue;
+    if (!manifest || !manifestVersion) continue;
 
     const packageJson = await readJson(path.join(pluginRoot, "package.json")) as { version?: unknown } | null;
     const packageVersion = typeof packageJson?.version === "string" ? packageJson.version : null;
@@ -145,21 +129,38 @@ export async function validateMcpContract(root: string): Promise<McpContractIssu
     if (marketVersion && manifestVersion !== marketVersion) {
       issues.push({ severity: "error", path: path.relative(root, manifestPath), message: `plugin version mismatch: manifest=${manifestVersion}, marketplace=${marketVersion}` });
     }
-  }
 
-  const triggeredBaselines = {
-    lsp: new Set<string>(),
-    channel: new Set<string>(),
-    install: new Set<string>(),
-    emptyUrl: new Set<string>(),
-    floating: new Set<string>(),
-  };
+    const required = Array.isArray(manifest.requiredMcpServers)
+      ? manifest.requiredMcpServers.filter((name): name is string => typeof name === "string")
+      : [];
+    if (pluginName === MCP_ALLOWED_PLUGIN) {
+      if (required.length !== 1 || required[0] !== MCP_ALLOWED_SERVER) {
+        issues.push({ severity: "error", path: path.relative(root, manifestPath), message: `emergency MCP safe baseline requires requiredMcpServers=["${MCP_ALLOWED_SERVER}"]` });
+      }
+      if (!existsSync(path.join(pluginRoot, ".mcp.json"))) {
+        issues.push({ severity: "error", path: path.relative(root, manifestPath), message: "emergency MCP safe baseline requires the bundled html-video .mcp.json" });
+      }
+    } else if (required.length > 0) {
+      issues.push({ severity: "error", path: path.relative(root, manifestPath), message: `requiredMcpServers is reserved for ${MCP_ALLOWED_PLUGIN} during the emergency MCP safe baseline` });
+    }
+
+    if (MCP_PAUSED_PLUGIN_SET.has(pluginName)) {
+      const description = marketplaceLongDescriptions.get(pluginName);
+      if (description !== undefined && !description.includes(MCP_PAUSED_MARKETPLACE_MARKER)) {
+        issues.push({ severity: "error", path: ".crabcode-plugin/marketplace.json", message: `paused MCP plugin "${pluginName}" must disclose the emergency safe-baseline status` });
+      }
+    }
+  }
 
   for (const pluginName of entries) {
     const pluginRoot = path.join(pluginsRoot, pluginName);
     const mcpPath = path.join(pluginRoot, ".mcp.json");
     if (!existsSync(mcpPath)) continue;
     const relativeMcp = path.relative(root, mcpPath);
+
+    if (pluginName !== MCP_ALLOWED_PLUGIN) {
+      issues.push({ severity: "error", path: relativeMcp, message: `emergency MCP safe baseline permits .mcp.json only for ${MCP_ALLOWED_PLUGIN}` });
+    }
 
     const parsed = await readJson(mcpPath);
     const servers = parsed === null ? null : parseServers(parsed);
@@ -179,6 +180,14 @@ export async function validateMcpContract(root: string): Promise<McpContractIssu
     const required = Array.isArray(manifest.requiredMcpServers)
       ? manifest.requiredMcpServers.filter((name): name is string => typeof name === "string")
       : [];
+
+    const serverNames = Object.keys(servers);
+    if (
+      pluginName === MCP_ALLOWED_PLUGIN &&
+      (serverNames.length !== 1 || serverNames[0] !== MCP_ALLOWED_SERVER)
+    ) {
+      issues.push({ severity: "error", path: relativeMcp, message: `emergency MCP safe baseline permits exactly one server named "${MCP_ALLOWED_SERVER}"` });
+    }
     for (const name of required) {
       if (!servers[name]) {
         issues.push({ severity: "error", path: path.relative(root, manifestPath), message: `requiredMcpServers entry "${name}" has no matching server in .mcp.json` });
@@ -195,46 +204,28 @@ export async function validateMcpContract(root: string): Promise<McpContractIssu
       const isRequired = required.includes(serverName);
       const url = typeof definition.url === "string" ? definition.url : null;
 
+      if (url !== null || definition.type === "http" || definition.type === "sse") {
+        issues.push({ severity: "error", path: relativeMcp, message: `remote/SSE server "${serverName}" is disabled by the emergency MCP safe baseline` });
+      }
+
       // Raw LSP byte-stream proxies do not speak MCP initialize/tools-list.
       if (joined.includes("lsp-wrapper")) {
-        if (LSP_PROXY_BASELINE.has(pluginName)) {
-          triggeredBaselines.lsp.add(pluginName);
-          issues.push({ severity: "warning", path: relativeMcp, message: `raw LSP proxy "${serverName}" is mis-filed as an MCP server (legacy baseline; migrate to a host LSP declaration, never mark it required)` });
-        } else {
-          issues.push({ severity: "error", path: relativeMcp, message: `raw LSP proxy "${serverName}" must not be declared in .mcp.json (it has no MCP handshake)` });
-        }
+        issues.push({ severity: "error", path: relativeMcp, message: `raw LSP proxy "${serverName}" must not be declared in .mcp.json (it has no MCP handshake)` });
         continue;
       }
 
       if (url !== null && url.trim() === "") {
-        if (EMPTY_URL_BASELINE.has(pluginName)) {
-          triggeredBaselines.emptyUrl.add(pluginName);
-          issues.push({ severity: "warning", path: relativeMcp, message: `server "${serverName}" has an empty placeholder URL (legacy baseline; fill in or remove the connector)` });
-        } else {
-          issues.push({ severity: "error", path: relativeMcp, message: `server "${serverName}" has an empty URL; executable config must not ship unset endpoints` });
-        }
+        issues.push({ severity: "error", path: relativeMcp, message: `server "${serverName}" has an empty URL; executable config must not ship unset endpoints` });
       }
 
       if (hasFloatingVersion(parts)) {
-        if (FLOATING_VERSION_BASELINE.has(pluginName) && !isRequired) {
-          triggeredBaselines.floating.add(pluginName);
-          issues.push({ severity: "warning", path: relativeMcp, message: `server "${serverName}" launches a floating version (@latest/unpinned) — legacy baseline; pin before any auto-activation` });
-        } else {
-          issues.push({ severity: "error", path: relativeMcp, message: `server "${serverName}" launches a floating version (@latest/unpinned); ${isRequired ? "required servers must be fully pinned" : "pin the launcher version"}` });
-        }
+        issues.push({ severity: "error", path: relativeMcp, message: `server "${serverName}" launches a floating version (@latest/unpinned); ${isRequired ? "required servers must be fully pinned" : "pin the launcher version"}` });
       }
 
       const runsStartScript = joined.includes(" start") || (Array.isArray(definition.args) && (definition.args as unknown[]).includes("start"));
       const installsOnLaunch = /\binstall\b/.test(joined) || (runsStartScript && startInstalls);
       if (installsOnLaunch) {
-        if (isRequired) {
-          issues.push({ severity: "error", path: relativeMcp, message: `required server "${serverName}" runs an installer on launch; required-local sidecars must cold-start offline from a prebuilt artifact` });
-        } else if (INSTALL_ON_START_BASELINE.has(pluginName)) {
-          triggeredBaselines.install.add(pluginName);
-          issues.push({ severity: "warning", path: relativeMcp, message: `server "${serverName}" installs dependencies on launch (legacy baseline; ship a prebuilt artifact before activation-by-default)` });
-        } else {
-          issues.push({ severity: "error", path: relativeMcp, message: `server "${serverName}" installs dependencies on launch; ship a prebuilt artifact instead` });
-        }
+        issues.push({ severity: "error", path: relativeMcp, message: `${isRequired ? "required " : ""}server "${serverName}" installs dependencies on launch; ship a prebuilt artifact instead` });
       }
 
       if (isRequired) {
@@ -252,37 +243,6 @@ export async function validateMcpContract(root: string): Promise<McpContractIssu
       }
     }
 
-    // Channel-notification implementations need a manifest channels declaration.
-    const serverSource = path.join(pluginRoot, "src", "server.ts");
-    if (existsSync(serverSource)) {
-      const source = await readFile(serverSource, "utf8");
-      if (source.includes("notifications/crabcode/channel") && manifest.channels === undefined) {
-        if (CHANNEL_DECLARATION_BASELINE.has(pluginName)) {
-          triggeredBaselines.channel.add(pluginName);
-          issues.push({ severity: "warning", path: path.relative(root, manifestPath), message: "channel notification implementation lacks a manifest channels declaration (legacy baseline; adopt the host channel lifecycle)" });
-        } else {
-          issues.push({ severity: "error", path: path.relative(root, manifestPath), message: "channel notification implementation must declare channels in the plugin manifest" });
-        }
-      }
-    }
-  }
-
-  const staleChecks: Array<[Set<string>, Set<string>, string]> = [
-    [LSP_PROXY_BASELINE, triggeredBaselines.lsp, "LSP_PROXY_BASELINE"],
-    [CHANNEL_DECLARATION_BASELINE, triggeredBaselines.channel, "CHANNEL_DECLARATION_BASELINE"],
-    [INSTALL_ON_START_BASELINE, triggeredBaselines.install, "INSTALL_ON_START_BASELINE"],
-    [EMPTY_URL_BASELINE, triggeredBaselines.emptyUrl, "EMPTY_URL_BASELINE"],
-    [FLOATING_VERSION_BASELINE, triggeredBaselines.floating, "FLOATING_VERSION_BASELINE"],
-  ];
-  const scannedPlugins = new Set(entries);
-  for (const [baseline, triggered, label] of staleChecks) {
-    for (const name of baseline) {
-      // A baseline entry is stale only when its plugin is present in this scan
-      // yet no longer triggers — partial fixture roots must not raise it.
-      if (scannedPlugins.has(name) && !triggered.has(name)) {
-        issues.push({ severity: "error", path: "src/policy/mcpContractValidator.ts", message: `stale ${label} entry "${name}" no longer triggers; remove it so the baseline only shrinks` });
-      }
-    }
   }
 
   return issues;
