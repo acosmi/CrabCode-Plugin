@@ -1,0 +1,115 @@
+{
+  "registry_version": 1,
+  "rules_version": "2026.03.15.1",
+  "verified_at": "2026-08-21",
+  "rules": [
+    {
+      "id": "REG-2002-09-MATERIALS",
+      "kind": "official",
+      "title": "申请表、鉴别材料和证明文件",
+      "source_url": "https://www.ncac.gov.cn/xxfb/flfg/bmgz/202410/t20241015_869486.html",
+      "effective_from": "2002-02-20",
+      "effective_to": null,
+      "last_verified_at": "2026-08-21",
+      "severity": "fail",
+      "mechanical_check": "materials-existence",
+      "notes": "《计算机软件著作权登记办法》第九条。"
+    },
+    {
+      "id": "REG-2002-10-PAGES",
+      "kind": "official",
+      "title": "源程序和文档前后各连续30页及行数",
+      "source_url": "https://www.ncac.gov.cn/xxfb/flfg/bmgz/202410/t20241015_869486.html",
+      "effective_from": "2002-02-20",
+      "effective_to": null,
+      "last_verified_at": "2026-08-21",
+      "severity": "fail",
+      "mechanical_check": "source-pages",
+      "notes": "《计算机软件著作权登记办法》第十条；不足60页提交全部。"
+    },
+    {
+      "id": "REG-2002-11-PROOFS",
+      "kind": "official",
+      "title": "身份证明和权属证明",
+      "source_url": "https://www.ncac.gov.cn/xxfb/flfg/bmgz/202410/t20241015_869486.html",
+      "effective_from": "2002-02-20",
+      "effective_to": null,
+      "last_verified_at": "2026-08-21",
+      "severity": "fail",
+      "mechanical_check": "supplemental-materials",
+      "notes": "《计算机软件著作权登记办法》第十一条。"
+    },
+    {
+      "id": "REG-2002-17-A4",
+      "kind": "official",
+      "title": "申请人签章、中文填写和A4纸张",
+      "source_url": "https://www.ncac.gov.cn/xxfb/flfg/bmgz/202410/t20241015_869486.html",
+      "effective_from": "2002-02-20",
+      "effective_to": null,
+      "last_verified_at": "2026-08-21",
+      "severity": "fail",
+      "mechanical_check": "pdf-a4-and-signature-review",
+      "notes": "《计算机软件著作权登记办法》第十七条；签章仍须本人/申请人完成。"
+    },
+    {
+      "id": "REG-2002-21-CONSISTENCY",
+      "kind": "official",
+      "title": "软件名称和权利人署名一致",
+      "source_url": "https://www.ncac.gov.cn/xxfb/flfg/bmgz/202410/t20241015_869486.html",
+      "effective_from": "2002-02-20",
+      "effective_to": null,
+      "last_verified_at": "2026-08-21",
+      "severity": "fail",
+      "mechanical_check": "material-consistency",
+      "notes": "《计算机软件著作权登记办法》第二十一条。"
+    },
+    {
+      "id": "FEE-2017-SUSPENSION",
+      "kind": "official",
+      "title": "停征计算机软件著作权登记费",
+      "source_url": "https://app.www.gov.cn/govdata/gov/201703/27/401727/article.html",
+      "effective_from": "2017-04-01",
+      "effective_to": null,
+      "last_verified_at": "2026-08-21",
+      "severity": "info",
+      "mechanical_check": "filing-guidance",
+      "notes": "代理服务费不属于官方登记费。"
+    },
+    {
+      "id": "FORM-2026-AI-DECLARATION",
+      "kind": "platform",
+      "title": "新版申请表AI使用承诺与经办人实名要求",
+      "source_url": "https://www.ccct.net.cn/html/bqzx/2026/0318/6637.html",
+      "effective_from": "2026-03-15",
+      "effective_to": null,
+      "last_verified_at": "2026-08-21",
+      "severity": "blocked",
+      "mechanical_check": "ai-assistance",
+      "notes": "平台口径，非《登记办法》条文；提交时必须按实际表格和真实情况复核。"
+    },
+    {
+      "id": "FORM-2026-FUNCTION-LENGTH",
+      "kind": "platform",
+      "title": "软件主要功能说明500至1300字",
+      "source_url": "https://www.ccct.net.cn/html/bqzx/2026/0318/6637.html",
+      "effective_from": "2026-03-15",
+      "effective_to": null,
+      "last_verified_at": "2026-08-21",
+      "severity": "fail",
+      "mechanical_check": "func-description",
+      "notes": "平台口径，非《登记办法》条文。"
+    },
+    {
+      "id": "PRACTICE-SOURCE-BOUNDARIES",
+      "kind": "practice",
+      "title": "首页和末页呈现自然模块边界",
+      "source_url": "https://github.com/fanbuz/codesucker",
+      "effective_from": "2026-08-21",
+      "effective_to": null,
+      "last_verified_at": "2026-08-21",
+      "severity": "warn",
+      "mechanical_check": "source-boundary-review",
+      "notes": "经验风险提示，不能冒充官方硬性规则。"
+    }
+  ]
+}

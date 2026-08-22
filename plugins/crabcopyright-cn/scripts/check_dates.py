@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """软著申请日期逻辑校验。
 
-红线见 apply-core/GUIDE.md §6:开发完成日期 ≤ 首次发表日期;
-企业申请时开发完成日期不得早于企业成立日期;各日期不得晚于申请日期。
+平台/事实逻辑见 apply-core/GUIDE.md §6:开发完成日期 ≤ 首次发表日期;
+企业申请时开发完成日期早于企业成立日期属于高风险事实冲突;各日期不得晚于申请日期。
 
 用法:
     python3 check_dates.py --dev-complete 2026-03-01 [--first-publish 2026-04-01|未发表]
@@ -33,34 +33,42 @@ def run_check(dev_complete, first_publish=None, apply_date=None, company_establi
     """按 GUIDE.md §6 校验日期先后关系。first_publish 为 None/空/'未发表' 表示未发表。"""
     items = []
     dev = parse_date(dev_complete)
-    apply_d = parse_date(apply_date) if apply_date not in UNPUBLISHED else datetime.date.today()
+    apply_d = None if apply_date in UNPUBLISHED else parse_date(apply_date)
     pub = None if first_publish in UNPUBLISHED else parse_date(first_publish)
     est = None if company_established in UNPUBLISHED else parse_date(company_established)
 
     if pub is not None and dev > pub:
         items.append({"level": "fail",
                       "message": f"首次发表日期 {pub} 早于开发完成日期 {dev}(红线:开发完成 ≤ 首次发表)"})
-    if dev > apply_d:
+    if apply_d is not None and dev > apply_d:
         items.append({"level": "fail",
                       "message": f"开发完成日期 {dev} 晚于申请日期 {apply_d}"})
-    if pub is not None and pub > apply_d:
+    if apply_d is not None and pub is not None and pub > apply_d:
         items.append({"level": "fail",
                       "message": f"首次发表日期 {pub} 晚于申请日期 {apply_d}"})
     if est is not None and est > dev:
         items.append({"level": "fail",
-                      "message": f"开发完成日期 {dev} 早于企业成立日期 {est}(企业申请红线)"})
+                      "message": f"开发完成日期 {dev} 早于企业成立日期 {est}(高风险事实冲突,须如实说明)"})
+    if apply_d is None:
+        items.append({"level": "warn",
+                      "message": "未填写申请日期,已跳过与申请日期的先后校验;提交前须以申请表日期复核"})
     if not items:
         items.append({"level": "info", "message": "日期先后关系全部满足"})
 
-    status = "fail" if any(i["level"] == "fail" for i in items) else "pass"
+    if any(i["level"] == "fail" for i in items):
+        status = "fail"
+    elif any(i["level"] == "warn" for i in items):
+        status = "warn"
+    else:
+        status = "pass"
     return {
         "check": "date-logic",
         "status": status,
-        "summary": f"开发完成 {dev} / 首次发表 {pub or '未发表'} / 申请 {apply_d}"
+        "summary": f"开发完成 {dev} / 首次发表 {pub or '未发表'} / 申请 {apply_d or '未填写'}"
                    + (f" / 企业成立 {est}" if est else ""),
         "items": items,
         "data": {"dev_complete": str(dev), "first_publish": str(pub) if pub else "未发表",
-                 "apply_date": str(apply_d),
+                 "apply_date": str(apply_d) if apply_d else "",
                  "company_established": str(est) if est else None},
     }
 

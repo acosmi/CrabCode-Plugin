@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crabcode.local/schemas/crabcopyright-manifest-v2.schema.json",
+  "title": "CrabCopyright-CN Application Manifest v2",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "plugin_version",
+    "rules_version",
+    "rules_verified_at",
+    "application_name",
+    "software",
+    "applicant",
+    "dates",
+    "source",
+    "manual",
+    "ai_assistance",
+    "materials",
+    "steps"
+  ],
+  "properties": {
+    "schema_version": {"type": "integer", "const": 2},
+    "plugin_version": {"type": "string", "minLength": 1},
+    "rules_version": {"type": "string", "minLength": 1},
+    "rules_verified_at": {"type": "string", "format": "date"},
+    "application_name": {"type": "string", "minLength": 1},
+    "software": {
+      "type": "object",
+      "required": ["full_name", "version"],
+      "properties": {
+        "full_name": {"type": "string", "minLength": 1},
+        "short_name": {"type": "string"},
+        "version": {"type": "string", "pattern": "^V?[0-9]+(\\.[0-9]+)*$"},
+        "classification_code": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "applicant": {"type": "object"},
+    "dates": {"type": "object"},
+    "source": {
+      "type": "object",
+      "required": ["dirs", "selected_files", "scope_confirmed", "processing"],
+      "properties": {
+        "root": {"type": "string"},
+        "dirs": {"type": "array", "items": {"type": "string"}},
+        "include_files": {"type": "array", "items": {"type": "string"}},
+        "selected_files": {"type": "array", "items": {"type": "string"}},
+        "scope_confirmed": {"type": "boolean"},
+        "processing": {
+          "type": "object",
+          "required": ["remove_comments", "remove_blank_lines", "mask_sensitive", "wrap_long_lines", "max_line_width", "tab_width"],
+          "properties": {
+            "remove_comments": {"type": "boolean"},
+            "remove_blank_lines": {"type": "boolean"},
+            "mask_sensitive": {"type": "boolean"},
+            "wrap_long_lines": {"type": "boolean"},
+            "max_line_width": {"type": "integer", "minimum": 40, "maximum": 240},
+            "tab_width": {"type": "integer", "minimum": 1, "maximum": 16}
+          },
+          "additionalProperties": false
+        },
+        "total_lines": {"type": "integer", "minimum": 0},
+        "effective_lines": {"type": "integer", "minimum": 0},
+        "material_pages": {"type": "integer", "minimum": 0},
+        "selection_path": {"type": "string"},
+        "audit_path": {"type": "string"},
+        "line_map_path": {"type": "string"},
+        "page_manifest_path": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "manual": {"type": "object"},
+    "ai_assistance": {
+      "type": "object",
+      "required": ["code", "manual", "application_materials", "current_workflow_used_ai", "provenance", "applicant_acknowledged"],
+      "properties": {
+        "code": {"enum": ["yes", "no", "unknown"]},
+        "manual": {"enum": ["yes", "no", "unknown"]},
+        "application_materials": {"enum": ["yes", "no", "unknown"]},
+        "current_workflow_used_ai": {"type": "boolean"},
+        "provenance": {"type": "array", "items": {"type": "object"}},
+        "applicant_acknowledged": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "artifacts": {"type": "object"},
+    "materials": {"type": "object"},
+    "steps": {"type": "object"}
+  },
+  "additionalProperties": true
+}

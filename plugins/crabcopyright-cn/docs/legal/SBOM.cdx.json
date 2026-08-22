@@ -1,0 +1,1351 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "type": "application",
+      "name": "@crabcode/crabcopyright-cn",
+      "version": "0.3.0",
+      "bom-ref": "pkg:npm/%40crabcode/crabcopyright-cn@0.3.0",
+      "purl": "pkg:npm/%40crabcode/crabcopyright-cn@0.3.0",
+      "licenses": [
+        {
+          "expression": "Apache-2.0"
+        }
+      ]
+    },
+    "properties": [
+      {
+        "name": "crabcode:source-lockfile",
+        "value": "bun.lock"
+      },
+      {
+        "name": "crabcode:upstream-lock",
+        "value": "docs/legal/SOURCE-LOCK.json"
+      },
+      {
+        "name": "crabcode:component-coverage",
+        "value": "all locked runtime and development components"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "name": "@nodelib/fs.scandir",
+      "version": "2.1.5",
+      "bom-ref": "pkg:npm/%40nodelib/fs.scandir@2.1.5",
+      "purl": "pkg:npm/%40nodelib/fs.scandir@2.1.5",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "beadb806adf29b91c4426d8d282af7c970f08dceef4ec1138510e7929d832bda75baa2d1f831eeae6fcd393a34286ec760753b7a9a4a663dcccaa62e3017fada"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "@nodelib/fs.scandir"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "@nodelib/fs.stat",
+      "version": "2.0.5",
+      "bom-ref": "pkg:npm/%40nodelib/fs.stat@2.0.5",
+      "purl": "pkg:npm/%40nodelib/fs.stat@2.0.5",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "46484f3e9db3aea0c0400ff68cd867ced70f025bfae17761229edaef8e78039a2f23b06e93182decc5fbb9dc00bb7ce0d437293d4d2bcf7555d5279aaaf638f8"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "@nodelib/fs.stat"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "@nodelib/fs.walk",
+      "version": "1.2.8",
+      "bom-ref": "pkg:npm/%40nodelib/fs.walk@1.2.8",
+      "purl": "pkg:npm/%40nodelib/fs.walk@1.2.8",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "a0607e53196059c810920c28f067041b07a6a1316ddc520ef5a6da6c199a1b05c8a01299f864f2d293f5f396de1a0ecb96287f3521d25765c0b35967ce7a1c4a"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "@nodelib/fs.walk"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "@types/bun",
+      "version": "1.4.0",
+      "bom-ref": "pkg:npm/%40types/bun@1.4.0",
+      "purl": "pkg:npm/%40types/bun@1.4.0",
+      "scope": "optional",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "2be95950b636def4602bf09f4e314857eb7289f68d7523253e1f63fba990fdc2dfa4ece72f202ece057f250cacc840a990140b54c4b2be396bd9f054480f7015"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "@types/bun"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "direct-development"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "@types/node",
+      "version": "20.19.43",
+      "bom-ref": "pkg:npm/%40types/node@20.19.43",
+      "purl": "pkg:npm/%40types/node@20.19.43",
+      "scope": "optional",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "ea8601022e62920e0f97e906b2862d6b050c053db364c0af3cd17ba552e71d97ddd737f7f034625a7fe04f4d51602754aa4bfb161afe0bda2de3fb5bfb6b15bc"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "@types/node"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "direct-development"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "braces",
+      "version": "3.0.3",
+      "bom-ref": "pkg:npm/braces@3.0.3",
+      "purl": "pkg:npm/braces@3.0.3",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "c906d780efce499543d88b222e5ae8fbb1dfe90d7c109aca484b1da0ccca78f29772dde0bc3f282dc390748cc6ba9af9163f840def203bf9717350737cca71bc"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "braces"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "bun-types",
+      "version": "1.4.0",
+      "bom-ref": "pkg:npm/bun-types@1.4.0",
+      "purl": "pkg:npm/bun-types@1.4.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "8882b0db706ca6741061dde9ac84ce071794b310479f0cd7e9825f18cb8d399cde35c32656acc82151919b597af6881a3d099be3007a04df260396c4f58b82e5"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "bun-types"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "chardet",
+      "version": "2.0.0",
+      "bom-ref": "pkg:npm/chardet@2.0.0",
+      "purl": "pkg:npm/chardet@2.0.0",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "c5580fa6e942a280e363acc7e26f585b78db91a05edc528802f179b23e6deda04db15976963204fb1c09e22360883647150bcd2298dd29d54e42fbe4e597f16d"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "chardet"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "direct-runtime"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "core-util-is",
+      "version": "1.0.3",
+      "bom-ref": "pkg:npm/core-util-is@1.0.3",
+      "purl": "pkg:npm/core-util-is@1.0.3",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "65006f8b50dca49e060ea6a78ee719d878f7c043b9a590d2f3d0566e472bbddc64b09a2bc140c365a997f65745929f5ac369660432e090e6c40380d6349f4561"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "core-util-is"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "docx",
+      "version": "8.5.0",
+      "bom-ref": "pkg:npm/docx@8.5.0",
+      "purl": "pkg:npm/docx@8.5.0",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "e126dc6de74f5d3722c925e24a734d2ee257a6fc457b99ea8af6e21075f22fc3ffc34c31dae5bb6173639d88235b47b67babf2f8bfed308494fe80225c2979ed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "docx"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "direct-runtime"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "fast-glob",
+      "version": "3.3.2",
+      "bom-ref": "pkg:npm/fast-glob@3.3.2",
+      "purl": "pkg:npm/fast-glob@3.3.2",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "a17dabb80150c1ffceae3f26ef7ed8e5a7710d03b42c007bfd2e4c9f109d4cd0dde29e81b32215b2ff4942c0136d34aaf0a1d1a4bc081db56550d6adc5dfb53b"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "fast-glob"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "direct-runtime"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "fastq",
+      "version": "1.20.1",
+      "bom-ref": "pkg:npm/fastq@1.20.1",
+      "purl": "pkg:npm/fastq@1.20.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "1864e8c49ff0d71df6b3f0f610a343ee44e29789fc39593ff66c9c4dce150f36b5de53afa54653197de61520ad57d92c746055cefb320152ccea61c54e1c57c7"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "ISC"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "fastq"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "fill-range",
+      "version": "7.1.1",
+      "bom-ref": "pkg:npm/fill-range@7.1.1",
+      "purl": "pkg:npm/fill-range@7.1.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "62c1a97b75872caf19622e2d583836272dde6d1cf6ad7a300f19e57786e4401d3471cff5670f405a70b48bdced0c98ad8afb50bda23d29a2f22ab73e8415b4ca"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "fill-range"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "glob-parent",
+      "version": "5.1.2",
+      "bom-ref": "pkg:npm/glob-parent@5.1.2",
+      "purl": "pkg:npm/glob-parent@5.1.2",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "00e22049009ea62258c0fdc04671b1fb95674eed870587736c63f8e5e2f0d6faf7cc1def64b7b279dd6c0bd8676dc39cf7f4ab33233944f42b906cf8692f59a3"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "ISC"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "glob-parent"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "iconv-lite",
+      "version": "0.6.3",
+      "bom-ref": "pkg:npm/iconv-lite@0.6.3",
+      "purl": "pkg:npm/iconv-lite@0.6.3",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "e1f0a4efdc2c84c773329dab1f4eaa5ab244e22a25a8b842507f8e8ae22053ef91074fbde0d9432fcd5ab4eec65f9e6e50ab9ea34b711cdb6f13223a0fb59d33"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "iconv-lite"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "direct-runtime"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "ignore",
+      "version": "5.3.1",
+      "bom-ref": "pkg:npm/ignore@5.3.1",
+      "purl": "pkg:npm/ignore@5.3.1",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "e45cadcff22b68c8eaa707dddf891edbc3d354c8d98c91b630f9f9b7b384e1e50250d7fc0406bb6f95944bdfd0bebea6c0e412ecc93abddb0c9e8e617be4fc5f"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "ignore"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "direct-runtime"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "immediate",
+      "version": "3.0.6",
+      "bom-ref": "pkg:npm/immediate@3.0.6",
+      "purl": "pkg:npm/immediate@3.0.6",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "5d7385b72a838cd0c043155f631b85ee0f4897f21b5a69a5420d8c60a387f04c484f5aa0eb1738cf24b71da10401382cd5bb5fcf1ab5e5c894898ee08d25d119"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "immediate"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "inherits",
+      "version": "2.0.4",
+      "bom-ref": "pkg:npm/inherits@2.0.4",
+      "purl": "pkg:npm/inherits@2.0.4",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "93fbc6697e3f6256b75b3c8c0af4d039761e207bea38ab67a8176ecd31e9ce9419cc0b2428c859d8af849c189233dcc64a820578ca572b16b8758799210a9ec1"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "ISC"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "inherits"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "is-extglob",
+      "version": "2.1.1",
+      "bom-ref": "pkg:npm/is-extglob@2.1.1",
+      "purl": "pkg:npm/is-extglob@2.1.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "49b29b00d90deb4dd58b88c466fe3d2de549327e321b0b1bcd9c28ac4a32122badb0dde725875b3b7eb37e1189e90103a4e6481640ed9eae494719af9778eca1"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "is-extglob"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "is-glob",
+      "version": "4.0.3",
+      "bom-ref": "pkg:npm/is-glob@4.0.3",
+      "purl": "pkg:npm/is-glob@4.0.3",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "c5e9526b21c7dfa66013b6568658bba56df884d6cd97c3a3bf92959a4243e2105d0f7b61f137e4f6f61ab0b33e99758e6611648197f184b4a7af046be1e9524a"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "is-glob"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "is-number",
+      "version": "7.0.0",
+      "bom-ref": "pkg:npm/is-number@7.0.0",
+      "purl": "pkg:npm/is-number@7.0.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "e350a27e483a7bc4f2952a5db53a5e2d532abd20445734edb47bc4443ef8d7ea6767c00dbf4d34e0c44be3740a3c394af5c1af369e8d6566540656c65d8c719e"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "is-number"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "isarray",
+      "version": "1.0.0",
+      "bom-ref": "pkg:npm/isarray@1.0.0",
+      "purl": "pkg:npm/isarray@1.0.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "54b82121634ce842d0ce8ef3c26720d0d99357258a623bc878cf37ca3a74c110d39949eb33aefc7d06dc281a3a9f6089105d2cce81bfff2b60f932a56bcf402d"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "isarray"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "jszip",
+      "version": "3.10.1",
+      "bom-ref": "pkg:npm/jszip@3.10.1",
+      "purl": "pkg:npm/jszip@3.10.1",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "c570ef79cc93a462eba85aef92b512a31c5f248e401fb53ccf1c6d55c969b14b4c0aae09436f742d8f005b973b1a09ebfd8fe82be6d031ba8adaa9ad937a4de2"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "jszip"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "direct-runtime"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "lie",
+      "version": "3.3.0",
+      "bom-ref": "pkg:npm/lie@3.3.0",
+      "purl": "pkg:npm/lie@3.3.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "51a88c27379646512e8f302ec392e8918d4be5e70d41864a7e6c99f4bef00c76ffa797ad29ac5786884172bc341186f2f86fcd039daf452378377f5dc47008c1"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "lie"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "merge2",
+      "version": "1.4.1",
+      "bom-ref": "pkg:npm/merge2@1.4.1",
+      "purl": "pkg:npm/merge2@1.4.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "f2aed51203095b827cb5c7d53f2f20d3d35c43065d6f0144aa17bf5999282338e7ff74c60f0b4e098b571b10373bcb4fce97330820e0bfe3f63f9cb4d1924e3a"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "merge2"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "micromatch",
+      "version": "4.0.8",
+      "bom-ref": "pkg:npm/micromatch@4.0.8",
+      "purl": "pkg:npm/micromatch@4.0.8",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "3d7c1f06162ed210423f0f039f413e58361beda7f77522d558a8b71c6bfce08745e13c85a02d32b3115dd06a31c3b9d2bf84ff3f3109431b18b0488508aa3604"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "micromatch"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "nanoid",
+      "version": "5.1.16",
+      "bom-ref": "pkg:npm/nanoid@5.1.16",
+      "purl": "pkg:npm/nanoid@5.1.16",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "915ae7b2b26a311f3ea0b2671849925b0f418af2b99adec7dc565ab55463adce701aa158b81c57d721bbf80ec68b901e7e45fab7fa02922cdc420a6ed1c63575"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "nanoid"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pako",
+      "version": "1.0.11",
+      "bom-ref": "pkg:npm/pako@1.0.11",
+      "purl": "pkg:npm/pako@1.0.11",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "e212c1f0fcb8cd971ee6ce3277d5f3a29ab056fff218d855d4197c353982ab5efadc778adbe130553bfe95e19e2f5dc39e1db07dbaa8c153d70883b4cf8b5a63"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "pako"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "picomatch",
+      "version": "2.3.2",
+      "bom-ref": "pkg:npm/picomatch@2.3.2",
+      "purl": "pkg:npm/picomatch@2.3.2",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "57bfaf404274e99f9ce6d4b27bc4be9c751f239d71a172178c743df5c42d294910aaa3b590efca08951f657b81e3b87f60194385a8761f785d5065e7f227b4a0"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "picomatch"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "process-nextick-args",
+      "version": "2.0.1",
+      "bom-ref": "pkg:npm/process-nextick-args@2.0.1",
+      "purl": "pkg:npm/process-nextick-args@2.0.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "de8b943a9421b60adb39ad7b27bfaec4e4e92136166863fbfc0868477f80fbfd5ef6c92bcde9468bf757cc4632bdbc6e6c417a5a7db2a6c7132a22891459f56a"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "process-nextick-args"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "queue-microtask",
+      "version": "1.2.3",
+      "bom-ref": "pkg:npm/queue-microtask@1.2.3",
+      "purl": "pkg:npm/queue-microtask@1.2.3",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "36e68d49ae9f94a4f925a498433268934e09cd32f5080e9a1a1bf9adf2d6dcf82a03e3360a1a59427002f21f22e19164052f17e51aa40c11c0eebe217a3dcaf4"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "queue-microtask"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "readable-stream",
+      "version": "2.3.8",
+      "bom-ref": "pkg:npm/readable-stream@2.3.8",
+      "purl": "pkg:npm/readable-stream@2.3.8",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "f29d00524e173838087b04a2d25f04a63b3e1159d688aecda03204194d07844efe67263c0f520c63ba1dbb9951ac55c683bd4bd79286f10acf9ae9b8e514ed74"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "readable-stream"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "reusify",
+      "version": "1.1.0",
+      "bom-ref": "pkg:npm/reusify@1.1.0",
+      "purl": "pkg:npm/reusify@1.1.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "83a4147dfd38a19a47b34786e69f37ac52e11de574d2e83f61ff6764ce9f2de52b3e0b814e44d039da40596b29321e794d97d54033da37735025f6d5440c5d23"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "reusify"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "run-parallel",
+      "version": "1.2.0",
+      "bom-ref": "pkg:npm/run-parallel@1.2.0",
+      "purl": "pkg:npm/run-parallel@1.2.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "e65e15c9947ce8b67f943c594d1ea3a8bf00144d92d0814b30fdba01b8ec2d5003c4776107f734194b07fb2dfd51f0a2dddcf3f0e950b8f9a768938ca031d004"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "run-parallel"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "safe-buffer",
+      "version": "5.1.2",
+      "bom-ref": "pkg:npm/safe-buffer@5.1.2",
+      "purl": "pkg:npm/safe-buffer@5.1.2",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "19dd94641243917958ec66c9c5fb04f3f9ef2a45045351b7f1cd6c88de903fa6bd3d3f4c98707c1a7a6c71298c252a05f0b388aedf2e77fc0fb688f2b381bafa"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "safe-buffer"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "safer-buffer",
+      "version": "2.1.2",
+      "bom-ref": "pkg:npm/safer-buffer@2.1.2",
+      "purl": "pkg:npm/safer-buffer@2.1.2",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "619a372bcd920fb462ca2d04d4440fa232f3ee4a5ea6749023d2323db1c78355d75debdbe5d248eeda72376003c467106c71bbbdcc911e4d1c6f0a9c42b894b6"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "safer-buffer"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sax",
+      "version": "1.6.1",
+      "bom-ref": "pkg:npm/sax@1.6.1",
+      "purl": "pkg:npm/sax@1.6.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "e36b415702d69da42f5b9cdce076d9ad3b9671c1020997c18bdd850eec2dab16ac1fe25b3c1dff14e29bd66db6d8ae364785b1bb1cf332c4ecc1fce0b52bbae1"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "ISC"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "sax"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "setimmediate",
+      "version": "1.0.5",
+      "bom-ref": "pkg:npm/setimmediate@1.0.5",
+      "purl": "pkg:npm/setimmediate@1.0.5",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "3004c9759a7cb0ba8397febc2df4266cff3328f2d0355e81219a0882bb1c14343e46cbcafc1c5e0d03a0cb128aa21d32ffc87706a5459c2a90fe077eade8885c"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "setimmediate"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "string_decoder",
+      "version": "1.1.1",
+      "bom-ref": "pkg:npm/string_decoder@1.1.1",
+      "purl": "pkg:npm/string_decoder@1.1.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "9ff4a19ef0e2e851db6d57ef8aba3e5a88e2173bfeb3c30f30705ccd578f7d4a4324bc282d3d21b759786300426e2f29240bde104767907c8fc933ff9b345fc2"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "string_decoder"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "to-regex-range",
+      "version": "5.0.1",
+      "bom-ref": "pkg:npm/to-regex-range@5.0.1",
+      "purl": "pkg:npm/to-regex-range@5.0.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "eb93fb8b3e97e7212bd5cc1c82f4316db230ed493780ecb974876d678ac3bde2ea86b7493fe2e2fc7c7ab722b43446fed860b29de08c2621aaac00c248d93cb1"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "to-regex-range"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "typescript",
+      "version": "5.9.3",
+      "bom-ref": "pkg:npm/typescript@5.9.3",
+      "purl": "pkg:npm/typescript@5.9.3",
+      "scope": "optional",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "8e5d6f6733c38a72ebf5e52ddc9feded5e8580d130f508ef04f772b33f4a7d00c3e357d0ac2d98e2f290762694a454f86d795bd511e12e9a7cc2d9ba3394e04b"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "Apache-2.0"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "typescript"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "direct-development"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "undici-types",
+      "version": "6.21.0",
+      "bom-ref": "pkg:npm/undici-types@6.21.0",
+      "purl": "pkg:npm/undici-types@6.21.0",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "8b00d9aa0d10006ae0f516afe47e27d0ceb87379a4479f5c27ac10a7eec2e2723482c984c5a79d6982cd3b8e1e4f802d041c236d38863cc96dd8c7744fd1fd25"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "undici-types"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "util-deprecate",
+      "version": "1.0.2",
+      "bom-ref": "pkg:npm/util-deprecate@1.0.2",
+      "purl": "pkg:npm/util-deprecate@1.0.2",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "10f0f9ab5b97c85c49a42acb9c27359c79eade039ae83641a1c008888d93692080ed5089d5424331a802cc891736c5187c3d5d68afff2d3110f318886eb1ed73"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "util-deprecate"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "xml",
+      "version": "1.0.1",
+      "bom-ref": "pkg:npm/xml@1.0.1",
+      "purl": "pkg:npm/xml@1.0.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "86e0aff481fd4dc7fde73b980ac42b699b569c9bc1b4b544d101cc3acf1b5b26401593437188ec3ead67131f23280f72f817a8f6ffbb3813d18ac4138e29d033"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "xml"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "xml-js",
+      "version": "1.6.11",
+      "bom-ref": "pkg:npm/xml-js@1.6.11",
+      "purl": "pkg:npm/xml-js@1.6.11",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "eeb562d8a31fc1f58597e1a93e0ea6f342153165cb4633be3f14eaed5d820e1a066a4d30cd8cc58146369b85c9e3b38675777c78b13c126c1f026763c3b942d6"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "properties": [
+        {
+          "name": "crabcode:bun-lock-key",
+          "value": "xml-js"
+        },
+        {
+          "name": "crabcode:dependency-kind",
+          "value": "transitive"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "pkg:npm/%40crabcode/crabcopyright-cn@0.3.0",
+      "dependsOn": [
+        "pkg:npm/%40nodelib/fs.scandir@2.1.5",
+        "pkg:npm/%40nodelib/fs.stat@2.0.5",
+        "pkg:npm/%40nodelib/fs.walk@1.2.8",
+        "pkg:npm/%40types/bun@1.4.0",
+        "pkg:npm/%40types/node@20.19.43",
+        "pkg:npm/braces@3.0.3",
+        "pkg:npm/bun-types@1.4.0",
+        "pkg:npm/chardet@2.0.0",
+        "pkg:npm/core-util-is@1.0.3",
+        "pkg:npm/docx@8.5.0",
+        "pkg:npm/fast-glob@3.3.2",
+        "pkg:npm/fastq@1.20.1",
+        "pkg:npm/fill-range@7.1.1",
+        "pkg:npm/glob-parent@5.1.2",
+        "pkg:npm/iconv-lite@0.6.3",
+        "pkg:npm/ignore@5.3.1",
+        "pkg:npm/immediate@3.0.6",
+        "pkg:npm/inherits@2.0.4",
+        "pkg:npm/is-extglob@2.1.1",
+        "pkg:npm/is-glob@4.0.3",
+        "pkg:npm/is-number@7.0.0",
+        "pkg:npm/isarray@1.0.0",
+        "pkg:npm/jszip@3.10.1",
+        "pkg:npm/lie@3.3.0",
+        "pkg:npm/merge2@1.4.1",
+        "pkg:npm/micromatch@4.0.8",
+        "pkg:npm/nanoid@5.1.16",
+        "pkg:npm/pako@1.0.11",
+        "pkg:npm/picomatch@2.3.2",
+        "pkg:npm/process-nextick-args@2.0.1",
+        "pkg:npm/queue-microtask@1.2.3",
+        "pkg:npm/readable-stream@2.3.8",
+        "pkg:npm/reusify@1.1.0",
+        "pkg:npm/run-parallel@1.2.0",
+        "pkg:npm/safe-buffer@5.1.2",
+        "pkg:npm/safer-buffer@2.1.2",
+        "pkg:npm/sax@1.6.1",
+        "pkg:npm/setimmediate@1.0.5",
+        "pkg:npm/string_decoder@1.1.1",
+        "pkg:npm/to-regex-range@5.0.1",
+        "pkg:npm/typescript@5.9.3",
+        "pkg:npm/undici-types@6.21.0",
+        "pkg:npm/util-deprecate@1.0.2",
+        "pkg:npm/xml-js@1.6.11",
+        "pkg:npm/xml@1.0.1"
+      ]
+    }
+  ]
+}

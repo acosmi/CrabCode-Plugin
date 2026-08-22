@@ -25,16 +25,13 @@ name: Publish official plugin marketplace to China mirror
 # 不引入任何新的信任面;它**不是**企业仓 CI 的那把钥匙,两把可独立吊销。
 # fork PR 天然读不到 secrets(GitHub 默认),workflow_dispatch 需要写权限。
 #
-# 触发:push main(合并即发布,content-addressed 幂等)+ workflow_dispatch 手动
-# 补发。**刻意无 schedule**(2026-07-27 教训:每 30 分钟轮询单独吃掉整月
-# Actions 额度)。
+# 自动发布已暂停。只能在本机测试和全局手动 CI 通过后，通过 workflow_dispatch
+# API 从 main 人工触发；仍保持 content-addressed 幂等。刻意无 schedule。
 
 on:
   workflow_dispatch: {}
-  push:
-    branches: [main]
 
-# 手动补发与 push 触发可能撞车 → 串行不取消,保证 latest 指针切换有序。
+# 多次手动补发可能撞车 → 串行不取消，保证 latest 指针切换有序。
 concurrency:
   group: publish-cn-mirror
   cancel-in-progress: false
@@ -44,8 +41,8 @@ jobs:
     name: Pack + publish official marketplace
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    # fork 里不跑(fork 也读不到 secrets,这里让它连 runner 都不占)
-    if: github.repository == 'acosmi/CrabCode-Plugin'
+    # 只允许官方仓 main 的人工触发；拒绝从功能分支发布未合并内容。
+    if: github.repository == 'acosmi/CrabCode-Plugin' && github.ref == 'refs/heads/main'
     permissions:
       contents: read
     env:
@@ -56,8 +53,8 @@ jobs:
       ARC_PREFIX: marketplaces/crabcode-plugins-official
 
     steps:
-      - name: Checkout this marketplace at the pushed commit
-        uses: actions/checkout@v6
+      - name: Checkout this marketplace at the manually dispatched main commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           path: marketplace-src
           fetch-depth: 1

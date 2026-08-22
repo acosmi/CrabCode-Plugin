@@ -1,0 +1,22 @@
+[
+  {"query":"我们公司有一个 pnpm monorepo，apps/admin、apps/merchant 和 services/order 想分别申请软著，先分析能拆几个、每个应该覆盖哪些目录和页面。","should_trigger":true,"expected_skill":"application-planning"},
+  {"query":"帮我把这个项目登记软件著作权，我不知道从材料清单还是源码 PDF 开始。","should_trigger":true,"expected_skill":"apply-manager"},
+  {"query":"个人独立开发的小程序办软著要准备哪些材料？申请表、身份证、代码和说明书现在分别缺什么？","should_trigger":true,"expected_skill":"materials-checklist"},
+  {"query":"manifest 在 outputs/库存系统/manifest.json，用确定性工具生成前后各 30 页源码、页眉页码和逐行来源映射。","should_trigger":true,"expected_skill":"source-code-material"},
+  {"query":"把我提供的库存管理系统用户手册 docx 整理成软著说明书，核对真实截图、目录、运行环境和版本号。","should_trigger":true,"expected_skill":"manual-material"},
+  {"query":"提交前逐字核对申请表、源码页眉、说明书的软件全称、V1.0 和开发完成日期。","should_trigger":true,"expected_skill":"consistency-check"},
+  {"query":"材料都准备好了，生成严格提交白名单目录和自查报告，不要把 manifest 和源码映射放进去。","should_trigger":true,"expected_skill":"package-build"},
+  {"query":"中国版权保护中心的软著申请表每个字段怎么填？尤其是 2026 诚信承诺和功能说明。","should_trigger":true,"expected_skill":"filing-guide"},
+  {"query":"旧版软著 manifest 要升级，新规则下还要记录是否用过 AI，帮我检查迁移和后续步骤。","should_trigger":true,"expected_skill":"apply-manager"},
+  {"query":"两个软著申请共享 packages/ui，检查是不是重复充数并给出需要人工说明的风险。","should_trigger":true,"expected_skill":"consistency-check"},
+  {"query":"把这份销售合同导出成 PDF，不涉及软件著作权。","should_trigger":false,"expected_skill":"pdf"},
+  {"query":"我想申请一个发明专利，帮我写权利要求书。","should_trigger":false,"expected_skill":"patent-workflow"},
+  {"query":"给公司的新商标做近似检索和注册类别建议。","should_trigger":false,"expected_skill":"trademark-workflow"},
+  {"query":"这张摄影作品要做普通作品著作权登记，需要什么材料？","should_trigger":false,"expected_skill":"works-copyright"},
+  {"query":"审查 package.json 里第三方依赖的开源许可证兼容性，不准备申请软著。","should_trigger":false,"expected_skill":"oss-review"},
+  {"query":"把 Word 里的目录、页眉和页码修一下，文件是年度报告.docx。","should_trigger":false,"expected_skill":"documents"},
+  {"query":"比较这两个 PDF 是否逐页一致并输出图像差异。","should_trigger":false,"expected_skill":"pdf"},
+  {"query":"分析这套源代码有没有安全漏洞，重点看鉴权和命令注入。","should_trigger":false,"expected_skill":"security-review"},
+  {"query":"把仓库按微服务边界重构并生成架构图，不涉及知识产权申请。","should_trigger":false,"expected_skill":"code-modernization"},
+  {"query":"我已经拿到软著证书，现在要起诉竞争对手抄袭代码，帮我做侵权证据分析。","should_trigger":false,"expected_skill":"ip-litigation"}
+]

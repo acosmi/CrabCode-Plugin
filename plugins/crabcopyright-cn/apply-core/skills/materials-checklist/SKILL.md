@@ -23,9 +23,11 @@ allowed-tools:
 ## 步骤
 
 1. 读该申请的 `outputs/<申请名>/manifest.json`(结构见 `${CRABCODE_PLUGIN_ROOT}/apply-core/MANIFEST.md`)取 `applicant.type` 与 `applicant.dev_method`;manifest 缺字段才用 AskUserQuestion 问清——**开发方式直接决定要不要补合同或许可证明**。
-2. 组装清单:基础三大件(申请表、源程序、文档)＋ 对应身份证明 ＋ 该开发方式的补充证明(见 GUIDE.md §2.2 表)。
-3. 逐项与用户核对状态。
-4. 把确认值写回 manifest:`applicant.type` / `dev_method` / `acquisition`、`materials` 各项状态,`steps.materials-checklist` 置 `done`。
+2. 同时确认并记录代码、说明书、申请材料的 AI 使用事实；本工序只盘点，不替用户推定。
+   unknown 不阻止继续盘点，但会阻止最终“可提交”结论。
+3. 组装清单:基础三大件(申请表、源程序、文档)＋ 对应身份证明 ＋ 该开发方式的补充证明(见 GUIDE.md §2.2 表)。
+4. 逐项与用户核对状态。
+5. 把确认值写回 manifest:`applicant.type` / `dev_method` / `acquisition`、`ai_assistance`、`materials` 各项状态,`steps.materials-checklist` 置 `done`。
 
 ## 输出格式
 

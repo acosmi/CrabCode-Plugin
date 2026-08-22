@@ -9,13 +9,14 @@ allowed-tools:
   - AskUserQuestion
   - WebSearch
   - WebFetch
+  - Bash(python3:*)
 ---
 
 <!-- capability-route: office-pdf=none(PDF 仅指用户上传平台的既有材料,由前序工序产出;本技能只输出逐字段填报卡片文本,不生成也不解析 PDF) -->
 
 # 软著在线填报指导
 
-给用户一份可照抄的**逐字段填报卡片**,并把平台流程和 2026 新版申请表要点讲清。
+给用户一份逐字段**核对卡片**,并把平台流程和 2026 新版申请表要点讲清。
 本技能不替用户提交(实名与签字须本人在平台完成),而是把每个字段该填什么、
 坑在哪讲透。**先读** `${CRABCODE_PLUGIN_ROOT}/apply-core/GUIDE.md` §6、§7、§8。
 
@@ -32,6 +33,9 @@ allowed-tools:
 著作权人等取自 manifest,与前序材料天然一致),manifest 缺的字段才用 AskUserQuestion
 逐项确认;确认值(`dates`、`applicant`、`software.short_name`/`classification_code` 等)
 写回 manifest,`steps.filing-guide` 置 `done`。输出建议值卡片:
+
+在输出卡片前必须实际运行 `check_all.py` 和 `check_ai.py`。任一 fail/blocked 时只能列出
+待修项，不得给“直接提交/照抄”结论。模型不得替用户填写经办人身份证号或签名。
 
 ```
 ## 软著在线填报卡片 · ${SOFTWARE_NAME} ${VERSION}
@@ -50,7 +54,8 @@ allowed-tools:
 
 ## 2026 新版申请表提醒（以平台实际字段为准,非《办法》条文）
 
-- 签章页需**手抄诚信承诺**（"本软件确系独立开发,未使用 AI 开发编写代码…"）。
+- 签章页公开转述包含**手抄诚信承诺**。先把平台当时显示的完整文字交用户本人阅读，
+  再对照 manifest 的真实 AI provenance；不得建议明知不真实地抄写“未使用 AI”。
 - **经办人本人签字并附身份证号**,禁止代签。
 - 违规列入版权登记失信名单并关联征信。
 - 详见 GUIDE.md §8——务必向用户说明这是"新版申请表要求、以填报时平台提示为准",不要冒充法规原文。
@@ -60,6 +65,7 @@ allowed-tools:
 - [ ] 用户拿到完整的逐字段建议值卡片
 - [ ] 日期逻辑、名称版本号与前序材料一致
 - [ ] 用户知晓 2026 新版申请表的签字与诚信承诺要求
+- [ ] `check_all.py` 无 fail/blocked，AI 使用事实已由申请人确认且与拟签承诺不冲突
 
 ## 检查点
 

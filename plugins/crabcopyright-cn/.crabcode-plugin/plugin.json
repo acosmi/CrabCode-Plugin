@@ -1,7 +1,7 @@
 {
   "name": "crabcopyright-cn",
-  "version": "0.2.1",
-  "description": "软著申请管家:面向中国版权保护中心软件著作权登记的知识产权材料管理工作流伞插件。统筹材料清单、源代码鉴别材料、说明书鉴别材料(引导 crabcode-office-suite 处理 Word/PDF)、一致性校验、申请包生成与在线填报指导。",
+  "version": "0.3.0",
+  "description": "软著申请管家:面向中国版权保护中心软件著作权登记的全流程插件。内置锁定 CodeSucker v0.4.5 的离线确定性源码内核、manifest v2、AI 使用事实闸门、DOCX/PDF 哈希绑定、材料一致性校验、申请包白名单与在线填报指导。",
   "author": {
     "name": "CrabCopyright"
   },
@@ -16,6 +16,8 @@
     "manual-material",
     "consistency-check",
     "filing-guide",
+    "deterministic-source-core",
+    "ai-provenance",
     "china",
     "umbrella"
   ],

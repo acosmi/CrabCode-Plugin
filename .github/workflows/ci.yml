@@ -49,6 +49,52 @@ jobs:
       - name: Verify media-ops standalone bundle is committed
         run: git ls-files --error-unmatch plugins/crabcode-media-ops/dist/server.js
 
+  crabcopyright-plugin:
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: plugins/crabcopyright-cn
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      COPYRIGHT_TEST_PYTHON: python
+      COPYRIGHT_PDF_PYTHON: python
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+        python-version:
+          - "3.9"
+          - "3.13"
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.3.11
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - run: bun install --frozen-lockfile
+      - run: python -m pip install pdfplumber==0.11.9 reportlab==4.4.9 pypdf==6.10.0
+      - run: bun run typecheck
+      - run: bun run test
+      - run: bun run check:distribution
+      - run: bun run scripts/verify-codesucker-port.ts
+      - name: Byte-compile deterministic filing scripts
+        run: python -m py_compile scripts/*.py
+      - name: Run repository-level filing gates with strong PDF dependencies
+        run: bun test ../../tests/crabcopyright-cn/
+      - name: Verify committed bundle is current
+        run: |
+          git ls-files --error-unmatch dist/source-core.js
+          test -z "$(git status --porcelain -- dist/source-core.js)"
+
   security-plugin:
     runs-on: ${{ matrix.os }}
     env:
@@ -83,7 +129,7 @@ jobs:
           GIT_ALLOW_PROTOCOL: https
         run: |
           # SOURCE-LOCK.json is repository-tracked and therefore attacker-controllable
-          # on a fork pull_request. Validate its values before handing them to git:
+          # when a manually dispatched run targets an untrusted revision. Validate its values before handing them to git:
           # require an https github.com URL free of shell/transport metacharacters and a
           # bare 40-hex commit id. This blocks SSRF to arbitrary hosts, ext:: remote-helper
           # execution, and argument/refspec injection via git fetch; well-formed but wrong

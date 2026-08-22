@@ -1,21 +1,15 @@
 name: Audit CN mirror freshness
 
-# The mirror deploy credential now lives in this repository's secrets: a dedicated
-# write-only (restrict + rrsync -wo) key used only by publish-to-cn-mirror.yml
-# (publishing migrated here from acosmi/crabcode-source on 2026-08-17). This audit
-# workflow itself stays deliberately read-only and uses no secrets.
-# Manual audits require the newest successful manually dispatched main CI release
-# immediately; scheduled audits allow an explicit eight-hour publication SLO, then
-# fail hard. Legacy successful runs remain readable during migration. Every accepted
-# pointer is still checked against a successful CI run and byte-compared with its
-# exact source commit.
+# The mirror deploy credential lives in this repository's secrets: a dedicated
+# write-only key used only by publish-to-cn-mirror.yml after its 2026-08-17 migration.
+# This audit remains read-only and secret-free. All automatic schedules are paused;
+# invoke it through workflow_dispatch after a manually dispatched global CI and mirror
+# publication. Every accepted pointer is checked against that exact successful main CI
+# commit and byte-compared with its source. Historical successful CI runs remain readable
+# during migration; querying them does not trigger a workflow.
 
 on:
   workflow_dispatch: {}
-  # The publisher (publish-to-cn-mirror.yml) runs on every push to main — nothing
-  # polls anywhere anymore. This cadence exists only to enforce the freshness SLO.
-  schedule:
-    - cron: '47 2,8,14,20 * * *'
 
 permissions:
   actions: read
@@ -158,7 +152,7 @@ jobs:
           set -euo pipefail
           WORK="${RUNNER_TEMP}/mirror-audit"
           mkdir -p "${WORK}"
-          FAIL_HINT="Run: gh workflow run sync-plugins-to-mirror.yml -R acosmi/crabcode-source"
+          FAIL_HINT="Run: gh workflow run publish-to-cn-mirror.yml -R acosmi/CrabCode-Plugin --ref main"
           fetch() {
             curl -fsSL --proto '=https' --proto-redir '=https' \
               --retry 5 --retry-all-errors --connect-timeout 10 --max-time 120 "$@"
@@ -237,7 +231,7 @@ jobs:
           prefix = sys.argv[3].rstrip("/") + "/"
 
           # Mirror distribution trim manifest (W-PLUGIN-MIRROR-SLIM, 2026-08-16).
-          # The publisher (acosmi/crabcode-source sync-plugins-to-mirror.yml) reads
+          # The publisher (this repository's publish-to-cn-mirror.yml) reads
           # the SAME file from the SAME commit it packs; we read it from the exact
           # checkout of the served SHA, so both sides derive their file sets from
           # one source and cannot diverge — the opposite of the one-sided contract

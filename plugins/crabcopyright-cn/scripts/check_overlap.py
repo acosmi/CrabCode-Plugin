@@ -3,8 +3,9 @@
 
 红线见 apply-core/GUIDE.md §3 与 application-planning:公共代码不得在多个申请里
 重复充数,跨申请代码雷同会被查重驳回。本脚本对多个申请的源码集合做两级比对:
-① 内容完全相同的文件(哈希一致,判 fail);② 行集合高相似的文件对与申请对整体
-行重叠率(经验阈值,判 warn)。
+① 内容完全相同的文件(哈希一致,默认判 warn/review-required);② 行集合高相似的文件对与申请对整体
+行重叠率(经验阈值,判 warn)。现行《登记办法》没有“任何相同文件必然驳回”的明文规则，
+脚本只提供风险证据；确认属于重复充数时由上层审查升级为阻断。
 
 用法:
     python3 check_overlap.py <申请A源码目录或文件>... --vs <申请B源码目录或文件>... [--vs ...] [--json]
@@ -57,8 +58,8 @@ def run_check(groups):
                 hash_b.setdefault(fb["sha256"], []).append(fb["path"])
             for fa in a["files"]:
                 for pb in hash_b.get(fa["sha256"], []):
-                    items.append({"level": "fail",
-                                  "message": f"文件内容完全相同: {fa['path']} ⇔ {pb}(公共代码不得重复计入两个申请)"})
+                    items.append({"level": "warn",
+                                  "message": f"文件内容完全相同，须复核是否为合法共享模块或重复充数: {fa['path']} ⇔ {pb}"})
             # ② 高相似文件对
             for fa in a["files"]:
                 for fb in b["files"]:
@@ -78,9 +79,7 @@ def run_check(groups):
 
     if not items:
         items.append({"level": "info", "message": "未发现相同文件或超阈值重叠"})
-    if any(i["level"] == "fail" for i in items):
-        status = "fail"
-    elif any(i["level"] == "warn" for i in items):
+    if any(i["level"] == "warn" for i in items):
         status = "warn"
     else:
         status = "pass"

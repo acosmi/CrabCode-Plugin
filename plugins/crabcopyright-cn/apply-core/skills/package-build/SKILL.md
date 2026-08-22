@@ -17,7 +17,7 @@ allowed-tools:
 
 # 软著申请包生成
 
-把已完成的各项材料统一命名、归入一个规范目录,并产出一份**材料自查对照表**——
+把已完成的各项材料统一命名、归入严格的 `提交件/` 白名单目录,并产出一份**材料自查对照表**——
 可机械判定的项**由确定性脚本产出结果**,不靠模型自述勾选;仅脚本够不着的项
 (截图与功能对应、末页自然结尾等)留人工确认并注明。**先读**
 `${CRABCODE_PLUGIN_ROOT}/apply-core/GUIDE.md`(用其 §9 红线清单作为对照表的检查项来源)
@@ -25,25 +25,34 @@ allowed-tools:
 
 ## 步骤
 
-1. 读该申请的 `outputs/<申请名>/manifest.json` 取全部参数;输出目录即
-   `outputs/软著申请-${SOFTWARE_NAME}${VERSION}/`(与 manifest 同目录)。
-2. 按命名规范拷入已有材料(缺的留占位并在对照表标 ❌):
+1. 读该申请的 schema v2 manifest；先运行 `check_ai.py`、`check_rules.py` 和
+   `check_all.py`。任何 fail/blocked 时不创建“可提交”目录。
+2. 输出目录为申请目录下的 `提交件/`。按命名规范只拷入以下白名单材料:
    - `01-软件著作权登记申请表.pdf`（平台生成后放入）
    - `02-源代码鉴别材料.pdf`
    - `03-说明书鉴别材料.pdf`
    - `04-身份证明文件.pdf`（用户自备）
    - `05-其他材料/`（合作/委托/许可证明等补充件）
+   `manifest.json`、`中间态/`、source-line-map、source-selection、source-audit、
+   audit-log、本机绝对路径、缓存和测试文件一律不进入 `提交件/`。
 3. **运行确定性校验脚本**,以其输出为对照表的机判结果:
    ```
    python3 ${CRABCODE_PLUGIN_ROOT}/scripts/check_all.py \
      --manifest outputs/<申请名>/manifest.json \
      [--compare-with outputs/<其他申请名>/manifest.json]... --json
    ```
-   多软著场景必须对每对申请加 `--compare-with` 做跨申请查重。退出码 1(有 fail)
-   即存在硬伤,不得进入"可提交"结论。
-4. 生成 `材料自查对照表.md`:机判项逐条引用脚本结果(pass/warn/fail 与原话),
-   人工项如实标"待人工确认";并把 `materials` 各项 path/status 与
-   `steps.package-build` 写回 manifest。
+   多软著场景必须加 `--compare-with` 做跨申请重叠复核。重叠属于经验 warning 时要在
+   对照表解释共享模块；只有确定为重复充数或其他 fail 才阻断。退出码 1 即不得进入
+   "可提交"结论。
+4. 由脚本创建提交白名单，不由模型自行 cp：
+   ```
+   python3 ${CRABCODE_PLUGIN_ROOT}/scripts/build_package.py \
+     --manifest outputs/<申请名>/manifest.json \
+     [--compare-with <其他申请>]...
+   ```
+   若只有 warn，必须先逐条人工复核，再显式传 `--allow-warn --review-note <复核记录>`；
+   AI blocked 不能用该参数覆盖。脚本拒绝覆盖已存在的 `提交件/`。
+5. `材料自查对照表.md` 逐条引用脚本结果，并把 `steps.package-build` 原子写回 manifest。
 
 ## 材料自查对照表模板
 
@@ -80,6 +89,7 @@ allowed-tools:
 ## 成功标准
 
 - [ ] 输出目录含全部应有文件(缺项在对照表标 ❌)
+- [ ] `提交件/` 只含白名单材料,不含 manifest/line-map/audit-log/本机路径/身份证号文本
 - [ ] `check_all.py` 已实际运行,机判项与脚本输出逐条对应,无一项由模型自述代替
 - [ ] 对照表涵盖源代码、说明书、申请表三大类的检查项
 - [ ] 存在 ❌ 项时在终端醒目提示,不假装完成
@@ -88,3 +98,4 @@ allowed-tools:
 
 若脚本总体结论为 FAIL 或对照表出现 ❌,不要宣称"打包完成即可提交",而应回到
 软著申请管家补齐对应材料;WARN 项须向用户逐条说明并由用户决定是否放行。
+AI 使用事实与拟签承诺冲突时属于 blocked，不能由用户一句“接受风险”覆盖为通过。

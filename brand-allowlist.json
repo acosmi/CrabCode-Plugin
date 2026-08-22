@@ -34,5 +34,23 @@
     "terms": ["opus"],
     "reason": "物种学名 Xenopus tropicalis(热带爪蟾)含 opus 子串,纯假阳性",
     "tracking": "永久豁免(生物物种名,无需跟进)"
+  },
+  {
+    "file": "plugins/crabcopyright-cn/scripts/build-codex-port.ts",
+    "terms": ["codex", ".codex"],
+    "reason": "功能性双宿主本地构建器必须生成 Codex 标准 .codex-plugin 目录和 cachebuster；不属于 CrabCode 产品品牌宣称",
+    "tracking": "仅限本地个人插件生成器；若宿主清单规范改名则同步删除"
+  },
+  {
+    "file": "plugins/crabcopyright-cn/tests/codex-port.test.ts",
+    "terms": ["codex", ".codex"],
+    "reason": "测试锁定双宿主构建器的 .codex-plugin 输出合同和 cachebuster，属于功能性协议字面量",
+    "tracking": "与 build-codex-port.ts 同步维护"
+  },
+  {
+    "file": "plugins/crabcopyright-cn/package.json",
+    "terms": ["codex"],
+    "reason": "package script 仅引用受控的双宿主构建器文件名，不是产品品牌或模型声明",
+    "tracking": "与 build-codex-port.ts 同步维护"
   }
 ]
