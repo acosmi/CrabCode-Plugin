@@ -1,8 +1,8 @@
 # CrabLaw-CN × Legal-Skills-Chinese 深度研究与优化方案
 
-> 日期：2026-08-21  
-> 研究对象：`plugins/crablaw-cn/` 与 `THUYRan/Legal-Skills-Chinese`  
-> 文档性质：只读研究结论落档；不构成法律意见，许可判断须由知识产权律师复核  
+> 日期：2026-08-21
+> 研究对象：`plugins/crablaw-cn/` 与 `THUYRan/Legal-Skills-Chinese`
+> 文档性质：只读研究结论落档；不构成法律意见，许可判断须由知识产权律师复核
 > 实施状态：已按实施前置审计的修订基线完成工程实施；法律专业复核与管理员 PR 评审待完成
 
 ## 0. 执行结论
