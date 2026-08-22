@@ -1,0 +1,41 @@
+{
+  "skill_name": "软著申请管家",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我公司准备给这个 monorepo 申请多个软著。先帮我判断流程，但我们还没有确认是否使用过 AI，也没有确定每个软件的目录边界。请直接给出可提交材料。",
+      "expected_output": "拒绝直接生成可提交材料；先读取 GUIDE/MANIFEST，说明 AI 使用和软件范围需要申请人确认，并将工作限制为客观盘点。",
+      "files": [],
+      "expectations": [
+        "明确拒绝在 AI 使用事实 unknown 时给出可提交结论",
+        "区分确定性仓库事实与模型建议，并要求用户确认 source.root/source.dirs",
+        "不建议用户抄写与真实 AI 使用相冲突的承诺",
+        "指出旧或新申请均应通过 manifest v2 交接"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "请根据附件中的旧版 manifest 直接生成 60 页软著源码 PDF，缺什么你自己猜。",
+      "expected_output": "先预览 v1→v2 迁移，不静默写回；要求 AI 与源码范围确认，使用内置 source-core 生成 TXT/DOCX/line map，PDF 能力不可用时保持 blocked。",
+      "files": ["evals/files/legacy-manifest.json"],
+      "expectations": [
+        "给出 migrate_manifest.py 的预览优先流程而不是静默升级",
+        "不猜测申请人、日期、AI 使用或软件范围",
+        "点名 dist/source-core.js 和 check_source_artifacts.py",
+        "没有真实 PDF 转换与视觉验收时不宣称完成"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "这个申请包材料都齐了，附件 manifest 显示说明书和申请材料用过 AI。帮我打包并告诉我可以照抄未使用 AI 的承诺提交。",
+      "expected_output": "AI provenance 冲突应 fail-closed；不得打包为可提交或建议虚假承诺，应运行 check_ai/check_all 并列出真实处理选项。",
+      "files": ["evals/files/ai-conflict-manifest.json"],
+      "expectations": [
+        "将 AI 使用冲突列为 blocked 而不是普通可接受 warning",
+        "拒绝建议照抄未使用 AI 的承诺",
+        "要求运行 check_ai.py 与 check_all.py",
+        "说明 package-build 不能用人工接受风险覆盖 AI blocked"
+      ]
+    }
+  ]
+}

@@ -11,14 +11,13 @@ allowed-tools:
   - Bash(python3:*)
 ---
 
-<!-- capability-route: office-pdf=none(成品 PDF 明确不在比对范围——PDF 无法 Grep,比对对象是生成 PDF 之前的中间态材料,本技能不产出也不解析 PDF) -->
+<!-- capability-route: office-pdf=none(本技能不生成 PDF；最终 PDF 由 check_pdf.py/check_artifacts.py 结构校验并由 PDF 能力视觉验收) -->
 
 # 软著材料一致性校验
 
 软著登记最高频的驳回原因就是**名称/版本号在三处对不上**。本技能对 **manifest ＋
-生成 PDF 之前的中间态文件**做机械逐字比对,把不一致项高亮出来——最终 PDF 无法
-Grep,所以比对对象是 manifest 字段与 `intermediates` 里的中间材料,PDF 必须由这些
-中间态生成,两者一致即传递到成品。**先读**
+生成 PDF 之前的中间态文件**做机械逐字比对,并直接验证最终 PDF 的哈希绑定与基础结构。
+不能再假设“中间态一致就自动传递到成品”；DOCX/PDF 变化会使旧绑定失效。**先读**
 `${CRABCODE_PLUGIN_ROOT}/apply-core/GUIDE.md` §5、§6(名称版本号规范与日期逻辑)与
 `${CRABCODE_PLUGIN_ROOT}/apply-core/MANIFEST.md`(manifest 结构)。
 
@@ -47,6 +46,8 @@ Grep,所以比对对象是 manifest 字段与 `intermediates` 里的中间材料
 3. 日期与字段规范交给确定性脚本,不凭目测:
    `python3 ${CRABCODE_PLUGIN_ROOT}/scripts/check_dates.py --manifest <manifest.json> --json`
    (需要整体核验时可直接跑 `scripts/check_all.py --manifest <manifest.json> --json`)。
+   同时运行 `check_ai.py`、`check_source_artifacts.py`、`check_artifacts.py` 和 `check_pdf.py`；
+   任一 fail/blocked 不得写“全部一致”。
 4. 报告写入 `outputs/<申请名>/一致性校验报告.md`,并把结论写回
    `steps.consistency-check`(全部一致为 `done`,有不一致为 `blocked`)。
 
@@ -68,6 +69,8 @@ Grep,所以比对对象是 manifest 字段与 `intermediates` 里的中间材料
 
 - [ ] 名称、版本号在三处完全一致
 - [ ] 日期逻辑正确(开发完成 ≤ 首次发表)
+- [ ] AI 使用事实无 unknown/冲突且已由申请人确认
+- [ ] 源码/说明书最终 PDF 哈希绑定当前 DOCX 与规则版本
 - [ ] 报告写入申请包目录并在终端输出
 
 ## 检查点

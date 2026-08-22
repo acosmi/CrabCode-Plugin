@@ -12,6 +12,8 @@ allowed-tools:
   - AskUserQuestion
   - WebSearch
   - WebFetch
+  - Bash(node:*)
+  - Bash(python3:*)
 ---
 
 # 软著申请管家（总编排）
@@ -25,16 +27,18 @@ allowed-tools:
 `${CRABCODE_PLUGIN_ROOT}/apply-core/MANIFEST.md` 定义的 `outputs/<申请名>/manifest.json`,
 不靠口头复述。
 
-## 开场依赖自检（第一步就做,别拖到排版才失败）
+## 开场硬门（第一步就做）
 
-工序 2/3 的 PDF 排版全部依赖 **crabcode-office-suite** 插件
-(`crabcode-office-suite:crabcode-pdf` / `crabcode-office-suite:crabcode-documents` 技能)。
-开场先探测它是否可用:检查当前可用技能列表中是否存在
-`crabcode-office-suite:crabcode-pdf` 与 `crabcode-office-suite:crabcode-documents`
-(即办公套件已安装并启用)。不可用、或触发时报 Unknown skill,说明办公套件未安装:
-**立即告知用户**"源代码/说明书转规范 PDF 的环节需要办公套件,请先通过 `/plugin`
-从 marketplace 安装启用 `crabcode-office-suite` 后重试",并问清是现在装还是先推进
-不依赖它的工序(0/1/4/6),不要走到排版环节才报错。
+1. 读 GUIDE、MANIFEST 和 manifest 当前版本。旧 manifest 只预览迁移，用户确认后才
+   显式写入；不静默改用户申请数据。
+2. 先确认并记录 `ai_assistance`。任一事实 unknown、当前工作流已由模型生成/改写申请
+   材料或申请人未确认时，只允许规划/只读复核，不得输出“可提交”。不要建议用户作不真实承诺。
+3. 源码 TXT/DOCX 由插件内置离线 `dist/source-core.js` 生成，不依赖办公套件。
+4. 最终 PDF 和说明书 DOCX/PDF 仍需真实文档能力。探测
+   `crabcode-office-suite:crabcode-pdf` / `crabcode-office-suite:crabcode-documents`、
+   当前宿主的 Documents/PDF 或本机 LibreOffice 是否真正可执行；仅有技能文案但运行时适配器
+   未实现也算不可用。不可用时明确 blocked，可先推进规划、清单和源码 DOCX，不能宣称
+   已生成可提交 PDF。
 
 ## 输入（缺则用 AskUserQuestion 索取）
 
@@ -56,7 +60,8 @@ outputs/软著申请-${SOFTWARE_NAME}${VERSION}/
 ├── 03-说明书鉴别材料.pdf           （封面/目录/概述/功能截图/运行环境）
 ├── 04-身份证明文件.pdf             （用户自备）
 ├── 05-其他材料/                    （合作/委托/二次开发等补充）
-├── 中间态/                         （源码材料文本、说明书定稿 docx、功能说明 txt）
+├── 中间态/                         （源码 TXT/DOCX、逐行映射、审计、说明书定稿）
+├── audit-log.jsonl                 （中间审计日志,不进入提交白名单）
 └── 材料自查对照表.md               （由 scripts/check_all.py 结果产出）
 ```
 
@@ -70,12 +75,13 @@ outputs/软著申请-${SOFTWARE_NAME}${VERSION}/
    若源码是 monorepo/大项目,或用户想登记**多个**软著,**先做这步**:分析仓库结构,
    按第一性原理规划拆成几个申请、每个申请归属哪些源码目录、说明书截哪些前端页面
    (含开发环境访问地址),并为每个申请初始化 `outputs/<申请名>/manifest.json`。
-   每个申请是独立的(全称+版本),彼此不共用页眉名称、不重复计入公共代码。
+   每个申请是独立的(全称+版本),彼此不共用页眉名称。公共代码重叠是需说明和复核的
+   经验风险，不冒充“任何相同文件必然驳回”的官方规则。
    单一软件可跳过此步,由本技能直接初始化 manifest。
 
    **多软著批量走 fan-out,不在主会话串行硬扛**:规划确认后,用 Task 工具为**每个
    申请**派发一个独立子代理并行推进只读准备工作——各子代理限定在自己申请的源码
-   目录内,完成材料清单核算、源码文件挑选与行数统计(职责同 `sc-material-collector`)、
+   目录内,完成材料清单核算、源码范围候选盘点(不代替用户确认边界)、
    截图取证清单细化(职责同 `manual-evidence-collector`),以 manifest 草稿(JSON)
    回传;**子代理一律只读、不落盘**。主会话逐份核对草稿后写入各自的
    `outputs/<申请名>/manifest.json`,再逐申请执行需要落盘的工序(3 排版、5 归档),
@@ -87,7 +93,8 @@ outputs/软著申请-${SOFTWARE_NAME}${VERSION}/
    因为它决定后面要不要准备许可证明、合同等补充件。
 
 2. **源代码鉴别材料** → 转 **source-code-material** 技能
-   扫描 `$SOURCE_CODE_DIR`,生成 60 页规范 PDF。
+   用内置确定性引擎扫描确认范围,生成可追溯 TXT/DOCX、line map 与审计报告；
+   文档能力可用时再转换并视觉验收最终 PDF。
 
 3. **说明书鉴别材料** → 转 **manual-material** 技能
    处理 `$MANUAL_PATH`,引导调用 crabcode-office-suite 办公套件生成规范 PDF。
@@ -96,7 +103,8 @@ outputs/软著申请-${SOFTWARE_NAME}${VERSION}/
    对 manifest 与中间态材料机械比对名称/版本号/日期逐字一致。**每当有材料更新就应重跑。**
 
 5. **申请包生成** → 转 **package-build** 技能
-   统一命名归档 + 运行 `scripts/check_all.py` 产出材料自查对照表。
+   仅按提交白名单归档 + 运行 `scripts/check_all.py`。line map、audit log、本机路径和
+   身份号码不进入提交件。
 
 6. **在线填报指导** → 转 **filing-guide** 技能
    给出平台逐字段填报卡片与 2026 新版申请表提示。
@@ -126,7 +134,9 @@ manifest 的 `steps` 判断用户到哪一步、汇报进度、决定下一步�
 1. **一致性第一**:软件全称、版本号、开发完成日期在申请表/源码页眉/说明书三处**逐字一致**(含大小写、空格、有无"V")。这是最高频驳回原因。
 2. **真实不注水**:绝不伪造、PS、虚构;不用空行/纯注释/模板凑行数页数。
 3. **日期自洽**:开发完成日期 ≤ 首次发表日期;企业申请不早于成立日期。
-4. **2026 新版申请表**(以平台实际为准,非《办法》条文):经办人本人签字+身份证号、手抄"未使用 AI"诚信承诺、功能说明扩写至 500–1300 字、失信/征信惩戒。详见 GUIDE.md §8。
+4. **AI 使用事实先于承诺**:2026 新版申请表公开转述包含经办人本人签字、身份证号、
+   “未使用 AI”手抄承诺和 500–1300 字功能说明。它是平台口径而非《办法》条文；
+   插件必须记录真实 AI provenance，冲突时 fail-closed，绝不指导虚假签署。详见 GUIDE.md §8。
 5. **隐私**:产物中不留身份证号等,由用户自行填入平台。
 6. **免费**:官方普通登记自 2017-04-01 起免费,提醒用户勿被"官费"话术误导(代理费另计)。
 

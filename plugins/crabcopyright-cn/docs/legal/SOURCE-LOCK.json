@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "lockKind": "exact-unmodified-core-source-snapshot",
+  "lockDate": "2026-08-21",
+  "upstream": {
+    "repository": "https://github.com/fanbuz/codesucker.git",
+    "release": "v0.4.5",
+    "annotatedTagObject": "9ed5137e83a1cb495fd3ab5d7f3d1f5a450e424d",
+    "commit": "2e39375cf6891b9d958c277f1c6eb3b5104814d9",
+    "commitTreeGitSha1": "7ee450b0caf44175e666cfabba6ab5668aa3e49b",
+    "corePath": "packages/core/src",
+    "coreTreeGitSha1": "cb277b12a6328ec92c8c2d7ab3adb30584142880",
+    "declaredVersion": "0.4.5",
+    "rulesVersion": "2026.07.2",
+    "license": "Apache-2.0",
+    "noticeGitBlobSha1": "e10909a2e86f9eb7431294447c6fb0e0262438d0",
+    "licenseGitBlobSha1": "1bdec5c92198e4c3d182dc064d40a67b54a43f7c",
+    "thirdPartyNoticesGitBlobSha1": "e8bf105dd18d091d09811dc8f78576d7fd26527c"
+  },
+  "port": {
+    "targetRoot": "plugins/crabcopyright-cn/vendor/codesucker-core/src",
+    "targetPluginVersion": "0.3.0",
+    "mapping": "byte-identical-one-to-one",
+    "expectedFiles": 11,
+    "expectedBytes": 148651,
+    "adaptationLayer": "plugins/crabcopyright-cn/src/source-core-cli.ts",
+    "bundle": "plugins/crabcopyright-cn/dist/source-core.js"
+  },
+  "files": [
+    {"path": "async.ts", "size": 1590, "gitBlobSha1": "aca00287840e7d99edb2b076c9300717ad85b82b", "sha256": "40d95e8098680b332cd6038c766df3bab242b1d8d7c4d655d3a525d1f4bfb7ea"},
+    {"path": "audit.ts", "size": 5689, "gitBlobSha1": "1c22f4f2130f2c8ed4bb4f9f1eecd7e8f58b8958", "sha256": "87ca6d910499d6549dcde1a72bd876b95f4329d203d38e5aee2916d960402460"},
+    {"path": "clean.ts", "size": 6776, "gitBlobSha1": "bb595521f431802ea79016f284afa510e45bbf7c", "sha256": "3b7d7fe92196d8c9daba6e554fd09321541ea41772ff6c89a9b95a4b6fae32a9"},
+    {"path": "discover.ts", "size": 9157, "gitBlobSha1": "463b6a472cbba5f23955aa2270b9dab08d70a5c0", "sha256": "e95b568e14ada3114a7427d4b666574819acb94953a595b6be814b7feb5fab20"},
+    {"path": "exclude-rules.ts", "size": 3651, "gitBlobSha1": "89c28b4de43fa0571113e03a59e38bb56decd62d", "sha256": "505adbe8e53ef04a476cc3196995a235704659da7608801a5b0580cfb719be0f"},
+    {"path": "index.ts", "size": 5110, "gitBlobSha1": "f9224c19fb56dfd05c4703597442abd2954fb67e", "sha256": "8b5797eb37b64d6e95bdf1608ef01f5b446342df5b70b7c11c35007fe7916a17"},
+    {"path": "language-syntax.ts", "size": 105931, "gitBlobSha1": "b3e5fd254483fdd610bdd31371327a8bd172cc6c", "sha256": "4d5fcb6175dc904a35f0c5e36a3d7211660e4df5eb4f788b0fbc37638c2437b9"},
+    {"path": "render.ts", "size": 3380, "gitBlobSha1": "128b54c5782df9549d127631b560202507b58794", "sha256": "906aa15d3ea373326b2134af1a3d3c5345f5f2effbeac1a9bb4648dd956333aa"},
+    {"path": "select.ts", "size": 2498, "gitBlobSha1": "e7fb1993b80a59cb352103294649eac4f9005ec9", "sha256": "fd24da25416b47aafa727db55f30110c663507118344e417007fc42083138582"},
+    {"path": "types.ts", "size": 4590, "gitBlobSha1": "10e2a0f615c2b7259dd3dc4dea131da86a352aa9", "sha256": "5bd19c8353d77e06d8d041c6392e8b6c40f6ae4db7a6c0e852b26e9a4fff92ce"},
+    {"path": "version.ts", "size": 279, "gitBlobSha1": "2e874fae17db3ed0134792b28ae5e22d4b4547f8", "sha256": "7e7bbb7ed904d7d35a7460e1fc7099037243f623e91d376450484832b08785ac"}
+  ]
+}

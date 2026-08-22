@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "plugin_version": "0.3.0",
+  "rules_version": "2026.03.15.1",
+  "rules_verified_at": "2026-08-21",
+  "application_name": "软著申请-示例库存系统V1.0",
+  "software": {"full_name": "示例库存系统", "short_name": "示例库存", "version": "V1.0"},
+  "applicant": {"copyright_owner": "示例科技有限公司", "type": "企业", "dev_method": "独立开发", "acquisition": "原始取得"},
+  "dates": {"dev_complete": "2026-01-01", "first_publish": "未发表", "apply_date": "2026-08-21", "company_established": "2020-01-01"},
+  "ai_assistance": {
+    "code": "no",
+    "manual": "yes",
+    "application_materials": "yes",
+    "current_workflow_used_ai": true,
+    "provenance": [
+      {"artifact": "功能说明.txt", "operation": "draft", "actor": "llm", "timestamp": "2026-08-21T12:00:00Z"}
+    ],
+    "applicant_acknowledged": true
+  },
+  "source": {
+    "root": "../../repo",
+    "dirs": ["apps/inventory"],
+    "include_files": [],
+    "selected_files": [],
+    "scope_confirmed": true,
+    "processing": {
+      "remove_comments": true,
+      "remove_blank_lines": true,
+      "mask_sensitive": true,
+      "wrap_long_lines": true,
+      "max_line_width": 78,
+      "tab_width": 4
+    }
+  },
+  "manual": {"source_path": "说明书.docx", "doc_type": "用户手册", "screenshot_plan": []},
+  "materials": {},
+  "steps": {}
+}

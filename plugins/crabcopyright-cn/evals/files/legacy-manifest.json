@@ -1,0 +1,10 @@
+{
+  "application_name": "软著申请-示例库存系统V1.0",
+  "software": {"full_name": "示例库存系统", "short_name": "示例库存", "version": "V1.0"},
+  "applicant": {"copyright_owner": "", "type": "企业", "dev_method": "独立开发", "acquisition": "原始取得"},
+  "dates": {"dev_complete": "", "first_publish": "未发表", "apply_date": "", "company_established": ""},
+  "source": {"dirs": ["apps/inventory"], "selected_files": []},
+  "manual": {"source_path": "", "doc_type": "用户手册", "screenshot_plan": []},
+  "materials": {},
+  "steps": {}
+}
