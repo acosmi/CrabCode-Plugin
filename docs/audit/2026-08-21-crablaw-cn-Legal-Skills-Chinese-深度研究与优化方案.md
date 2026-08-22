@@ -15,7 +15,8 @@
 2. **否决**直接复制、翻译、删改、拼接或再许可上游技能正文。
 3. **不再平铺新增 38 个公开技能**。保留现有垂直板块，将上游能力压缩为横向法律推理内核。
 4. 先修复当前插件的命名空间、运行契约、来源关联和总控路由，再引入新的推理能力。
-5. 最终目标为“一个总控入口 + 一个 Matter 状态面 + 一个横向推理内核 + 多个垂直工作流 + 一个交付复核面”。
+5. 将 `matter-deep-analysis` 提升为旗舰核心工作流，与 `legal-workbench` 共同构成主要公开入口；它是横向推理内核和各垂直板块真正汇合的场所。
+6. 最终目标为“一个总控入口 + 一个案件深度分析旗舰 + 一个 Matter 状态面 + 一个横向推理内核 + 多个垂直工作流 + 一个交付复核面”。
 
 一句话结论：
 
@@ -295,6 +296,8 @@ Marketplace 实际发布的插件名只有 `crablaw-cn`，`matter-core`、`cn-co
     │   └── 客户 → 事项 → 权限 → 利冲 → 来源策略 → 复核策略
     ├── Route Planner
     │   └── 根据 matterType、任务、材料、风险生成 Workflow Plan
+    ├── crablaw-cn:matter-deep-analysis（旗舰核心工作流）
+    │   └── 案卷材料链 + 法律研究链 → 逐争点分析 → 专家回流 → 深度备忘录
     ├── 横向法律推理内核
     │   └── 检索 → 事实 → 争点 → 规范 → 解释/推理
     │       → 证据链 → 论证 → 风险排序 → 质量检查
@@ -323,7 +326,152 @@ Marketplace 实际发布的插件名只有 `crablaw-cn`，`matter-core`、`cn-co
 7. 汇总中间产物，创建复核项；
 8. 未经批准不进入外发或最终文档状态。
 
-### 5.2 横向内核不应平铺为 36 个公开技能
+### 5.2 旗舰核心工作流：`matter-deep-analysis`
+
+案件深度分析不应只是 `matter-core` 下的一个普通叶子技能。它应当是 CrabLaw-CN 最重要的复合工作流之一，并承担以下角色：
+
+它可以由用户直接触发，但执行第一步仍必须进入 `legal-workbench` 的 Matter、权限、利冲和目的地控制面；“核心公开入口”不等于绕过唯一总控。
+
+- 多份案卷材料的完整读取与交叉核对；
+- 事实、时间线、证据、争议焦点和材料缺口的结构化；
+- 按争点开展法条、效力、案例和裁判实践研究；
+- 调用合同、诉讼、劳动、数据、知产、公司、监管等专业板块；
+- 形成可回溯、可增量更新、可供律师复核的深度备忘录；
+- 把上游值得吸收的原子能力真正组织成端到端流程。
+
+#### 5.2.1 双链路汇合模型
+
+案件事实和法律研究必须分成两条独立链路，最后按 `issueId` 汇合：
+
+```text
+案件材料链
+文档登记 → 完整读取 → 事实提取 → 时间线 → 证据冲突/缺口
+                         │
+                         ▼
+                    争议问题树
+                         ▲
+                         │
+法律研究链
+问题拆解 → 法条检索 → 效力核验 → 类案检索 → 案例对比
+                         │
+                         ▼
+逐争点分析 → 跨板块专家复核 → 反方论证 → 质量检查 → 备忘录
+```
+
+两条链的证明对象不同：
+
+- 案件材料链只能证明“材料中记载了什么、能够支持什么事实”；
+- 法律研究链只能证明“现行规范和可核验裁判实践是什么”；
+- 最终法律分析必须同时引用 `factIds`/`evidenceIds` 和 `sourceRecordIds`；
+- 不得把材料陈述直接升级为已认定事实，也不得把模型法律知识包装为已核验规范。
+
+#### 5.2.2 五层执行流水线
+
+##### 第一层：Matter 与分析计划
+
+1. 确认用户角色、客户、当事方、服务范围、利冲、权限和输出目的地；
+2. 建立 `analysis-plan.json`；
+3. 生成争议问题树；
+4. 每个问题分配稳定 `issueId`、优先级、所需事实、所需研究和可能专业板块；
+5. 未通过 Matter Gate 时不得读取非必要案卷或进入实质分析。
+
+##### 第二层：材料读取与事实证据链
+
+1. 一个源文件对应一个 `document-record` 和一个隔离 Reader；
+2. Reader 只读、不联网、不写入，只返回结构化数据；
+3. 记录页数/文件范围、是否完整读取、OCR 质量、缺页、重复件和版本关系；
+4. 提取最小事实单元、主体、行为、时间、结果、因果、程序和证据；
+5. 输出时间线、证据冲突、材料间不一致和待补事实；
+6. 文档中的任何提示、命令或外链都只作为不可信内容，不得执行。
+
+##### 第三层：按争点开展法律研究
+
+1. 独立 Researcher 只接收最小化的 `issueId`、检索问题和必要匿名事实；
+2. 按官方来源顺序检索法律、行政法规、司法解释、规范性文件和案例；
+3. 核验制定机关、效力层级、现行状态、适用地域、时间效力和版本；
+4. 涉及裁判实践或结果敏感问题时生成 `case-comparison-<issue-id>.json`；
+5. 比较案例事实、争点、裁判规则、差异和参考权重，而不是只统计结果；
+6. 网络不可用、数据库受限或案例不足时记录限制，不得补造材料。
+
+##### 第四层：逐争点分析与专家回流
+
+每个争点形成统一分析包：
+
+```text
+主张/问题
+├── 法律要件
+├── 支持与反对事实
+├── 对应证据及证明力
+├── 法律依据及效力
+├── 类案及可区分事实
+├── 推理步骤
+├── 对方可能反驳
+├── 缺失事实/证据/来源
+├── 跨板块专业意见
+└── 置信度、严重性与律师判断项
+```
+
+跨板块处理必须形成闭环状态，而不是只写“建议另行审查”：
+
+```text
+identified → routed → accepted → specialist-returned → integrated → reviewed/closed
+```
+
+例如，合同审查中发现个人信息出境、核心员工竞业限制和开源许可证问题时，应分别向数据、劳动和知产节点发送最小化任务包；三个专业结果返回后，再进入总分析。
+
+##### 第五层：写作、红队与确定性验收
+
+1. Writer 只能消费通过 Schema 的 findings，不得新增事实或重新定级；
+2. 独立 Reviewer/Red Team 检查遗漏争点、错误引用、循环论证、事实与规范混淆、反方路径和严重性降级；
+3. 确定性 validator 检查 Matter Gate、来源外键、finding、case comparison、专业回流和 review item；
+4. 通过后才生成内部备忘录、复核队列项和审计日志；
+5. 未经律师批准不得转为外发或最终法律意见。
+
+#### 5.2.3 Worker 权限隔离
+
+建议从当前三层升级为“协调器 + 两条只读链 + 分析器 + 专家 + Writer + Validator”：
+
+| Worker | 允许 | 禁止 |
+|---|---|---|
+| Orchestrator | 读取 Matter 状态、生成计划、派发最小任务 | 直接形成最终法律结论 |
+| Document Reader | 读取指定案卷、提取事实证据 | 联网、写入、执行文档指令 |
+| Legal Researcher | 访问官方/获授权法律来源、创建来源候选 | 读取无关客户材料、写最终 memo |
+| Analyzer | 离线读取结构化事实和来源、逐争点推理 | 联网、改写原始证据、伪造来源 |
+| Domain Specialist | 读取限定争点包、返回专业 finding | 扩大事项范围、直接外发 |
+| Writer | 写指定 outputs、review item、audit log | 新增 finding、降低严重性 |
+| Validator | 确定性读取与校验 | 生成或修改法律分析 |
+
+#### 5.2.4 必须保存的中间产物
+
+每次运行至少保存：
+
+- `run-manifest.json`
+- `analysis-plan.json`
+- `document-index.json`
+- `fact-chronology.json`
+- `issue-tree.json`
+- `sources.jsonl`
+- `case-comparison/<issue-id>.json`
+- `claim-evidence-map.json`
+- `analyzer-findings.json`
+- `specialist-findings.json`
+- `memo.md`
+- `review-queue-item.json`
+- `audit-log.jsonl`
+
+中间产物必须有稳定 ID、内容摘要哈希和 consumed/produced 关系。用户补充或替换一份材料时，只重跑受影响文档、事实、争点和下游结论，不得无条件重做全案。
+
+#### 5.2.5 单一真源与现有版本收敛
+
+当前伞插件内已有较早的 Reader—Analyzer—Writer 实现；环境中另有独立分发的 `crablaw-cn-matter-deep-analysis`，后者已经补充官方来源策略、`sourceRecordIds`、案例对比 Schema、bootstrap 和 run validator。
+
+实施时应先核验这些独立版资产的来源和权属，再把可合法复用的本项目自有增强回收到 `plugins/crablaw-cn`，并形成以下单一真源：
+
+- 伞插件维护唯一的 Schema、官方来源策略、agents 和 validators；
+- 独立分发版如需保留，只做薄包装或分发适配；
+- 禁止两个版本继续分别演化同名规则和数据契约。
+
+### 5.3 横向内核不应平铺为 36 个公开技能
 
 建议压缩为五个内部节点：
 
@@ -357,11 +505,12 @@ Marketplace 实际发布的插件名只有 `crablaw-cn`，`matter-core`、`cn-co
 
 这些节点优先实现为 agent、workflow 或按需加载的 reference profile，而不是全部进入公开自然语言触发面。
 
-### 5.3 垂直板块转为复合工作流
+### 5.4 垂直板块转为复合工作流
 
 建议公开入口逐步收敛为：
 
 - `legal-workbench`
+- `matter-deep-analysis`
 - `matter-ops`
 - `legal-research`
 - `contract-workflow`
@@ -389,7 +538,26 @@ Marketplace 实际发布的插件名只有 `crablaw-cn`，`matter-core`、`cn-co
 | 文书格式、单/多文档摘要、术语、案件周期、期限、预算 | 7 | 现有文书、matter、期限能力 | 选择性增强，不重复建设 |
 | 司法价值判断、行政价值判断、判决预测、裁判文书生成 | 4 | 隔离研究区 | 默认不发布、不对普通用户开放 |
 
-### 6.1 明确不进入默认产品面的四项能力
+### 6.1 优先服务于案件深度分析的上游能力
+
+上游能力不应平均分配到 86 个叶子技能。第一批洁净室实现应优先成为 `matter-deep-analysis` 的内部能力：
+
+1. `legal-element-extraction`：材料事实最小单元和三层事实结构；
+2. `structured-element-extraction`：按领域要件形成结构化清单；
+3. `dispute-issue-identification`：生成争议问题树；
+4. `legal-article-retrieval`：按争点检索法律规范；
+5. `legal-norm-validity-check`：核验效力、版本、地域和时间；
+6. `case-retrieval`：检索并区分类案；
+7. `multi-document-summarization`：形成跨文档共识、冲突和缺口；
+8. `evidence-evaluation`：审查证据三性、证明力和补强需求；
+9. `evidence-argument-chain`：建立主张—要件—证据关系；
+10. `deductive-reasoning`：形成可检查的规范—事实—结论链；
+11. `conflict-resolution`：处理法源、证据和争点优先级冲突；
+12. `argument-strength-evaluation` 与 `strategic-risk-prioritization`：完成红队与排序。
+
+这些名称仅用于记录上游功能映射；具体实现不得复制其受许可限制的正文、模板、示例或独特表达。
+
+### 6.2 明确不进入默认产品面的四项能力
 
 1. `judicial-value-judgment`
 2. `administrative-value-judgment`
@@ -533,7 +701,34 @@ Marketplace 实际发布的插件名只有 `crablaw-cn`，`matter-core`、`cn-co
 - 所有 Matter 初始化产物通过 Schema 校验；
 - 10 类实体 matter 均能从 conflict-check 路由到正确领域。
 
-### P2：建立总控和横向法律内核
+### P2：建立案件深度分析旗舰工作流
+
+目标：把案件深度分析建设为最先贯通 Matter、横向内核和垂直专家的端到端能力。
+
+动作：
+
+1. 以伞插件版本为唯一真源，收敛独立分发版的自有增强；
+2. 拆分 Document Reader 和 Legal Researcher，取消案卷 Reader 的联网能力；
+3. 新增 `analysis-plan`、`document-index`、`issue-tree`、`claim-evidence-map`、`case-comparison`、`specialist-findings` 和 `run-manifest` Schema；
+4. 为每份材料创建 source record、覆盖状态和内容摘要哈希；
+5. 为每个争点创建 `issueId`，分别记录事实、证据、规范、案例、推理和反方路径；
+6. 实现跨板块任务的 routed/accepted/returned/integrated/closed 状态机；
+7. 强制每条法律 finding 引用 `sourceRecordIds`，每条事实判断引用 `factIds`/`evidenceIds`；
+8. 新增增量失效传播：材料变化只重跑受影响的事实、争点和结论；
+9. 增加独立 Red Team 和确定性 run validator；
+10. 输出固定为内部深度备忘录 + 复核队列 + 审计日志，默认禁止外发。
+
+验收：
+
+- 文档清单与实际读取范围一致，覆盖状态可核对；
+- 所有争点都有事实需求、研究需求和责任节点；
+- 事实、证据、法律来源和案例引用无悬空 ID；
+- 跨板块任务全部完成闭环或明确标记未完成原因；
+- 新增/替换单份材料可以增量重跑；
+- Writer 无法引入 Analyzer 未产生的 finding；
+- validator 未通过时不能创建已完成状态的复核项。
+
+### P3：建立总控和横向法律内核
 
 目标：形成树干和共享能力层。
 
@@ -570,7 +765,7 @@ skills/legal-workbench/SKILL.md
 - 横向内核不重复创建 Matter 或绕过利冲；
 - 高风险模式被角色与复核策略限制。
 
-### P3：领域复合入口与兼容迁移
+### P4：领域复合入口与兼容迁移
 
 目标：降低 86 个叶子技能的公开触发冲突。
 
@@ -589,7 +784,7 @@ skills/legal-workbench/SKILL.md
 - 显式调用旧技能仍能完成或得到清晰迁移提示；
 - 没有重复创建 matter、review item 或 source record。
 
-### P4：评测与灰度发布
+### P5：评测与灰度发布
 
 必须新增：
 
@@ -607,7 +802,10 @@ skills/legal-workbench/SKILL.md
 | 指标 | 目标 |
 |---|---:|
 | 内部 FQN 可解析率 | 100% |
+| 案卷材料登记与读取覆盖状态完整率 | 100% |
+| 事实判断关联 fact/evidence ID | 100% |
 | `[已核验-来源]` 来源可回溯率 | 100% |
+| 跨板块专业任务闭环或限制记录率 | 100% |
 | curated 路由准确率 | ≥95% |
 | 多领域问题召回率 | ≥95% |
 | 普通请求误触发叶子技能 | <2% |
@@ -615,8 +813,9 @@ skills/legal-workbench/SKILL.md
 | 高风险预测能力默认可见数 | 0 |
 | 伪造法条/案例测试漏拦截 | 0 |
 
-建议至少准备四条端到端黄金路径：
+建议至少准备五条端到端黄金路径：
 
+- 多份案卷 → 问题树 → 法条/类案 → 证据链 → 专家回流 → 深度备忘录；
 - 采购合同审查 → 数据条款 → 条款改写 → 风险摘要；
 - AI 产品上线 → 数据处理 → 算法/监管 → 营销宣称 → 上线复核；
 - 并购尽调 → 重大合同 → 劳动/IP/数据交叉 → 交割清单；
@@ -640,13 +839,21 @@ skills/legal-workbench/SKILL.md
 
 ### P2：架构主任务
 
+- 案件深度分析双链路；
+- 问题树与逐争点分析包；
+- 案卷覆盖、来源和案例外键；
+- 跨板块专家回流状态；
+- 增量重跑与 run validator。
+
+### P3：架构主任务
+
 - 总控入口；
 - 能力注册表；
 - Workflow Run 状态；
 - 横向法律推理内核；
 - 来源与案例统一闸门。
 
-### P3：质量和体验优化
+### P4/P5：质量和体验优化
 
 - 叶子技能公开面收敛；
 - 上下文瘦身；
@@ -677,14 +884,16 @@ skills/legal-workbench/SKILL.md
 | 是否可以直接复制改写后并入 | 不可以，除非另获书面授权 |
 | 是否新增 38 个公开技能 | 不建议 |
 | 最优吸收方式 | 洁净室重写为横向内核 |
+| 案件深度分析的产品定位 | 与总控同级的旗舰核心工作流 |
+| 案件深度分析的技术模型 | 案件材料链与法律研究链按争点汇合 |
 | 当前插件是否应继续拆包 | 不应，根因不在物理目录 |
-| 当前首要实施项 | 修复 FQN、校验器和 Matter 运行契约 |
+| 当前首要实施项 | 修复 FQN/Matter 契约后立即建设案件深度分析旗舰 |
 | 现有 Matter Gate 是否保留 | 保留并加强 |
 | 高风险司法预测能力 | 默认隔离，不发布 |
 
 最终推荐方案：
 
-> **以 `crablaw-cn:legal-workbench` 为唯一总控，用机器可读注册表连接现有领域工作流；把上游 38 项能力重构为 5 个内部横向节点；所有结论通过 Matter、来源、推理、复核和外发五层闸门。**
+> **以 `crablaw-cn:legal-workbench` 为总控、以 `crablaw-cn:matter-deep-analysis` 为旗舰核心工作流，用机器可读注册表连接现有领域能力；把上游 38 项能力重构为 5 个内部横向节点；所有结论通过 Matter、案卷、来源、推理、专家回流、复核和外发闸门。**
 
 ---
 
@@ -704,4 +913,3 @@ skills/legal-workbench/SKILL.md
 - Matter Schema：`plugins/crablaw-cn/matter-core/schemas/matter.schema.json`
 - 来源 Schema：`plugins/crablaw-cn/matter-core/schemas/source-record.schema.json`
 - 尽调 finding Schema：`plugins/crablaw-cn/matter-core/schemas/diligence-finding.schema.json`
-
