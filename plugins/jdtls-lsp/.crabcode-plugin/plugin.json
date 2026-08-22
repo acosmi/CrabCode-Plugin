@@ -1,7 +1,7 @@
 {
   "name": "jdtls-lsp",
-  "version": "0.1.0",
-  "description": "Java language server (Eclipse JDT.LS) bridge for CrabCode, providing code intelligence and refactoring.",
+  "version": "0.1.1",
+  "description": "Java language server (Eclipse JDT.LS) bridge for CrabCode, providing code intelligence and refactoring. Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"
   },

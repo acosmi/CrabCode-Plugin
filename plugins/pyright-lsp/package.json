@@ -1,6 +1,6 @@
 {
   "name": "pyright-lsp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "description": "Python language server (Pyright) bridge for CrabCode, providing static type checking and code intelligence.",

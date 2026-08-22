@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "imessage": {
-      "command": "bun",
-      "args": ["run", "--cwd", "${CRABCODE_PLUGIN_ROOT}", "--shell=bun", "--silent", "start"]
-    }
-  }
-}

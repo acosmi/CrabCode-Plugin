@@ -38,6 +38,10 @@ import {
   validateVersionConsistency,
 } from "../src/policy/versionConsistencyValidator.ts";
 import { formatDocFactsIssues, validateDocFacts } from "../src/policy/docFactsValidator.ts";
+import {
+  formatWorkflowTriggerIssues,
+  validateManualWorkflowTriggers,
+} from "../src/policy/workflowTriggerValidator.ts";
 
 const root = path.resolve(process.argv[2] ?? ".");
 
@@ -123,6 +127,13 @@ if (docFacts.length > 0) {
   hasOutput = true;
   process.stderr.write(`[doc-facts]\n${formatDocFactsIssues(docFacts, root)}\n`);
   if (docFacts.some((issue) => issue.severity === "error")) hasError = true;
+}
+
+const workflowTriggers = await validateManualWorkflowTriggers(root);
+if (workflowTriggers.length > 0) {
+  hasOutput = true;
+  process.stderr.write(`[workflow-triggers]\n${formatWorkflowTriggerIssues(workflowTriggers)}\n`);
+  hasError = true;
 }
 
 if (!hasOutput) {

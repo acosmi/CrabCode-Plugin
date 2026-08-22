@@ -1,7 +1,7 @@
 {
   "name": "fakechat",
-  "version": "0.1.0",
-  "description": "Localhost chat test surface for CrabCode. Loopback channel for exercising the bridge notification flow without a real third-party service.",
+  "version": "0.1.1",
+  "description": "Localhost chat test surface for CrabCode. Loopback channel for exercising the bridge notification flow without a real third-party service. Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"
   },

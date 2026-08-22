@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "auditDate": "2026-08-22",
+  "executionPolicy": "local-only-no-automatic-ci",
+  "baselineCommit": "0192ec8669e8c76eff64a49ff2257d3c111263d7",
+  "environment": {
+    "os": "macOS 26.5.2",
+    "architecture": "arm64",
+    "bun": "1.3.11",
+    "python": "3.14.5",
+    "java": "21.0.10",
+    "actionlint": "1.7.12"
+  },
+  "automaticCiTriggered": false,
+  "requiredRuns": [
+    {
+      "id": "clean-task-root-typecheck",
+      "command": "bun run typecheck",
+      "workingTree": "isolated task-only worktree",
+      "result": "pass"
+    },
+    {
+      "id": "clean-task-root-tests",
+      "command": "bun test ./tests/",
+      "workingTree": "isolated task-only worktree",
+      "result": "pass",
+      "passed": 257,
+      "failed": 0,
+      "skipped": 8,
+      "skipDisposition": "the strong PDF path and required security upstream integration cases were executed separately; the remaining incomplete-checkout security case is mutually exclusive"
+    },
+    {
+      "id": "clean-task-root-build",
+      "command": "bun run build",
+      "workingTree": "isolated task-only worktree",
+      "result": "pass"
+    },
+    {
+      "id": "clean-task-root-validate",
+      "command": "bun run lint:brand && bun run scripts/lint-brand.ts dist && bun run validate",
+      "workingTree": "isolated task-only worktree",
+      "result": "pass",
+      "warnings": [
+        "pre-existing crabfin audit-xls office-spreadsheets routing warning",
+        "30 pre-existing doc-facts warnings inherited from origin/main"
+      ]
+    },
+    {
+      "id": "manual-workflow-gates",
+      "command": "actionlint .github/workflows/*.yml && bun run lint:workflow-triggers",
+      "workingTree": "isolated task-only worktree",
+      "result": "pass"
+    },
+    {
+      "id": "html-video-full",
+      "command": "bun run validate",
+      "workingDirectory": "plugins/crabcode-html-video",
+      "result": "pass",
+      "passed": 44,
+      "failed": 0,
+      "checks": [
+        "typecheck",
+        "MCP initialize/tools-list/tool call",
+        "serverInfo version",
+        "Chromium security regression",
+        "dist-only cold start",
+        "distribution credential/brand scan",
+        "ffmpeg/browser doctor"
+      ]
+    },
+    {
+      "id": "mediaops-core",
+      "command": "bun run typecheck && bun run check:distribution && bun run test && bun run validate",
+      "workingDirectory": "plugins/crabcode-media-ops",
+      "result": "pass",
+      "passed": 109,
+      "failed": 0,
+      "checks": [
+        "38-tool dist-only startup",
+        "contained .mcp.json absence",
+        "requiredMcpServers empty",
+        "CycloneDX SBOM aligned at 0.4.3"
+      ]
+    },
+    {
+      "id": "mediaops-full-qa",
+      "command": "bun run test:qa && bun run qa:release",
+      "workingDirectory": "plugins/crabcode-media-ops",
+      "result": "pass",
+      "passed": 9,
+      "failed": 0,
+      "checks": [
+        "Nu/axe/Playwright evidence binding",
+        "five golden viewport/theme fixtures",
+        "100-run deterministic render"
+      ]
+    },
+    {
+      "id": "media-publisher",
+      "command": "bun run lint && bun run test && bun run qa:nu && CRABPUBLISH_SKIP_VISUAL=1 bun run test:browser",
+      "workingDirectory": "plugins/crabcode-media-publisher",
+      "result": "pass",
+      "passed": 64,
+      "failed": 0,
+      "details": {
+        "unitSecurityDomainTests": 25,
+        "nuValidatedHtmlDocuments": 15,
+        "browserFlows": 39
+      }
+    },
+    {
+      "id": "security-locked-upstream",
+      "command": "verify port; build FULL-PORT.patch --check; CRABCODE_SECURITY_UPSTREAM_CHECKOUT=<locked-checkout> bun test ./tests/crabcode-security/",
+      "workingDirectory": "repository root",
+      "result": "pass",
+      "passed": 88,
+      "failed": 0,
+      "skipped": 1,
+      "skipDisposition": "mutually exclusive incomplete-checkout negative case",
+      "provenanceChecks": 505,
+      "lockedUpstreamCommit": "4b3d2a2a965ce1a36eb4b03078db891ab46bc257"
+    },
+    {
+      "id": "crabcopyright-merged-base",
+      "scope": "independently merged origin/main base commit ecbe2d2; not modified by the MCP commit",
+      "result": "pass",
+      "pluginTests": 11,
+      "strongPdfRepositoryTests": 13,
+      "checks": [
+        "typecheck",
+        "distribution freshness",
+        "CodeSucker port verification",
+        "Python byte compile",
+        "pdfplumber/reportlab/pypdf strong path"
+      ]
+    }
+  ],
+  "supplementalAttempts": [
+    {
+      "id": "pinned-playwright-linux-container",
+      "result": "not-tested",
+      "reason": "MCR layer downloads repeatedly failed or stalled with EOF; exact image digest was verified but the local content store lacked required layers",
+      "mergeGate": false,
+      "rationale": "all required test commands ran locally on macOS with the pinned Bun, Playwright, Java and Python versions; no remote CI result is used"
+    }
+  ]
+}

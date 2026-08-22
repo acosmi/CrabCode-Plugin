@@ -1,5 +1,7 @@
 # Discord
 
+> **MCP 安全暂停（2026-08-22）**：安全状态：本版本不发布可执行 MCP 配置；安装不会启动该服务或发起网络请求。 本文保留目标能力与后续接入资料，不代表当前版本已连接或可执行。
+
 CrabCode integration with Discord as a messaging bridge. The bridge accepts
 inbound messages from approved senders and relays outbound responses from
 CrabCode.

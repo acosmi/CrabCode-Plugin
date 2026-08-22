@@ -107,8 +107,12 @@ const capabilities = await readFile(join(pluginRoot, 'src', 'tools', 'capabiliti
 const domain = await readFile(join(pluginRoot, 'src', 'domain.ts'), 'utf8')
 if (!server.includes("import { VERSION }")) errors.push('server must use shared VERSION')
 if (!capabilities.includes("import { VERSION }")) errors.push('capabilities must use shared VERSION')
-const runtimeVersion = domain.match(/export const VERSION = '([^']+)'/)?.[1]
-if (runtimeVersion !== manifest.version) errors.push(`version mismatch: runtime=${runtimeVersion ?? 'missing'}, plugin=${manifest.version}`)
+if (!domain.includes("import packageMetadata from '../package.json' with { type: 'json' }")) {
+  errors.push('domain VERSION must import package.json as the single version source')
+}
+if (!domain.includes('export const VERSION = packageMetadata.version')) {
+  errors.push('domain VERSION must derive from packageMetadata.version')
+}
 if (/\b(?:bun|npm|pnpm|yarn)\s+install\b/.test(pkg.scripts?.start ?? '')) {
   errors.push('start script must not install dependencies: the required-local sidecar has to cold-start offline from the prebuilt dist')
 }
@@ -116,26 +120,11 @@ if (!pkg.scripts?.start?.includes('dist/server.js')) errors.push('start script m
 if (pkg.bin !== './dist/server.js') errors.push('package bin must point at the prebuilt dist/server.js')
 if (!existsSync(join(pluginRoot, 'dist', 'server.js'))) errors.push('dist/server.js is missing; run `bun run build` (the distribution bundle ships in-repo)')
 
-const mcpConfig = await json(join(pluginRoot, '.mcp.json'))
-const mcpServers = mcpConfig?.mcpServers && typeof mcpConfig.mcpServers === 'object' ? mcpConfig.mcpServers : null
-if (!mcpServers) errors.push('.mcp.json must declare wrapped mcpServers')
-const mediaopsServer = mcpServers?.mediaops
-if (!mediaopsServer) errors.push('.mcp.json must declare the mediaops server')
-else {
-  const mcpArgs: unknown[] = Array.isArray(mediaopsServer.args) ? mediaopsServer.args : []
-  if (mediaopsServer.command !== 'bun' || !mcpArgs.includes('${CRABCODE_PLUGIN_ROOT}/dist/server.js')) {
-    errors.push('.mcp.json mediaops server must execute the prebuilt ${CRABCODE_PLUGIN_ROOT}/dist/server.js with bun')
-  }
-  if (mcpArgs.some((value) => typeof value === 'string' && /install/.test(value))) errors.push('.mcp.json mediaops launch args must not run an installer')
-  if (typeof mediaopsServer.env?.MEDIAOPS_DATA_DIR !== 'string') errors.push('.mcp.json mediaops server must inject MEDIAOPS_DATA_DIR')
+if (existsSync(join(pluginRoot, '.mcp.json'))) {
+  errors.push('.mcp.json must remain absent while mediaops principal-config-missing containment is active')
 }
 const requiredServers: unknown[] = Array.isArray(manifest.requiredMcpServers) ? manifest.requiredMcpServers : []
-if (!requiredServers.includes('mediaops')) {
-  errors.push('plugin.json must declare requiredMcpServers:["mediaops"] so CrabCode >=1.0.16 activates the lifecycle (audit P0-B)')
-}
-for (const name of requiredServers) {
-  if (typeof name !== 'string' || !mcpServers?.[name]) errors.push(`requiredMcpServers entry ${String(name)} has no matching .mcp.json server definition`)
-}
+if (requiredServers.length !== 0) errors.push('requiredMcpServers must stay empty while mediaops is contained')
 if (pkg.overrides?.hono !== '4.12.25') errors.push('Hono security override must remain pinned at 4.12.25 until the SDK resolves above it')
 if (existsSync(join(pluginRoot, 'editorial', 'scripts', '__pycache__'))) errors.push('generated __pycache__ must not ship in the plugin')
 
@@ -200,4 +189,4 @@ if (errors.length) {
   process.stderr.write(errors.map((error) => `ERROR ${error}`).join('\n') + '\n')
   process.exit(1)
 }
-process.stdout.write(`validate-media-plugin: ${skillNames.size} skills, ${declaredTools.size} registered tools, ${schemaNames.length} schemas, runtime/docs/manifest/marketplace/SBOM aligned at ${manifest.version}\n`)
+process.stdout.write(`validate-media-plugin: contained executable, ${skillNames.size} skills, ${declaredTools.size} tested tools, ${schemaNames.length} schemas, runtime/docs/manifest/marketplace/SBOM aligned at ${manifest.version}\n`)

@@ -1,5 +1,7 @@
 # Serena
 
+> **MCP 安全暂停（2026-08-22）**：安全状态：本版本不发布可执行 MCP 配置；安装不会启动该服务或发起网络请求。 本文保留目标能力与后续接入资料，不代表当前版本已连接或可执行。
+
 CrabCode integration with the [Serena](https://github.com/oraios/serena) MCP
 server by Oraios. Serena layers LSP-driven semantic understanding on top of
 the codebase.

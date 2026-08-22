@@ -1,12 +1,12 @@
 {
   "name": "crabcode-media-ops",
-  "version": "0.4.2",
-  "description": "Governed media operations for CrabCode: clean-room references, verifiable research, originality review, refined white HTML delivery, hash-bound approval, and frozen local publish packages.",
+  "version": "0.4.3",
+  "description": "Governed media operations for CrabCode: clean-room references, verifiable research, originality review, refined white HTML delivery, hash-bound approval, and frozen local publish packages. Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"
   },
   "license": "Apache-2.0",
-  "requiredMcpServers": ["mediaops"],
+  "requiredMcpServers": [],
   "keywords": [
     "media-ops",
     "publishing",

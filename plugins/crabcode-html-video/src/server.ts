@@ -14,6 +14,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types.js'
 import type { z } from 'zod/v4'
 import { join } from 'node:path'
+import packageMetadata from '../package.json' with { type: 'json' }
 
 import { toToolResult, type Envelope } from './envelope.ts'
 import * as validateGraph from './tools/validateGraph.ts'
@@ -29,7 +30,7 @@ import type { ToolContext } from './cancellation.ts'
 // bundle was imported; keep this assignment as a defense-in-depth invariant.
 process.env.PRODUCER_HYPERFRAME_MANIFEST_PATH = join(pluginRoot(), 'dist', 'hyperframe.manifest.json')
 
-const server = new McpServer({ name: 'html-video', version: '0.1.0' })
+const server = new McpServer({ name: 'html-video', version: packageMetadata.version })
 
 function register<T extends z.ZodTypeAny>(
   name: string,

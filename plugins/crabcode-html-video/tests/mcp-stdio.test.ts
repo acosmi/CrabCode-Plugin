@@ -4,6 +4,7 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import { dirname, resolve } from 'node:path'
 import { tmpdir } from 'node:os'
 import { fileURLToPath } from 'node:url'
+import packageMetadata from '../package.json' with { type: 'json' }
 
 const pluginRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 let client: Client | undefined
@@ -34,6 +35,7 @@ async function connect(extraEnvironment: Record<string, string> = {}): Promise<C
 describe('MCP stdio contract', () => {
   test('initialize, list tools, and call a read-only tool', async () => {
     const connected = await connect()
+    expect(connected.getServerVersion()?.version).toBe(packageMetadata.version)
     const listed = await connected.listTools()
     const byName = new Map(listed.tools.map((tool) => [tool.name, tool]))
 

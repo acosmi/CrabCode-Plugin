@@ -1,6 +1,6 @@
 {
   "name": "typescript-lsp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "description": "TypeScript/JavaScript language server bridge for CrabCode, providing code intelligence, go-to-definition, find references, and error checking.",

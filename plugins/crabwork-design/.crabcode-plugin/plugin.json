@@ -1,7 +1,7 @@
 {
   "name": "crabwork-design",
-  "version": "0.2.2",
-  "description": "Accelerate design workflows — critique, design system management, UX writing, accessibility audits, research synthesis, and dev handoff. From exploration to pixel-perfect specs.",
+  "version": "0.2.3",
+  "description": "Accelerate design workflows — critique, design system management, UX writing, accessibility audits, research synthesis, and dev handoff. From exploration to pixel-perfect specs. Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"
   },

@@ -1,7 +1,7 @@
 {
   "name": "crabwork-hr",
-  "version": "0.2.2",
-  "description": "Streamline people operations — recruiting, onboarding, performance reviews, compensation analysis, and policy guidance. Maintain compliance and keep your team running smoothly.",
+  "version": "0.2.3",
+  "description": "Streamline people operations — recruiting, onboarding, performance reviews, compensation analysis, and policy guidance. Maintain compliance and keep your team running smoothly. Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"
   },

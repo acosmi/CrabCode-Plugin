@@ -1,7 +1,7 @@
 {
   "name": "terraform",
-  "version": "0.1.0",
-  "description": "HashiCorp Terraform MCP integration for CrabCode. Plan, inspect, and reason about Infrastructure-as-Code with explicit human approval for any apply.",
+  "version": "0.1.1",
+  "description": "HashiCorp Terraform MCP integration for CrabCode. Plan, inspect, and reason about Infrastructure-as-Code with explicit human approval for any apply. Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"
   },
