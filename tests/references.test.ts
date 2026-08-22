@@ -67,6 +67,22 @@ describe("reference validator", () => {
     expect(messages(issues, "error")).toEqual([]);
   });
 
+  test("accepts nested agents explicitly declared by a plugin manifest", async () => {
+    const root = await makeFixture([
+      {
+        rel: "plugins/office-suite/.crabcode-plugin/plugin.json",
+        content: JSON.stringify({ agents: ["./matter/agents/reviewer.md"] }),
+      },
+      { rel: "plugins/office-suite/matter/agents/reviewer.md", content: "# reviewer" },
+      {
+        rel: "plugins/alpha/skills/writer/SKILL.md",
+        content: "委派 Agent(office-suite:reviewer)。",
+      },
+    ]);
+    const issues = await validateReferences(root);
+    expect(messages(issues, "error")).toEqual([]);
+  });
+
   test("keeps skill, agent, and workflow namespaces type-safe", async () => {
     const root = await makeFixture([
       { rel: "plugins/office-suite/agents/reviewer.md", content: "# reviewer" },
@@ -112,6 +128,30 @@ describe("reference validator", () => {
     ]);
     const issues = await validateReferences(root);
     expect(messages(issues, "error")).toEqual([]);
+  });
+
+  test("rejects a leading slash on a canonical CrabLaw FQN", async () => {
+    const root = await makeFixture([
+      { rel: "plugins/crablaw-cn/skills/review/SKILL.md", content: "# review" },
+      {
+        rel: "plugins/alpha/skills/writer/SKILL.md",
+        content: "错误路由到 `/crablaw-cn:review`。",
+      },
+    ]);
+    const errors = messages(await validateReferences(root), "error");
+    expect(errors.some((message) => message.includes("不得带前导 /"))).toBe(true);
+  });
+
+  test("rejects CrabLaw board names used as callable namespaces", async () => {
+    const root = await makeFixture([
+      {
+        rel: "plugins/crablaw-cn/cn-contract/skills/review/SKILL.md",
+        content: "转交 `/cn-contract:clause-redraft`，再调用 matter-core:review-queue。",
+      },
+    ]);
+    const errors = messages(await validateReferences(root), "error");
+    expect(errors.some((message) => message.includes("cn-contract:clause-redraft"))).toBe(true);
+    expect(errors.some((message) => message.includes("matter-core:review-queue"))).toBe(true);
   });
 
   test("warns when capability keywords appear without routing", async () => {

@@ -5,7 +5,7 @@ description: 起草面向受援人的通俗语言法律告知书,把法律意见
 argument-hint: "[受援人 matter id 与要告知的结论/风险/下一步]"
 ---
 
-# /cn-legal-aid:plain-language-letter
+# crablaw-cn:plain-language-letter
 
 【AI 辅助草稿，需律师复核】
 
@@ -38,10 +38,10 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 受援人需作出选择后留痕：移交 `/cn-legal-aid:client-comms-log`。
-- 涉及具体期限：移交 `/cn-legal-aid:deadlines`。
-- 背后法律分析需展开：移交 `/cn-legal-aid:case-memo`。
-- 发出前由督导复核：移交 `/cn-legal-aid:supervisor-review-queue`。
+- 受援人需作出选择后留痕：移交 `crablaw-cn:client-comms-log`。
+- 涉及具体期限：移交 `crablaw-cn:deadlines`。
+- 背后法律分析需展开：移交 `crablaw-cn:case-memo`。
+- 发出前由督导复核：移交 `crablaw-cn:supervisor-review-queue`。
 
 ## 产出物路由
 

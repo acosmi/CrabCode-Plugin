@@ -5,7 +5,7 @@ description: 法律援助资格审查,核对经济困难标准、事项范围与
 argument-hint: "[受援人 client/matter id、经济状况、事项类型与诉求]"
 ---
 
-# /cn-legal-aid:eligibility-check
+# crablaw-cn:eligibility-check
 
 【AI 辅助草稿，需律师复核】
 
@@ -41,7 +41,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 资格符合：移交 `/cn-legal-aid:aid-application-form` 生成申请/受理登记表。
-- 需补正材料：回到 `/cn-legal-aid:aid-intake` 补充收集。
-- 拟向受援人通俗告知结论：移交 `/cn-legal-aid:plain-language-letter`。
-- 涉具体法律分析：移交 `/cn-legal-aid:case-memo`。
+- 资格符合：移交 `crablaw-cn:aid-application-form` 生成申请/受理登记表。
+- 需补正材料：回到 `crablaw-cn:aid-intake` 补充收集。
+- 拟向受援人通俗告知结论：移交 `crablaw-cn:plain-language-letter`。
+- 涉具体法律分析：移交 `crablaw-cn:case-memo`。

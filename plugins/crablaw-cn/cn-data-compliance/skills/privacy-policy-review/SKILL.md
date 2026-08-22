@@ -5,7 +5,7 @@ description: 在中国法数据合规工作流中审查隐私政策、App 告知
 argument-hint: "[policy text or file path]"
 ---
 
-# /cn-data-compliance:privacy-policy-review
+# crablaw-cn:privacy-policy-review
 
 【AI 辅助草稿，需律师复核】
 

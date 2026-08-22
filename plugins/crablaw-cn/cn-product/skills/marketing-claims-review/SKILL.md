@@ -5,7 +5,7 @@ description: 审查营销宣传用语的中国法合规性(广告法绝对化用
 argument-hint: "[拟用的宣传文案、详情页文本或广告脚本]"
 ---
 
-# /cn-product:marketing-claims-review
+# crablaw-cn:marketing-claims-review
 
 【AI 辅助草稿，需律师复核】
 
@@ -45,7 +45,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 - 涉特殊行业资质/广告审查批文/代言备案:转交 `/cn-regulatory`(对应资质许可审查技能)。
 - 文案中使用他人商标、作品、肖像等:转交 `/cn-ip`(对应侵权/权属审查技能)。
-- 宣传中涉及用户数据、画像、个性化推送:转交 `/cn-data-compliance:data-activity-triage`。
+- 宣传中涉及用户数据、画像、个性化推送:转交 `crablaw-cn:data-activity-triage`。
 - 涉 AI 生成的营销素材或生成式内容标识:转交 `/cn-ai-governance`(对应 AI 用例评估技能)。
-- 该文案属上线整体审查的一部分:并入 `/cn-product:launch-review`。
-- 仅需快速判断某一句能不能说:转交 `/cn-product:is-this-a-problem`。
+- 该文案属上线整体审查的一部分:并入 `crablaw-cn:launch-review`。
+- 仅需快速判断某一句能不能说:转交 `crablaw-cn:is-this-a-problem`。

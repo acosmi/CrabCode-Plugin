@@ -5,7 +5,7 @@ description: 诉讼/仲裁立案前信息收集,产出 litigation-matter 草案�
 argument-hint: "[当事人、争议事实、诉讼请求或已有材料]"
 ---
 
-# /cn-litigation:matter-intake
+# crablaw-cn:matter-intake
 
 【AI 辅助草稿，需律师复核】
 
@@ -23,7 +23,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 4. 诉讼请求/仲裁请求：拟列具体请求（给付/确认/形成）、标的金额或标的物、是否含利息/违约金/迟延履行金，确认请求与事实、法律关系对应。
 5. 管辖审查：审查级别管辖与地域管辖（一般地域、特殊地域、专属管辖），核查是否存在有效的管辖协议或仲裁协议/仲裁条款；若约定仲裁则确认仲裁机构与仲裁规则，排除向法院起诉的路径（民事诉讼法管辖规定、仲裁法第四条至第二十一条 [模型知识-待核]）。
 6. 诉讼时效/申请仲裁期限：核查请求权是否在诉讼时效期间内（一般三年，自权利人知道或应当知道权利受损害及义务人之日起算），识别时效中止、中断、最长二十年的情形，并提示时效抗辩风险（民法典第一百八十八条至第一百九十九条 [模型知识-待核]）。
-7. 证据线索盘点：列出已有/待取证据（书证、物证、电子数据、证人、鉴定、勘验等）及缺口；标记可能需要诉前证据保全或申请调取的证据，移交 `/cn-litigation:legal-hold`。
+7. 证据线索盘点：列出已有/待取证据（书证、物证、电子数据、证人、鉴定、勘验等）及缺口；标记可能需要诉前证据保全或申请调取的证据，移交 `crablaw-cn:legal-hold`。
 8. 保全需求：评估是否需要诉前/诉中财产保全或行为保全，记录被申请人财产线索与担保能力（litigation-matter 的 `preservation` 字段）。
 9. 来源标注：每条法律或事实断言按 `[已核验-来源]`/`[用户提供]`/`[模型知识-待核]` 标注。无核验来源的法律点写入 `sources.jsonl` 的 `source-record`，`status: source-needs-check`，`effectiveStatus` 说明待核内容。
 10. 形成 `litigation-matter` 草案（forumType、forumName、causeOfAction、partyRole、instance、claimAmount/claimSummary、preservation、status: active、citationTag），并建立 `pending-review` 的 review queue item。期限不写入 litigation-matter；如已识别明确期限，分别写入 `compliance-deadline`（obligationType: litigation-deadline）。
@@ -41,7 +41,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 需固定或保全证据：移交 `/cn-litigation:legal-hold`。
-- 需形成案件简报与策略：移交 `/cn-litigation:matter-briefing`。
+- 需固定或保全证据：移交 `crablaw-cn:legal-hold`。
+- 需形成案件简报与策略：移交 `crablaw-cn:matter-briefing`。
 - 需冲突检查或新建案件：移交 matter-core 相应流程。
-- 涉合同效力/条款争议：可联动 `/cn-contract:review`。
+- 涉合同效力/条款争议：可联动 `crablaw-cn:review`。

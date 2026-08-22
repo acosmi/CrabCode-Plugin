@@ -1,0 +1,11 @@
+{
+  "checkedAt": "2026-08-21",
+  "upstream": "THUYRan/Legal-Skills-Chinese",
+  "upstreamSnapshot": "d844a25f6d5e6eff4999774a9ab0f79f7cb9d22d",
+  "target": "plugins/crablaw-cn",
+  "method": "normalized exact SHA-256 character shingles",
+  "shingleSize": 96,
+  "matchPairs": 0,
+  "status": "pass",
+  "notice": "Engineering provenance preflight only; not a copyright or license opinion."
+}

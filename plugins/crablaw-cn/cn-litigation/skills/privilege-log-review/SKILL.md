@@ -5,7 +5,7 @@ description: 涉密/不公开材料梳理(中国无 privilege log,映射为证�
 argument-hint: "[拟提交或交换的材料清单，及涉密/涉隐私情况说明]"
 ---
 
-# /cn-litigation:privilege-log-review
+# crablaw-cn:privilege-log-review
 
 【AI 辅助草稿，需律师复核】
 
@@ -43,6 +43,6 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 质证环节使用本分级结论：移交 `/cn-litigation:deposition-prep`。
-- 涉及向法院申请调取或对方持有的涉密材料：移交 `/cn-litigation:subpoena-triage`。
-- 涉及个人信息合规的实体判断：升级至 `/cn-data-compliance:data-activity-triage`。
+- 质证环节使用本分级结论：移交 `crablaw-cn:deposition-prep`。
+- 涉及向法院申请调取或对方持有的涉密材料：移交 `crablaw-cn:subpoena-triage`。
+- 涉及个人信息合规的实体判断：升级至 `crablaw-cn:data-activity-triage`。

@@ -5,7 +5,7 @@ description: 起草法律援助案件的法律文书内部草稿,如起诉状、
 argument-hint: "[受援人 matter id、文书类型与要点/已确认的事实证据]"
 ---
 
-# /cn-legal-aid:document-draft
+# crablaw-cn:document-draft
 
 【AI 辅助草稿，需律师复核】
 
@@ -41,10 +41,10 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 法律依据不足：移交 `/cn-legal-aid:research-start` 检索。
-- 分析基础需补强：回到 `/cn-legal-aid:case-memo`。
-- 提交期限管理：移交 `/cn-legal-aid:deadlines`。
-- 提交前必经督导复核：移交 `/cn-legal-aid:supervisor-review-queue`。
+- 法律依据不足：移交 `crablaw-cn:research-start` 检索。
+- 分析基础需补强：回到 `crablaw-cn:case-memo`。
+- 提交期限管理：移交 `crablaw-cn:deadlines`。
+- 提交前必经督导复核：移交 `crablaw-cn:supervisor-review-queue`。
 
 ## 产出物路由
 

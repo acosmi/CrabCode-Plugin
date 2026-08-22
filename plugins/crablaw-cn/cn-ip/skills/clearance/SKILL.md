@@ -5,7 +5,7 @@ description: 在商标/专利申请前做在先权利检索与可注册性/侵�
 argument-hint: "[拟申请标的:商标文字图样及尼斯类别 / 技术方案 / 外观;以及业务场景]"
 ---
 
-# /cn-ip:clearance
+# crablaw-cn:clearance
 
 【AI 辅助草稿，需律师复核】
 
@@ -39,8 +39,8 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 命中疑似侵权风险且涉及已上市产品:转 `/cn-ip:fto-triage`(专利)或 `/cn-ip:infringement-triage`。
-- 拟登记内部 IP 资产:转 `/cn-ip:invention-intake`(发明)或 `/cn-ip:portfolio`。
+- 命中疑似侵权风险且涉及已上市产品:转 `crablaw-cn:fto-triage`(专利)或 `crablaw-cn:infringement-triage`。
+- 拟登记内部 IP 资产:转 `crablaw-cn:invention-intake`(发明)或 `crablaw-cn:portfolio`。
 - 需正式检索报告:由律师在官方途径完成,本草稿不替代官方检索结论。
 
 ## 调研升级路径

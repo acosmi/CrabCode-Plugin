@@ -5,7 +5,7 @@ description: 形成中国法数据出境路径的初步研判工作底稿。当�
 argument-hint: "[transfer facts]"
 ---
 
-# /cn-data-compliance:cross-border-transfer-check
+# crablaw-cn:cross-border-transfer-check
 
 【AI 辅助草稿，需律师复核】
 

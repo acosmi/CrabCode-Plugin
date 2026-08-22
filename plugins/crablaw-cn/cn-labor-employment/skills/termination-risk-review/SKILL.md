@@ -5,7 +5,7 @@ description: 形成中国法下解除/终止劳动关系或不续签的风险研
 argument-hint: "[termination facts and records]"
 ---
 
-# /cn-labor-employment:termination-risk-review
+# crablaw-cn:termination-risk-review
 
 【AI 辅助草稿，需律师复核】
 

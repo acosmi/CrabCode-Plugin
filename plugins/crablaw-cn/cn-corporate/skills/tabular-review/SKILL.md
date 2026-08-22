@@ -5,7 +5,7 @@ description: 对一批中国合同或文件按统一维度逐项做表格化审�
 argument-hint: "[文件批次路径、清单或审查维度]"
 ---
 
-# /cn-corporate:tabular-review
+# crablaw-cn:tabular-review
 
 【AI 辅助草稿，需律师复核】
 
@@ -35,9 +35,9 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 单份高风险文件深审：转交 `/cn-contract:review`。
-- 纳入尽调发现：转交 `/cn-corporate:diligence-issue-extraction` 或 `/cn-corporate:material-contract-schedule`。
-- 面向业务团队汇总：转交 `/cn-corporate:deal-team-summary`。
+- 单份高风险文件深审：转交 `crablaw-cn:review`。
+- 纳入尽调发现：转交 `crablaw-cn:diligence-issue-extraction` 或 `crablaw-cn:material-contract-schedule`。
+- 面向业务团队汇总：转交 `crablaw-cn:deal-team-summary`。
 
 ## 产出物路由
 

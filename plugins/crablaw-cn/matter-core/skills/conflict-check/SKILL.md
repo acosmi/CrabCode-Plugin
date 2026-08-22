@@ -5,7 +5,7 @@ description: 在开展实质性法律工作前,为某事项生成初步利益冲
 argument-hint: "[matter id]"
 ---
 
-# /matter-core:conflict-check
+# crablaw-cn:conflict-check
 
 【AI 辅助草稿，需律师复核】
 
@@ -44,7 +44,11 @@ Return an initial conflict-screening report with a clear review status and next 
 
 After this skill finishes, route based on the screening status:
 
-- `no-hit` or lawyer-confirmed `cleared-by-lawyer`: hand off to the matter's domain skill (`/cn-contract:review`, `/cn-data-compliance:data-activity-triage`, `/cn-labor-employment:employment-contract-review`, or matter-core `/matter-core:review-queue` for direct review-queue authoring).
+- `no-hit` or lawyer-confirmed `cleared-by-lawyer`: hand off to
+  `crablaw-cn:legal-workbench`. It must read `legal-core/capability-registry.json` and choose the
+  default capability for contract, data-compliance, labor-employment, corporate, IP, litigation,
+  AI-governance, regulatory, product, legal-aid, or matter operations. A caller that already names a
+  bounded leaf task may route directly to that canonical `crablaw-cn:<skill>` after the gate passes.
 - `hit-review-required`: stop substantive domain work; escalate to the responsible lawyer for `cleared-by-lawyer` confirmation or matter decline.
 - `pending`: re-run after the responsible lawyer reviews; do not allow domain skills to proceed.
 
@@ -54,4 +58,10 @@ Validate the resulting record before treating the screening as complete:
 
 - `matters/<matter-id>/conflict-check.json` → `matter-core/schemas/conflict-check.schema.json`
 
-Repo-local validation: `npm run validate:schema -- <file> matter-core/schemas/conflict-check.schema.json`.
+Validation:
+
+```text
+python3 ${CRABCODE_PLUGIN_ROOT}/matter-core/scripts/validate_json.py \
+  --schema ${CRABCODE_PLUGIN_ROOT}/matter-core/schemas/conflict-check.schema.json \
+  --file <conflict-check.json>
+```

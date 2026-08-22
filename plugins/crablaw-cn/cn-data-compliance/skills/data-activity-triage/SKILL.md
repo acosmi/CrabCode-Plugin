@@ -5,7 +5,7 @@ description: 对中国法下某项数据处理活动做初步分诊,判断是否
 argument-hint: "[processing activity facts]"
 ---
 
-# /cn-data-compliance:data-activity-triage
+# crablaw-cn:data-activity-triage
 
 【AI 辅助草稿，需律师复核】
 
@@ -49,7 +49,7 @@ Return initial classification, missing facts, required follow-up workpapers, sou
 
 Route based on the triage:
 
-- PIA required: hand off to `/cn-data-compliance:pia-generation` with the triage record id.
-- Cross-border path candidate: hand off to `/cn-data-compliance:cross-border-transfer-check`.
-- Entrusted, joint, or third-party recipient: hand off to `/cn-data-compliance:data-processing-review`.
-- Privacy notice gaps surfaced: hand off to `/cn-data-compliance:privacy-policy-review`.
+- PIA required: hand off to `crablaw-cn:pia-generation` with the triage record id.
+- Cross-border path candidate: hand off to `crablaw-cn:cross-border-transfer-check`.
+- Entrusted, joint, or third-party recipient: hand off to `crablaw-cn:data-processing-review`.
+- Privacy notice gaps surfaced: hand off to `crablaw-cn:privacy-policy-review`.

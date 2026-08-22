@@ -5,7 +5,7 @@ description: 审查开源软件许可证合规草稿(义务、传染性 copyleft
 argument-hint: "[涉及的开源组件及许可证、分发方式(SaaS/分发二进制/内部使用)、是否修改]"
 ---
 
-# /cn-ip:oss-review
+# crablaw-cn:oss-review
 
 【AI 辅助草稿，需律师复核】
 
@@ -41,6 +41,6 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 涉及合同中的知识产权/许可条款:转 `/cn-ip:ip-clause-review`。
-- 收到开源社区/权利人侵权主张:转 `/cn-ip:infringement-triage`。
+- 涉及合同中的知识产权/许可条款:转 `crablaw-cn:ip-clause-review`。
+- 收到开源社区/权利人侵权主张:转 `crablaw-cn:infringement-triage`。
 - 自有代码拟开源或对外许可:由律师设计许可策略,本草稿不替代许可方案设计。

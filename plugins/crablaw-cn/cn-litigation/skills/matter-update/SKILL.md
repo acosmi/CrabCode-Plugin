@@ -5,7 +5,7 @@ description: 案件进展更新,开庭/裁定/送达后同步 litigation-matter 
 argument-hint: "[案件 caseId 与进展事件，如开庭/裁定/送达回执]"
 ---
 
-# /cn-litigation:matter-update
+# crablaw-cn:matter-update
 
 【AI 辅助草稿，需律师复核】
 
@@ -42,7 +42,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 案件已审结/执行完毕：移交 `/cn-litigation:matter-close`。
-- 需更新策略与简报：移交 `/cn-litigation:matter-briefing`。
+- 案件已审结/执行完毕：移交 `crablaw-cn:matter-close`。
+- 需更新策略与简报：移交 `crablaw-cn:matter-briefing`。
 - 期限集中管理：交由 matter-core 的 compliance-deadline-watcher 监测。
-- 多案件总览：移交 `/cn-litigation:portfolio-status`。
+- 多案件总览：移交 `crablaw-cn:portfolio-status`。

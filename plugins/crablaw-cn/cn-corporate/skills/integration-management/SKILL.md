@@ -5,7 +5,7 @@ description: 规划与跟踪中国法下的并购后整合法律事项,作为律
 argument-hint: "[交易结构、整合范围或交割后资料路径]"
 ---
 
-# /cn-corporate:integration-management
+# crablaw-cn:integration-management
 
 【AI 辅助草稿，需律师复核】
 
@@ -36,7 +36,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 合同移转条款审查：转交 `/cn-contract:review`；批量处理转交 `/cn-corporate:tabular-review`。
-- 整合所需内部决议：转交 `/cn-corporate:board-minutes` 或 `/cn-corporate:written-consent`。
-- 整合后存续合规：转交 `/cn-corporate:entity-compliance`。
-- 员工安置劳动专项：转交劳动板块（如 `/cn-labor-employment:employment-contract-review`）。
+- 合同移转条款审查：转交 `crablaw-cn:review`；批量处理转交 `crablaw-cn:tabular-review`。
+- 整合所需内部决议：转交 `crablaw-cn:board-minutes` 或 `crablaw-cn:written-consent`。
+- 整合后存续合规：转交 `crablaw-cn:entity-compliance`。
+- 员工安置劳动专项：转交劳动板块（如 `crablaw-cn:employment-contract-review`）。

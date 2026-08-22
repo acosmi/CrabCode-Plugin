@@ -5,7 +5,7 @@ description: 在 CrabLaw-CN 工作流中创建或更新客户档案,作为开展
 argument-hint: "[client name or profile facts]"
 ---
 
-# /matter-core:new-client
+# crablaw-cn:new-client
 
 【AI 辅助草稿，需律师复核】
 
@@ -26,7 +26,7 @@ Create a client profile under the CrabLaw-CN matter foundation. This skill does 
    - Do not invent entity registration data.
 3. Prepare `clients/<client-id>/client.json` using `matter-core/schemas/client.schema.json`.
 4. Add an `audit-log.jsonl` entry if an active matter already exists.
-5. Tell the user the next required step is `/matter-core:new-matter` or `/matter-core:conflict-check`.
+5. Tell the user the next required step is `crablaw-cn:new-matter` or `crablaw-cn:conflict-check`.
 
 ## Stop Conditions
 

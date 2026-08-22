@@ -5,7 +5,7 @@ description: 审查合同中的知识产权条款草稿(权属、许可、保证
 argument-hint: "[合同文本或相关条款、合同类型、我方立场(权利人/被许可方/委托方/受托方)]"
 ---
 
-# /cn-ip:ip-clause-review
+# crablaw-cn:ip-clause-review
 
 【AI 辅助草稿，需律师复核】
 
@@ -42,7 +42,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 整份合同审查:转合同板块 `/cn-contract:review`。
-- 涉及开源组件义务:转 `/cn-ip:oss-review`。
-- 出现侵权担保被触发/侵权指控:转 `/cn-ip:infringement-triage`。
-- 涉资产权属登记:转 `/cn-ip:invention-intake` 或 `/cn-ip:portfolio`。
+- 整份合同审查:转合同板块 `crablaw-cn:review`。
+- 涉及开源组件义务:转 `crablaw-cn:oss-review`。
+- 出现侵权担保被触发/侵权指控:转 `crablaw-cn:infringement-triage`。
+- 涉资产权属登记:转 `crablaw-cn:invention-intake` 或 `crablaw-cn:portfolio`。

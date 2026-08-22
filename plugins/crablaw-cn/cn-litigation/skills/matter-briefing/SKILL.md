@@ -5,7 +5,7 @@ description: 生成诉讼/仲裁案件简报,梳理争点、程序节点、风�
 argument-hint: "[案件 caseId 或案件事实与材料]"
 ---
 
-# /cn-litigation:matter-briefing
+# crablaw-cn:matter-briefing
 
 【AI 辅助草稿，需律师复核】
 
@@ -17,7 +17,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Workflow
 
-1. 读取案件登记：从 litigation-matter 取 forumType、forumName、caseNumber、causeOfAction、partyRole、instance、claimSummary、status；如无登记，先回到 `/cn-litigation:matter-intake`。
+1. 读取案件登记：从 litigation-matter 取 forumType、forumName、caseNumber、causeOfAction、partyRole、instance、claimSummary、status；如无登记，先回到 `crablaw-cn:matter-intake`。
 2. 争点梳理：归纳事实争点与法律争点，区分双方无争议事实、有争议事实与纯法律适用问题；标注每项主张的证据支撑强弱。
 3. 实体法分析：就案由对应的请求权基础（民法典合同编/物权编/侵权责任编等相关条文 [模型知识-待核]）逐项评估构成要件是否满足，识别抗辩事由（诉讼时效、清偿、抵销、不可抗力、情势变更等）。
 4. 程序节点：列出当前审级（一审/二审/再审/执行/仲裁）下的关键程序节点——立案、举证期限、开庭、质证、辩论、裁判、上诉、申请执行等；期限以 `compliance-deadline`（obligationType: litigation-deadline）为唯一真实来源，简报仅引用不另存。
@@ -40,7 +40,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 需构建事实时间线：移交 `/cn-litigation:chronology`。
-- 进展更新（开庭/裁定/送达后）：移交 `/cn-litigation:matter-update`。
-- 需跟踪对方：移交 `/cn-litigation:oc-status`。
-- 需证据保全/固定：移交 `/cn-litigation:legal-hold`。
+- 需构建事实时间线：移交 `crablaw-cn:chronology`。
+- 进展更新（开庭/裁定/送达后）：移交 `crablaw-cn:matter-update`。
+- 需跟踪对方：移交 `crablaw-cn:oc-status`。
+- 需证据保全/固定：移交 `crablaw-cn:legal-hold`。

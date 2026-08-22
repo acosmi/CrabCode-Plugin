@@ -5,7 +5,7 @@ description: 起草企业内部 AI 治理政策/制度草稿(AI 使用规范、�
 argument-hint: "[制度类型、适用范围或已识别的合规义务]"
 ---
 
-# /cn-ai-governance:policy-starter
+# crablaw-cn:policy-starter
 
 【AI 辅助草稿，需律师复核】
 
@@ -45,6 +45,6 @@ Return:
 
 ## Next Steps
 
-- 制度落地需逐条核对企业现状差距:hand off to `/cn-ai-governance:reg-gap-analysis`。
-- 涉及个人信息处理制度:escalate to `/cn-data-compliance:privacy-policy-review` 或 `/cn-data-compliance:data-processing-review`。
+- 制度落地需逐条核对企业现状差距:hand off to `crablaw-cn:reg-gap-analysis`。
+- 涉及个人信息处理制度:escalate to `crablaw-cn:privacy-policy-review` 或 `crablaw-cn:data-processing-review`。
 - 涉及员工行为与劳动管理:escalate to `/cn-labor-employment` 相应技能。

@@ -41,11 +41,31 @@ const WALK_SKIP_DIRS = new Set(["node_modules", "dist", "coverage", ".git", "ven
 
 // A bare backticked FQN is intentionally kind-neutral because the surrounding
 // prose may name a skill, agent, or workflow. Typed Agent(...) / Workflow(...)
-// calls are checked against their exact namespaces below. Only canonical
-// plugin roots contribute callables; arbitrary nested folders never do.
-const FQN_PATTERN = /`([a-z0-9][a-z0-9-]*):([a-z0-9][a-z0-9-]*)`/g;
+// calls are checked against their exact namespaces below. Nested agents only
+// contribute callables when the plugin manifest explicitly declares their file.
+// The optional slash is parsed so the validator can reject legacy slash-command
+// notation instead of silently missing it.
+const FQN_PATTERN = /`(\/?)([a-z0-9][a-z0-9-]*):([a-z0-9][a-z0-9-]*)`/g;
 const TYPED_CALL_PATTERN = /\b(Agent|Workflow)\(([^)]*)\)/g;
 const TYPED_FQN_PATTERN = /^([a-z0-9][a-z0-9-]*):([a-z0-9][a-z0-9-]*)$/;
+
+const LEGACY_CRABLAW_NAMESPACES = new Set([
+  "matter-core",
+  "cn-contract",
+  "cn-data-compliance",
+  "cn-labor-employment",
+  "cn-corporate",
+  "cn-litigation",
+  "cn-ip",
+  "cn-regulatory",
+  "cn-ai-governance",
+  "cn-product",
+  "cn-legal-aid",
+]);
+const LEGACY_CRABLAW_REF_PATTERN = new RegExp(
+  `(?<![a-z0-9-])/?(${[...LEGACY_CRABLAW_NAMESPACES].join("|")}):([a-z0-9][a-z0-9-]*)`,
+  "g",
+);
 
 // Bare `mcp__<server>__` tool references must match a server declared in the
 // owning plugin's .mcp.json.
@@ -89,7 +109,10 @@ export async function validateReferences(root: string): Promise<ReferenceIssue[]
   for (const plugin of pluginNames) {
     const pluginDir = path.join(pluginsDir, plugin);
     const skills = await collectSkillNames(pluginDir);
-    const agents = await collectDirectFileStems(path.join(pluginDir, "agents"), [".md"]);
+    const agents = new Set([
+      ...(await collectDirectFileStems(path.join(pluginDir, "agents"), [".md"])),
+      ...(await collectManifestDeclaredFileStems(pluginDir, "agents", [".md"])),
+    ]);
     const workflows = await collectDirectFileStems(
       path.join(pluginDir, "workflows"),
       [".js", ".mjs", ".cjs", ".ts"],
@@ -101,7 +124,7 @@ export async function validateReferences(root: string): Promise<ReferenceIssue[]
   }
 
   if (registry) {
-    await validateRegistryIntegrity(registry, absRoot, pluginsDir, skillIndex, issues);
+    await validateRegistryIntegrity(registry, absRoot, skillIndex, agentIndex, issues);
   }
 
   const registryPluginSet = new Set<string>(
@@ -120,6 +143,9 @@ export async function validateReferences(root: string): Promise<ReferenceIssue[]
         continue;
       }
 
+      if (plugin === "crablaw-cn") {
+        checkLegacyCrabLawNamespaces(content, file, issues);
+      }
       checkDeadFqns(content, file, callableIndex, registryPluginSet, issues);
       checkTypedCallableReferences(content, file, agentIndex, workflowIndex, issues);
       await checkMcpToolRefs(content, file, plugin, pluginDir, mcpServerCache, issues);
@@ -179,8 +205,8 @@ async function loadRegistry(absRoot: string, issues: ReferenceIssue[]): Promise<
 async function validateRegistryIntegrity(
   registry: Registry,
   absRoot: string,
-  pluginsDir: string,
   skillIndex: Map<string, Set<string>>,
+  agentIndex: Map<string, Set<string>>,
   issues: ReferenceIssue[],
 ): Promise<void> {
   const registryPath = path.join(absRoot, REGISTRY_RELATIVE);
@@ -205,14 +231,11 @@ async function validateRegistryIntegrity(
         });
       }
       if (entry.agent) {
-        const agentPath = path.join(pluginsDir, entry.plugin, "agents", `${entry.agent}.md`);
-        try {
-          await stat(agentPath);
-        } catch {
+        if (!agentIndex.get(entry.plugin)?.has(entry.agent)) {
           issues.push({
             severity: "error",
             file: registryPath,
-            message: `能力「${capability.id}」的域内专用代理 ${entry.plugin}/agents/${entry.agent}.md 无法解析`,
+            message: `能力「${capability.id}」的域内专用代理 ${entry.plugin}:${entry.agent} 未在规范 agents/ 或 manifest agents 中声明`,
           });
         }
       }
@@ -228,10 +251,23 @@ function checkDeadFqns(
   issues: ReferenceIssue[],
 ): void {
   for (const match of content.matchAll(FQN_PATTERN)) {
-    const plugin = match[1] ?? "";
-    const skill = match[2] ?? "";
+    const leadingSlash = match[1] ?? "";
+    const plugin = match[2] ?? "";
+    const skill = match[3] ?? "";
     const known = callableIndex.has(plugin);
     const planned = registryPluginSet.has(plugin);
+    // Other plugin families use `/plugin:command` as user-facing slash-command
+    // documentation; command validation is owned elsewhere. CrabLaw is the only
+    // family being migrated from slash-shaped pseudo-FQNs in this gate.
+    if (leadingSlash && plugin !== "crablaw-cn") continue;
+    if (leadingSlash && plugin === "crablaw-cn") {
+      issues.push({
+        severity: "error",
+        file,
+        message: `非规范引用 \`/${plugin}:${skill}\`:全限定调用名不得带前导 /,请改为 \`${plugin}:${skill}\``,
+      });
+      continue;
+    }
     if (!known && !planned) continue;
     if (known && callableIndex.get(plugin)?.has(skill)) continue;
     issues.push({
@@ -240,6 +276,26 @@ function checkDeadFqns(
       message: known
         ? `死链引用 \`${plugin}:${skill}\`:插件存在但规范根目录中无对应技能、代理或工作流`
         : `死链引用 \`${plugin}:${skill}\`:provider 插件尚未就位(注册表状态 planned),请改用 pending 标记与升级路径措辞`,
+    });
+  }
+}
+
+function checkLegacyCrabLawNamespaces(
+  content: string,
+  file: string,
+  issues: ReferenceIssue[],
+): void {
+  const seen = new Set<string>();
+  for (const match of content.matchAll(LEGACY_CRABLAW_REF_PATTERN)) {
+    const namespace = match[1] ?? "";
+    const callable = match[2] ?? "";
+    const token = `${namespace}:${callable}`;
+    if (seen.has(token)) continue;
+    seen.add(token);
+    issues.push({
+      severity: "error",
+      file,
+      message: `CrabLaw 旧板块命名空间 ${token} 不可调用;板块只是展示分组,请改为 crablaw-cn:${callable}`,
     });
   }
 }
@@ -464,6 +520,40 @@ async function collectDirectFileStems(dir: string, extensions: string[]): Promis
     }
   } catch {
     return out;
+  }
+  return out;
+}
+
+async function collectManifestDeclaredFileStems(
+  pluginDir: string,
+  field: "agents",
+  extensions: string[],
+): Promise<Set<string>> {
+  const out = new Set<string>();
+  let parsed: Record<string, unknown>;
+  try {
+    parsed = JSON.parse(
+      await readFile(path.join(pluginDir, ".crabcode-plugin", "plugin.json"), "utf8"),
+    ) as Record<string, unknown>;
+  } catch {
+    return out;
+  }
+
+  const raw = parsed[field];
+  const entries = typeof raw === "string" ? [raw] : Array.isArray(raw) ? raw : [];
+  const resolvedRoot = path.resolve(pluginDir);
+  for (const entry of entries) {
+    if (typeof entry !== "string") continue;
+    const resolved = path.resolve(pluginDir, entry);
+    if (resolved !== resolvedRoot && !resolved.startsWith(`${resolvedRoot}${path.sep}`)) continue;
+    if (!extensions.includes(path.extname(resolved).toLowerCase())) continue;
+    try {
+      if ((await stat(resolved)).isFile()) {
+        out.add(path.basename(resolved, path.extname(resolved)));
+      }
+    } catch {
+      // presentation/manifest validation owns missing declared files
+    }
   }
   return out;
 }

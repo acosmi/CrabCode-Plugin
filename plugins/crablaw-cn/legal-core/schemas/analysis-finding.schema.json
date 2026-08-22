@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crablaw.local/schemas/legal-core/analysis-finding.schema.json",
+  "title": "CrabLaw-CN Analysis Findings",
+  "type": "object",
+  "required": ["schemaVersion", "matterId", "runId", "findings"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "matterId": { "type": "string", "minLength": 2 },
+    "runId": { "type": "string", "minLength": 2 },
+    "findings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["findingId", "issueId", "category", "statement", "citationTag", "sourceRecordIds", "factIds", "evidenceIds", "severity", "confidenceBasis", "reviewRequired", "producedBy"],
+        "properties": {
+          "findingId": { "type": "string", "minLength": 2 },
+          "issueId": { "type": "string", "minLength": 2 },
+          "category": { "enum": ["legal-rule", "fact-assessment", "evidence-gap", "risk", "deadline", "cross-domain", "legal-conclusion"] },
+          "statement": { "type": "string", "minLength": 1 },
+          "citationTag": { "enum": ["[已核验-来源]", "[用户提供]", "[模型知识-待核]"] },
+          "sourceRecordIds": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 2 }, "uniqueItems": true },
+          "factIds": { "type": "array", "items": { "type": "string", "minLength": 2 }, "uniqueItems": true },
+          "evidenceIds": { "type": "array", "items": { "type": "string", "minLength": 2 }, "uniqueItems": true },
+          "severity": { "enum": ["info", "green", "yellow", "red"] },
+          "confidenceBasis": { "type": "string", "minLength": 1 },
+          "reviewRequired": { "type": "boolean" },
+          "producedBy": { "enum": ["diligence-reader", "diligence-analyzer", "domain-specialist"] },
+          "recommendation": { "type": "string", "minLength": 1 },
+          "caseComparisonRequired": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

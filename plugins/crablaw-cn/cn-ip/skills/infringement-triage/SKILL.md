@@ -5,7 +5,7 @@ description: 对知识产权侵权线索做分流草稿,分别处置"我方权�
 argument-hint: "[线索方向:我方被侵 或 我方被指侵;涉案权利、对方主体、已知事实]"
 ---
 
-# /cn-ip:infringement-triage
+# crablaw-cn:infringement-triage
 
 【AI 辅助草稿，需律师复核】
 
@@ -38,8 +38,8 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 拟发警告函:转 `/cn-ip:cease-desist`。
-- 走平台投诉/通知删除:转 `/cn-ip:takedown`。
-- 我方被指专利侵权需比对权利要求:转 `/cn-ip:fto-triage`。
-- 涉合同项下侵权担保/权属争议:转 `/cn-ip:ip-clause-review`。
+- 拟发警告函:转 `crablaw-cn:cease-desist`。
+- 走平台投诉/通知删除:转 `crablaw-cn:takedown`。
+- 我方被指专利侵权需比对权利要求:转 `crablaw-cn:fto-triage`。
+- 涉合同项下侵权担保/权属争议:转 `crablaw-cn:ip-clause-review`。
 - 进入诉讼/仲裁:升级至诉讼板块由律师评估。

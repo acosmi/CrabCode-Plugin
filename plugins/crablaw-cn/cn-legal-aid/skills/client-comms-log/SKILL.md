@@ -5,7 +5,7 @@ description: 受援人沟通记录整理,结构化记录每次沟通的时间、
 argument-hint: "[受援人 matter id 与本次沟通的时间/方式/内容]"
 ---
 
-# /cn-legal-aid:client-comms-log
+# crablaw-cn:client-comms-log
 
 【AI 辅助草稿，需律师复核】
 
@@ -38,7 +38,7 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 形成新待办期限：移交 `/cn-legal-aid:deadlines`。
-- 需向受援人发出通俗告知：移交 `/cn-legal-aid:plain-language-letter`。
-- 沟通触及案件状态变化：移交 `/cn-legal-aid:case-status`。
-- 出现法律分析需求：移交 `/cn-legal-aid:case-memo`。
+- 形成新待办期限：移交 `crablaw-cn:deadlines`。
+- 需向受援人发出通俗告知：移交 `crablaw-cn:plain-language-letter`。
+- 沟通触及案件状态变化：移交 `crablaw-cn:case-status`。
+- 出现法律分析需求：移交 `crablaw-cn:case-memo`。

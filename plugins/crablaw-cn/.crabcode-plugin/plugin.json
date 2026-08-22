@@ -1,7 +1,7 @@
 {
   "name": "crablaw-cn",
-  "version": "0.2.1",
-  "description": "CrabLaw-CN PRC legal practice workflow umbrella: matter management, contracts, litigation, IP, corporate, labor, data-compliance, AI-governance, regulatory, product and legal-aid capabilities for Chinese-law work.",
+  "version": "0.3.0",
+  "description": "CrabLaw-CN PRC legal practice workbench with a shared matter gate, traceable deep analysis, legal research/reasoning controls, and coordinated contract, litigation, IP, corporate, labor, data, AI, regulatory, product and legal-aid workflows.",
   "author": {
     "name": "CrabLaw"
   },
@@ -25,6 +25,8 @@
     "intellectual-property",
     "labor",
     "legal-aid",
+    "legal-reasoning",
+    "legal-research",
     "litigation",
     "m-and-a",
     "marketing",
@@ -40,6 +42,7 @@
     "trademark"
   ],
   "skills": [
+    "./legal-core/skills/legal-workbench",
     "./matter-core/skills/compliance-deadline-watcher",
     "./matter-core/skills/conflict-check",
     "./matter-core/skills/matter-archive",
@@ -130,6 +133,8 @@
   "agents": [
     "./matter-core/agents/diligence-reader.md",
     "./matter-core/agents/diligence-analyzer.md",
-    "./matter-core/agents/diligence-writer.md"
+    "./matter-core/agents/diligence-writer.md",
+    "./matter-core/agents/legal-researcher.md",
+    "./matter-core/agents/diligence-reviewer.md"
   ]
 }

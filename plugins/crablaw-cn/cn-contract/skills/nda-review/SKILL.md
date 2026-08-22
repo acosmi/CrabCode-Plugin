@@ -5,7 +5,7 @@ description: 在中国法合同与商业秘密工作流中审查保密协议/NDA
 argument-hint: "[NDA file path, pasted text, or matter facts]"
 ---
 
-# /cn-contract:nda-review
+# crablaw-cn:nda-review
 
 【AI 辅助草稿，需律师复核】
 

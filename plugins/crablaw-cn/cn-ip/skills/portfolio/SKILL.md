@@ -5,7 +5,7 @@ description: 管理知识产权资产组合草稿(注册号/状态/续展总览)
 argument-hint: "[资产清单或来源(商标/专利/著作权/域名)、需总览或新增/更新的项]"
 ---
 
-# /cn-ip:portfolio
+# crablaw-cn:portfolio
 
 【AI 辅助草稿，需律师复核】
 
@@ -36,6 +36,6 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 ## Next Steps
 
 - 期限跟踪交由合规期限 watcher(读取 `compliance-deadline`,本技能不重复跟踪)。
-- 新增发明/创意拟纳入组合:转 `/cn-ip:invention-intake`。
-- 申请前清除:转 `/cn-ip:clearance`。
-- 发现疑似侵权或权利被侵:转 `/cn-ip:infringement-triage`。
+- 新增发明/创意拟纳入组合:转 `crablaw-cn:invention-intake`。
+- 申请前清除:转 `crablaw-cn:clearance`。
+- 发现疑似侵权或权利被侵:转 `crablaw-cn:infringement-triage`。

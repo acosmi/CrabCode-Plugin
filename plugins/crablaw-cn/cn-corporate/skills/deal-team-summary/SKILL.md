@@ -5,7 +5,7 @@ description: 基于审查/尽调成果,生成面向业务团队的中国并购�
 argument-hint: "[review queue / diligence-finding 条目 id 或尽调摘要]"
 ---
 
-# /cn-corporate:deal-team-summary
+# crablaw-cn:deal-team-summary
 
 【AI 辅助草稿，需律师复核】
 
@@ -35,6 +35,6 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 风险点需深入审查时：回溯 `/cn-corporate:diligence-issue-extraction` 或 `/cn-contract:review`。
-- 交割推进：转交 `/cn-corporate:closing-checklist`。
+- 风险点需深入审查时：回溯 `crablaw-cn:diligence-issue-extraction` 或 `crablaw-cn:review`。
+- 交割推进：转交 `crablaw-cn:closing-checklist`。
 - 拟对外发送的客户版材料：先经律师复核并明确发送目的地，再考虑脱敏处理。

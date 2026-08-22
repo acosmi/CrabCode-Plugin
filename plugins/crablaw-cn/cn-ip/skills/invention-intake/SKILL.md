@@ -5,7 +5,7 @@ description: 登记发明创造/创意披露并做职务发明判定与申请前
 argument-hint: "[发明/创意描述、发明人、研发背景(是否本职/利用单位条件)、拟保护方式]"
 ---
 
-# /cn-ip:invention-intake
+# crablaw-cn:invention-intake
 
 【AI 辅助草稿，需律师复核】
 
@@ -41,9 +41,9 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 申请前需在先权利/查新清除:转 `/cn-ip:clearance`。
-- 拟纳入资产组合管理:转 `/cn-ip:portfolio`。
-- 权属/奖励报酬涉合同安排:转 `/cn-ip:ip-clause-review`。
+- 申请前需在先权利/查新清除:转 `crablaw-cn:clearance`。
+- 拟纳入资产组合管理:转 `crablaw-cn:portfolio`。
+- 权属/奖励报酬涉合同安排:转 `crablaw-cn:ip-clause-review`。
 - 选择商业秘密路径:由律师设计保密与管理措施,本草稿不替代保密制度设计。
 
 ## 调研升级路径

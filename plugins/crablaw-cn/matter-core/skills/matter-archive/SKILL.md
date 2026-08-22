@@ -5,7 +5,7 @@ description: 归档某事项,完整保留其产出、来源记录、复核记录
 argument-hint: "[matter id]"
 ---
 
-# /matter-core:matter-archive
+# crablaw-cn:matter-archive
 
 【AI 辅助草稿，需律师复核】
 
@@ -48,4 +48,6 @@ Before archiving, re-validate the matter's records to ensure the archived bundle
 - `matters/<matter-id>/review-queue.jsonl` records → `matter-core/schemas/review-queue.schema.json`
 - `matters/<matter-id>/sources.jsonl` records → `matter-core/schemas/source-record.schema.json`
 
-Repo-local validation per file: `npm run validate:schema -- <file> matter-core/schemas/<name>.schema.json`.
+Validate JSON records with `${CRABCODE_PLUGIN_ROOT}/matter-core/scripts/validate_json.py`; a deep
+analysis run must also pass `validate_run.py` before archive. Never rewrite a user's existing matter
+store merely to satisfy a newer optional field.

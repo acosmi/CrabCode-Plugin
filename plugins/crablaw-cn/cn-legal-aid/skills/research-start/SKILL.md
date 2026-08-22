@@ -5,7 +5,7 @@ description: 法律援助案件法律检索起步,拆解争点、确定检索路
 argument-hint: "[受援人 matter id 与待检索的法律问题/争点]"
 ---
 
-# /cn-legal-aid:research-start
+# crablaw-cn:research-start
 
 【AI 辅助草稿，需律师复核】
 
@@ -37,9 +37,9 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 检索成果用于分析：移交 `/cn-legal-aid:case-memo`。
-- 检索支撑文书起草：移交 `/cn-legal-aid:document-draft`。
-- 检索涉及期限规则：移交 `/cn-legal-aid:deadlines`。
+- 检索成果用于分析：移交 `crablaw-cn:case-memo`。
+- 检索支撑文书起草：移交 `crablaw-cn:document-draft`。
+- 检索涉及期限规则：移交 `crablaw-cn:deadlines`。
 - 跨领域问题：联动相应专业板块（如 `/cn-labor-employment`、`/cn-litigation`）。
 
 ## 调研升级路径

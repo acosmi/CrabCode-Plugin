@@ -5,7 +5,7 @@ description: 法律援助案件期限管理,识别并登记诉讼时效、起诉
 argument-hint: "[受援人 matter id 与已知期限/诉讼阶段]"
 ---
 
-# /cn-legal-aid:deadlines
+# crablaw-cn:deadlines
 
 【AI 辅助草稿，需律师复核】
 
@@ -38,6 +38,6 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 ## Next Steps
 
 - 期限监测：交由 matter-core 的 compliance-deadline-watcher 监测。
-- 临近上诉/举证期限需出文书：移交 `/cn-legal-aid:document-draft`。
-- 期限变动需告知受援人：移交 `/cn-legal-aid:plain-language-letter`。
-- 期限随状态变化更新：移交 `/cn-legal-aid:case-status`。
+- 临近上诉/举证期限需出文书：移交 `crablaw-cn:document-draft`。
+- 期限变动需告知受援人：移交 `crablaw-cn:plain-language-letter`。
+- 期限随状态变化更新：移交 `crablaw-cn:case-status`。

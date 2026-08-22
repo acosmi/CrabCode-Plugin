@@ -5,7 +5,7 @@ description: 构建案件事实时间线,从证据与当事人陈述梳理并严
 argument-hint: "[案件 caseId、证据材料或当事人陈述]"
 ---
 
-# /cn-litigation:chronology
+# crablaw-cn:chronology
 
 【AI 辅助草稿，需律师复核】
 
@@ -37,9 +37,9 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 据时间线评估争点与策略：移交 `/cn-litigation:matter-briefing`。
-- 需固定/保全缺口证据：移交 `/cn-litigation:legal-hold`。
-- 事实更新（新证据/新进展）：回到本 skill 或 `/cn-litigation:matter-update`。
+- 据时间线评估争点与策略：移交 `crablaw-cn:matter-briefing`。
+- 需固定/保全缺口证据：移交 `crablaw-cn:legal-hold`。
+- 事实更新（新证据/新进展）：回到本 skill 或 `crablaw-cn:matter-update`。
 
 ## 产出物路由
 

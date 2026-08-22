@@ -5,7 +5,7 @@ description: 在中国法工作流中对合同草稿或来件协议做律师复�
 argument-hint: "[file path, pasted text, or matter facts]"
 ---
 
-# /cn-contract:review
+# crablaw-cn:review
 
 【AI 辅助草稿，需律师复核】
 
@@ -46,10 +46,10 @@ Use:
 
 Depending on the review outcome:
 
-- For specific clause revisions: hand off to `/cn-contract:clause-redraft` with the target clause and objective.
-- For a business-facing summary derived from this review: hand off to `/cn-contract:risk-summary` with this review item id.
-- For confidentiality-only documents: prefer `/cn-contract:nda-review` instead of this generic review.
-- When data, labor, or other regulatory issues surface, escalate to the matching domain skill (`/cn-data-compliance:data-activity-triage`, `/cn-labor-employment:employment-contract-review`).
+- For specific clause revisions: hand off to `crablaw-cn:clause-redraft` with the target clause and objective.
+- For a business-facing summary derived from this review: hand off to `crablaw-cn:risk-summary` with this review item id.
+- For confidentiality-only documents: prefer `crablaw-cn:nda-review` instead of this generic review.
+- When data, labor, or other regulatory issues surface, escalate to the matching domain skill (`crablaw-cn:data-activity-triage`, `crablaw-cn:employment-contract-review`).
 
 ## 产出物路由
 

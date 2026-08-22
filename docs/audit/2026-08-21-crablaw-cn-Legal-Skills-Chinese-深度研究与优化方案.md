@@ -3,7 +3,7 @@
 > 日期：2026-08-21  
 > 研究对象：`plugins/crablaw-cn/` 与 `THUYRan/Legal-Skills-Chinese`  
 > 文档性质：只读研究结论落档；不构成法律意见，许可判断须由知识产权律师复核  
-> 实施状态：未实施，待管理员评审
+> 实施状态：已按实施前置审计的修订基线完成工程实施；法律专业复核与管理员 PR 评审待完成
 
 ## 0. 执行结论
 
@@ -913,3 +913,11 @@ skills/legal-workbench/SKILL.md
 - Matter Schema：`plugins/crablaw-cn/matter-core/schemas/matter.schema.json`
 - 来源 Schema：`plugins/crablaw-cn/matter-core/schemas/source-record.schema.json`
 - 尽调 finding Schema：`plugins/crablaw-cn/matter-core/schemas/diligence-finding.schema.json`
+
+## 13. 实施结果索引
+
+- 实施前置审计：`docs/audit/2026-08-21-crablaw-cn-Legal-Skills-Chinese-实施前置审计.md`
+- 全量实施日志：`docs/audit/2026-08-21-crablaw-cn-Legal-Skills-Chinese-全量实施日志.md`
+- 字段兼容契约：`docs/handoff/2026-08-21-crablaw-cn-v0.3.0-字段契约.md`
+- v0.3.0 发布说明：`docs/releases/2026-08-21-crablaw-cn-v0.3.0.md`
+- 评测查看器：`docs/audit/2026-08-21-crablaw-cn-v0.3.0-eval-review.html`

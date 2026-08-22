@@ -5,7 +5,7 @@ description: 在中国法数据合规工作流中审查委托处理、共同处�
 argument-hint: "[agreement, SDK list, vendor facts, or clause text]"
 ---
 
-# /cn-data-compliance:data-processing-review
+# crablaw-cn:data-processing-review
 
 【AI 辅助草稿，需律师复核】
 

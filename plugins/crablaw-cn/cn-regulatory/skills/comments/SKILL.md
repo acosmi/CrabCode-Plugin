@@ -5,7 +5,7 @@ description: 对监管征求意见稿起草反馈意见与修改建议(内部草
 argument-hint: "[征求意见稿文本或对应 reg-policy 条目]"
 ---
 
-# /cn-regulatory:comments
+# crablaw-cn:comments
 
 【AI 辅助草稿，需律师复核】
 
@@ -36,6 +36,6 @@ Apply the standard CrabLaw-CN Matter Gate, Shared Guardrails, and Currency Gate 
 
 ## Next Steps
 
-- 需先比对草案与现行规则差异：先转交 `/cn-regulatory:policy-diff`。
-- 草案若获通过对内部制度的改写预案：转交 `/cn-regulatory:policy-redraft`。
-- 草案对现状的潜在缺口评估：转交 `/cn-regulatory:gaps`。
+- 需先比对草案与现行规则差异：先转交 `crablaw-cn:policy-diff`。
+- 草案若获通过对内部制度的改写预案：转交 `crablaw-cn:policy-redraft`。
+- 草案对现状的潜在缺口评估：转交 `crablaw-cn:gaps`。

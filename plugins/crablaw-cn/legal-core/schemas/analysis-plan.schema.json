@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crablaw.local/schemas/legal-core/analysis-plan.schema.json",
+  "title": "CrabLaw-CN Analysis Plan",
+  "type": "object",
+  "required": ["schemaVersion", "planId", "runId", "matterId", "status", "createdAt", "updatedAt", "documentIds", "issues"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "planId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,120}$" },
+    "runId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,120}$" },
+    "matterId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,100}$" },
+    "status": { "enum": ["draft", "approved-internal", "in-progress", "blocked", "complete", "stale"] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "documentIds": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,120}$" },
+      "uniqueItems": true
+    },
+    "issues": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["issueId", "title", "priority", "status", "documentIds", "requiredResearch", "targetDomains"],
+        "properties": {
+          "issueId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,120}$" },
+          "title": { "type": "string", "minLength": 1 },
+          "priority": { "enum": ["critical", "high", "medium", "low"] },
+          "status": { "enum": ["planned", "in-progress", "blocked", "complete", "stale"] },
+          "documentIds": { "type": "array", "items": { "type": "string", "minLength": 2 }, "uniqueItems": true },
+          "requiredResearch": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+          "targetDomains": {
+            "type": "array",
+            "items": { "enum": ["contract", "data-compliance", "labor-employment", "corporate", "ip", "litigation", "ai-governance", "regulatory", "product", "legal-aid", "matter-core"] },
+            "uniqueItems": true
+          },
+          "blockingReason": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
