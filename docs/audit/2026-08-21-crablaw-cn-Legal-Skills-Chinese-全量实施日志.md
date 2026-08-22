@@ -190,7 +190,8 @@ presentation contract 还要求 `short-description` 和 `argument-hint`，两者
 
 本机最终验收已覆盖根仓库、Security 锁定上游差分、HTML Video、Media Ops、
 Media Publisher 和 actionlint；详细计数、环境差异及本机依赖修复均记录在上述补充
-审计文档。本轮未调用远端 CI。
+审计文档。合并前因旧 required checks 与人工调度事件不兼容，最终工程 HEAD 通过
+全局 API 人工运行 CI，run `32579055627` 为 8/8 success；没有恢复自动 CI。
 
 交付后最终复核结论：
 

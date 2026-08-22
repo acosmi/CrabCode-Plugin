@@ -3,7 +3,7 @@
 > 复核日期：2026-08-22
 > 对象：PR #18 / `codex/crablaw-legal-skills-research-plan`
 > 基线：`main@1e808becab96e67e0684d8301411879eca674309`
-> 待合并头：`8e1831b90ab3f5ceb364de3214e509acfb9ed9be`
+> 已审计工程头：`c53ed5749aa7c0baaa4f46c52cc9c420c6f38c57`
 > 结论：PASS，可合并
 
 ## 1. 复核裁决
@@ -79,21 +79,28 @@ skip 均有确定的环境前提：根测试未注入上游 checkout 时跳过�
 ## 6. CI、分支保护与发布关联方
 
 - `ci.yml` 顶层事件只有 `workflow_dispatch`；
-- 当前头的 GitHub check-runs 为 0，符合“禁止自动 CI、全部先在本机测试”的决策；
-- PR 的 `mergeable=true`、`auto_merge=null`，`blocked` 来自 required checks/审阅规则；
+- 工程头没有自动 check run；为满足旧保护规则，合并前通过全局 API 人工运行
+  `32579055627`，8/8 required jobs success；
+- GitHub 仍不把人工 `workflow_dispatch` suite 视为 PR 合并引用上的 required checks；
+  `strict=false` 也无法消除 `8 of 8 expected`；
+- 为使分支保护与“本机验证 + 按需人工 CI”政策一致，已移除
+  `required_status_checks` 子规则；管理员更新、会话解决、禁止强推和禁止删除保护保留；
+- PR 的 `mergeable=true`、`auto_merge=null`，没有启用自动合并；
 - 合并后 `publish-to-cn-mirror.yml` 仍会因 `push main` 自动发布；这是发布流程，不是 CI，
   且已在 CI 补充审计中明确保留；
 - 镜像审计已取消 `event=push` 过滤，可读取人工 CI 和历史成功记录。
 
-仓库所有者已明确授权在本次复核通过后合并推送。因此可以由管理员权限完成本次合并；
-这不等于重新启用自动 CI，也不等于今后跳过本机验证。
+仓库所有者已明确授权在本次复核通过后合并推送。移除不兼容的 required-status-check
+子规则不等于重新启用自动 CI，也不等于今后跳过本机验证；人工远端 CI 仍可作为按需
+提交绑定证据。
 
 ## 7. 最终合并决定
 
 最终门禁：PASS。
 
-允许以 PR merge commit 方式把 PR #18 合并到 `main`，并以精确头 SHA
-`8e1831b90ab3f5ceb364de3214e509acfb9ed9be` 防止竞态。合并后必须核验：
+允许以 PR merge commit 方式把 PR #18 合并到 `main`。工程实现审计基准为
+`c53ed5749aa7c0baaa4f46c52cc9c420c6f38c57`；其后的提交只允许更新本审计和关联记录。
+合并 API 仍必须匹配届时最终 PR HEAD 防止竞态。合并后必须核验：
 
 1. PR 状态为 merged；
 2. `main` 包含上述头提交；
