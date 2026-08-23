@@ -1,6 +1,6 @@
 {
   "name": "crabcode-setup",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Analyze a repository and recommend CrabCode-native automations such as skills, hooks, agents, plugins, and MCP servers.",
   "license": "Apache-2.0",
   "type": "module",
@@ -21,6 +21,7 @@
     "lint:mcp-contract": "bun run scripts/validate-mcp-contract.ts",
     "lint:doc-facts": "bun run scripts/lint-doc-facts.ts",
     "lint:workflow-triggers": "bun run scripts/validate-workflow-triggers.ts",
+    "test:mcp-upgrade-fixture": "bun run scripts/verify-mcp-upgrade-restart-fixture.ts",
     "validate": "bun run scripts/validate-all.ts",
     "test": "bun test ./tests/",
     "typecheck": "tsc --noEmit"

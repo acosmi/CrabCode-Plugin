@@ -1,6 +1,6 @@
 {
   "name": "clangd-lsp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "C/C++ language server (clangd) bridge for CrabCode, providing code intelligence, diagnostics, and formatting. Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"

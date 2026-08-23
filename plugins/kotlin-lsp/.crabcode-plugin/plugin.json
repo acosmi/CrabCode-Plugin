@@ -1,6 +1,6 @@
 {
   "name": "kotlin-lsp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Kotlin language server bridge for CrabCode, providing code intelligence, refactoring, and analysis. Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"

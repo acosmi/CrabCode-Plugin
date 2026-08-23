@@ -1,10 +1,16 @@
-# crabcode-media-ops 0.4.3
+# crabcode-media-ops 0.4.4
 
-> **MCP 安全暂停（2026-08-22）**：安全状态：本版本不发布可执行 MCP 配置；安装不会启动该服务或发起网络请求。 本文保留目标能力与后续接入资料，不代表当前版本已连接或可执行。
+> **MCP 安全暂停（2026-08-22）**：本版本不发布可执行 MCP 配置；安装不会启动该服务或发起网络请求。如果曾安装旧版，请先升级插件并重启 CrabCode；仅重载插件不能证明旧 MCP 客户端或进程已退出。下文任何 Connect、`.mcp.json`、端点、launcher 或启动描述均仅是历史配置/未来恢复审查参考，不代表本版本会生成配置、连接、启动或提供相应工具。
 
 可审计的新媒体运营插件：参考材料防火墙、联网可信来源研究、独立原创风险复核、创作者风格管理、精排白底 HTML 交付、可信身份约束的审批，以及冻结发布包。
 
-## 0.4.3 变更（MCP 紧急安全暂停）
+## 0.4.4 变更（MCP 深度复核整改）
+
+- 继续保持 `.mcp.json` 缺席及 `requiredMcpServers=[]`，不恢复任何执行入口。
+- 所有连接/启动说明改为历史或未来审查参考；旧安装必须升级插件并重启 CrabCode，单独 reload 不作为旧进程驱逐证据。
+- package、manifest、marketplace、runtime/serverInfo、dist 与 CycloneDX SBOM 统一为 `0.4.4`。
+
+## 0.4.3 历史变更（MCP 紧急安全暂停）
 
 - **发布面 fail-closed**：当前版本不发布 `.mcp.json`，`requiredMcpServers` 为空；安装或升级不会启动 mediaops sidecar，也不会由插件配置发起网络请求。
 - **能力边界**：sidecar 源码与确定性测试继续保留，供本机验证和后续宿主 principal 合同验收；依赖 `mediaops.*` 的治理步骤必须以 `MCP_INACTIVE` / `GATE_NOT_EXECUTED` 停止，不能把手工替代写成已治理结果。
@@ -19,7 +25,7 @@
 ## 0.4.1 历史变更（MCP 可用性修复，已由 0.4.3 暂停）
 
 - **生命周期声明**：manifest 增加 `requiredMcpServers: ["mediaops"]`，CrabCode ≥1.0.16 安装后自动激活本地 sidecar；用户显式 disable 始终优先。旧宿主上退化为 inactive，不崩溃。
-- **自包含发行物**：`.mcp.json` 直接执行入库的 `dist/server.js`（`bun --no-env-file`），启动不再执行任何安装步骤，离线冷启动实测亚秒到 2 秒完成 initialize/tools/list。Playwright/axe/vnu 为交付 QA 的惰性可选依赖，缺失时基础 MCP 全量可用、`delivery.verify` full 模式返回 `DEPENDENCY_NOT_READY`（static 模式始终可用）。`bun run check:distribution` 校验发行物新鲜度并做清洁目录冷启动 smoke。
+- **历史自包含发行物**：0.4.1 的 `.mcp.json` 曾直接执行入库 `dist/server.js`，且当时的离线冷启动与工具测试通过；0.4.3 已移除该执行配置，因此本段不代表当前 MCP 可用。`bun run check:distribution` 仅供保留源码的本机后续验证。
 - **身份模式**：`mcp_oauth`（team-governed，多真人主体）之外新增 `MEDIAOPS_IDENTITY_MODE=local-editorial`——单一可信本地用户（`local_editorial` 低保证），确定性机器操作（`originality.scan`、`delivery.render`、`content.save` 的 `serviceImport:true` 机械 intake 导入）由 `mediaops-server:service`（`service_account`）执行；`originality.review`、`editorial.review`、`approval.decide`、`profile.confirm` 等第二真人门禁保持 pending，绝不伪造多人治理。env 配置角色出现 `*` 通配将被直接拒绝。
 - **运行前预检**：`media-core/PRACTICE.md` 定义统一 preflight 与停止码（`MCP_INACTIVE`/`MCP_START_FAILED`/`MCP_TOOL_UNDISCOVERABLE`/`AUTHENTICATION_REQUIRED`/`ROLE_REQUIRED`/`DEPENDENCY_NOT_READY`/`GATE_NOT_EXECUTED`）；`mediaops.capabilities` 报告身份模式与停止码清单，`mediaops.doctor` 报告发行物、重依赖探测与逐工具阶段 readiness。报告中显示已完成的阶段必须附服务端权威 ID/哈希。
 - **编排边界**：子代理只返回结构化数据，全部 `mediaops.*` 状态调用由主线程执行并由 validator 强制（agents 文档不得直接引用 mediaops 工具）。
@@ -121,7 +127,7 @@ reference.register
 
 ## 自动 QA 与本地验收
 
-已验证的运行组合为 Bun 1.3.11、Java 17+（CI 使用 Java 21）、`vnu-jar` 26.7.15、Playwright 1.61.1、其捆绑 Chromium 149.0.7827.55 与 axe-core 4.12.1。缺少 Java、浏览器或版本不匹配时，`delivery.verify` 明确失败并保留报告，不会降级成手工“通过”。
+已验证的运行组合为 Bun 1.3.11、Java 17+（CI 使用 Java 21）、`vnu-jar` 26.7.15、Playwright 1.61.1、其锁定 Chromium revision 1228（macOS 实际产品版本 `149.0.7827.55`，Linux 固定镜像实际产品版本 `149.0.7827.0`）与 axe-core 4.12.1。平台必须命中该精确映射；未知平台、缺少 Java/浏览器或 patch 版本不匹配时，`delivery.verify` 明确失败并保留报告，不会降级成手工“通过”。
 
 ```bash
 bun install --frozen-lockfile

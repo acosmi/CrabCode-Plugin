@@ -1,6 +1,6 @@
 {
   "name": "crabwork-enterprise-search",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Search across all of your company's tools in one place. Find anything across email, chat, documents, and wikis without switching between apps. Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"

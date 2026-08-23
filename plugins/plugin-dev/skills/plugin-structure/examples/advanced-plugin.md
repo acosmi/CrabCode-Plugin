@@ -1,6 +1,7 @@
 # Advanced Plugin Example
 
-A complex, enterprise-grade plugin with MCP integration and advanced organization.
+A complex, enterprise-grade plugin structure example. MCP-backed capabilities
+are represented only as blocked proposals while containment is active.
 
 ## Directory Structure
 
@@ -64,18 +65,8 @@ enterprise-devops/
 │       └── workflow/
 │           ├── notify-team.sh
 │           └── update-status.sh
-├── .mcp.json
-├── servers/
-│   ├── kubernetes-mcp/
-│   │   ├── index.js
-│   │   ├── package.json
-│   │   └── lib/
-│   ├── terraform-mcp/
-│   │   ├── main.py
-│   │   └── requirements.txt
-│   └── github-actions-mcp/
-│       ├── server.js
-│       └── package.json
+├── proposals/
+│   └── mcp-capabilities.md   # blocked, non-executable inventory
 ├── lib/
 │   ├── core/
 │   │   ├── logger.js
@@ -137,43 +128,15 @@ enterprise-devops/
     "./agents/orchestration",
     "./agents/specialized"
   ],
-  "hooks": "./hooks/hooks.json",
-  "mcpServers": "./.mcp.json"
+  "hooks": "./hooks/hooks.json"
 }
 ```
 
-### .mcp.json
+### proposals/mcp-capabilities.md
 
-```json
-{
-  "mcpServers": {
-    "kubernetes": {
-      "command": "node",
-      "args": ["${CRABCODE_PLUGIN_ROOT}/servers/kubernetes-mcp/index.js"],
-      "env": {
-        "KUBECONFIG": "${KUBECONFIG}",
-        "K8S_NAMESPACE": "${K8S_NAMESPACE:-default}"
-      }
-    },
-    "terraform": {
-      "command": "python",
-      "args": ["${CRABCODE_PLUGIN_ROOT}/servers/terraform-mcp/main.py"],
-      "env": {
-        "TF_STATE_BUCKET": "${TF_STATE_BUCKET}",
-        "AWS_REGION": "${AWS_REGION}"
-      }
-    },
-    "github-actions": {
-      "command": "node",
-      "args": ["${CRABCODE_PLUGIN_ROOT}/servers/github-actions-mcp/server.js"],
-      "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}",
-        "GITHUB_ORG": "${GITHUB_ORG}"
-      }
-    }
-  }
-}
-```
+Use the `mcp-integration` Markdown proposal template. Keep runtime, endpoint,
+command, package, secrets, tool names, and activation unset; status remains
+`blocked / non-executable / not connected`.
 
 ### commands/ci/build.md
 
@@ -194,14 +157,8 @@ Trigger CI/CD build pipeline and monitor progress in real-time.
    - Check for uncommitted changes
    - Validate configuration files
 
-2. **Trigger**: Start build via MCP server
-   \`\`\`javascript
-   // Uses github-actions MCP server
-   const build = await tools.github_actions_trigger_workflow({
-     workflow: 'build.yml',
-     ref: currentBranch
-   })
-   \`\`\`
+2. **Trigger**: Stop with `CAPABILITY_BLOCKED` while the proposed external
+   build capability has no approved executable integration.
 
 3. **Monitor**: Track build progress
    - Display real-time logs
@@ -283,12 +240,11 @@ Specialized agent for orchestrating complex deployments across multiple environm
    - Restore previous state
    - Notify stakeholders
 
-## MCP Integration
+## Blocked MCP Capability Proposal
 
-Uses multiple MCP servers:
-- `kubernetes`: Deploy and manage containers
-- `terraform`: Provision infrastructure
-- `github-actions`: Trigger deployment pipelines
+Inventory Kubernetes operations, infrastructure provisioning, and deployment
+pipeline triggering as desired capabilities only. Do not select or configure a
+server, and do not claim these operations are available.
 
 ## Monitoring Integration
 
@@ -589,24 +545,11 @@ spec:
           averageUtilization: 70
 \`\`\`
 
-## MCP Server Integration
+## Blocked External Operations
 
-This skill works with the kubernetes MCP server for operations:
-
-**List pods**:
-\`\`\`javascript
-const pods = await tools.k8s_list_pods({ namespace: 'default' })
-\`\`\`
-
-**Get pod logs**:
-\`\`\`javascript
-const logs = await tools.k8s_get_logs({ pod: 'api-xyz', container: 'app' })
-\`\`\`
-
-**Apply manifests**:
-\`\`\`javascript
-const result = await tools.k8s_apply_manifest({ file: 'deployment.yaml' })
-\`\`\`
+Cluster listing, log retrieval, and manifest application require an approved
+integration that does not exist in this example. Stop with
+`CAPABILITY_BLOCKED`; do not invent tool names or calls.
 
 ## Detailed References
 
@@ -708,12 +651,10 @@ bash ${CRABCODE_PLUGIN_ROOT}/skills/kubernetes-ops/scripts/validate-manifest.sh 
 **Agents**: Separated by role (orchestration vs. specialized)
 **Skills**: Rich resources (references, examples, scripts)
 
-### MCP Integration
+### MCP Capability Inventory
 
-Three custom MCP servers:
-- **Kubernetes**: Cluster operations
-- **Terraform**: Infrastructure provisioning
-- **GitHub Actions**: CI/CD automation
+Three blocked proposals: Kubernetes operations, Terraform provisioning, and
+GitHub Actions automation. No server implementation or connection is included.
 
 ### Shared Libraries
 
@@ -762,7 +703,7 @@ Built-in monitoring via lib integrations:
 
 ## Scaling Considerations
 
-- **Performance**: Separate MCP servers for parallel operations
+- **Performance**: Evaluate concurrency only after an approved integration exists
 - **Organization**: Multi-level directories for scalability
 - **Maintainability**: Shared libraries reduce duplication
 - **Flexibility**: Environment configs enable customization

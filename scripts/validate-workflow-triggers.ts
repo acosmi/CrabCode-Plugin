@@ -11,5 +11,7 @@ if (issues.length > 0) {
   process.stderr.write(`${formatWorkflowTriggerIssues(issues)}\n`);
   process.exitCode = 1;
 } else {
-  process.stdout.write("validate-workflow-triggers: all workflows are API-manual only\n");
+  process.stdout.write(
+    "validate-workflow-triggers: all workflows are workflow_dispatch-only; release operations require recorded API dispatches\n",
+  );
 }

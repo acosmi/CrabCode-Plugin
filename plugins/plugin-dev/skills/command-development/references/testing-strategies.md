@@ -335,18 +335,10 @@ EOF
 # Verify: State file cleaned up
 ```
 
-**Scenario 3: Command + MCP Integration**
+**Scenario 3: Command + blocked external capability**
 
-```bash
-# Setup: Command uses MCP tools
-# Test: Verify MCP server accessible
-
-> /mcp-command
-# Verify:
-# 1. MCP server starts (if stdio)
-# 2. Tool calls succeed
-# 3. Results included in output
-```
+Verify the command stops with a clear unavailable state, uses no invented tool
+result, and falls back only to user-provided data while MCP remains contained.
 
 ## Automated Testing Approaches
 
@@ -627,7 +619,7 @@ Before releasing a command:
 ### Integration
 - [ ] Works with other commands
 - [ ] Works with hooks (if applicable)
-- [ ] Works with MCP (if applicable)
+- [ ] External MCP capability remains blocked and non-executable
 - [ ] State management works
 
 ### Quality

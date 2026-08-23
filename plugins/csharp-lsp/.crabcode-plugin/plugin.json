@@ -1,6 +1,6 @@
 {
   "name": "csharp-lsp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "C# language server bridge for CrabCode, providing code intelligence and diagnostics. Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"

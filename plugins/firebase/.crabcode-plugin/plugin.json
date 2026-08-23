@@ -1,6 +1,6 @@
 {
   "name": "firebase",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Google Firebase MCP integration for CrabCode. Manage Firestore, authentication, cloud functions, hosting, and storage directly from the development surface. Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"

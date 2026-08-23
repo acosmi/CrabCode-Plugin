@@ -226,70 +226,27 @@ Command hooks return JSON to stdout:
 
 Decisions: `approve`, `block`, `ask_user` (ask for confirmation).
 
-## MCP Servers
+## MCP Capability Proposal During Containment
 
-**Location**: `.mcp.json` at plugin root
-**Format**: JSON
+> The historical executable schemas below are withdrawn. Do not create
+> `.mcp.json`, manifest MCP declarations, endpoints, commands, packages, secret
+> bindings, or connection steps. Output only a blocked Markdown inventory.
 
-### Server Types
+**Location**: `proposals/mcp-capabilities.md`
+**Format**: Markdown
+**Required status**: `blocked / non-executable / not connected`
 
-**stdio** (local process):
+Record only:
 
-```json
-{
-  "mcpServers": {
-    "my-server": {
-      "command": "node",
-      "args": ["${CRABCODE_PLUGIN_ROOT}/servers/server.js"],
-      "env": {
-        "API_KEY": "${API_KEY}"
-      }
-    }
-  }
-}
-```
+- user-visible capability and accountable owner;
+- data read/write classes;
+- desired identity, consent, and approval boundaries;
+- fail-closed behavior when unavailable;
+- provenance, security, exact-release, host lifecycle, upgrade/restart, E2E,
+  and rollback evidence still required.
 
-**SSE** (remote server, server-sent events transport):
-
-```json
-{
-  "mcpServers": {
-    "asana": {
-      "type": "sse",
-      "url": "https://mcp.asana.com/sse"
-    }
-  }
-}
-```
-
-**HTTP** (remote server, streamable HTTP transport):
-
-```json
-{
-  "mcpServers": {
-    "api-service": {
-      "type": "http",
-      "url": "https://api.example.com/mcp",
-      "headers": {
-        "Authorization": "Bearer ${API_TOKEN}"
-      }
-    }
-  }
-}
-```
-
-### Environment Variable Expansion
-
-All MCP configs support `${VAR_NAME}` substitution:
-
-- `${CRABCODE_PLUGIN_ROOT}` — plugin directory (always use for portability)
-- `${ANY_ENV_VAR}` — user environment variables
-
-Document all required environment variables in the plugin README.
-
-### Directory Servers Without a URL
-
-Some MCP directory entries have no `url` because the endpoint is dynamic. Plugins can reference these servers by **name** instead — if the server name in the plugin's MCP config matches the directory entry name, it is treated the same as a URL match.
+Leave transport, endpoint, command, package, secret bindings, tool names, and
+activation unset. This inventory cannot be renamed into an executable config.
 
 ## Commands (Legacy)
 
@@ -343,8 +300,9 @@ allowed-tools: Read, Write, Edit, Bash(git:*)
 # Bash with specific commands only
 allowed-tools: Bash(npm:*), Read
 
-# MCP tools (specific)
-allowed-tools: ["mcp__plugin_name_server__tool_name"]
+# MCP tools are not authorable by a stable guessed namespace. During the
+# containment baseline, record the required capability in the blocked proposal
+# inventory and leave it out of allowed-tools.
 ```
 
 ## CONNECTORS.md

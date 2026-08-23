@@ -1,18 +1,18 @@
 # CrabWork 生命科学研究
 
-> **MCP 安全暂停（2026-08-22）**：安全状态：本版本不发布可执行 MCP 配置；安装不会启动该服务或发起网络请求。 本文保留目标能力与后续接入资料，不代表当前版本已连接或可执行。
+> **MCP 安全暂停（2026-08-22）**：本版本不发布可执行 MCP 配置；安装不会启动该服务或发起网络请求。如果曾安装旧版，请先升级插件并重启 CrabCode；仅重载插件不能证明旧 MCP 客户端或进程已退出。下文任何 Connect、`.mcp.json`、端点、launcher 或启动描述均仅是历史配置/未来恢复审查参考，不代表本版本会生成配置、连接、启动或提供相应工具。
 
-连接临床前研究工具与数据库(文献检索、基因组学分析、靶点优先级排序),加速生命科学早期研发。可独立使用,也可在 CrabCode 中直接安装使用。
+提供可独立使用的生命科学分析方法；历史目标包括文献检索、基因组学分析与靶点优先级排序等外部数据能力，当前均未连接。
 
 > 基于上游开源知识工作插件(Apache-2.0)二次开发,已去品牌化并适配 CrabCode 生态;上游出处与许可信息见 [docs/legal/THIRD_PARTY_NOTICES.md](docs/legal/THIRD_PARTY_NOTICES.md)。
 
-本插件将 11 个 MCP 服务集成与 5 个分析技能整合到一个面向生命科学研究者的统一包中。
+本版本保留 5 个分析技能；下列 11 个 MCP 服务仅为历史/未来能力目录，当前不集成、不连接。
 
 ## 包含内容
 
-### MCP 服务(数据源与工具)
+### 历史 MCP 服务目录（当前不可用）
 
-> 如遇陌生占位符或需确认已连接的工具,请参阅 [CONNECTORS.md](CONNECTORS.md)。
+> 下列占位符仅帮助理解未来能力分类；当前连接数为 0。
 
 | 提供方 | 功能 | 类别/占位符 |
 |---|---|---|
@@ -28,9 +28,9 @@
 | Owkin | 面向生物学的 AI——组织病理与药物发现 | `~~AI research` |
 | Benchling\* | 实验室数据管理平台 | `~~lab platform` |
 
-### 可选二进制 MCP 服务
+### 历史二进制候选（当前不可下载或启动）
 
-以下服务需单独下载二进制文件:
+以下项目曾作为候选记录；不要按本插件下载或启动：
 
 - **10X Genomics txg-mcp**(`~~genomics platform`)——云端分析数据与工作流([GitHub](https://github.com/10XGenomics/txg-mcp/releases))
 - **ToolUniverse**(`~~tool database`)——哈佛 MIMS 出品的科学发现 AI 工具集([GitHub](https://github.com/mims-harvard/ToolUniverse/releases))
@@ -59,7 +59,7 @@
 
 在 CrabCode 插件市场中搜索「CrabWork 生命科学研究」并安装,或通过 marketplace 添加 `crabwork-bio-research`。
 
-安装后运行 `/start` 命令,查看可用工具并完成环境初始化。
+安装后只能使用随包技能处理用户直接提供的材料；不要期待 `/start` 初始化 MCP 工具。
 
 ## 常用工作流
 

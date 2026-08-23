@@ -476,24 +476,11 @@ Plugin hooks merge with user's hooks and run in parallel.
 "matcher": "*"
 ```
 
-**Regex patterns:**
-```json
-"matcher": "mcp__.*__delete.*"  // All MCP delete tools
-```
-
 **Note:** Matchers are case-sensitive.
 
 ### Common Patterns
 
 ```json
-// All MCP tools
-"matcher": "mcp__.*"
-
-// A specific MCP server's tools. Plugin-provided servers are exposed under a
-// generated prefix, not the plugin name — run /mcp to read the actual tool
-// names first, then match on what you see. Do not hand-assemble the prefix.
-"matcher": "mcp__p_[a-z0-9]+__.*"
-
 // All file operations
 "matcher": "Read|Write|Edit"
 

@@ -128,7 +128,27 @@ function ensureBrowserHooks(): void {
 const REQUIRED_PLAYWRIGHT_VERSION = '1.61.1'
 const REQUIRED_AXE_VERSION = '4.12.1'
 const REQUIRED_VNU_VERSION = '26.7.15'
-const REQUIRED_CHROMIUM_VERSION = '149.0.7827.55'
+export const REQUIRED_CHROMIUM_VERSIONS = {
+  darwin: '149.0.7827.55',
+  linux: '149.0.7827.0',
+} as const
+
+export function requiredChromiumVersion(platform: NodeJS.Platform): string {
+  const version = REQUIRED_CHROMIUM_VERSIONS[
+    platform as keyof typeof REQUIRED_CHROMIUM_VERSIONS
+  ]
+  if (!version) {
+    throw new Error(`qa_infrastructure_failed: unsupported Chromium QA platform ${platform}`)
+  }
+  return version
+}
+
+export function matchesRequiredChromiumVersion(
+  actual: string,
+  platform: NodeJS.Platform,
+): boolean {
+  return actual === requiredChromiumVersion(platform)
+}
 const VIEWPORTS = [320, 375, 768, 1440] as const
 const COLOR_SCHEMES = ['light', 'dark'] as const
 const WHITE = 'rgb(255, 255, 255)'
@@ -573,6 +593,7 @@ async function runBrowserQa(args: {
   queueWaitMs: number
 }): Promise<{ report: QaArtifactRef; status: QaStatus; checks: QaCheckResult[]; evidence: QaArtifactRef[]; chromiumVersion: string | null; errors: string[] }> {
   ensureBrowserHooks()
+  const requiredChromium = requiredChromiumVersion(process.platform)
   const screenshotsRoot = join(args.qaRoot, 'screenshots')
   const printRoot = join(args.qaRoot, 'print')
   await mkdir(screenshotsRoot, { recursive: true })
@@ -589,7 +610,7 @@ async function runBrowserQa(args: {
       playwright: args.playwrightVersion,
       axe: args.axeVersion,
       chromium: null,
-      requiredChromium: REQUIRED_CHROMIUM_VERSION,
+      requiredChromium,
       executablePath: process.env.MEDIAOPS_QA_CHROMIUM_EXECUTABLE?.trim() || '',
     },
     timing: {
@@ -619,8 +640,10 @@ async function runBrowserQa(args: {
     const { browser, launchMs } = await getSharedBrowser(executablePath)
     reportData.timing.browserLaunchMs = launchMs
     reportData.tools.chromium = browser.version()
-    if (reportData.tools.chromium !== REQUIRED_CHROMIUM_VERSION) {
-      reportData.errors.push(`Expected bundled Chromium ${REQUIRED_CHROMIUM_VERSION}, found ${reportData.tools.chromium}.`)
+    if (!matchesRequiredChromiumVersion(reportData.tools.chromium, process.platform)) {
+      reportData.errors.push(
+        `Expected bundled Chromium ${requiredChromium} on ${process.platform}, found ${reportData.tools.chromium}.`,
+      )
     }
     server = await startArtifactServer(args.artifactRoot)
     const relativeHtml = relative(args.artifactRoot, args.htmlPath).split(sep).map(encodeURIComponent).join('/')

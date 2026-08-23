@@ -77,20 +77,25 @@ Use this workflow for structured, high-quality plugin development from concept t
 
 **Trigger phrases:** "add MCP server", "integrate MCP", "configure .mcp.json", "Model Context Protocol", "stdio/SSE/HTTP server", "connect external service"
 
+> **MCP emergency safe baseline:** the MCP integration skill currently produces
+> only a blocked, non-executable capability/evidence proposal. It does not emit
+> `.mcp.json`, manifest MCP declarations, endpoints, launcher commands, MCPB
+> references, installation steps, or connection claims.
+
 **What it covers:**
-- MCP server configuration (.mcp.json vs plugin.json)
-- All server types: stdio (local), SSE (hosted/OAuth), HTTP (REST), WebSocket (real-time)
-- Environment variable expansion (${CRABCODE_PLUGIN_ROOT}, user vars)
-- MCP tool naming and usage in commands/agents
-- Authentication patterns: OAuth, tokens, env vars
-- Integration patterns and performance optimization
+- User-visible capability and accountable-owner inventory
+- Data, privilege, identity, consent, and fail-closed risk boundaries
+- Local/remote/MCPB runtime families as risks only, with no selected transport
+- Provenance, security, provider E2E, host lifecycle, upgrade/restart, release,
+  rollback, and post-publish evidence requirements
 
 **Resources:**
-- Core SKILL.md
-- 3 example configurations (stdio, SSE, HTTP)
-- 3 reference docs: server-types (~3,200w), authentication (~2,800w), tool-usage (~2,600w)
+- Proposal-only core SKILL.md
+- 1 blocked non-executable Markdown inventory template
+- 3 concise risk references: runtime, authentication, and tool-usage evidence
 
-**Use when:** Integrating external services, APIs, databases, or tools into your plugin.
+**Use when:** Recording a future external capability for review while executable
+MCP authoring and connection remain blocked.
 
 ### 3. plugin-structure
 
@@ -212,12 +217,12 @@ crabcode --plugin-dir /path/to/plugin-dev
 ### Creating Your First Plugin
 
 1. **Plan your plugin structure:**
-   - Ask: "What's the best directory structure for a plugin with commands and MCP integration?"
+   - Ask: "What's the best directory structure for a plugin with skills and hooks?"
    - The plugin-structure skill will guide you
 
-2. **Add MCP integration (if needed):**
-   - Ask: "How do I add an MCP server for database access?"
-   - The mcp-integration skill provides examples and patterns
+2. **Inventory future MCP needs (if any):**
+   - Ask: "What evidence would a future database capability need?"
+   - The mcp-integration skill returns a blocked, non-executable proposal only
 
 3. **Implement hooks (if needed):**
    - Ask: "Create a PreToolUse hook that validates file writes"
@@ -241,8 +246,8 @@ The plugin-dev toolkit supports your entire plugin development lifecycle:
 └──────────┬──────────┘
            │
 ┌──────────▼──────────┐
-│  Integrate Services │  → mcp-integration skill
-│  (MCP servers)      │
+│  Inventory Services │  → mcp-integration skill
+│  (blocked proposal) │
 └──────────┬──────────┘
            │
 ┌──────────▼──────────┐
@@ -291,9 +296,10 @@ SCRIPTS=skills/hook-development/scripts
 
 ### Working Examples
 
-Every skill provides working examples:
+Implementation skills provide working examples; MCP skills provide blocked
+inventories only:
 - **hook-development**: 3 complete hook scripts (bash, write validation, context loading)
-- **mcp-integration**: 3 server configurations (stdio, SSE, HTTP)
+- **mcp-integration**: 1 non-executable capability/evidence proposal
 - **plugin-structure**: 3 plugin layouts (minimal, standard, advanced)
 - **plugin-settings**: 3 examples (read-settings hook, create-settings command, templates)
 - **command-development**: 10 complete command examples (review, test, deploy, docs, etc.)
@@ -311,19 +317,19 @@ All skills follow consistent standards:
 
 - **Core Skills**: 7 SKILL.md files
 - **Reference Docs**: detailed guides per skill
-- **Examples**: working examples (hook scripts, MCP configs, plugin layouts, settings files)
+- **Examples**: working non-MCP examples plus blocked MCP proposal templates
 - **Utilities**: validation/testing/parsing scripts
 
 ## Use Cases
 
-### Building a Database Plugin
+### Planning a Database-Capability Plugin
 
 ```
-1. "What's the structure for a plugin with MCP integration?"
+1. "What's the structure for a plugin with database guidance?"
    → plugin-structure skill provides layout
 
-2. "How do I configure an stdio MCP server for PostgreSQL?"
-   → mcp-integration skill shows configuration
+2. "What risks and evidence would future database access require?"
+   → mcp-integration records a blocked proposal without runtime details
 
 3. "Add a Stop hook to ensure connections close properly"
    → hook-development skill provides pattern
@@ -344,17 +350,17 @@ All skills follow consistent standards:
 
 ```
 
-### Integrating External Services
+### Inventorying Future External Capabilities
 
 ```
-1. "Add Asana MCP server with OAuth"
-   → mcp-integration skill covers SSE servers
+1. "Inventory a future Asana-backed capability"
+   → mcp-integration records identity, data, consent, and evidence gaps
 
-2. "Use Asana tools in my commands"
-   → mcp-integration tool-usage reference
+2. "Define the fail-closed behavior while it is unavailable"
+   → keep commands tool-independent or use user-provided data
 
-3. "Structure my plugin with commands and MCP"
-   → plugin-structure skill provides patterns
+3. "Record what a future review must prove"
+   → no config, endpoint, tool name, or connection instruction is emitted
 ```
 
 ## Best Practices
@@ -363,8 +369,8 @@ All skills emphasize:
 
 ✅ **Security First**
 - Input validation in hooks
-- HTTPS/WSS for MCP servers
-- Environment variables for credentials
+- MCP capabilities remain blocked non-executable proposals
+- No endpoints, launchers, packages, or credential bindings
 - Principle of least privilege
 
 ✅ **Portability**

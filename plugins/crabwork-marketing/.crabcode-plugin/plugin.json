@@ -1,6 +1,6 @@
 {
   "name": "crabwork-marketing",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Create content, plan campaigns, and analyze performance across marketing channels. Maintain brand voice consistency, track competitors, and report on what's working. Executable MCP configuration is intentionally paused in this release.",
   "license": "Apache-2.0",
   "author": {

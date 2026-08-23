@@ -28,6 +28,18 @@ function normalize(text: string): string {
   return text.replace(/\r\n/g, '\n')
 }
 
+function checkBuildPathLeaks(text: string, label: string): void {
+  const leaked = [
+    ...text.matchAll(/\/(?:Users|home|private\/tmp|tmp)\/[^\s"'`)>\]]+/gu),
+    ...text.matchAll(/[A-Za-z]:\\Users\\[^\s"'`)>\]]+/gu),
+  ].map((match) => match[0])
+  if (leaked.length > 0) {
+    errors.push(
+      `${label} bundle leaks an absolute build path: ${[...new Set(leaked)].slice(0, 3).join(', ')}`,
+    )
+  }
+}
+
 async function buildToTemp(): Promise<string> {
   const pkg = JSON.parse(await readFile(join(pluginRoot, 'package.json'), 'utf8')) as { scripts?: Record<string, string> }
   const buildScript = pkg.scripts?.build
@@ -47,6 +59,8 @@ async function buildToTemp(): Promise<string> {
 async function checkFreshness(tempOut: string): Promise<void> {
   const committed = normalize(await readFile(join(pluginRoot, 'dist', 'server.js'), 'utf8'))
   const rebuilt = normalize(await readFile(join(tempOut, 'server.js'), 'utf8'))
+  checkBuildPathLeaks(committed, 'committed')
+  checkBuildPathLeaks(rebuilt, 'rebuilt')
   if (committed !== rebuilt) {
     errors.push('dist/server.js is stale: rebuild output differs from the committed bundle. Run `bun run build` and commit dist/server.js.')
   }

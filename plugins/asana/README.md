@@ -1,17 +1,17 @@
 # Asana
 
-> **MCP 安全暂停（2026-08-22）**：安全状态：本版本不发布可执行 MCP 配置；安装不会启动该服务或发起网络请求。 本文保留目标能力与后续接入资料，不代表当前版本已连接或可执行。
+> **MCP 安全暂停（2026-08-22）**：本版本不发布可执行 MCP 配置；安装不会启动该服务或发起网络请求。如果曾安装旧版，请先升级插件并重启 CrabCode；仅重载插件不能证明旧 MCP 客户端或进程已退出。下文任何 Connect、`.mcp.json`、端点、launcher 或启动描述均仅是历史配置/未来恢复审查参考，不代表本版本会生成配置、连接、启动或提供相应工具。
 
-CrabCode integration with the Asana MCP server. Create tasks, search projects,
-update assignments, and track progress from the same surface you use for code.
+Historical Asana MCP integration metadata. The current package provides no
+Asana tools or connection.
 
-## Connect
+## Historical connection reference (inactive)
 
-The bundled `.mcp.json` points at `https://mcp.asana.com/sse`. Sign in through
-Asana when the MCP client prompts. No additional environment variables are
-required at the plugin level.
+The removed `.mcp.json` pointed at the legacy Asana SSE endpoint. This endpoint
+is retained only as incident history; do not copy it or attempt sign-in from
+this plugin.
 
-## What you can do
+## Historical target capabilities (not available)
 
 - List, search, and filter tasks across workspaces
 - Create and update tasks, including assignees, due dates, and custom fields
@@ -20,5 +20,5 @@ required at the plugin level.
 
 ## Notes
 
-This plugin only wires the Asana MCP server into CrabCode. Tool availability,
-rate limits, and authentication scope are governed by Asana.
+Future restoration would require provider and host E2E, security review, and a
+new approved release. The current plugin does not wire an Asana server.

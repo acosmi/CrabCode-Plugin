@@ -1,6 +1,6 @@
 {
   "name": "rust-analyzer-lsp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "type": "module",
   "description": "Rust language server (rust-analyzer) bridge for CrabCode, providing code intelligence and analysis.",

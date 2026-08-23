@@ -7,6 +7,11 @@ version: 0.1.0
 
 # Plugin Structure for CrabCode
 
+> **MCP containment boundary:** This skill must not add `.mcp.json`, manifest
+> `mcpServers`, JSON/MCPB references, endpoints, launcher commands, or activation
+> instructions. If MCP-backed capability is requested, hand off to
+> `mcp-integration` for a blocked, non-executable Markdown proposal only.
+
 ## Overview
 
 CrabCode plugins follow a standardized directory structure with automatic component discovery. Understanding this structure enables creating well-organized, maintainable plugins that integrate seamlessly with CrabCode.
@@ -33,7 +38,6 @@ plugin-name/
 │       └── SKILL.md         # Required for each skill
 ├── hooks/
 │   └── hooks.json           # Event handler configuration
-├── .mcp.json                # MCP server definitions
 └── scripts/                 # Helper scripts and utilities
 ```
 
@@ -93,8 +97,7 @@ Specify custom paths for components (supplements default directories):
   "name": "plugin-name",
   "commands": "./custom-commands",
   "agents": ["./agents", "./specialized-agents"],
-  "hooks": "./config/hooks.json",
-  "mcpServers": "./.mcp.json"
+  "hooks": "./config/hooks.json"
 }
 ```
 
@@ -231,28 +234,13 @@ hooks/
 
 **Usage**: Hooks execute automatically in response to CrabCode events
 
-### MCP Servers
+### MCP-backed capabilities during containment
 
-**Location**: `.mcp.json` at plugin root or inline in `plugin.json`
-**Format**: JSON configuration for MCP server definitions
-**Auto-start**: Servers start automatically when plugin enables
-
-**Example format**:
-```json
-{
-  "mcpServers": {
-    "server-name": {
-      "command": "node",
-      "args": ["${CRABCODE_PLUGIN_ROOT}/servers/server.js"],
-      "env": {
-        "API_KEY": "${API_KEY}"
-      }
-    }
-  }
-}
-```
-
-**Usage**: MCP servers integrate seamlessly with CrabCode's tool system
+Executable MCP files and manifest declarations are outside this structure
+skill's permitted output. Record the desired capability, data classes,
+identity/consent boundary, fail-closed behavior, owner, and missing release
+evidence in the `mcp-integration` proposal template. Keep runtime, endpoint,
+package, command, secrets, and activation unset.
 
 ## Portable Path References
 
@@ -334,7 +322,6 @@ source "${CRABCODE_PLUGIN_ROOT}/lib/common.sh"
 
 **Configuration**: Use standard names
 - `hooks.json`
-- `.mcp.json`
 - `plugin.json`
 
 ## Auto-Discovery Mechanism
@@ -346,12 +333,16 @@ CrabCode automatically discovers and loads components:
 3. **Agents**: Scans `agents/` directory for `.md` files
 4. **Skills**: Scans `skills/` for subdirectories containing `SKILL.md`
 5. **Hooks**: Loads configuration from `hooks/hooks.json` or manifest
-6. **MCP servers**: Loads configuration from `.mcp.json` or manifest
+6. **MCP containment**: Published executable MCP configuration is rejected by
+   the repository gate except for the separately owned canonical html-video
+   sidecar; this skill never creates that exception
 
 **Discovery timing**:
 - Plugin installation: Components register with CrabCode
 - Plugin enable: Components become available for use
-- No restart required: Changes take effect on next CrabCode session
+- Component changes take effect on the next CrabCode session. Plugin upgrades
+  that remove historical MCP configuration require upgrading the plugin and
+  restarting CrabCode; reload is not an eviction proof.
 
 **Override behavior**: Custom paths in `plugin.json` supplement (not replace) default directories
 
@@ -428,7 +419,6 @@ my-plugin/
 ├── hooks/             # Event handlers
 │   ├── hooks.json
 │   └── scripts/
-├── .mcp.json          # External integrations
 └── scripts/           # Shared utilities
 ```
 

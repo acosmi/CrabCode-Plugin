@@ -7,12 +7,19 @@ description: >
   tailor, adapt, personalize, tweak, or modify a plugin — including first-time setup of a generic plugin
   template, filling in placeholders, "make this plugin work for my team / for us / for Asana / for Slack",
   "set up the plugin for our org", updating a plugin's connectors, skill, ticket tool, channel, or URLs,
-  connecting MCPs for the tools a plugin references, or repackaging a plugin after edits.
+  inventorying proposed MCP capabilities for later security review, or repackaging a plugin after edits.
 ---
 
 # Plugin Customization
 
 Customize a plugin for a specific organization — either by setting up a generic plugin template for the first time, or by tweaking and refining an already-configured plugin.
+
+> **Emergency MCP boundary:** While the repository MCP safe baseline is active,
+> this skill must not create, edit, copy, or package `.mcp.json`; add manifest
+> `mcpServers`; reference an MCPB path/URL; emit a launcher command or endpoint;
+> call a connector installation action; or claim that a proposed integration is
+> connected. MCP-related output is limited to the non-executable inventory in
+> `examples/mcp-integration-proposal.md` and must be labelled `blocked`.
 
 > **Finding the plugin**: To find the plugin's source files, locate the plugin directory under the local plugins root, e.g. run `find . -type d -name "*<plugin-name>*"` from the plugins directory, then read its files to understand its structure before making changes.
 
@@ -94,17 +101,21 @@ Work through each item using context from Phase 0 and Phase 1.
 
 If user doesn't know or skips, leave the value unchanged (or the `~~`-prefixed placeholder, for generic setup).
 
-### Phase 4: Search for Useful MCPs
+### Phase 4: Inventory Proposed MCP Capabilities
 
-After customization items have been resolved, connect MCPs for any tools that were identified or changed. See `references/mcp-servers.md` for the full workflow, category-to-keywords mapping, and config file format.
+After customization items have been resolved, record the capabilities that
+would require MCP in a non-executable proposal. See `references/mcp-servers.md`.
 
 For each tool identified during customization:
 
-1. Search the registry: `search_mcp_registry(keywords=[...])` using category keywords from `references/mcp-servers.md`, or search for the specific tool name if already known
-2. If unconnected: `suggest_connectors(directoryUuids=["chosen-uuid"])` — user completes auth
-3. Update the plugin's MCP config file (check `plugin.json` for custom location, otherwise `.mcp.json` at root)
+1. Record the user-visible capability and provider name.
+2. Record data classes, desired authentication model, and owner.
+3. Mark runtime, endpoint, command, package, and activation as `blocked / not selected`.
+4. List provenance, security, release-gate, and host-lifecycle evidence still required.
 
-Collect all MCP results and present them together in the summary output (see below) — don't present MCPs one at a time during this phase.
+Do not search for or copy an endpoint into the plugin, do not invoke a Connect
+flow, and do not add any executable reference. Collect proposals together in
+the summary and state that they are neither installed nor connected.
 
 ## Packaging the Plugin
 
@@ -122,7 +133,7 @@ After all customizations are applied, package the plugin as a `.plugin` file for
 
 ## Summary Output
 
-After customization, present the user with a summary of what was learned grouped by source. Always include the MCPs sections showing which MCPs were connected during setup and which ones the user should still connect:
+After customization, present the user with a summary of what was learned grouped by source. If MCP-backed capabilities were identified, add one `Blocked MCP proposals` section and explicitly say that nothing was installed, connected, or activated:
 
 ```markdown
 ## From searching Slack
@@ -139,14 +150,15 @@ After customization, present the user with a summary of what was learned grouped
 - Ticket statuses are: Backlog, In Progress, In Review, Done
 ```
 
-Then present the MCPs that were connected during setup and any that the user should still connect, with instructions on how to connect them.
+Then present only the capability inventory and missing review evidence. Do not
+provide connection instructions or an executable configuration.
 
-If no knowledge MCPs were available in Phase 1, and the user had to answer at least one question manually, include a note at the end:
-
-> By the way, connecting sources like Slack or Microsoft Teams would let me find answers automatically next time you customize a plugin.
+If no approved knowledge source was available in Phase 1, simply state that the
+customization used the user's direct answers. Do not recommend connecting a new
+source during containment.
 
 ## Additional Resources
 
-- **`references/mcp-servers.md`** — MCP discovery workflow, category-to-keywords mapping, config file locations
+- **`references/mcp-servers.md`** — containment-era non-executable proposal workflow
 - **`references/search-strategies.md`** — Knowledge MCP query patterns for finding tool names and org values
-- **`examples/customized-mcp.json`** — Example fully configured `.mcp.json`
+- **`examples/mcp-integration-proposal.md`** — non-executable inventory template

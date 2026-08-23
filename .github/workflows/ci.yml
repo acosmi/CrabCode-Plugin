@@ -16,7 +16,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Checkout full history for the old-to-safe MCP fixture
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
 
       - name: Lint GitHub Actions workflows
         env:
@@ -30,7 +33,15 @@ jobs:
             "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
           printf '%s  %s\n' "${ACTIONLINT_SHA256}" "${ARCHIVE}" | sha256sum -c -
           tar -xzf "${ARCHIVE}" -C "${RUNNER_TEMP}" actionlint
-          "${RUNNER_TEMP}/actionlint" .github/workflows/*.yml
+          mapfile -d '' WORKFLOWS < <(
+            find .github/workflows -maxdepth 1 -type f \
+              \( -name '*.yml' -o -name '*.yaml' \) -print0
+          )
+          [ "${#WORKFLOWS[@]}" -gt 0 ] || {
+            echo "::error::no workflow files found"
+            exit 1
+          }
+          "${RUNNER_TEMP}/actionlint" "${WORKFLOWS[@]}"
 
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
@@ -81,7 +92,23 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - run: bun install --frozen-lockfile
-      - run: python -m pip install pdfplumber==0.11.9 reportlab==4.4.9 pypdf==6.10.0
+      - name: Install Python-version-compatible strong PDF dependencies
+        env:
+          PYTHON_VERSION: ${{ matrix.python-version }}
+        run: |
+          set -euo pipefail
+          # pdfplumber 0.11.9 pins pdfminer.six 20251230, whose Python>=3.10
+          # requirement makes the declared 3.9 cell impossible to install.
+          # 0.11.7 is the latest compatible line for this test-only 3.9 cell.
+          case "${PYTHON_VERSION}" in
+            3.9) PDFPLUMBER_VERSION=0.11.7 ;;
+            3.13) PDFPLUMBER_VERSION=0.11.9 ;;
+            *) echo "::error::unreviewed Python matrix version ${PYTHON_VERSION}"; exit 1 ;;
+          esac
+          python -m pip install \
+            "pdfplumber==${PDFPLUMBER_VERSION}" \
+            reportlab==4.4.9 \
+            pypdf==6.10.0
       - run: bun run typecheck
       - run: bun run test
       - run: bun run check:distribution
@@ -202,9 +229,11 @@ jobs:
 
       - run: bun install --frozen-lockfile
       - run: bun run typecheck
-      - run: bun run build:mcp
-      - run: bun test ./tests ./packages
+      # Freshness must run before any build can overwrite the checkout. The
+      # checker rebuilds into an isolated temp directory and byte-compares it.
       - run: bun run check:distribution
+      - run: bun test ./tests ./packages
+      - run: bun src/doctor-cli.ts --check-only
       - name: Verify committed standalone bundle is complete and current
         run: |
           git ls-files --error-unmatch dist/bootstrap.js dist/server.js dist/hyperframe.manifest.json dist/hyperframe.runtime.iife.js

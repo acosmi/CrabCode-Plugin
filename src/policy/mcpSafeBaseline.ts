@@ -12,6 +12,38 @@ export const MCP_SAFE_BASELINE_ID = "mcp-emergency-safe-baseline-v1";
 export const MCP_ALLOWED_PLUGIN = "crabcode-html-video";
 export const MCP_ALLOWED_SERVER = "html-video";
 
+/**
+ * The only executable MCP configuration allowed in the published repository.
+ * Keep this as data rather than reconstructing it in the validator so a field,
+ * argument, environment entry, or extra property cannot silently widen the
+ * emergency exception.
+ */
+export const MCP_ALLOWED_CONFIG = {
+  mcpServers: {
+    [MCP_ALLOWED_SERVER]: {
+      command: "bun",
+      args: [
+        "--no-env-file",
+        "--cwd",
+        "${CRABCODE_PLUGIN_ROOT}",
+        "${CRABCODE_PLUGIN_ROOT}/dist/bootstrap.js",
+      ],
+      env: {
+        CRABCODE_HTML_VIDEO_DATA: "${CRABCODE_PLUGIN_DATA}",
+      },
+    },
+  },
+} as const;
+
+export const MCP_ALLOWED_CONFIG_PATH =
+  `plugins/${MCP_ALLOWED_PLUGIN}/.mcp.json` as const;
+
+/** Both files are part of the trusted local bootstrap chain. */
+export const MCP_ALLOWED_ARTIFACTS = [
+  "dist/bootstrap.js",
+  "dist/server.js",
+] as const;
+
 /** Stable user-facing disclosure required on every paused marketplace entry. */
 export const MCP_PAUSED_MARKETPLACE_MARKER =
   "安全状态：本版本不发布可执行 MCP 配置；安装不会启动该服务或发起网络请求。";

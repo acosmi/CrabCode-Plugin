@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "evidenceId": "mcp-remediation-local-matrix-contract-v1",
+  "commands": {
+    "root": "bun install --frozen-lockfile && bun run typecheck && bun test ./tests/ && bun run build && bun run lint:brand && bun run scripts/lint-brand.ts dist && bun run validate && actionlint .github/workflows/*.yml",
+    "html-video": "bun install --frozen-lockfile && bun run validate && git diff --exit-code -- dist",
+    "media-ops": "bun install --frozen-lockfile && bun run typecheck && bun run check:distribution && bun run test && bun run test:qa && bun run qa:release && bun run validate",
+    "media-publisher": "bun install --frozen-lockfile && bun run lint && bun run test && bun run qa:nu && CRABPUBLISH_SKIP_VISUAL=1 bun run test:browser",
+    "crabcopyright": "bun install --frozen-lockfile && bun run typecheck && bun run test && bun run check:distribution && bun run scripts/verify-codesucker-port.ts && python -m py_compile scripts/*.py && bun test ../../tests/crabcopyright-cn/",
+    "security": "bun run scripts/verify-crabcode-security-port.ts \"$CRABCODE_SECURITY_UPSTREAM_CHECKOUT\" && bun run scripts/build-crabcode-security-port-patch.ts --check \"$CRABCODE_SECURITY_UPSTREAM_CHECKOUT\" && bun test ./tests/crabcode-security/ && sh -n plugins/crabcode-security/hooks/banner_hook.sh && python -m py_compile plugins/crabcode-security/hooks/banner_notice.py plugins/crabcode-security/scripts/patch_artifacts.py plugins/crabcode-security/scripts/render_report.py plugins/crabcode-security/scripts/write_scan_meta.py && test \"$(git ls-files -s plugins/crabcode-security/hooks/banner_hook.sh plugins/crabcode-security/hooks/banner_notice.py plugins/crabcode-security/scripts/patch_artifacts.py plugins/crabcode-security/scripts/render_report.py plugins/crabcode-security/scripts/write_scan_meta.py | cut -d' ' -f1 | sort -u)\" = \"100755\"",
+    "host-plugin-mcp": "bun run scripts/run-bun-test.ts ./tests/unit/plugin-installation-transaction.test.ts ./tests/unit/official-marketplace-gcs-transport-hardening.test.ts ./tests/unit/official-marketplace-add-gcs-first.test.ts ./tests/unit/plugin-lifecycle-generation.test.ts ./tests/unit/plugin-mcp-lifecycle.test.ts ./tests/unit/plugin-mcp-stale-tool-revoke.test.ts ./tests/unit/plugin-mcp-activation-source.test.ts",
+    "old-to-safe-fixture": "bun run test:mcp-upgrade-fixture"
+  },
+  "cells": {
+    "root-macos-arm64": { "commandId": "root", "environment": { "os": "macos", "architecture": "arm64", "bun": "1.3.11", "workingDirectory": "CrabCode-Plugin" } },
+    "root-linux-arm64": { "commandId": "root", "environment": { "os": "linux", "architecture": "arm64", "bun": "1.3.11", "workingDirectory": "CrabCode-Plugin" } },
+    "html-video-macos-arm64": { "commandId": "html-video", "environment": { "os": "macos", "architecture": "arm64", "bun": "1.3.11", "workingDirectory": "plugins/crabcode-html-video" } },
+    "html-video-linux-arm64": { "commandId": "html-video", "environment": { "os": "linux", "architecture": "arm64", "bun": "1.3.11", "workingDirectory": "plugins/crabcode-html-video" } },
+    "media-ops-macos-arm64": { "commandId": "media-ops", "environment": { "os": "macos", "architecture": "arm64", "bun": "1.3.11", "javaMajor": "21", "workingDirectory": "plugins/crabcode-media-ops" } },
+    "media-ops-linux-playwright-arm64": { "commandId": "media-ops", "environment": { "os": "linux", "architecture": "arm64", "bun": "1.3.11", "javaMajor": "21", "containerDigest": "sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48", "workingDirectory": "plugins/crabcode-media-ops" } },
+    "media-publisher-macos-arm64": { "commandId": "media-publisher", "environment": { "os": "macos", "architecture": "arm64", "bun": "1.3.11", "javaMajor": "21", "workingDirectory": "plugins/crabcode-media-publisher" } },
+    "media-publisher-linux-playwright-arm64": { "commandId": "media-publisher", "environment": { "os": "linux", "architecture": "arm64", "bun": "1.3.11", "javaMajor": "21", "containerDigest": "sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48", "workingDirectory": "plugins/crabcode-media-publisher" } },
+    "crabcopyright-macos-python3.9": { "commandId": "crabcopyright", "environment": { "os": "macos", "architecture": "arm64", "bun": "1.3.11", "python": "3.9.25", "workingDirectory": "plugins/crabcopyright-cn" } },
+    "crabcopyright-macos-python3.13": { "commandId": "crabcopyright", "environment": { "os": "macos", "architecture": "arm64", "bun": "1.3.11", "python": "3.13.12", "workingDirectory": "plugins/crabcopyright-cn" } },
+    "crabcopyright-linux-python3.9": { "commandId": "crabcopyright", "environment": { "os": "linux", "architecture": "arm64", "bun": "1.3.11", "python": "3.9.25", "workingDirectory": "plugins/crabcopyright-cn" } },
+    "crabcopyright-linux-python3.13": { "commandId": "crabcopyright", "environment": { "os": "linux", "architecture": "arm64", "bun": "1.3.11", "python": "3.13.12", "workingDirectory": "plugins/crabcopyright-cn" } },
+    "security-macos-python3.9": { "commandId": "security", "environment": { "os": "macos", "architecture": "arm64", "bun": "1.3.11", "python": "3.9.25", "workingDirectory": "CrabCode-Plugin", "upstreamCommit": "4b3d2a2a965ce1a36eb4b03078db891ab46bc257", "upstreamTree": "0961f052c654edbaf6d5f5c1da676920ddc38706" } },
+    "security-macos-python3.13": { "commandId": "security", "environment": { "os": "macos", "architecture": "arm64", "bun": "1.3.11", "python": "3.13.12", "workingDirectory": "CrabCode-Plugin", "upstreamCommit": "4b3d2a2a965ce1a36eb4b03078db891ab46bc257", "upstreamTree": "0961f052c654edbaf6d5f5c1da676920ddc38706" } },
+    "security-linux-python3.9": { "commandId": "security", "environment": { "os": "linux", "architecture": "arm64", "bun": "1.3.11", "python": "3.9.25", "workingDirectory": "CrabCode-Plugin", "upstreamCommit": "4b3d2a2a965ce1a36eb4b03078db891ab46bc257", "upstreamTree": "0961f052c654edbaf6d5f5c1da676920ddc38706" } },
+    "security-linux-python3.13": { "commandId": "security", "environment": { "os": "linux", "architecture": "arm64", "bun": "1.3.11", "python": "3.13.12", "workingDirectory": "CrabCode-Plugin", "upstreamCommit": "4b3d2a2a965ce1a36eb4b03078db891ab46bc257", "upstreamTree": "0961f052c654edbaf6d5f5c1da676920ddc38706" } },
+    "host-plugin-mcp-unit-suite": { "commandId": "host-plugin-mcp", "environment": { "os": "macos", "architecture": "arm64", "bun": "1.3.11", "workingDirectory": "CrabCode-host", "hostRepository": "CrabCode", "hostCommit": "199d9c27817e9de9d3f47752087a9db5ec7a09c8", "hostTree": "eadc9670af3e44649805b87a7ac8c1fa645b3789", "hostTrackedClean": "true" } },
+    "old-to-safe-dual-process-fixture": { "commandId": "old-to-safe-fixture", "environment": { "os": "macos", "architecture": "arm64", "bun": "1.3.11", "workingDirectory": "CrabCode-Plugin" } }
+  }
+}

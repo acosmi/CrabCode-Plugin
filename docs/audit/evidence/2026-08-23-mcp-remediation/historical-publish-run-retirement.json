@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-08-23T09:28:15Z",
+  "repository": "acosmi/CrabCode-Plugin",
+  "workflow": {
+    "id": 336369746,
+    "name": "Publish official plugin marketplace to China mirror",
+    "path": ".github/workflows/publish-to-cn-mirror.yml"
+  },
+  "githubListEvidence": {
+    "command": "gh run list --repo acosmi/CrabCode-Plugin --workflow publish-to-cn-mirror.yml --limit 100 --json databaseId,headSha,event,status,conclusion,createdAt,updatedAt,url,workflowName",
+    "returnedRunCount": 3
+  },
+  "control": {
+    "findingId": "P1-REL-02",
+    "type": "delete-historical-runs-and-migrate-safe-publisher-identity",
+    "status": "unbypassable-control-verified",
+    "verifiedUnbypassableControl": "historical-runs-deleted",
+    "verifiedAt": "2026-08-23T15:25:38Z",
+    "reason": "All three credential-bearing historical push runs were archived locally and permanently deleted after explicit user authorization. GitHub API now reports total_count=0/workflow_runs=[] for workflow ID 336369746, and each known run ID returns 404. The old workflow remains disabled as a fail-only tombstone; safe publication moves to publish-safe-to-cn-mirror.yml under a distinct workflow identity.",
+    "deletionVerification": {
+      "deletedRunIds": [32579374255, 32579303978, 32050757636],
+      "workflowRunsApiTotalCount": 0,
+      "workflowRunsApiIds": [],
+      "individualRunHttpStatus": {
+        "32579374255": 404,
+        "32579303978": 404,
+        "32050757636": 404
+      },
+      "recoverable": false
+    },
+    "disabledWorkflow": {
+      "id": 336369746,
+      "path": ".github/workflows/publish-to-cn-mirror.yml",
+      "requiredState": "disabled_manually",
+      "observedState": "disabled_manually",
+      "observedUpdatedAt": "2026-08-23T10:52:51Z",
+      "safeReplacementPath": ".github/workflows/publish-safe-to-cn-mirror.yml",
+      "safeReplacementWorkflowId": null,
+      "safeReplacementRegistrationStatus": "awaiting-default-branch-merge",
+      "runtimeGate": "scripts/validate-retired-publisher.py"
+    },
+    "rerunNegativeTest": {
+      "status": "not-executed",
+      "reason": "The safety approval layer rejected intentionally invoking the credential-bearing historical publisher. GitHub documents disabled workflows as stopped from being triggered; publisher and auditor additionally fail closed unless the API state remains disabled_manually."
+    },
+    "archivedTextLogs": {
+      "capturedAt": "2026-08-23T12:24:22Z",
+      "storage": "restricted local out-of-repository audit directory",
+      "sourceCommand": "gh run view <run-id> --repo acosmi/CrabCode-Plugin --log",
+      "files": [
+        {
+          "runId": 32579374255,
+          "fileName": "32579374255.log",
+          "sizeBytes": 585855,
+          "sha256": "369b122139914e072da7eebf64e62502851103b7c121a573928bb8b2a843abeb"
+        },
+        {
+          "runId": 32579303978,
+          "fileName": "32579303978.log",
+          "sizeBytes": 574238,
+          "sha256": "130d2d31d25230008584770062df3aaa7caa05e169ec84327b00a83d96443d55"
+        },
+        {
+          "runId": 32050757636,
+          "fileName": "32050757636.log",
+          "sizeBytes": 573788,
+          "sha256": "e929f690ab7ddb9589bb81f0cc23d6432aac04971f8237f236b822812f282c37"
+        }
+      ]
+    }
+  },
+  "runs": [
+    {
+      "databaseId": 32579374255,
+      "runNumber": 3,
+      "runAttempt": 1,
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "headBranch": "main",
+      "headSha": "2e0b1266dcc4c34f8930cd589ce7aaedd6aa0f10",
+      "headTree": "ff937e235237c40c9ff43702ec5ae5b520f3fdaf",
+      "createdAt": "2026-08-22T14:40:09Z",
+      "updatedAt": "2026-08-22T14:40:48Z",
+      "actor": "acosmi-fushihua",
+      "checkSuiteId": 88302863441,
+      "displayTitle": "Merge pull request #18 from codex/crablaw-legal-skills-research-plan",
+      "url": "https://github.com/acosmi/CrabCode-Plugin/actions/runs/32579374255"
+    },
+    {
+      "databaseId": 32579303978,
+      "runNumber": 2,
+      "runAttempt": 1,
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "headBranch": "main",
+      "headSha": "c09298c49d2030392a5d388a8a4d997743c7870c",
+      "headTree": "7c2b47aa58a50a3bdfe80d46d3cb10d508a2bac6",
+      "createdAt": "2026-08-22T14:38:46Z",
+      "updatedAt": "2026-08-22T14:39:26Z",
+      "actor": "acosmi-fushihua",
+      "checkSuiteId": 88302696920,
+      "displayTitle": "Merge pull request #19 from acosmi/codex/acosmi-mcp-audit-plan",
+      "url": "https://github.com/acosmi/CrabCode-Plugin/actions/runs/32579303978"
+    },
+    {
+      "databaseId": 32050757636,
+      "runNumber": 1,
+      "runAttempt": 1,
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "headBranch": "main",
+      "headSha": "1e808becab96e67e0684d8301411879eca674309",
+      "headTree": "739149a4a5cb3a1144869467d32feba59b7de3f5",
+      "createdAt": "2026-08-17T17:32:06Z",
+      "updatedAt": "2026-08-17T17:32:47Z",
+      "actor": "acosmi-fushihua",
+      "checkSuiteId": 86886432399,
+      "displayTitle": "Merge pull request #16 from acosmi/feat/publish-workflow-migration-20260817",
+      "url": "https://github.com/acosmi/CrabCode-Plugin/actions/runs/32050757636"
+    }
+  ]
+}

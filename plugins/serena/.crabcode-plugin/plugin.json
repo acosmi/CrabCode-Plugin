@@ -1,6 +1,6 @@
 {
   "name": "serena",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Serena MCP integration for CrabCode. Semantic code navigation, refactoring suggestions, and codebase understanding via language-server integration. Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"

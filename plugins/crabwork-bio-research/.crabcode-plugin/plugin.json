@@ -1,6 +1,6 @@
 {
   "name": "crabwork-bio-research",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Connect to preclinical research tools and databases (literature search, genomics analysis, target prioritization) to accelerate early-stage life sciences R&D Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"
