@@ -13,9 +13,22 @@
   },
   "control": {
     "findingId": "P1-REL-02",
-    "type": "disable-historical-workflow-id-and-migrate-safe-publisher-identity",
-    "status": "defense-in-depth-disabled-awaiting-unbypassable-control",
-    "reason": "All three historical workflow versions ran on push and retain a rerun URL that can reuse repository-level mirror credentials. Workflow ID 336369746 was disabled through the GitHub API while preserving all run metadata/logs; the old path is retained as a failing tombstone and safe publication moves to publish-safe-to-cn-mirror.yml under a distinct workflow identity. No additional runs were returned by the workflow-scoped GitHub API query.",
+    "type": "delete-historical-runs-and-migrate-safe-publisher-identity",
+    "status": "unbypassable-control-verified",
+    "verifiedUnbypassableControl": "historical-runs-deleted",
+    "verifiedAt": "2026-08-23T15:25:38Z",
+    "reason": "All three credential-bearing historical push runs were archived locally and permanently deleted after explicit user authorization. GitHub API now reports total_count=0/workflow_runs=[] for workflow ID 336369746, and each known run ID returns 404. The old workflow remains disabled as a fail-only tombstone; safe publication moves to publish-safe-to-cn-mirror.yml under a distinct workflow identity.",
+    "deletionVerification": {
+      "deletedRunIds": [32579374255, 32579303978, 32050757636],
+      "workflowRunsApiTotalCount": 0,
+      "workflowRunsApiIds": [],
+      "individualRunHttpStatus": {
+        "32579374255": 404,
+        "32579303978": 404,
+        "32050757636": 404
+      },
+      "recoverable": false
+    },
     "disabledWorkflow": {
       "id": 336369746,
       "path": ".github/workflows/publish-to-cn-mirror.yml",
