@@ -116,7 +116,166 @@ describe("version consistency validator", () => {
     );
     const messages = (await validateVersionConsistency(root)).map((issue) => issue.message).join("\n");
     expect(messages).toContain('plugin "alpha" changed distributable source bytes; expected version 1.0.1, got 1.0.0');
-    expect(messages).toContain('changed plugin "alpha" must be listed with previous=1.0.0 and remediation=1.0.1');
+    expect(messages).toContain('changed plugin "alpha" must be listed with previous=1.0.0 and release=1.0.1');
+  });
+
+  test("requires an independent contract for the release after remediation", async () => {
+    const root = await makeTempRoot();
+    await writeJson(path.join(root, ".crabcode-plugin", "marketplace.json"), {
+      metadata: { version: "1.0.0" },
+      plugins: [{ name: "alpha", source: "./plugins/alpha", version: "1.0.0" }],
+    });
+    await writeJson(path.join(root, "plugins/alpha/.crabcode-plugin/plugin.json"), {
+      name: "alpha",
+      version: "1.0.0",
+    });
+    await writeFile(path.join(root, "plugins/alpha/README.md"), "baseline\n");
+    for (const args of [
+      ["init"],
+      ["config", "user.email", "test@example.invalid"],
+      ["config", "user.name", "Version Test"],
+      ["add", "."],
+      ["commit", "-m", "baseline"],
+    ]) execFileSync("git", ["-C", root, ...args]);
+    const baselineCommit = execFileSync("git", ["-C", root, "rev-parse", "HEAD"], {
+      encoding: "utf8",
+    }).trim();
+    const baselineTree = execFileSync("git", ["-C", root, "rev-parse", "HEAD^{tree}"], {
+      encoding: "utf8",
+    }).trim();
+
+    await writeFile(path.join(root, "plugins/alpha/README.md"), "remediation\n");
+    await writeJson(path.join(root, ".crabcode-plugin", "marketplace.json"), {
+      metadata: { version: "1.0.1" },
+      plugins: [{ name: "alpha", source: "./plugins/alpha", version: "1.0.1" }],
+    });
+    await writeJson(path.join(root, "plugins/alpha/.crabcode-plugin/plugin.json"), {
+      name: "alpha",
+      version: "1.0.1",
+    });
+    await writeJson(
+      path.join(root, "docs/audit/evidence/2026-08-23-mcp-remediation/remediation-release.json"),
+      {
+        baseline: { commit: baselineCommit, tree: baselineTree, marketplaceVersion: "1.0.0" },
+        remediation: { marketplaceVersion: "1.0.1" },
+        changedPluginCount: 1,
+        changedPlugins: [{
+          pluginId: "alpha",
+          previousVersion: "1.0.0",
+          remediationVersion: "1.0.1",
+          reason: "fixture",
+        }],
+      },
+    );
+    expect(await validateVersionConsistency(root)).toEqual([]);
+    for (const args of [
+      ["add", "."],
+      ["commit", "-m", "remediation"],
+    ]) execFileSync("git", ["-C", root, ...args]);
+    const remediationCommit = execFileSync("git", ["-C", root, "rev-parse", "HEAD"], {
+      encoding: "utf8",
+    }).trim();
+    const remediationTree = execFileSync("git", ["-C", root, "rev-parse", "HEAD^{tree}"], {
+      encoding: "utf8",
+    }).trim();
+
+    await writeFile(path.join(root, "plugins/alpha/README.md"), "later release\n");
+    await writeJson(path.join(root, ".crabcode-plugin", "marketplace.json"), {
+      metadata: { version: "1.0.2" },
+      plugins: [{ name: "alpha", source: "./plugins/alpha", version: "1.0.2" }],
+    });
+    await writeJson(path.join(root, "plugins/alpha/.crabcode-plugin/plugin.json"), {
+      name: "alpha",
+      version: "1.0.2",
+    });
+    expect((await validateVersionConsistency(root)).map((issue) => issue.message).join("\n"))
+      .toContain("advanced beyond 1.0.1 without its own release version contract");
+
+    await writeJson(
+      path.join(root, "docs/audit/evidence/releases/marketplace-1.0.2.json"),
+      {
+        baseline: {
+          commit: remediationCommit,
+          tree: remediationTree,
+          marketplaceVersion: "1.0.1",
+        },
+        release: { marketplaceVersion: "1.0.2" },
+        changedPluginCount: 1,
+        changedPlugins: [{
+          pluginId: "alpha",
+          previousVersion: "1.0.1",
+          releaseVersion: "1.0.2",
+          reason: "fixture",
+        }],
+      },
+    );
+    expect(await validateVersionConsistency(root)).toEqual([]);
+  });
+
+  test("binds plugin additions and removals explicitly in a release contract", async () => {
+    const root = await makeTempRoot();
+    await writeJson(path.join(root, ".crabcode-plugin", "marketplace.json"), {
+      metadata: { version: "1.0.0" },
+      plugins: [{ name: "alpha", source: "./plugins/alpha", version: "1.0.0" }],
+    });
+    await writeJson(path.join(root, "plugins/alpha/.crabcode-plugin/plugin.json"), {
+      name: "alpha",
+      version: "1.0.0",
+    });
+    for (const args of [
+      ["init"],
+      ["config", "user.email", "test@example.invalid"],
+      ["config", "user.name", "Version Test"],
+      ["add", "."],
+      ["commit", "-m", "baseline"],
+    ]) execFileSync("git", ["-C", root, ...args]);
+    const baselineCommit = execFileSync("git", ["-C", root, "rev-parse", "HEAD"], {
+      encoding: "utf8",
+    }).trim();
+    const baselineTree = execFileSync("git", ["-C", root, "rev-parse", "HEAD^{tree}"], {
+      encoding: "utf8",
+    }).trim();
+
+    await writeJson(path.join(root, ".crabcode-plugin", "marketplace.json"), {
+      metadata: { version: "1.0.1" },
+      plugins: [{ name: "beta", source: "./plugins/beta", version: "0.1.0" }],
+    });
+    await writeJson(path.join(root, "plugins/beta/.crabcode-plugin/plugin.json"), {
+      name: "beta",
+      version: "0.1.0",
+    });
+    const contractPath = path.join(
+      root,
+      "docs/audit/evidence/2026-08-23-mcp-remediation/remediation-release.json",
+    );
+    const contract = {
+      baseline: { commit: baselineCommit, tree: baselineTree, marketplaceVersion: "1.0.0" },
+      remediation: { marketplaceVersion: "1.0.1" },
+      changedPluginCount: 2,
+      changedPlugins: [
+        {
+          pluginId: "alpha",
+          changeType: "remove",
+          previousVersion: "1.0.0",
+          remediationVersion: null,
+          reason: "fixture",
+        },
+        {
+          pluginId: "beta",
+          changeType: "add",
+          previousVersion: null,
+          remediationVersion: "0.1.0",
+          reason: "fixture",
+        },
+      ],
+    };
+    await writeJson(contractPath, contract);
+    expect(await validateVersionConsistency(root)).toEqual([]);
+
+    contract.changedPlugins[0]!.remediationVersion = "0.0.0";
+    await writeJson(contractPath, contract);
+    expect((await validateVersionConsistency(root)).map((issue) => issue.message).join("\n"))
+      .toContain('changedPlugins entry "alpha" does not declare a valid add, update, or remove transition');
   });
 
   test("flags marketplace version drifting from plugin.json", async () => {
