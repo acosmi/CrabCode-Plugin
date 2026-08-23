@@ -2086,3 +2086,286 @@ Content-Security-Policy: ... frame-src 'self' blob: ... frame-ancestors 'none'
 ```
 
 因此任务代码已提交，4174 开发服务器可访问；本分支没有 upstream、未推送、未合并。工作树只剩用户原有的四个 `crabcode-html-video/dist` 删除。
+## 2026-07-15：CrabCode `fea30c131` 敌意复核审计
+
+### 隔离、范围与基线
+
+用户要求对下游 CrabCode 提交 `fea30c131` 做深度毁灭性复核，核对关联影响、正确性与回归。该请求是审计而非新的修复授权，因此本轮不修改 CrabCode 源码、不合并、不推送；只执行静态调用链检查、攻击夹具、门禁复跑和证据归档。
+
+主插件工作区同时已有另一任务修改本执行日志并产生 media-ops 文件；下游 CrabCode 工作区也出现与本审计无关的 `docs/video/` 未跟踪目录。为不覆盖共享改动，从 CrabAccount 已完成提交创建隔离审计分支和工作树，仅提交本节日志：
+
+```text
+$ git worktree add -b codex/crabaccount-validator-adversarial-audit /Users/fushihua/Desktop/CrabCode-Plugin-wt-validator-audit codex/crabaccount-migration
+Preparing worktree (new branch 'codex/crabaccount-validator-adversarial-audit')
+HEAD is now at 3afa5ae docs: close CrabAccount execution audit
+```
+
+下游真实基线与提交边界：
+
+```text
+$ git status --short --branch
+## codex/crabaccount-validator-optional-hooks
+
+$ git show --stat --oneline fea30c131
+fea30c131 fix(plugin): accept safely missing optional hooks
+ src/utils/plugins/validatePlugin.ts            | 21 +++++++++++++++++++--
+ tests/unit/plugin-realpath-containment.test.ts | 24 ++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+), 2 deletions(-)
+
+$ git rev-parse HEAD
+fea30c131142eef3dfbc5ab49039cc55531859d1
+
+$ git rev-parse fea30c131^
+f05292a3948d85eb6b1bb4c94df83d0d4f572738
+
+$ git merge-base fea30c131 main
+f05292a3948d85eb6b1bb4c94df83d0d4f572738
+```
+
+审计期间后出现的 `?? docs/video/` 与本任务无关，未读取内容、未删除、未暂存；本提交的两个跟踪文件始终无工作树改动。
+
+### 第一性根因与真实影响面
+
+父提交中的 `validateHooksJson()` 只把原生 errno `ENOENT` 当作可选 hooks 缺失；但 2026-07-09 接入的路径安全层会在读取前把缺失目标封装为无 `code` 字段的 `PluginPathSecurityError(reason='path-missing')`。`getErrnoCode()` 只读取字符串 `error.code`，因此真正无 `hooks/hooks.json` 的纯技能插件被错误判为校验失败。
+
+```text
+$ git show fea30c131^:src/utils/plugins/validatePlugin.ts | sed -n '840,900p'
+...
+const code = getErrnoCode(e)
+// ENOENT is fine — hooks are optional
+if (code === 'ENOENT') { return success }
+...
+
+$ sed -n '120,140p' src/utils/errors.ts
+export function getErrnoCode(e: unknown): string | undefined {
+  if (e && typeof e === 'object' && 'code' in e && typeof e.code === 'string') {
+    return e.code
+  }
+  return undefined
+}
+```
+
+调用检索确认 `validatePluginContents()` 的生产调用者只有 `src/cli/handlers/plugins.ts::pluginValidateHandler()`；其余命中均为测试。因此 `fea30c131` 只改变 `crabcode plugin validate` 的内容校验结果，不改变插件安装、加载、hooks 执行、权限、协议、网络、配置、数据或 agent runtime。CrabAccount 无 hooks 在旧校验器里是假失败，但 runtime 本来就允许该可选文件缺失。
+
+本提交收到 `path-missing` 后，用同一 resolver 以 `mustExist:false` 再解析一次；只有最深既有祖先可规范化且目标仍在插件根内，才接受为普通缺失。对本调用点逐分支推演与攻击夹具确认：
+
+- 真正缺失的 `hooks/` 或 `hooks/hooks.json`：通过；
+- 合法 hooks、非法 JSON：分别通过、失败；
+- 末端悬空链接、悬空父链接、包外父链接：失败；
+- `hooks` 是普通文件、`hooks.json` 是目录：失败；
+- 读取解析后的原生 `ENOENT` 仍保留旧有“可选文件在竞态中消失则接受”的语义；该分支不是本提交新增。
+
+### 临时攻击矩阵与方法偏离
+
+第一次尝试用 `bun -e` 直接导入源码模块，因未经过仓库 build/test launcher 的宏注入而失败；这是审计方法错误，不是产品失败，同一方法未重复三次：
+
+```text
+$ bun -e '<adversarial matrix>'
+ReferenceError: MACRO is not defined
+at src/tools/AgentTool/AgentTool.tsx:101:17
+Bun v1.3.11 (macOS arm64)
+[exit 1]
+```
+
+随后按仓库规定使用临时 Bun test 夹具和 `scripts/run-bun-test.ts`。夹具只用于审计，运行后用 `apply_patch` 删除；删除后 CrabCode 的两个任务文件无未提交变化。
+
+```text
+$ bun scripts/run-bun-test.ts ./tests/unit/crabaccount-validator-adversarial-audit.tmp.test.ts
+(pass) ordinary absence remains accepted
+(pass) valid hooks remain accepted
+(pass) invalid hooks JSON remains rejected
+(pass) final dangling symlink is rejected
+(pass) dangling parent symlink is rejected
+(pass) outside parent symlink with missing child is rejected
+(pass) non-directory hooks parent is rejected
+(pass) hooks.json directory is rejected
+AUDIT_DANGLING_SKILLS validatorFailures=0 loaderErrors=0
+AUDIT_DANGLING_MCP manifestSuccess=true errors=0
+AUDIT_DANGLING_RUNTIME_HOOKS loaded=false loaderErrors=0
+11 pass
+0 fail
+13 expect() calls
+Ran 11 tests across 1 file. [405.00ms]
+```
+
+### 敌意发现与裁决
+
+**直接改动裁决：通过，正向且未发现引入回归。** 新接受集合只增加“可证明在根内的普通缺失 hooks”；新拒绝集合保留悬空/越界/不可解析现有节点。没有把安全错误宽泛吞掉，且影响面仅为显式 CLI validator。
+
+**M1（继承缺口，非 `fea30c131` 回归）：底层分类未形成单一根因闭环。** `canonicalizeCandidate()` 的注释声明 dangling/cyclic link 不能按普通缺失处理，但 `mustExist:true` 分支在 `realpath()` 返回 `ENOENT/ENOTDIR` 时立即抛 `path-missing`，没有先 `lstat()` 消歧。于是所有把 `path-missing` 当作可选缺失的调用方都可能重现同类假阴性。攻击夹具实证：悬空 `skills` 在 validator 和 loader 均零错误；悬空默认 `.mcp.json` 的 manifest 校验成功；runtime 对悬空默认 hooks 不加载但也不记录错误。未观察到包外读取或执行，因为目标一旦存在，后续每次解析仍会做 realpath containment；问题是安全分类和诊断静默，不是本提交新增的越界执行。
+
+该事实与 `docs/audit/2026-07-09-S2-插件真实路径封闭-实施报告.md` 所写“dangling/cyclic link 不按普通缺失处理”“不将安全拒绝伪装成普通缺失”存在架构偏差。`fea30c131` 是必要且安全的局部兼容修复，但不应被表述为整个路径安全层的根因闭环。若另立项修根，应在 `canonicalizeCandidate()` 统一消歧，并逐一复验所有 `path-missing` 消费者；不能机械全局替换，也不能在本次审计中顺手扩大范围。
+
+**L1（诊断质量）：二次解析错误被空 catch 丢弃。** 悬空 hooks 虽被正确拒绝，返回给用户的仍是第一次 `path-missing` 错误，而不是二次解析得到的 `path-unresolvable/path-escape`。新增负向测试只断言存在任一失败，未锁定 `fileType='hooks'`、错误原因和消息分类。该问题不改变通过/失败结果，但削弱故障定位和未来反漂移能力。
+
+**L2（跨平台证据）：Windows 只能判为未实机验证。** 新的末端悬空 file symlink 测试在 Windows 无 Developer Mode/管理员权限时直接 early-return；本提交没有新增免特权 junction 父路径夹具。本机 macOS POSIX symlink 矩阵通过，不能冒充 Windows 真机验收。
+
+### 完整门禁真实输出
+
+```text
+$ bun scripts/run-bun-test.ts ./tests/unit/plugin-realpath-containment.test.ts
+40 pass
+0 fail
+76 expect() calls
+Ran 40 tests across 1 file. [473.00ms]
+
+$ bunx biome check src/utils/plugins/validatePlugin.ts tests/unit/plugin-realpath-containment.test.ts
+Checked 2 files in 15ms. No fixes applied.
+
+$ bun run lint
+$ bash ci/check-protocol-facade.sh && bash ci/check-render-use-promise.sh
+✓ render-use gate: no unstable promise passed into use().
+
+$ bun run typecheck
+$ tsc --noEmit
+[exit 0]
+
+$ bun run build
+Built dist/index.js (1 output(s), version 1.0.15, build-id 1.0.15+fea30c131142)
+
+$ bun run test
+5247 pass
+3 skip
+13 todo
+0 fail
+17442 expect() calls
+Ran 5263 tests across 475 files. [82.99s]
+
+$ env CRABCODE_CONFIG_DIR=/tmp/crabcode-validator-audit-config CRABCODE_DISABLE_TELEMETRY=1 bun dist/index.js plugin validate /Users/fushihua/Desktop/CrabCode-Plugin/plugins/crabaccount/.crabcode-plugin/plugin.json
+Validating plugin manifest: /Users/fushihua/Desktop/CrabCode-Plugin/plugins/crabaccount/.crabcode-plugin/plugin.json
+✔ Validation passed
+[exit 0]
+
+$ git diff --check fea30c131^ fea30c131
+[无输出]
+```
+
+### 最终结论
+
+- `fea30c131` 可判定为低风险、正向、无已发现回归的窄修复；若目标只是让合法无-hooks 插件通过 CLI 校验，该提交可用。
+- 它不是 CrabAccount 运行所必需的 runtime 改动，而是通用 CLI validator 的兼容修复；不合并时 CrabAccount 仍可加载，但旧 validator 会假失败。
+- 不把该提交升级宣称为路径安全根因彻底修复；M1/L1/L2 应作为独立后续审计输入。
+- 截至该次审计结束，下游分支保持 `codex/crabaccount-validator-optional-hooks`，提交仍为 `fea30c131`；未合并 main、未推送、未改全局安装态。
+
+## 2026-07-15：CrabFin-CN `audit-xls` refs warning 根因修复
+
+### 隔离、技能使用与基线
+
+- 主工作树 `/Users/fushihua/Desktop/CrabCode-Plugin` 当时位于 `codex/media-ops-integrity-html`，存在 media-ops 未提交改动；未读取、覆盖、暂存或删除这些改动。
+- 从已完成审计提交 `6c332011d8e649eedc585f9ffb68ef2d3eb72ab6` 建立隔离工作树 `/Users/fushihua/Desktop/CrabCode-Plugin-wt-crabfin-routing` 和任务分支 `codex/crabfin-audit-xls-routing` 后才修改文件。
+- 本次属于既有技能改进，按 `skill-creator` 核对名称保持、能力依赖、真实降级和验证。其完整多智能体 A/B 基准用于主观或大范围技能迭代；本次是确定性的单路由缺口，且用户要求避免过度工程，因此没有生成大规模评测工作区，而以现有引用校验单测、315 技能正文防漂移哈希和全仓门禁验证。未派 subagent。
+
+基线真实输出：
+
+```text
+$ git worktree add -b codex/crabfin-audit-xls-routing /Users/fushihua/Desktop/CrabCode-Plugin-wt-crabfin-routing 6c332011d8e649eedc585f9ffb68ef2d3eb72ab6
+Preparing worktree (new branch 'codex/crabfin-audit-xls-routing')
+HEAD is now at 6c33201 docs: audit CrabCode optional hooks validator
+
+$ bun run lint:refs
+$ bun run scripts/validate-references.ts
+WARNING plugins/crabfin-cn/fin-core/skills/audit-xls/SKILL.md: 正文命中「办公文档产出/电子表格」关键词(excel、电子表格)但无路由引导——请引用 `crabcode-office-suite:crabcode-spreadsheets` 路由段,或添加 <!-- capability-route: office-spreadsheets=none(理由) --> 显式豁免
+lint:refs — 0 error(s), 1 warning(s)
+```
+
+### 第一性根因、影响面与架构裁决
+
+`git blame` 与 `git show 20a68b1` 证明，提交 `20a68b11418a4bcc471b61e2ad5638c6020bf7a8` 在本地化技能卡时给 `audit-xls` 新增了 `short-description: 检查电子表格…`；注册表的 `office-spreadsheets` 关键词包含 `excel/电子表格/xlsx`，但该技能正文没有同步增加 provider 全限定名。根因是**本地化元数据与既有能力路由合同不同步**，不是 CrabAccount、CrabCode runtime 或 Git refs 故障。
+
+影响面仅为 `plugins/crabfin-cn/fin-core/skills/audit-xls/SKILL.md` 的模型执行引导和仓库 `lint:refs` 输出。警告不阻断构建，但真实风险是模型只拿到审计清单，未被告知如何读取工作簿，可能把文件元数据或不完整抽取误报为公式级审计。
+
+架构裁决：
+
+1. 不用 `office-spreadsheets=none(...)` 豁免；该技能确实处理真实工作簿，豁免会隐藏根因。
+2. 不给 `crabfin-cn` manifest 增加 `dependencies`。用户直接粘贴公式时仍可做有限审计，而强依赖缺失会让整个 54 技能伞形插件降级；正文的可选路由符合 `docs/capability-routing.md` 分层语义。
+3. 不改 CrabCode 源码、marketplace、能力注册表或 provider 名称。`crabcode-office-suite:crabcode-spreadsheets` 已在注册表登记为 available，实体技能与 manifest 声明均存在。
+4. 邻接审计发现办公套件内置 `summarize()` 当前只返回格式和字节数，`recalculate()` 仍明确为 `NOT_IMPLEMENTED`；因此不能把“成功调用 provider”直接等同于“已完成审计”。本次在需求技能中明确：源文件只读、元数据不算审计证据、只报告实际可读范围，并披露宏/外链/缓存值/加密/截断等限制。实现完整 Excel 引擎适配器会扩大到另一个插件、依赖和运行时，不是消除本 warning 的必要条件，未顺手扩建。
+
+### 实施内容与复发条件
+
+在 `audit-xls/SKILL.md` 增加 `Spreadsheet capability routing`：
+
+- `.xlsx/.xlsm` 真实工作簿调用 `crabcode-office-suite:crabcode-spreadsheets`；
+- 原文件只读，不保存、不重算、不修改；
+- 文件类型/字节数等 metadata 不得冒充工作簿审计；
+- `Unknown skill` 时引导 `/plugin` 安装或启用办公套件，安装前只能审计用户直接粘贴的公式/值；
+- CSV/TSV 只支持值检查，不能证明公式、样式、隐藏内容或链接。
+
+同时更新 `tests/workflow-skill-presentation-completeness.test.ts` 的模型正文聚合哈希，确认这是对 315 个工作流技能中一个技能的有意正文变更；调用身份哈希和技能数量未变。没有新增重复的字符串单测：引用校验已有“provider 引用可消除 warning”的机制单测，具体生产文件由全仓 `lint:refs` 扫描，正文整体另有聚合哈希防止未审计漂移。
+
+复发条件：删除或拼错全限定名会重新触发引用告警或死链错误；把只读/完整性边界删掉会改变聚合哈希并使防漂移测试失败。若办公套件未安装，或底层引擎只能返回 metadata，仍不能完成真实单元格审计——这是明确降级条件，不是被掩盖的成功路径。
+
+### 首轮失败、恢复与三次规则
+
+首次全量门禁出现两个不同问题，均只失败一次：
+
+```text
+$ bun run typecheck
+$ tsc --noEmit
+error TS2688: Cannot find type definition file for 'bun-types'.
+```
+
+隔离工作树没有 `node_modules`，锁文件已声明 `bun-types`；按锁文件安装后恢复：
+
+```text
+$ bun install --frozen-lockfile
++ @types/bun@1.3.14
++ typescript@5.9.3
+5 packages installed [22.00ms]
+
+$ bun run typecheck
+$ tsc --noEmit
+[exit 0]
+```
+
+正文防漂移测试首次正确拦截预期变化：
+
+```text
+Expected: 95aedfcb1b63d12437277394ddc4aef1caf54c2b19359069a1068689c0f63c2c
+Received: b3d1cab6eb06f871324f73a45af0df1016b89f232ff432435f25190067c7fa39
+75 pass
+1 fail
+```
+
+将期望值更新为审计后的新哈希后，定向测试 `1 pass / 0 fail / 1299 expect`。没有任何同一问题连续失败三次。
+
+### 最终门禁真实输出
+
+```text
+$ bun run lint:refs
+$ bun run scripts/validate-references.ts
+[exit 0；零 warning]
+
+$ bun test ./tests/references.test.ts
+10 pass
+0 fail
+13 expect() calls
+
+$ bun run validate
+$ bun run scripts/validate-all.ts
+validate-all: all checks passed
+
+$ bun run typecheck
+$ tsc --noEmit
+[exit 0]
+
+$ bun test ./tests/
+76 pass
+0 fail
+1480 expect() calls
+Ran 76 tests across 9 files. [5.34s]
+
+$ bun run build
+Bundled 18 modules in 2ms
+cli.js  32.0 KB (entry point)
+
+$ git diff --check
+[无输出]
+```
+
+### 敌意复核结论
+
+- **根因**：修复的是缺失 provider 路由及其真实性边界，不是用豁免消音。
+- **回归**：未改变技能调用身份、manifest、marketplace、注册表、依赖或 CrabCode；原始工作簿增加只读保护，未扩大写入面。
+- **范围**：两处产品/测试改动加本日志，完整 Excel 引擎适配作为邻接缺口明示但未过度扩建。
+- **交付（截至该次审计结束）**：分支独立，未合并 main、未删除分支、未回滚、未 force-push、未 push。
