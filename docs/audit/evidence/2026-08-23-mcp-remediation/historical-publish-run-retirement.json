@@ -30,6 +30,31 @@
     "rerunNegativeTest": {
       "status": "not-executed",
       "reason": "The safety approval layer rejected intentionally invoking the credential-bearing historical publisher. GitHub documents disabled workflows as stopped from being triggered; publisher and auditor additionally fail closed unless the API state remains disabled_manually."
+    },
+    "archivedTextLogs": {
+      "capturedAt": "2026-08-23T12:24:22Z",
+      "storage": "restricted local out-of-repository audit directory",
+      "sourceCommand": "gh run view <run-id> --repo acosmi/CrabCode-Plugin --log",
+      "files": [
+        {
+          "runId": 32579374255,
+          "fileName": "32579374255.log",
+          "sizeBytes": 585855,
+          "sha256": "369b122139914e072da7eebf64e62502851103b7c121a573928bb8b2a843abeb"
+        },
+        {
+          "runId": 32579303978,
+          "fileName": "32579303978.log",
+          "sizeBytes": 574238,
+          "sha256": "130d2d31d25230008584770062df3aaa7caa05e169ec84327b00a83d96443d55"
+        },
+        {
+          "runId": 32050757636,
+          "fileName": "32050757636.log",
+          "sizeBytes": 573788,
+          "sha256": "e929f690ab7ddb9589bb81f0cc23d6432aac04971f8237f236b822812f282c37"
+        }
+      ]
     }
   },
   "runs": [
