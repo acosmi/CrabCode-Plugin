@@ -10577,7 +10577,7 @@ var package_default;
 var init_package = __esm(() => {
   package_default = {
     name: "crabcode-media-ops-mcp",
-    version: "0.4.3",
+    version: "0.4.4",
     license: "Apache-2.0",
     type: "module",
     bin: "./dist/server.js",
@@ -28750,6 +28750,16 @@ function ensureBrowserHooks() {
   browserHooksInstalled = true;
   installBrowserShutdownHooks();
 }
+function requiredChromiumVersion(platform) {
+  const version2 = REQUIRED_CHROMIUM_VERSIONS[platform];
+  if (!version2) {
+    throw new Error(`qa_infrastructure_failed: unsupported Chromium QA platform ${platform}`);
+  }
+  return version2;
+}
+function matchesRequiredChromiumVersion(actual, platform) {
+  return actual === requiredChromiumVersion(platform);
+}
 function errorMessage(error2) {
   return error2 instanceof Error ? error2.message : String(error2);
 }
@@ -29120,6 +29130,7 @@ function addCheck(report, id, passed, detail, evidence) {
 }
 async function runBrowserQa(args) {
   ensureBrowserHooks();
+  const requiredChromium = requiredChromiumVersion(process.platform);
   const screenshotsRoot = join5(args.qaRoot, "screenshots");
   const printRoot = join5(args.qaRoot, "print");
   await mkdir2(screenshotsRoot, { recursive: true });
@@ -29135,7 +29146,7 @@ async function runBrowserQa(args) {
       playwright: args.playwrightVersion,
       axe: args.axeVersion,
       chromium: null,
-      requiredChromium: REQUIRED_CHROMIUM_VERSION,
+      requiredChromium,
       executablePath: process.env.MEDIAOPS_QA_CHROMIUM_EXECUTABLE?.trim() || ""
     },
     timing: {
@@ -29165,8 +29176,8 @@ async function runBrowserQa(args) {
     const { browser, launchMs } = await getSharedBrowser(executablePath);
     reportData.timing.browserLaunchMs = launchMs;
     reportData.tools.chromium = browser.version();
-    if (reportData.tools.chromium !== REQUIRED_CHROMIUM_VERSION) {
-      reportData.errors.push(`Expected bundled Chromium ${REQUIRED_CHROMIUM_VERSION}, found ${reportData.tools.chromium}.`);
+    if (!matchesRequiredChromiumVersion(reportData.tools.chromium, process.platform)) {
+      reportData.errors.push(`Expected bundled Chromium ${requiredChromium} on ${process.platform}, found ${reportData.tools.chromium}.`);
     }
     server = await startArtifactServer(args.artifactRoot);
     const relativeHtml = relative3(args.artifactRoot, args.htmlPath).split(sep2).map(encodeURIComponent).join("/");
@@ -29427,10 +29438,14 @@ async function runDeliveryQa(artifactRoot, htmlRelativePath) {
       qaRootQueues.delete(rootKey);
   }
 }
-var BROWSER_LAUNCH_TIMEOUT_MS = 45000, PAGE_GOTO_TIMEOUT_MS = 30000, BROWSER_SEGMENT_TIMEOUT_MS = 120000, CROSS_PROCESS_LOCK_STALE_MS = 600000, CROSS_PROCESS_LOCK_WAIT_MS = 180000, CROSS_PROCESS_LOCK_PATH, sharedBrowser = null, sharedBrowserLaunch = null, sharedBrowserExecutable, browserHooksInstalled = false, REQUIRED_PLAYWRIGHT_VERSION = "1.61.1", REQUIRED_AXE_VERSION = "4.12.1", REQUIRED_VNU_VERSION = "26.7.15", REQUIRED_CHROMIUM_VERSION = "149.0.7827.55", VIEWPORTS, COLOR_SCHEMES, WHITE = "rgb(255, 255, 255)", require2, MAX_CONCURRENT_QA_RUNS = 1, activeQaRuns = 0, qaWaiters, qaRootQueues;
+var BROWSER_LAUNCH_TIMEOUT_MS = 45000, PAGE_GOTO_TIMEOUT_MS = 30000, BROWSER_SEGMENT_TIMEOUT_MS = 120000, CROSS_PROCESS_LOCK_STALE_MS = 600000, CROSS_PROCESS_LOCK_WAIT_MS = 180000, CROSS_PROCESS_LOCK_PATH, sharedBrowser = null, sharedBrowserLaunch = null, sharedBrowserExecutable, browserHooksInstalled = false, REQUIRED_PLAYWRIGHT_VERSION = "1.61.1", REQUIRED_AXE_VERSION = "4.12.1", REQUIRED_VNU_VERSION = "26.7.15", REQUIRED_CHROMIUM_VERSIONS, VIEWPORTS, COLOR_SCHEMES, WHITE = "rgb(255, 255, 255)", require2, MAX_CONCURRENT_QA_RUNS = 1, activeQaRuns = 0, qaWaiters, qaRootQueues;
 var init_delivery_qa = __esm(() => {
   init_artifacts();
   CROSS_PROCESS_LOCK_PATH = join5(tmpdir2(), "mediaops-delivery-qa.cross-process.lock");
+  REQUIRED_CHROMIUM_VERSIONS = {
+    darwin: "149.0.7827.55",
+    linux: "149.0.7827.0"
+  };
   VIEWPORTS = [320, 375, 768, 1440];
   COLOR_SCHEMES = ["light", "dark"];
   require2 = createRequire(import.meta.url);
@@ -39630,7 +39645,7 @@ async function handler(_args = {}, principal) {
       automaticBrowserVisualVerification: true,
       automaticHtmlValidation: "Nu Html Checker 26.7.15",
       automaticAccessibilityVerification: "axe-core 4.12.1 automated rules plus manual review",
-      fixedBrowserEvidence: "Playwright 1.61.1 / Chromium 149.0.7827.55",
+      fixedBrowserEvidence: "Playwright 1.61.1 / Chromium revision 1228 (darwin 149.0.7827.55; linux 149.0.7827.0)",
       namedVisualReviewAttestation: true,
       renderContract: RENDER_CONTRACT,
       approvalStateMachine: true,

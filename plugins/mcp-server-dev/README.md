@@ -1,32 +1,25 @@
 # mcp-server-dev
 
-Skills for designing and building MCP servers that work seamlessly with CrabCode.
+Proposal-only skills for future MCP capabilities during the repository
+emergency safe baseline.
 
-## What's inside
+## Current Safety State
 
-Three skills that compose into a full build path:
+This version does not scaffold, build, deploy, package, sign, install, connect,
+or test an MCP server/app/package. It emits no executable configuration,
+endpoint, launcher, dependency command, tool schema, or connection instruction.
 
-| Skill | Purpose |
+Every result is marked:
+
+`blocked / non-executable / not connected / not tested`
+
+## Skills
+
+| Skill | Current purpose |
 |---|---|
-| **`build-mcp-server`** | Entry point. Interrogates the use case, picks deployment model (remote HTTP / MCPB / local stdio), picks tool-design pattern, routes to a specialized skill. |
-| **`build-mcp-app`** | Adds interactive UI widgets (forms, pickers, confirm dialogs) rendered inline in chat. Works on remote servers and MCPB bundles. |
-| **`build-mcpb`** | Packages a local stdio server with its runtime so users can install it without Node/Python. For servers that must touch the local machine. |
+| `build-mcp-server` | Inventory the capability, threat boundary, fail-closed behavior, owner, and missing release evidence. |
+| `build-mcp-app` | Inventory interaction, sandbox, accessibility, abuse, host-compatibility, and UI evidence needs. |
+| `build-mcpb` | Inventory local privileges, packaging supply chain, signature, extraction, upgrade/restart, and rollback evidence. |
 
-## How it works
-
-`build-mcp-server` is the front door. It asks what you're connecting to, who'll use it, how big the action surface is, and whether you need in-chat UI. From those answers it recommends one of four paths:
-
-- **Remote streamable-HTTP** (the default recommendation for anything wrapping a cloud API) — scaffolded inline
-- **MCP app** — hands off to `build-mcp-app`
-- **MCPB** — hands off to `build-mcpb`
-- **Local stdio prototype** — scaffolded inline with an MCPB upgrade note
-
-Each skill ships reference files for the parts that don't fit in the main instructions: auth flows (DCR/CIMD), tool-description writing, widget templates, manifest schemas, security hardening.
-
-## Usage
-
-Ask CrabCode to "help me build an MCP server" and the entry skill will trigger. Or invoke directly:
-
-```
-/mcp-server-dev:build-mcp-server
-```
+Executable authoring remains blocked until a future approved change explicitly
+replaces the repository-wide MCP safe baseline.

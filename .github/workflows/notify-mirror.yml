@@ -1,12 +1,13 @@
 name: Audit CN mirror freshness
 
 # The mirror deploy credential lives in this repository's secrets: a dedicated
-# write-only key used only by publish-to-cn-mirror.yml after its 2026-08-17 migration.
+# write-only key used only by publish-safe-to-cn-mirror.yml after retirement of
+# the historical publisher identity.
 # This audit remains read-only and secret-free. All automatic schedules are paused;
 # invoke it through workflow_dispatch after a manually dispatched global CI and mirror
-# publication. Every accepted pointer is checked against that exact successful main CI
-# commit and byte-compared with its source. Historical successful CI runs remain readable
-# during migration; querying them does not trigger a workflow.
+# publication. Every accepted pointer is checked against the newest successful manual
+# main CI commit and byte-compared with its source. Historical push CI is never release
+# evidence.
 
 on:
   workflow_dispatch: {}
@@ -20,53 +21,150 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  dispatch_guard:
+    name: Reject non-official or non-main audit dispatch
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Fail closed instead of reporting a skipped-success audit
+        env:
+          DISPATCH_REPOSITORY: ${{ github.repository }}
+          DISPATCH_REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          [ "${DISPATCH_REPOSITORY}" = 'acosmi/CrabCode-Plugin' ] || {
+            echo "::error::mirror audit is allowed only from acosmi/CrabCode-Plugin"
+            exit 1
+          }
+          [ "${DISPATCH_REF}" = 'refs/heads/main' ] || {
+            echo "::error::mirror audit is allowed only from refs/heads/main"
+            exit 1
+          }
+
   audit:
     name: Verify latest green release on CN mirror
+    needs: dispatch_guard
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
       MIRROR_BASE: https://updates.acosmi.com/crabcode/plugins/crabcode-plugins-official
       ARCHIVE_PREFIX: marketplaces/crabcode-plugins-official/
-      FRESHNESS_SLO_SECONDS: 28800
 
     steps:
       - name: Resolve the latest successful main CI release
         id: release
         env:
           GH_TOKEN: ${{ github.token }}
+          DISPATCH_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
           RUNS="${RUNNER_TEMP}/ci-runs.json"
+          MAIN_REF="${RUNNER_TEMP}/main-ref.json"
+          RETIRED_WORKFLOW="${RUNNER_TEMP}/retired-publisher.json"
+          SAFE_WORKFLOW="${RUNNER_TEMP}/safe-publisher.json"
+          HISTORICAL_RUNS="${RUNNER_TEMP}/retired-publisher-runs.json"
+          curl -fsSL --retry 4 --retry-all-errors \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -o "${RETIRED_WORKFLOW}" \
+            'https://api.github.com/repos/acosmi/CrabCode-Plugin/actions/workflows/336369746'
+          curl -fsSL --retry 4 --retry-all-errors \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -o "${SAFE_WORKFLOW}" \
+            'https://api.github.com/repos/acosmi/CrabCode-Plugin/actions/workflows/publish-safe-to-cn-mirror.yml'
+          curl -fsSL --retry 4 --retry-all-errors \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -o "${HISTORICAL_RUNS}" \
+            'https://api.github.com/repos/acosmi/CrabCode-Plugin/actions/workflows/336369746/runs?per_page=100'
+          python3 - "${RETIRED_WORKFLOW}" "${SAFE_WORKFLOW}" <<'PY'
+          import json, sys
+          payload = json.load(open(sys.argv[1], encoding="utf-8"))
+          safe = json.load(open(sys.argv[2], encoding="utf-8"))
+          required = {
+              "id": 336369746,
+              "path": ".github/workflows/publish-to-cn-mirror.yml",
+              "state": "disabled_manually",
+          }
+          mismatches = {
+              key: {"expected": value, "actual": payload.get(key)}
+              for key, value in required.items() if payload.get(key) != value
+          }
+          if mismatches:
+              raise SystemExit(f"historical publisher is not safely retired: {mismatches}")
+          safe_required = {
+              "path": ".github/workflows/publish-safe-to-cn-mirror.yml",
+              "state": "active",
+          }
+          safe_mismatches = {
+              key: {"expected": value, "actual": safe.get(key)}
+              for key, value in safe_required.items() if safe.get(key) != value
+          }
+          safe_id = safe.get("id")
+          if not isinstance(safe_id, int) or safe_id <= 0 or safe_id == 336369746:
+              safe_mismatches["id"] = {
+                  "expected": "positive ID distinct from 336369746",
+                  "actual": safe_id,
+              }
+          if safe_mismatches:
+              raise SystemExit(f"safe publisher identity is invalid: {safe_mismatches}")
+          PY
           curl -fsSL --retry 4 --retry-all-errors \
             -H 'Accept: application/vnd.github+json' \
             -H "Authorization: Bearer ${GH_TOKEN}" \
             -o "${RUNS}" \
-            'https://api.github.com/repos/acosmi/CrabCode-Plugin/actions/workflows/ci.yml/runs?branch=main&per_page=100'
+            'https://api.github.com/repos/acosmi/CrabCode-Plugin/actions/workflows/ci.yml/runs?branch=main&event=workflow_dispatch&per_page=100'
+          curl -fsSL --retry 4 --retry-all-errors \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -o "${MAIN_REF}" \
+            'https://api.github.com/repos/acosmi/CrabCode-Plugin/git/ref/heads/main'
           read -r SHA CI_URL < <(python3 - "${RUNS}" <<'PY'
           import json, re, sys
           runs = json.load(open(sys.argv[1], encoding="utf-8")).get("workflow_runs", [])
           successful = [
               item for item in runs
-              if item.get("status") == "completed" and item.get("conclusion") == "success"
+              if item.get("status") == "completed"
+              and item.get("conclusion") == "success"
+              and item.get("event") == "workflow_dispatch"
+              and item.get("head_branch") == "main"
+              and item.get("path") == ".github/workflows/ci.yml"
           ]
           successful.sort(key=lambda item: item.get("created_at", ""), reverse=True)
           run = successful[0] if successful else None
           if run is None or not re.fullmatch(r"[0-9a-f]{40}", str(run.get("head_sha", ""))):
-              raise SystemExit("no successful main CI run with a valid SHA")
+              raise SystemExit("no successful workflow_dispatch main ci.yml run with a valid SHA")
           print(run["head_sha"], run["html_url"])
           PY
           )
+          API_MAIN_SHA="$(python3 - "${MAIN_REF}" <<'PY'
+          import json, re, sys
+          sha = (json.load(open(sys.argv[1], encoding="utf-8")).get("object") or {}).get("sha", "")
+          if re.fullmatch(r"[0-9a-f]{40}", sha) is None:
+              raise SystemExit(f"GitHub main ref did not return one lowercase SHA: {sha!r}")
+          print(sha)
+          PY
+          )"
+          [ "${SHA}" = "${DISPATCH_SHA}" ] || {
+            echo "::error::newest successful manual CI ${SHA} != audit dispatch SHA ${DISPATCH_SHA}; main advanced without exact CI"
+            exit 1
+          }
+          [ "${API_MAIN_SHA}" = "${DISPATCH_SHA}" ] || {
+            echo "::error::GitHub main is now ${API_MAIN_SHA} != audit dispatch SHA ${DISPATCH_SHA}; refusing stale audit"
+            exit 1
+          }
           {
             echo "latest_sha=${SHA}"
             echo "latest_ci_url=${CI_URL}"
           } >> "${GITHUB_OUTPUT}"
           echo "Latest successful release is ${SHA} from ${CI_URL}"
 
-      - name: Validate the served pointer and freshness SLO
+      - name: Require the served pointer to equal the newest manual CI
         id: target
         env:
-          EVENT_NAME: ${{ github.event_name }}
           LATEST_SHA: ${{ steps.release.outputs.latest_sha }}
+          LATEST_CI_URL: ${{ steps.release.outputs.latest_ci_url }}
         run: |
           set -euo pipefail
           WORK="${RUNNER_TEMP}/mirror-audit"
@@ -83,79 +181,106 @@ jobs:
           print(raw.decode("ascii"))
           PY
           )"
-          read -r TARGET_SHA TARGET_CI_URL FRESHNESS PENDING_SHA PENDING_AGE < <(
-            python3 - "${RUNNER_TEMP}/ci-runs.json" "${POINTER}" "${EVENT_NAME}" \
-              "${FRESHNESS_SLO_SECONDS}" "${LATEST_SHA}" <<'PY'
-          import datetime, json, re, sys
-          runs_path, pointer, event_name, slo_raw, latest_sha = sys.argv[1:]
-          if not re.fullmatch(r"[0-9a-f]{40}", pointer):
-              raise SystemExit(f"mirror latest is not a valid SHA: {pointer!r}")
-          runs = json.load(open(runs_path, encoding="utf-8")).get("workflow_runs", [])
-          successful = [
-              item for item in runs
-              if item.get("status") == "completed" and item.get("conclusion") == "success"
-          ]
-          successful.sort(key=lambda item: item.get("created_at", ""), reverse=True)
-          target_index = next((i for i, item in enumerate(successful) if item.get("head_sha") == pointer), None)
-          if target_index is None:
-              raise SystemExit("mirror pointer does not identify a successful main CI run in the last 100 runs")
-          target = successful[target_index]
-          freshness = "exact"
-          pending_sha = "none"
-          pending_age = 0
-          if pointer != latest_sha:
-              if event_name == "workflow_dispatch":
-                  raise SystemExit(f"manual audit requires latest green {latest_sha}, mirror serves {pointer}")
-              newer = [item for item in successful[:target_index] if item.get("head_sha") != pointer]
-              if not newer:
-                  raise SystemExit("latest green differs from mirror but no newer successful run was found")
-              oldest_pending = newer[-1]
-              completed = datetime.datetime.fromisoformat(oldest_pending["updated_at"].replace("Z", "+00:00"))
-              pending_age = max(0, int((datetime.datetime.now(datetime.timezone.utc) - completed).total_seconds()))
-              pending_sha = oldest_pending["head_sha"]
-              slo = int(slo_raw)
-              if pending_age > slo:
-                  raise SystemExit(f"mirror is stale: pending green {pending_sha} has waited {pending_age}s (SLO {slo}s)")
-              freshness = f"publication-grace-{pending_age}s"
-          print(pointer, target["html_url"], freshness, pending_sha, pending_age)
-          PY
-          )
+          [ "${POINTER}" = "${LATEST_SHA}" ] || {
+            echo "::error::manual audit requires newest manual green ${LATEST_SHA}, mirror serves ${POINTER}"
+            exit 1
+          }
           {
-            echo "sha=${TARGET_SHA}"
-            echo "ci_url=${TARGET_CI_URL}"
-            echo "freshness=${FRESHNESS}"
-            echo "pending_sha=${PENDING_SHA}"
-            echo "pending_age=${PENDING_AGE}"
+            echo "sha=${POINTER}"
+            echo "ci_url=${LATEST_CI_URL}"
           } >> "${GITHUB_OUTPUT}"
-          if [ "${FRESHNESS}" != exact ]; then
-            echo "::warning::Mirror serves ${TARGET_SHA}; pending green ${PENDING_SHA} has waited ${PENDING_AGE}s within the ${FRESHNESS_SLO_SECONDS}s publication SLO."
-          fi
 
       - name: Check out the exact release for byte-level comparison
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ steps.target.outputs.sha }}
           path: expected-source
-          fetch-depth: 1
+          fetch-depth: 0
           persist-credentials: false
+
+      - name: Recheck origin main before byte audit
+        env:
+          EXPECTED_SHA: ${{ steps.target.outputs.sha }}
+        run: |
+          set -euo pipefail
+          git -C expected-source fetch --force --no-tags \
+            origin refs/heads/main:refs/remotes/origin/main
+          RUNTIME_MAIN="$(git -C expected-source rev-parse refs/remotes/origin/main)"
+          [ "${RUNTIME_MAIN}" = "${EXPECTED_SHA}" ] || {
+            echo "::error::origin/main advanced to ${RUNTIME_MAIN} after audit dispatch; expected ${EXPECTED_SHA}"
+            exit 1
+          }
+
+      - name: Require exact-main local matrix attestation
+        env:
+          EXPECTED_SHA: ${{ steps.target.outputs.sha }}
+        run: |
+          set -euo pipefail
+          EXPECTED_TREE="$(git -C expected-source rev-parse "${EXPECTED_SHA}^{tree}")"
+          python3 expected-source/scripts/validate-retired-publisher.py \
+            --workflow-json "${RUNNER_TEMP}/retired-publisher.json" \
+            --safe-workflow-json "${RUNNER_TEMP}/safe-publisher.json" \
+            --control-evidence-json \
+              expected-source/docs/audit/evidence/2026-08-23-mcp-remediation/historical-publish-run-retirement.json \
+            --historical-runs-json "${RUNNER_TEMP}/retired-publisher-runs.json"
+          EVIDENCE_TAG="mcp-remediation-tested-${EXPECTED_SHA}"
+          git -C expected-source fetch --force --no-tags origin \
+            "refs/tags/${EVIDENCE_TAG}:refs/tags/${EVIDENCE_TAG}"
+          [ "$(git -C expected-source cat-file -t "refs/tags/${EVIDENCE_TAG}")" = tag ] || {
+            echo "::error::${EVIDENCE_TAG} must be an annotated tag"
+            exit 1
+          }
+          [ "$(git -C expected-source rev-parse "refs/tags/${EVIDENCE_TAG}^{commit}")" = "${EXPECTED_SHA}" ] || {
+            echo "::error::${EVIDENCE_TAG} does not peel to ${EXPECTED_SHA}"
+            exit 1
+          }
+          ALLOWED_SIGNERS="${GITHUB_WORKSPACE}/expected-source/docs/audit/keys/mcp-remediation-test-allowed-signers"
+          git -C expected-source \
+            -c gpg.format=ssh \
+            -c gpg.ssh.allowedSignersFile="${ALLOWED_SIGNERS}" \
+            verify-tag "refs/tags/${EVIDENCE_TAG}"
+          LOGS_TAG="mcp-remediation-logs-${EXPECTED_SHA}"
+          git -C expected-source fetch --force --no-tags origin \
+            "refs/tags/${LOGS_TAG}:refs/tags/${LOGS_TAG}"
+          [ "$(git -C expected-source cat-file -t "refs/tags/${LOGS_TAG}")" = tag ] || {
+            echo "::error::${LOGS_TAG} must be an annotated tag"
+            exit 1
+          }
+          git -C expected-source \
+            -c gpg.format=ssh \
+            -c gpg.ssh.allowedSignersFile="${ALLOWED_SIGNERS}" \
+            verify-tag "refs/tags/${LOGS_TAG}"
+          LOGS_COMMIT="$(git -C expected-source rev-parse "refs/tags/${LOGS_TAG}^{commit}")"
+          LOGS_TREE="$(git -C expected-source rev-parse "${LOGS_COMMIT}^{tree}")"
+          ATTESTATION="${RUNNER_TEMP}/local-test-attestation.json"
+          git -C expected-source show "${LOGS_COMMIT}:attestation.json" > "${ATTESTATION}"
+          python3 expected-source/scripts/validate-local-test-attestation.py \
+            --attestation-json "${ATTESTATION}" \
+            --expected-commit "${EXPECTED_SHA}" \
+            --expected-tree "${EXPECTED_TREE}" \
+            --release-contract-json \
+              expected-source/docs/audit/evidence/2026-08-23-mcp-remediation/remediation-release.json \
+            --git-repo expected-source \
+            --logs-commit "${LOGS_COMMIT}" \
+            --logs-tree "${LOGS_TREE}" \
+            --matrix-contract-json \
+              expected-source/docs/audit/evidence/2026-08-23-mcp-remediation/local-test-matrix-contract.json
 
       - name: Verify mirror pointer, index, archive, and path safety
         env:
           SHA: ${{ steps.target.outputs.sha }}
           CI_URL: ${{ steps.target.outputs.ci_url }}
-          FRESHNESS: ${{ steps.target.outputs.freshness }}
-          PENDING_SHA: ${{ steps.target.outputs.pending_sha }}
-          PENDING_AGE: ${{ steps.target.outputs.pending_age }}
           LATEST_SHA: ${{ steps.release.outputs.latest_sha }}
           LATEST_CI_URL: ${{ steps.release.outputs.latest_ci_url }}
         run: |
           set -euo pipefail
           WORK="${RUNNER_TEMP}/mirror-audit"
           mkdir -p "${WORK}"
-          FAIL_HINT="Run: gh workflow run publish-to-cn-mirror.yml -R acosmi/CrabCode-Plugin --ref main"
+          FAIL_HINT="Run publish-safe-to-cn-mirror.yml with required ci_run_id and expected_sha inputs for the exact main commit"
           fetch() {
             curl -fsSL --proto '=https' --proto-redir '=https' \
-              --retry 5 --retry-all-errors --connect-timeout 10 --max-time 120 "$@"
+              --retry 5 --retry-all-errors --connect-timeout 10 --max-time 120 \
+              -H 'Cache-Control: no-cache' "$@"
           }
           fail() {
             echo "::error::$1"
@@ -223,6 +348,12 @@ jobs:
           PY
           unzip -tq "${WORK}/${SHA}.zip" >/dev/null \
             || fail "mirror archive ${SHA}.zip failed CRC validation"
+          python3 expected-source/scripts/build-deterministic-mirror-archive.py \
+            --repo expected-source --commit "${SHA}" \
+            --prefix "${ARCHIVE_PREFIX}" \
+            --output "${WORK}/${SHA}.expected.zip" \
+            --existing-archive "${WORK}/${SHA}.zip" \
+            || fail "mirror archive bytes are not the canonical deterministic archive for ${SHA}"
           python3 - "${WORK}/${SHA}.zip" expected-source "${ARCHIVE_PREFIX}" <<'PY'
           import json, pathlib, stat, sys, zipfile
 
@@ -231,7 +362,7 @@ jobs:
           prefix = sys.argv[3].rstrip("/") + "/"
 
           # Mirror distribution trim manifest (W-PLUGIN-MIRROR-SLIM, 2026-08-16).
-          # The publisher (this repository's publish-to-cn-mirror.yml) reads
+          # The publisher (this repository's publish-safe-to-cn-mirror.yml) reads
           # the SAME file from the SAME commit it packs; we read it from the exact
           # checkout of the served SHA, so both sides derive their file sets from
           # one source and cannot diverge — the opposite of the one-sided contract
@@ -355,6 +486,40 @@ jobs:
                   raise SystemExit("mirror latest no longer requires revalidation")
           PY
 
+          # The byte audit can take minutes. Recheck main at the final verdict so
+          # an intervening merge cannot leave an already-stale audit green.
+          RETIRED_FINAL="${RUNNER_TEMP}/retired-publisher-final.json"
+          SAFE_FINAL="${RUNNER_TEMP}/safe-publisher-final.json"
+          HISTORICAL_RUNS_FINAL="${RUNNER_TEMP}/retired-publisher-runs-final.json"
+          curl -fsSL --retry 4 --retry-all-errors \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -o "${RETIRED_FINAL}" \
+            'https://api.github.com/repos/acosmi/CrabCode-Plugin/actions/workflows/336369746'
+          curl -fsSL --retry 4 --retry-all-errors \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -o "${SAFE_FINAL}" \
+            'https://api.github.com/repos/acosmi/CrabCode-Plugin/actions/workflows/publish-safe-to-cn-mirror.yml'
+          curl -fsSL --retry 4 --retry-all-errors \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -o "${HISTORICAL_RUNS_FINAL}" \
+            'https://api.github.com/repos/acosmi/CrabCode-Plugin/actions/workflows/336369746/runs?per_page=100'
+          python3 expected-source/scripts/validate-retired-publisher.py \
+            --workflow-json "${RETIRED_FINAL}" \
+            --safe-workflow-json "${SAFE_FINAL}" \
+            --control-evidence-json \
+              expected-source/docs/audit/evidence/2026-08-23-mcp-remediation/historical-publish-run-retirement.json \
+            --historical-runs-json "${HISTORICAL_RUNS_FINAL}"
+          git -C expected-source fetch --force --no-tags \
+            origin refs/heads/main:refs/remotes/origin/main
+          FINAL_MAIN="$(git -C expected-source rev-parse refs/remotes/origin/main)"
+          [ "${FINAL_MAIN}" = "${SHA}" ] || {
+            echo "::error::origin/main advanced to ${FINAL_MAIN} during mirror audit; audited ${SHA}"
+            exit 1
+          }
+
           ZIP_SHA256="$(sha256sum "${WORK}/${SHA}.zip" | cut -d' ' -f1)"
           INDEX_SHA256="$(sha256sum "${WORK}/marketplace.json" | cut -d' ' -f1)"
           PLUGINS="$(python3 -c 'import json,sys; print(len(json.load(open(sys.argv[1]))["plugins"]))' "${WORK}/marketplace.json")"
@@ -365,9 +530,8 @@ jobs:
             echo "- served release SHA: \`${SHA}\`"
             echo "- newest successful CI: ${LATEST_CI_URL}"
             echo "- newest successful SHA: \`${LATEST_SHA}\`"
-            echo "- freshness state: \`${FRESHNESS}\`"
-            echo "- oldest pending SHA: \`${PENDING_SHA}\`"
-            echo "- oldest pending age (seconds): \`${PENDING_AGE}\`"
+            echo "- CI event: \`workflow_dispatch\`"
+            echo "- freshness state: \`exact\`"
             echo "- plugins: ${PLUGINS}"
             echo "- ZIP SHA-256: \`${ZIP_SHA256}\`"
             echo "- marketplace SHA-256: \`${INDEX_SHA256}\`"

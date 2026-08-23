@@ -5,6 +5,14 @@ import { spawnSync } from 'node:child_process'
 
 const root = join(import.meta.dir, '..')
 const textExtensions = new Set(['.ts', '.js', '.json', '.md'])
+const distributionFiles = [
+  'bootstrap.js',
+  'hyperframe.manifest.json',
+  'hyperframe.runtime.iife.js',
+  'server.js',
+] as const
+
+verifyCommittedDistributionIsFresh()
 
 // Build names from fragments so this first-party guard does not itself add a
 // prohibited brand literal. Word boundaries avoid false positives in codec or
@@ -22,10 +30,7 @@ const prohibitedTerms = prohibitedTermParts.map((parts) => parts.join(''))
 
 const files = [
   ...collectFirstPartyFiles(root),
-  join(root, 'dist', 'bootstrap.js'),
-  join(root, 'dist', 'server.js'),
-  join(root, 'dist', 'hyperframe.runtime.iife.js'),
-  join(root, 'dist', 'hyperframe.manifest.json'),
+  ...distributionFiles.map((file) => join(root, 'dist', file)),
 ]
 
 const violations: string[] = []
@@ -90,6 +95,59 @@ try {
 }
 
 console.log('standalone distribution bootstrap passed (dist-only copy)')
+
+function verifyCommittedDistributionIsFresh(): void {
+  const rebuildRoot = mkdtempSync(join(tmpdir(), 'crabcode-html-video-rebuild-'))
+  try {
+    const rebuiltDist = join(rebuildRoot, 'dist')
+    const rebuild = spawnSync(
+      process.execPath,
+      [join(root, 'scripts', 'build-mcp.ts'), '--outdir', rebuiltDist],
+      {
+        cwd: root,
+        env: process.env,
+        encoding: 'utf8',
+        timeout: 120_000,
+      },
+    )
+    if (rebuild.error || rebuild.status !== 0) {
+      const detail = [rebuild.error?.message, rebuild.stdout.trim(), rebuild.stderr.trim()]
+        .filter(Boolean)
+        .join('\n')
+      throw new Error(`isolated distribution rebuild failed${detail ? `:\n${detail}` : ''}`)
+    }
+
+    const committedDist = join(root, 'dist')
+    assertExactDistributionFiles(committedDist, 'committed')
+    assertExactDistributionFiles(rebuiltDist, 'rebuilt')
+    for (const file of distributionFiles) {
+      const committedPath = join(committedDist, file)
+      const rebuiltPath = join(rebuiltDist, file)
+      if (!readFileSync(committedPath).equals(readFileSync(rebuiltPath))) {
+        throw new Error(`committed dist/${file} is stale; run bun run build:mcp and commit the result`)
+      }
+      const committedExecutableBits = statSync(committedPath).mode & 0o111
+      const rebuiltExecutableBits = statSync(rebuiltPath).mode & 0o111
+      if (committedExecutableBits !== rebuiltExecutableBits) {
+        throw new Error(`committed dist/${file} has stale executable mode bits`)
+      }
+    }
+  } finally {
+    rmSync(rebuildRoot, { recursive: true, force: true })
+  }
+
+  console.log('committed distribution freshness check passed (isolated rebuild is byte-identical)')
+}
+
+function assertExactDistributionFiles(directory: string, label: string): void {
+  const actual = readdirSync(directory).sort()
+  const expected = [...distributionFiles].sort()
+  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+    throw new Error(
+      `${label} distribution file set mismatch: expected ${expected.join(', ')}, got ${actual.join(', ')}`,
+    )
+  }
+}
 
 function collectFirstPartyFiles(directory: string): string[] {
   const results: string[] = []

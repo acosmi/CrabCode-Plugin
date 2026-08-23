@@ -4,7 +4,9 @@ Scaffolding for new CrabCode plugins. Copy a template directory into `plugins/<p
 
 ## Templates
 
-- `plugin-mcp-wrapper/` — declarative MCP wrapper. No runtime code.
+- `plugin-mcp-wrapper/` — non-executable MCP integration proposal. It contains
+  no `.mcp.json`, manifest MCP declaration, endpoint, or launcher command while
+  the emergency safe baseline is active.
 - `plugin-standard/` — TypeScript runtime plugin. Use for hooks, bridges, or any plugin that needs executable logic.
 - `worker-report.md` — per-window worker report template referenced by the §"Worker Contract" section of the migration rules.
 

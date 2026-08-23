@@ -235,13 +235,12 @@ Guide the user through creating a complete, high-quality CrabCode plugin from in
 ### For MCP:
 
 1. Load mcp-integration skill using Skill tool
-2. Create .mcp.json configuration with:
-   - Server type (stdio for local, SSE for hosted)
-   - Command and args (with ${CRABCODE_PLUGIN_ROOT})
-   - extensionToLanguage mapping if LSP
-   - Environment variables as needed
-3. Document required env vars in README
-4. Provide setup instructions
+2. During the emergency MCP safe baseline, create only the blocked,
+   non-executable Markdown proposal required by that skill.
+3. Do not create `.mcp.json`, manifest `mcpServers`, JSON/MCPB references,
+   endpoints, commands, packages, environment bindings, or setup instructions.
+4. State explicitly that the proposed capability is not installed, connected,
+   activated, or tested.
 
 ### For Settings:
 
@@ -318,7 +317,7 @@ Guide the user through creating a complete, high-quality CrabCode plugin from in
    - [ ] User-invoked skills appear in `/help` and execute correctly
    - [ ] Agents trigger on appropriate scenarios
    - [ ] Hooks activate on events (if applicable)
-   - [ ] MCP servers connect (if applicable)
+   - [ ] MCP requests produced only a blocked, non-executable proposal
    - [ ] Settings files work (if applicable)
 
 3. **Testing recommendations**:
@@ -326,7 +325,8 @@ Guide the user through creating a complete, high-quality CrabCode plugin from in
    - For user-invoked skills: Run `/plugin-name:skill-name` with various arguments
    - For agents: Create scenarios matching agent examples
    - For hooks: Use `crabcode --debug` to see hook execution
-   - For MCP: Use `/mcp` to verify servers and tools
+   - For MCP proposals: verify no config, endpoint, command, package, tool name,
+     secret binding, install step, or connection claim was emitted
 
 4. **Ask user**: "I've prepared the plugin for testing. Would you like me to guide you through testing each component, or do you want to test it yourself?"
 
@@ -344,7 +344,7 @@ Guide the user through creating a complete, high-quality CrabCode plugin from in
 
 1. **Verify README completeness**:
    - Check README has: overview, features, installation, prerequisites, usage
-   - For MCP plugins: Document required environment variables
+   - For MCP proposals: document missing risk/release evidence and fail-closed behavior
    - For hook plugins: Explain hook activation
    - For settings: Provide configuration templates
 
@@ -390,7 +390,7 @@ Guide the user through creating a complete, high-quality CrabCode plugin from in
   - Strong trigger phrases
   - ${CRABCODE_PLUGIN_ROOT} for portability
   - Progressive disclosure
-  - Security-first (HTTPS, no hardcoded credentials)
+  - Security-first (no hardcoded credentials; MCP remains proposal-only)
 
 ### Key Decision Points (Wait for User)
 
@@ -435,14 +435,15 @@ Every component must meet these standards:
 
 - Skills: 4 (migration best practices, create-migration, run-migrations, rollback)
 - Agents: 1 (migration-validator)
-- MCP: 1 (database connection)
+- MCP proposal: 1 (blocked future database capability)
 
 ### Phase 3: Clarifying Questions
 
 - Which databases? (PostgreSQL, MySQL, etc.)
 - Migration file format? (SQL, code-based?)
 - Should agent validate before applying?
-- What MCP tools needed? (query, execute, schema)
+- What data, privilege, identity, approval, and release evidence would future
+  database access require?
 
 ### Phase 4-8: Implementation, Validation, Testing, Documentation
 

@@ -1,6 +1,6 @@
 {
   "name": "crabwork-operations",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Optimize business operations — vendor management, process documentation, change management, capacity planning, and compliance tracking. Keep your organization running efficiently. Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"

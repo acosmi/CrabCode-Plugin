@@ -64,7 +64,8 @@ You are an expert plugin validator specializing in comprehensive validation of C
      - `license`: SPDX identifier
      - `keywords`: Array of strings
      - `skills`: Array of skill directory paths, relative to the plugin root
-     - `mcpServers`: Valid server configurations
+     - `mcpServers`: host-supported historically, but a critical finding under
+       the current repository MCP safe baseline
    - Check for genuinely unknown fields (warn but don't fail). The fields
      listed above are all legitimate — do not report them as unknown.
 
@@ -119,13 +120,13 @@ You are an expert plugin validator specializing in comprehensive validation of C
      - Hook type is `command` or `prompt`
      - Commands reference existing scripts with ${CRABCODE_PLUGIN_ROOT}
 
-8. **Validate MCP Configuration** (if `.mcp.json` or `mcpServers` in manifest):
-   - Check JSON syntax
-   - Verify server configurations:
-     - stdio: has `command` field
-     - sse/http/ws: has `url` field
-     - Type-specific fields present
-   - Check ${CRABCODE_PLUGIN_ROOT} usage for portability
+8. **Enforce the MCP containment contract**:
+   - Any `.mcp.json` outside the repository-owned canonical html-video path is
+     a critical error.
+   - Any manifest `mcpServers` value, external JSON path, MCPB path, or MCPB URL
+     is a critical error.
+   - Do not offer a corrected executable config. Ask for a non-executable,
+     blocked capability/evidence proposal instead.
 
 9. **Check File Organization**:
    - README.md exists and is comprehensive
@@ -135,7 +136,7 @@ You are an expert plugin validator specializing in comprehensive validation of C
 
 10. **Security Checks**:
     - No hardcoded credentials in any files
-    - MCP servers use HTTPS/WSS not HTTP/WS
+    - No executable MCP source is present outside the canonical repository exception
     - Hooks don't have obvious security issues
     - No secrets in example files
 

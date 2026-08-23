@@ -253580,7 +253580,7 @@ import { join as join59 } from "path";
 // package.json
 var package_default = {
   name: "crabcode-html-video-mcp",
-  version: "0.1.3",
+  version: "0.1.4",
   license: "Apache-2.0",
   type: "module",
   bin: "./dist/bootstrap.js",
@@ -253590,8 +253590,8 @@ var package_default = {
     "check:distribution": "bun scripts/check-distribution.ts",
     start: "bun --no-env-file dist/bootstrap.js",
     typecheck: "tsc -p tsconfig.json && tsc -p packages/content-graph/tsconfig.json && tsc -p packages/seek-shim/tsconfig.json && tsc -p packages/multi-segment/tsconfig.json",
-    test: "bun run build:mcp && bun test ./tests ./packages",
-    validate: "bun run typecheck && bun run test && bun run check:distribution && bun src/doctor-cli.ts --check-only"
+    test: "bun test ./tests ./packages",
+    validate: "bun run typecheck && bun run check:distribution && bun run test && bun src/doctor-cli.ts --check-only"
   },
   dependencies: {
     "@crabcode/content-graph": "file:./packages/content-graph",

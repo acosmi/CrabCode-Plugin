@@ -1,20 +1,17 @@
 # Laravel Boost
 
-> **MCP 安全暂停（2026-08-22）**：安全状态：本版本不发布可执行 MCP 配置；安装不会启动该服务或发起网络请求。 本文保留目标能力与后续接入资料，不代表当前版本已连接或可执行。
+> **MCP 安全暂停（2026-08-22）**：本版本不发布可执行 MCP 配置；安装不会启动该服务或发起网络请求。如果曾安装旧版，请先升级插件并重启 CrabCode；仅重载插件不能证明旧 MCP 客户端或进程已退出。下文任何 Connect、`.mcp.json`、端点、launcher 或启动描述均仅是历史配置/未来恢复审查参考，不代表本版本会生成配置、连接、启动或提供相应工具。
 
-CrabCode integration with the Laravel Boost MCP server. The Boost server runs
-inside your Laravel application via `php artisan boost:mcp`, so CrabCode
-talks to the same code, routes, and database the application sees.
+Historical Laravel Boost MCP integration metadata. The current package does not
+run Artisan or connect CrabCode to an application.
 
-## Connect
+## Historical connection reference (inactive)
 
-1. Install the Laravel Boost package in your application and run any vendor
-   setup it requires.
-2. Make sure `php artisan boost:mcp` runs from the project root.
-3. Launch CrabCode from that project root; the plugin invokes the command on
-   stdio.
+The removed configuration historically invoked `php artisan boost:mcp` from a
+project root. Do not use this as setup instruction; future restoration requires
+an explicit local-runtime and release review.
 
-## What you can do
+## Historical target capabilities (not available)
 
 - Inspect routes, controllers, and middleware
 - Run safe Artisan introspection commands
@@ -23,5 +20,5 @@ talks to the same code, routes, and database the application sees.
 
 ## Notes
 
-The MCP server runs inside your Laravel process. Treat its filesystem and
-database access as if you were running Artisan locally.
+Any future runtime would have application filesystem and database access and
+must be reviewed accordingly. No server runs in the current version.

@@ -1,28 +1,25 @@
 # 连接器
 
+> **MCP 安全暂停**：当前版本没有可执行 MCP 配置、内置服务或已连接来源；不得按本文下载、安装、填写凭证、修改设置或连接服务。以下内容仅是历史/未来能力分类，恢复前必须另行通过安全、宿主、发布与升级重启审查。
+
 ## 工具引用机制
 
-插件文件用 `~~category` 作为占位符,代表用户在该类别下连接的具体工具。例如 `~~data warehouse` 可指 Snowflake、BigQuery 或任何提供 MCP 服务的数据仓库。
+插件文件用 `~~category` 标记未来能力类别；当前它不解析为已连接工具。
 
-插件是**工具无关**的——它们以类别(数据仓库、笔记本、产品分析等)而非具体产品来描述工作流。`.mcp.json` 预配置了具体的 MCP 服务,但同类别下的任何 MCP 服务都可使用。
+插件以工具类别而非具体产品描述工作流。历史版本曾预配置 MCP；当前对应配置已删除，同类别产品名仅用于未来能力盘点，不代表可用或可连接。
 
-## 本插件的连接器
+## 历史/未来能力目录（当前不可用）
 
-| 类别 | 占位符 | 内置服务 | 其它可选 |
+| 类别 | 占位符 | 历史示例 | 未来候选 |
 |---|---|---|---|
 | 数据仓库 | `~~data warehouse` | Snowflake\*、Databricks\*、BigQuery、Definite | Redshift、PostgreSQL、MySQL |
 | 笔记本 | `~~notebook` | Hex | Jupyter、Deepnote、Observable |
 | 产品分析 | `~~product analytics` | Amplitude | Mixpanel、Heap |
 | 项目管理 | `~~project tracker` | Atlassian(Jira/Confluence) | Linear、Asana |
 
-\* 租户型连接器——首次使用需填写自己的账号/工作区标识,填完即可用。启用插件时会弹出填写框,也可在设置页 → MCP 里点「配置」。Snowflake 另需先在自己账号内创建 MCP 服务器对象(厂商未提供公共端点)。
+\* 这些是历史租户候选；当前不要填写账号/工作区、进入 MCP 设置或创建服务器对象。
 
-## 租户型连接器的 URL 形态约束
+## 历史租户配置说明
 
-`.mcp.json` 是严格 JSON、放不下注释,因此把约束记在这里。
-
-`${user_config.X}` 可以出现在 URL 的 **host 段、path 段或 query 段**,但**不能整段替换 `url`**:
-宿主先校验 URL 合法性、后做变量替换,`"url": "${user_config.mcp_url}"` 会被直接判非法。
-
-已对宿主真 schema 实测(2026-07-24):host 中段、host 整段、path 段、query 段全部通过,仅"整段变量"失败。
-改这两条 URL 时保持变量嵌在合法 URL 骨架内即可。
+旧版本的变量/URL 试验仅保留为事故背景。当前不要创建 MCP JSON、填写
+租户变量或编辑端点；未来恢复需重新按当时宿主 schema 与供应商 E2E 审查。

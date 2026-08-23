@@ -1,11 +1,47 @@
-import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import {
+  copyFileSync,
+  existsSync,
+  lstatSync,
+  mkdirSync,
+  readFileSync,
+  realpathSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
+import { tmpdir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 
 const root = join(import.meta.dir, '..')
-const dist = join(root, 'dist')
-rmSync(dist, { recursive: true, force: true })
-mkdirSync(dist, { recursive: true })
+const output = resolveOutputDirectory(process.argv.slice(2))
+const dist = output.path
+if (output.resetCommittedDist) {
+  if (existsSync(dist)) {
+    const stats = lstatSync(dist)
+    if (!stats.isDirectory() || stats.isSymbolicLink()) {
+      throw new Error('committed dist must be an ordinary directory before rebuild')
+    }
+  }
+  rmSync(dist, { recursive: true, force: true })
+  mkdirSync(dist, { recursive: false })
+} else {
+  // Custom output is used only by the freshness checker. Never delete or
+  // overwrite a caller-selected path: its parent must already be an ordinary
+  // directory under the real OS temp root and the final dist path must not yet
+  // exist. mkdir's EEXIST behavior also closes the check/create race.
+  if (existsSync(dist)) throw new Error('custom --outdir must not already exist')
+  const parent = dirname(dist)
+  const parentStats = lstatSync(parent)
+  if (!parentStats.isDirectory() || parentStats.isSymbolicLink()) {
+    throw new Error('custom --outdir parent must be an ordinary directory')
+  }
+  const realParent = realpathSync(parent)
+  const realTempRoot = realpathSync(tmpdir())
+  if (!isWithin(realTempRoot, realParent)) {
+    throw new Error('custom --outdir parent must resolve inside the OS temporary directory')
+  }
+  mkdirSync(dist, { recursive: false })
+}
 
 // Every first-party tool schema is Zod v4. The MCP SDK nevertheless imports
 // its legacy v3 JSON-schema converter unconditionally; replace that unreachable
@@ -108,3 +144,34 @@ for (const file of ['hyperframe.manifest.json', 'hyperframe.runtime.iife.js']) {
 }
 
 console.log(`built security bootstrap, MCP bundle, and Hyperframes runtime assets in ${dist}`)
+
+function resolveOutputDirectory(args: string[]): {
+  path: string
+  resetCommittedDist: boolean
+} {
+  const optionIndexes = args.flatMap((arg, index) => (arg === '--outdir' ? [index] : []))
+  if (optionIndexes.length > 1) throw new Error('--outdir may be specified only once')
+  if (optionIndexes.length === 0) {
+    if (args.length > 0) throw new Error(`unexpected build argument: ${args[0]}`)
+    return { path: join(root, 'dist'), resetCommittedDist: true }
+  }
+
+  const optionIndex = optionIndexes[0]
+  const value = args[optionIndex + 1]
+  if (!value || args.length !== 2 || optionIndex !== 0) {
+    throw new Error('usage: bun scripts/build-mcp.ts [--outdir <path>]')
+  }
+
+  const output = resolve(root, value)
+  // Custom builds never reset a directory and are restricted to isolated temp
+  // roots. The default no-argument path is the sole destructive rebuild target.
+  if (basename(output) !== 'dist' || !isWithin(resolve(tmpdir()), output)) {
+    throw new Error('--outdir must name a dist directory inside the OS temporary directory')
+  }
+  return { path: output, resetCommittedDist: false }
+}
+
+function isWithin(parent: string, candidate: string): boolean {
+  const path = relative(parent, candidate)
+  return path !== '' && path !== '..' && !path.startsWith(`..${sep}`) && !isAbsolute(path)
+}

@@ -2,6 +2,11 @@
 
 Complete reference for `plugin.json` configuration.
 
+> **Current repository policy:** The host schema historically supports MCP
+> declarations, but the emergency publishing baseline rejects every manifest
+> `mcpServers` value, JSON/MCPB path, and MCPB URL. This reference must not be
+> used to generate one; use the blocked non-executable MCP proposal instead.
+
 ## File Location
 
 **Required path**: `.crabcode-plugin/plugin.json`
@@ -321,37 +326,11 @@ Hook configuration location or inline definition.
 
 #### mcpServers
 
-**Type**: String (path to JSON file) or Object (inline configuration)
-**Default**: `./.mcp.json`
+**Historical host type**: String, object, or array.
 
-MCP server configuration location or inline definition.
-
-**File path**:
-```json
-{
-  "mcpServers": "./.mcp.json"
-}
-```
-
-**Inline configuration**:
-```json
-{
-  "mcpServers": {
-    "github": {
-      "command": "node",
-      "args": ["${CRABCODE_PLUGIN_ROOT}/servers/github-mcp.js"],
-      "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
-      }
-    }
-  }
-}
-```
-
-**Use cases**:
-- Simple plugins: Single inline server (< 20 lines)
-- Complex plugins: External `.mcp.json` file
-- Multiple servers: Always use external file
+**Current publishing rule**: forbidden. This includes inline server maps,
+external JSON, local MCPB, and remote MCPB. Do not add the field or provide a
+copyable value. Record only a blocked capability/evidence proposal.
 
 ## Path Resolution
 
@@ -373,26 +352,31 @@ All paths in component fields must follow these rules:
 - ❌ `"../shared/commands"`
 - ❌ `".\\commands"` (backslash)
 
-### Resolution Order
+### Historical Loader Resolution Order (Risk Reference Only)
 
-When CrabCode loads components:
+The host historically scans and merges multiple component sources. This is a
+risk inventory explaining why MCP containment must cover more than one path;
+it is not current authoring guidance:
 
 1. **Default directories**: Scans standard locations first
    - `./commands/`
    - `./agents/`
    - `./skills/`
    - `./hooks/hooks.json`
-   - `./.mcp.json`
+   - historical plugin-root MCP config (blocked by repository policy)
 
 2. **Custom paths**: Scans paths specified in manifest
    - Paths from `commands` field
    - Paths from `agents` field
-   - Files from `hooks` and `mcpServers` fields
+   - Hook files and historical manifest MCP sources (the latter are blocked)
 
-3. **Merge behavior**: Components from all locations load
+3. **Historical merge behavior**: Components from all locations could load
    - No overwriting
    - All discovered components register
    - Name conflicts cause errors
+
+Do not create an MCP source to exercise this order. Current MCP requests must
+stop at the non-executable proposal described by the parent skill.
 
 ## Validation
 
@@ -537,8 +521,7 @@ Full configuration with all features:
     "./admin-commands"
   ],
   "agents": "./specialized-agents",
-  "hooks": "./config/hooks.json",
-  "mcpServers": "./.mcp.json"
+  "hooks": "./config/hooks.json"
 }
 ```
 

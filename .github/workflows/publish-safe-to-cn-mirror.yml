@@ -1,0 +1,558 @@
+name: Publish official plugin marketplace to China mirror (safe v2)
+
+# 把本仓(官方插件市场)打成 content-addressed zip,发布到中国镜像
+# updates.acosmi.com/crabcode/plugins/crabcode-plugins-official/{latest,<sha>.zip},
+# 并把同一 checkout 的 marketplace.json 发布到同一前缀(acosmi.com/skill 插件页
+# 同源主源与 updates.acosmi.com 远程兜底都读它)。
+#
+# 迁移史(2026-08-17 用户裁决):此工作流原住企业源码仓
+# acosmi/crabcode-source(.github/workflows/sync-plugins-to-mirror.yml),
+# 因为镜像部署密钥当时只在那边。用户裁定「插件发版应住插件仓」,遂迁入本仓,
+# 配**专用**部署密钥(见下),旧工作流同日退役。发布语义逐字节继承,含:
+#   - zip 布局契约(zip 内所有文件前缀 = marketplaces/crabcode-plugins-official/,
+#     客户端 strip 该前缀提取;exec 位经 zip 中央目录 external_attr 恢复)
+#   - latest = 本仓 HEAD SHA(纯文本指针);{sha}.zip content-addressed 可永久缓存
+#   - 镜像瘦身清单 .crabcode-plugin/mirror-distribution.json(三方同源:本发布器
+#     与审计器 notify-mirror.yml 从同一个被审 SHA 的 checkout 读同一份清单)
+#   - 先落并读回 immutable zip+checksum；latest 作为宿主唯一线性化点单文件切换；
+#     最后更新网站用的 non-authoritative marketplace projection。固定路径间没有
+#     服务器事务，projection 不一致时整次 workflow/audit 失败，但不会让旧 runtime
+#     被新 marketplace 提前宣称为已升级
+#
+# 密钥边界(为什么公开仓可以持有这个 secret):MIRROR_SSH_KEY 是**专用**
+# 写单向部署钥,服务器侧 authorized_keys 以
+#   restrict,command="rrsync -wo /var/www/updates/crabcode"
+# 锁死 —— 无 shell、无端口转发、只能 rsync 写入镜像内容目录。其爆炸半径
+# (改写镜像插件内容)与「本仓 main 被合入恶意内容后被如实发布」完全同阶,
+# 不引入任何新的信任面;它**不是**企业仓 CI 的那把钥匙,两把可独立吊销。
+# fork PR 天然读不到 secrets(GitHub 默认),workflow_dispatch 需要写权限。
+#
+# 自动发布已暂停。运营合同要求在本机测试和全局手动 CI 通过后，用 API 从 main
+# 发起 workflow_dispatch；GitHub 的同一事件也能由 Actions UI 发起，YAML 无法区分
+# 两种传输来源，因此最终证据必须记录实际 API 调用和 run ID。刻意无 schedule。
+
+on:
+  workflow_dispatch:
+    inputs:
+      ci_run_id:
+        description: Successful manually dispatched ci.yml run ID for this exact main commit
+        required: true
+        type: string
+      expected_sha:
+        description: Full lowercase main commit SHA expected to be published
+        required: true
+        type: string
+
+# 多次手动补发可能撞车 → 串行不取消，保证 latest 指针切换有序。
+concurrency:
+  group: publish-cn-mirror
+  cancel-in-progress: false
+
+jobs:
+  dispatch_guard:
+    name: Reject non-official or non-main dispatch
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Fail closed instead of reporting a skipped-success release
+        env:
+          DISPATCH_REPOSITORY: ${{ github.repository }}
+          DISPATCH_REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          [ "${DISPATCH_REPOSITORY}" = 'acosmi/CrabCode-Plugin' ] || {
+            echo "::error::publication is allowed only from acosmi/CrabCode-Plugin"
+            exit 1
+          }
+          [ "${DISPATCH_REF}" = 'refs/heads/main' ] || {
+            echo "::error::publication is allowed only from refs/heads/main"
+            exit 1
+          }
+
+  publish:
+    name: Pack + publish official marketplace
+    needs: dispatch_guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # 保留 secret-boundary 防御深度；dispatch_guard 负责令错误 ref 的整次 run
+    # 明确失败，避免 job-level if 单独使用时产生 skipped-success 假绿。
+    if: github.repository == 'acosmi/CrabCode-Plugin' && github.ref == 'refs/heads/main'
+    permissions:
+      actions: read
+      contents: read
+    env:
+      MIRROR_HOST: ${{ secrets.MIRROR_HOST }}
+      MIRROR_PATH: ${{ secrets.MIRROR_PATH }}
+      MIRROR_USER: crabdeploy
+      MIRROR_PUBLIC_BASE: https://updates.acosmi.com/crabcode
+      ARC_PREFIX: marketplaces/crabcode-plugins-official
+
+    steps:
+      - name: Checkout this marketplace at the manually dispatched main commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: marketplace-src
+          fetch-depth: 0
+
+      - name: Bind publication to exact successful manual CI and current main
+        env:
+          CI_RUN_ID: ${{ inputs.ci_run_id }}
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+          DISPATCH_SHA: ${{ github.sha }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          [[ "${CI_RUN_ID}" =~ ^[1-9][0-9]*$ ]] || {
+            echo "::error::ci_run_id must be a positive numeric Actions run ID"
+            exit 1
+          }
+          [[ "${EXPECTED_SHA}" =~ ^[0-9a-f]{40}$ ]] || {
+            echo "::error::expected_sha must be one full lowercase commit SHA"
+            exit 1
+          }
+          [ "${EXPECTED_SHA}" = "${DISPATCH_SHA}" ] || {
+            echo "::error::expected_sha ${EXPECTED_SHA} != workflow dispatch SHA ${DISPATCH_SHA}"
+            exit 1
+          }
+          CHECKED_OUT_SHA="$(git -C marketplace-src rev-parse HEAD)"
+          [ "${CHECKED_OUT_SHA}" = "${EXPECTED_SHA}" ] || {
+            echo "::error::checkout ${CHECKED_OUT_SHA} != expected_sha ${EXPECTED_SHA}"
+            exit 1
+          }
+
+          RUN_JSON="${RUNNER_TEMP}/approved-ci-run.json"
+          RETIRED_WORKFLOW_JSON="${RUNNER_TEMP}/retired-publisher.json"
+          SAFE_WORKFLOW_JSON="${RUNNER_TEMP}/safe-publisher.json"
+          HISTORICAL_RUNS_JSON="${RUNNER_TEMP}/retired-publisher-runs.json"
+          curl -fsSL --proto '=https' --proto-redir '=https' \
+            --retry 4 --retry-all-errors \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -o "${RETIRED_WORKFLOW_JSON}" \
+            'https://api.github.com/repos/acosmi/CrabCode-Plugin/actions/workflows/336369746'
+          curl -fsSL --proto '=https' --proto-redir '=https' \
+            --retry 4 --retry-all-errors \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -o "${SAFE_WORKFLOW_JSON}" \
+            'https://api.github.com/repos/acosmi/CrabCode-Plugin/actions/workflows/publish-safe-to-cn-mirror.yml'
+          curl -fsSL --proto '=https' --proto-redir '=https' \
+            --retry 4 --retry-all-errors \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -o "${HISTORICAL_RUNS_JSON}" \
+            'https://api.github.com/repos/acosmi/CrabCode-Plugin/actions/workflows/336369746/runs?per_page=100'
+          python3 marketplace-src/scripts/validate-retired-publisher.py \
+            --workflow-json "${RETIRED_WORKFLOW_JSON}" \
+            --safe-workflow-json "${SAFE_WORKFLOW_JSON}" \
+            --control-evidence-json \
+              marketplace-src/docs/audit/evidence/2026-08-23-mcp-remediation/historical-publish-run-retirement.json \
+            --historical-runs-json "${HISTORICAL_RUNS_JSON}"
+          curl -fsSL --proto '=https' --proto-redir '=https' \
+            --retry 4 --retry-all-errors \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -o "${RUN_JSON}" \
+            "https://api.github.com/repos/acosmi/CrabCode-Plugin/actions/runs/${CI_RUN_ID}"
+          git -C marketplace-src fetch --force --no-tags \
+            origin refs/heads/main:refs/remotes/origin/main
+          CURRENT_MAIN="$(git -C marketplace-src rev-parse refs/remotes/origin/main)"
+          python3 marketplace-src/scripts/validate-mirror-release-gate.py \
+            --run-json "${RUN_JSON}" \
+            --expected-run-id "${CI_RUN_ID}" \
+            --expected-sha "${EXPECTED_SHA}" \
+            --dispatch-sha "${DISPATCH_SHA}" \
+            --checked-out-sha "${CHECKED_OUT_SHA}" \
+            --origin-main-sha "${CURRENT_MAIN}"
+
+          # Local matrix evidence is an annotated tag outside the commit tree,
+          # avoiding a self-referential "evidence file changes tested tree"
+          # cycle. The tag name, peeled commit, recorded tree, all 18 cells and
+          # raw-log manifest digest are exact-main gates.
+          TESTED_TREE="$(git -C marketplace-src rev-parse "${EXPECTED_SHA}^{tree}")"
+          EVIDENCE_TAG="mcp-remediation-tested-${EXPECTED_SHA}"
+          git -C marketplace-src fetch --force --no-tags origin \
+            "refs/tags/${EVIDENCE_TAG}:refs/tags/${EVIDENCE_TAG}"
+          [ "$(git -C marketplace-src cat-file -t "refs/tags/${EVIDENCE_TAG}")" = tag ] || {
+            echo "::error::${EVIDENCE_TAG} must be an annotated tag"
+            exit 1
+          }
+          [ "$(git -C marketplace-src rev-parse "refs/tags/${EVIDENCE_TAG}^{commit}")" = "${EXPECTED_SHA}" ] || {
+            echo "::error::${EVIDENCE_TAG} does not peel to ${EXPECTED_SHA}"
+            exit 1
+          }
+          ALLOWED_SIGNERS="${GITHUB_WORKSPACE}/marketplace-src/docs/audit/keys/mcp-remediation-test-allowed-signers"
+          git -C marketplace-src \
+            -c gpg.format=ssh \
+            -c gpg.ssh.allowedSignersFile="${ALLOWED_SIGNERS}" \
+            verify-tag "refs/tags/${EVIDENCE_TAG}"
+          LOGS_TAG="mcp-remediation-logs-${EXPECTED_SHA}"
+          git -C marketplace-src fetch --force --no-tags origin \
+            "refs/tags/${LOGS_TAG}:refs/tags/${LOGS_TAG}"
+          [ "$(git -C marketplace-src cat-file -t "refs/tags/${LOGS_TAG}")" = tag ] || {
+            echo "::error::${LOGS_TAG} must be an annotated tag"
+            exit 1
+          }
+          git -C marketplace-src \
+            -c gpg.format=ssh \
+            -c gpg.ssh.allowedSignersFile="${ALLOWED_SIGNERS}" \
+            verify-tag "refs/tags/${LOGS_TAG}"
+          LOGS_COMMIT="$(git -C marketplace-src rev-parse "refs/tags/${LOGS_TAG}^{commit}")"
+          LOGS_TREE="$(git -C marketplace-src rev-parse "${LOGS_COMMIT}^{tree}")"
+          ATTESTATION="${RUNNER_TEMP}/local-test-attestation.json"
+          git -C marketplace-src show "${LOGS_COMMIT}:attestation.json" > "${ATTESTATION}"
+          python3 marketplace-src/scripts/validate-local-test-attestation.py \
+            --attestation-json "${ATTESTATION}" \
+            --expected-commit "${EXPECTED_SHA}" \
+            --expected-tree "${TESTED_TREE}" \
+            --release-contract-json \
+              marketplace-src/docs/audit/evidence/2026-08-23-mcp-remediation/remediation-release.json \
+            --git-repo marketplace-src \
+            --logs-commit "${LOGS_COMMIT}" \
+            --logs-tree "${LOGS_TREE}" \
+            --matrix-contract-json \
+              marketplace-src/docs/audit/evidence/2026-08-23-mcp-remediation/local-test-matrix-contract.json
+
+      - name: Validate marketplace.json (防半包发布给网站)
+        run: |
+          set -euo pipefail
+          python3 - marketplace-src/.crabcode-plugin/marketplace.json <<'PY'
+          import json, sys
+          d = json.load(open(sys.argv[1]))
+          plugins = d.get("plugins")
+          assert isinstance(plugins, list) and len(plugins) > 0, "plugins 为空"
+          miss = [p["name"] for p in plugins if not p.get("displayName")]
+          meta = d.get("metadata") or {}
+          print(f"plugins={len(plugins)} version={meta.get('version')} missing_displayName={len(miss)}")
+          PY
+
+      - name: Build content-addressed zip
+        id: pack
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          set -euo pipefail
+          SHA="$(git -C marketplace-src rev-parse HEAD)"
+          [ "${SHA}" = "${EXPECTED_SHA}" ] || {
+            echo "::error::archive commit ${SHA} != expected_sha ${EXPECTED_SHA}"
+            exit 1
+          }
+          echo "sha=${SHA}" >> "$GITHUB_OUTPUT"
+          echo "Official marketplace HEAD: ${SHA}"
+          # 归档只读取 SHA 的 Git tree/blob、固定 tree 顺序/commit 时间/权限；不读取
+          # checkout mtime 或未提交内容。同 SHA 连建两次必须逐字节相同。
+          python3 marketplace-src/scripts/build-deterministic-mirror-archive.py \
+            --repo marketplace-src --commit "${SHA}" --prefix "${ARC_PREFIX}/" \
+            --output "${SHA}.zip"
+          python3 marketplace-src/scripts/build-deterministic-mirror-archive.py \
+            --repo marketplace-src --commit "${SHA}" --prefix "${ARC_PREFIX}/" \
+            --output "${SHA}.repeat.zip"
+          cmp -s "${SHA}.zip" "${SHA}.repeat.zip" || {
+            echo "::error::same-SHA deterministic archive rebuild produced different bytes"
+            exit 1
+          }
+          rm "${SHA}.repeat.zip"
+          printf '%s' "${SHA}" > latest
+          echo "zip 大小:" && ls -la "${SHA}.zip"
+          # 自检用审计器的真判据(全称量词):**每一条**条目都必须带 ARC_PREFIX。
+          # 「至少有一条带前缀」在有无越界项两种状态下给同一个答案,照不到 bug。
+          python3 - "${SHA}.zip" "${ARC_PREFIX}/" <<'PY'
+          import sys, zipfile
+          archive, prefix = sys.argv[1], sys.argv[2]
+          with zipfile.ZipFile(archive) as bundle:
+              names = [item.filename for item in bundle.infolist()]
+          if not names:
+              raise SystemExit("zip 为空")
+          bad = [name for name in names if not name.startswith(prefix)]
+          if bad:
+              raise SystemExit(f"zip 含 {len(bad)} 条越界项(客户端会丢弃/审计器会判 unsafe): {bad[:10]}")
+          print(f"✓ 全部 {len(names)} 条条目均以 {prefix} 开头")
+          PY
+
+      - name: Refuse immutable overwrite, rollback, or stale main
+        id: mirror_guard
+        run: |
+          set -euo pipefail
+          SHA="${{ steps.pack.outputs.sha }}"
+          BASE="${MIRROR_PUBLIC_BASE}/plugins/crabcode-plugins-official"
+          WORK="${RUNNER_TEMP}/mirror-publish-guard"
+          mkdir -p "${WORK}"
+
+          git -C marketplace-src fetch --force --no-tags \
+            origin refs/heads/main:refs/remotes/origin/main
+          CURRENT_MAIN="$(git -C marketplace-src rev-parse refs/remotes/origin/main)"
+          [ "${CURRENT_MAIN}" = "${SHA}" ] || {
+            echo "::error::origin/main is now ${CURRENT_MAIN}, refusing stale publish of ${SHA}"
+            exit 1
+          }
+
+          LATEST_STATUS="$(curl -sS --proto '=https' --proto-redir '=https' \
+            --retry 4 --retry-all-errors -H 'Cache-Control: no-cache' \
+            -o "${WORK}/latest" -w '%{http_code}' "${BASE}/latest")"
+          case "${LATEST_STATUS}" in
+            200)
+              CURRENT_POINTER="$(python3 - "${WORK}/latest" <<'PY'
+          import pathlib, re, sys
+          raw = pathlib.Path(sys.argv[1]).read_bytes()
+          if re.fullmatch(b"[0-9a-f]{40}", raw) is None:
+              raise SystemExit(f"mirror latest is not exactly one lowercase SHA: {raw!r}")
+          print(raw.decode("ascii"))
+          PY
+              )"
+              if [ "${CURRENT_POINTER}" != "${SHA}" ]; then
+                git -C marketplace-src merge-base --is-ancestor "${CURRENT_POINTER}" "${SHA}" || {
+                  echo "::error::mirror latest ${CURRENT_POINTER} is not an ancestor of ${SHA}; refusing rollback or divergent publication"
+                  exit 1
+                }
+              fi
+              ;;
+            404) echo "Mirror has no latest pointer yet; treating this as initial publication" ;;
+            *) echo "::error::mirror latest returned HTTP ${LATEST_STATUS}"; exit 1 ;;
+          esac
+
+          ARCHIVE_STATUS="$(curl -sS --proto '=https' --proto-redir '=https' \
+            --retry 4 --retry-all-errors -o "${WORK}/${SHA}.zip" -w '%{http_code}' \
+            "${BASE}/${SHA}.zip")"
+          case "${ARCHIVE_STATUS}" in
+            200)
+              # Rebuild from the commit again and compare inside the deterministic
+              # builder. A mismatch exits non-zero before deploy credentials exist.
+              python3 marketplace-src/scripts/build-deterministic-mirror-archive.py \
+                --repo marketplace-src --commit "${SHA}" --prefix "${ARC_PREFIX}/" \
+                --output "${WORK}/${SHA}.rebuilt.zip" \
+                --existing-archive "${WORK}/${SHA}.zip"
+              echo "archive_exists=true" >> "${GITHUB_OUTPUT}"
+              echo "✓ public ${SHA}.zip already exists with identical bytes; it will not be overwritten"
+              ;;
+            404)
+              echo "archive_exists=false" >> "${GITHUB_OUTPUT}"
+              echo "✓ public ${SHA}.zip does not exist and may be created once"
+              ;;
+            *) echo "::error::mirror archive probe returned HTTP ${ARCHIVE_STATUS}"; exit 1 ;;
+          esac
+
+      - name: Setup deploy SSH
+        env:
+          MIRROR_SSH_KEY: ${{ secrets.MIRROR_SSH_KEY }}
+          MIRROR_KNOWN_HOSTS: ${{ secrets.MIRROR_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          for v in MIRROR_SSH_KEY MIRROR_KNOWN_HOSTS MIRROR_HOST; do
+            if [ -z "${!v:-}" ]; then
+              echo "::error::${v} secret 未设置"
+              exit 1
+            fi
+          done
+          mkdir -p "${HOME}/.ssh"
+          printf '%s\n' "${MIRROR_SSH_KEY}" > "${HOME}/.ssh/mirror_deploy"
+          chmod 600 "${HOME}/.ssh/mirror_deploy"
+          printf '%s\n' "${MIRROR_KNOWN_HOSTS}" > "${HOME}/.ssh/known_hosts"
+          echo "RSYNC_RSH=ssh -i ${HOME}/.ssh/mirror_deploy -o IdentitiesOnly=yes -o UserKnownHostsFile=${HOME}/.ssh/known_hosts -o StrictHostKeyChecking=yes" >> "$GITHUB_ENV"
+
+      - name: Publish immutable runtime, then pointer, then website projection
+        env:
+          ARCHIVE_EXISTS: ${{ steps.mirror_guard.outputs.archive_exists }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          SHA="${{ steps.pack.outputs.sha }}"
+          DEST_BASE="${MIRROR_PATH:-.}"
+          DEST="${MIRROR_USER}@${MIRROR_HOST}"
+          PLUGIN_DIR="plugins/crabcode-plugins-official"
+          BASE="${MIRROR_PUBLIC_BASE}/${PLUGIN_DIR}"
+          RSYNC() {
+            local attempt
+            for attempt in 1 2 3; do
+              if rsync -rtv --chmod=D755,F644 -e "${RSYNC_RSH}" "$@"; then
+                return 0
+              fi
+              echo "::warning::rsync 第 ${attempt} 次失败,$((attempt * 20))s 后重试"
+              sleep $((attempt * 20))
+            done
+            return 1
+          }
+          # crabdeploy 的 key 被 rrsync(-wo)forced command 锁死,只准 rsync、拒绝
+          # 任意 ssh(mkdir → "is not rsync")。rsync 默认不创建多级父目录,故同步
+          # **顶层 plugins 目录**(源不带尾斜杠)到 DEST_BASE → rsync 在限定目录内
+          # 递归创建子路径,这是 rrsync 允许的标准行为,无需预建目录。
+          # ① 只传 content-addressed runtime ZIP + checksum，并在切 pointer
+          #    前从公网逐字节读回。宿主只消费 latest → <sha>.zip；ZIP 内自带
+          #    同 commit marketplace，因此 active runtime 不依赖外置 projection。
+          mkdir -p "stage/${PLUGIN_DIR}"
+          if [ "${ARCHIVE_EXISTS}" = false ]; then
+            cp "${SHA}.zip" "stage/${PLUGIN_DIR}/"
+          else
+            echo "✓ skip immutable ${SHA}.zip upload; identical public bytes already exist"
+          fi
+          # 校验和(W-PLUGIN-MIRROR-CHECKSUM)解析正则
+          # `([0-9a-f]{64})  ([A-Za-z0-9._-]+)\n?`:
+          # **恰两个空格 + 纯 basename**。
+          # ⚠️ 不直接重定向 `sha256sum` 原生输出:其分隔符随平台变(POSIX 文本模式
+          # `<hash>␠␠<file>` 合规;Windows/MSYS 二进制模式 `<hash>␠*<file>` 不合规)。
+          # 「靠平台默认值恰好对」会在换执行池那天静默变红 —— 故只取第一字段,
+          # printf 显式拼出审计器要的形态。
+          printf '%s  %s\n' "$(sha256sum "${SHA}.zip" | cut -d' ' -f1)" \
+            "${SHA}.zip" > "stage/${PLUGIN_DIR}/${SHA}.zip.sha256"
+          RSYNC "stage/plugins" "${DEST}:${DEST_BASE}/"
+          READY_DIR="${RUNNER_TEMP}/mirror-runtime-ready"
+          mkdir -p "${READY_DIR}"
+          curl -fsSL --proto '=https' --proto-redir '=https' \
+            --retry 5 --retry-all-errors -H 'Cache-Control: no-cache' \
+            -o "${READY_DIR}/${SHA}.zip" \
+            "${BASE}/${SHA}.zip"
+          curl -fsSL --proto '=https' --proto-redir '=https' \
+            --retry 5 --retry-all-errors -H 'Cache-Control: no-cache' \
+            -o "${READY_DIR}/${SHA}.zip.sha256" \
+            "${BASE}/${SHA}.zip.sha256"
+          cmp -s "${SHA}.zip" "${READY_DIR}/${SHA}.zip" || {
+            echo "::error::public immutable ${SHA}.zip does not match the canonical local archive"
+            exit 1
+          }
+          python3 - "${READY_DIR}" "${SHA}" <<'PY'
+          import hashlib, pathlib, re, sys
+          root, sha = pathlib.Path(sys.argv[1]), sys.argv[2]
+          payload = root / f"{sha}.zip"
+          record = (root / f"{sha}.zip.sha256").read_text(encoding="ascii")
+          match = re.fullmatch(r"([0-9a-f]{64})  ([A-Za-z0-9._-]+)\n?", record)
+          actual = hashlib.sha256(payload.read_bytes()).hexdigest()
+          if match is None or match.group(2) != f"{sha}.zip" or match.group(1) != actual:
+              raise SystemExit("public immutable ZIP checksum is malformed or mismatched")
+          PY
+          echo "✓ immutable ${SHA}.zip + checksum are publicly ready"
+
+          # ② 切 latest 单文件指针。它是 generation-1 active runtime 的唯一
+          #    线性化点；不带 --delete，不影响已传 content object。
+          RETIRED_WORKFLOW_JSON="${RUNNER_TEMP}/retired-publisher-before-pointer.json"
+          SAFE_WORKFLOW_JSON="${RUNNER_TEMP}/safe-publisher-before-pointer.json"
+          HISTORICAL_RUNS_JSON="${RUNNER_TEMP}/retired-publisher-runs-before-pointer.json"
+          curl -fsSL --proto '=https' --proto-redir '=https' \
+            --retry 4 --retry-all-errors \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -o "${RETIRED_WORKFLOW_JSON}" \
+            'https://api.github.com/repos/acosmi/CrabCode-Plugin/actions/workflows/336369746'
+          curl -fsSL --proto '=https' --proto-redir '=https' \
+            --retry 4 --retry-all-errors \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -o "${SAFE_WORKFLOW_JSON}" \
+            'https://api.github.com/repos/acosmi/CrabCode-Plugin/actions/workflows/publish-safe-to-cn-mirror.yml'
+          curl -fsSL --proto '=https' --proto-redir '=https' \
+            --retry 4 --retry-all-errors \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -o "${HISTORICAL_RUNS_JSON}" \
+            'https://api.github.com/repos/acosmi/CrabCode-Plugin/actions/workflows/336369746/runs?per_page=100'
+          python3 marketplace-src/scripts/validate-retired-publisher.py \
+            --workflow-json "${RETIRED_WORKFLOW_JSON}" \
+            --safe-workflow-json "${SAFE_WORKFLOW_JSON}" \
+            --control-evidence-json \
+              marketplace-src/docs/audit/evidence/2026-08-23-mcp-remediation/historical-publish-run-retirement.json \
+            --historical-runs-json "${HISTORICAL_RUNS_JSON}"
+          # 上传可能较慢；切指针前重新校验 main。若 main 已前进，保留不可达的
+          # content object 但绝不把 latest 切到陈旧 SHA。
+          git -C marketplace-src fetch --force --no-tags \
+            origin refs/heads/main:refs/remotes/origin/main
+          CURRENT_MAIN="$(git -C marketplace-src rev-parse refs/remotes/origin/main)"
+          [ "${CURRENT_MAIN}" = "${SHA}" ] || {
+            echo "::error::origin/main advanced to ${CURRENT_MAIN} during upload; latest remains unchanged"
+            exit 1
+          }
+          RECHECK_DIR="${RUNNER_TEMP}/mirror-pointer-recheck"
+          mkdir -p "${RECHECK_DIR}"
+          RECHECK_STATUS="$(curl -sS --proto '=https' --proto-redir '=https' \
+            --retry 4 --retry-all-errors -H 'Cache-Control: no-cache' \
+            -o "${RECHECK_DIR}/latest" -w '%{http_code}' \
+            "${MIRROR_PUBLIC_BASE}/plugins/crabcode-plugins-official/latest")"
+          case "${RECHECK_STATUS}" in
+            200)
+              RECHECK_POINTER="$(python3 - "${RECHECK_DIR}/latest" <<'PY'
+          import pathlib, re, sys
+          raw = pathlib.Path(sys.argv[1]).read_bytes()
+          if re.fullmatch(b"[0-9a-f]{40}", raw) is None:
+              raise SystemExit(f"mirror latest is not exactly one lowercase SHA: {raw!r}")
+          print(raw.decode("ascii"))
+          PY
+              )"
+              if [ "${RECHECK_POINTER}" != "${SHA}" ]; then
+                git -C marketplace-src merge-base --is-ancestor "${RECHECK_POINTER}" "${SHA}" || {
+                  echo "::error::mirror latest changed to non-ancestor ${RECHECK_POINTER} during upload; latest remains unchanged"
+                  exit 1
+                }
+              fi
+              ;;
+            404) ;;
+            *) echo "::error::mirror latest recheck returned HTTP ${RECHECK_STATUS}"; exit 1 ;;
+          esac
+          mkdir -p "stage-latest/${PLUGIN_DIR}"
+          cp latest "stage-latest/${PLUGIN_DIR}/"
+          RSYNC "stage-latest/plugins" "${DEST}:${DEST_BASE}/"
+          echo "✓ latest 指针已切换 → ${SHA}"
+
+          # ③ latest 成功后才更新 Acosmi 网站使用的外置 marketplace projection。
+          # 现有 rrsync/static-file 合同不提供多文件 transaction；因此不能把
+          # projection+checksum 与 latest 伪称为原子。任一上传/读回不一致都会令
+          # workflow 和后续 audit 失败，但最坏状态是“runtime 已安全、网站仍旧”，
+          # 而不是“网站声称已安全、runtime 仍在旧危险 ZIP”。
+          mkdir -p "stage-projection/${PLUGIN_DIR}"
+          cp marketplace-src/.crabcode-plugin/marketplace.json \
+            "stage-projection/${PLUGIN_DIR}/marketplace.json"
+          (
+            cd "stage-projection/${PLUGIN_DIR}"
+            printf '%s  %s\n' "$(sha256sum marketplace.json | cut -d' ' -f1)" \
+              marketplace.json > marketplace.json.sha256
+          )
+          RSYNC "stage-projection/plugins" "${DEST}:${DEST_BASE}/"
+          echo "✓ non-authoritative marketplace projection uploaded for ${SHA}"
+
+      - name: Verify URLs (200 + pointer + marketplace.json + 校验和真伪)
+        run: |
+          set -euo pipefail
+          SHA="${{ steps.pack.outputs.sha }}"
+          BASE="${MIRROR_PUBLIC_BASE}/plugins/crabcode-plugins-official"
+          WORK="${RUNNER_TEMP}/mirror-verify"
+          mkdir -p "${WORK}"
+          for url in "${BASE}/latest" "${BASE}/${SHA}.zip" \
+                     "${BASE}/${SHA}.zip.sha256" "${BASE}/marketplace.json.sha256"; do
+            CODE="$(curl -fsS -H 'Cache-Control: no-cache' -o /dev/null -w '%{http_code}' -I "${url}")" || {
+              echo "::error::不可达 ${url}"
+              exit 1
+            }
+            echo "✓ ${CODE} ${url}"
+          done
+          POINTER="$(curl -fsSL -H 'Cache-Control: no-cache' "${BASE}/latest")"
+          [ "${POINTER}" = "${SHA}" ] || { echo "::error::latest='${POINTER}' != ${SHA}"; exit 1; }
+          MP_COUNT="$(curl -fsSL -H 'Cache-Control: no-cache' "${BASE}/marketplace.json" | python3 -c 'import json,sys; print(len(json.load(sys.stdin)["plugins"]))')"
+          [ "${MP_COUNT}" -gt 0 ] || { echo "::error::镜像 marketplace.json plugins 为空"; exit 1; }
+          echo "✓ marketplace.json plugins=${MP_COUNT}"
+          # 校验和必须**真的**校验:只断言 200 等于只证明「有个文件在那」。这里把
+          # 审计器的两条判据(正则形态 + 摘要匹配真实字节)前移到发布当场。
+          for name in "${SHA}.zip" marketplace.json; do
+            curl -fsSL -H 'Cache-Control: no-cache' -o "${WORK}/${name}" "${BASE}/${name}"
+            curl -fsSL -H 'Cache-Control: no-cache' -o "${WORK}/${name}.sha256" "${BASE}/${name}.sha256"
+          done
+          cmp -s "${SHA}.zip" "${WORK}/${SHA}.zip" || {
+            echo "::error::public ${SHA}.zip does not byte-match the canonical local archive"
+            exit 1
+          }
+          cmp -s marketplace-src/.crabcode-plugin/marketplace.json \
+            "${WORK}/marketplace.json" || {
+            echo "::error::public marketplace.json does not byte-match ${SHA}"
+            exit 1
+          }
+          python3 - "${WORK}" "${SHA}" <<'PY'
+          import hashlib, pathlib, re, sys
+          work, sha = pathlib.Path(sys.argv[1]), sys.argv[2]
+          for payload in (f"{sha}.zip", "marketplace.json"):
+              record = (work / f"{payload}.sha256").read_text(encoding="ascii")
+              match = re.fullmatch(r"([0-9a-f]{64})  ([A-Za-z0-9._-]+)\n?", record)
+              if match is None:
+                  raise SystemExit(f"校验和记录形态不合审计器正则: {payload}.sha256 -> {record!r}")
+              if match.group(2) != payload:
+                  raise SystemExit(f"校验和记录指向了别的文件名: {match.group(2)} != {payload}")
+              actual = hashlib.sha256((work / payload).read_bytes()).hexdigest()
+              if actual != match.group(1):
+                  raise SystemExit(f"校验和与镜像字节不符: {payload}")
+              print(f"✓ {payload}.sha256 形态合规且与镜像字节相符")
+          PY
+          echo "官方插件市场镜像已就位,国内客户端启动将走镜像而非 GitHub git clone。"

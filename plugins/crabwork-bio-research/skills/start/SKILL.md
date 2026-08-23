@@ -1,12 +1,14 @@
 ---
 name: 生物科研工作流入门
 short-description: 检查科研数据源与分析能力，并为研究目标推荐起步路径
-description: Orients a biological researcher to the bio-research plugin—checks which literature, drug-discovery, data-repository, and visualization MCP servers are connected, and surveys the available analysis skills. Use when getting started or onboarding, when the user asks "what can this plugin do", "what tools/MCP servers are available", "how do I begin", "help me get set up", "what skills are here", or when they describe a research goal but are unsure where to start.
+description: Orients a biological researcher to the currently offline-safe bio-research plugin, surveys analysis skills that work with user-provided data, and records any future external-data need as blocked. Use when getting started or onboarding, when the user asks what the plugin can do, what skills are available, how to begin, or describes a research goal but is unsure where to start.
 ---
 
 # Bio-Research Start
 
-> If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../../CONNECTORS.md).
+> All MCP connectors are paused. Do not download, install, connect, or test a
+> server. Use user-provided files/text and treat CONNECTORS.md as historical
+> capability inventory only.
 
 You are helping a biological researcher get oriented with the bio-research plugin. Walk through the following steps in order.
 
@@ -22,9 +24,11 @@ together literature search, data analysis pipelines,
 and scientific strategy — all in one place.
 ```
 
-## Step 2: Check Available MCP Servers
+## Step 2: State the Current Containment Boundary
 
-Test which MCP servers are connected by listing available tools. Group the results:
+State that this version publishes no executable connector configuration and
+offers no external MCP tools. Do not inspect settings or propose a connection.
+The categories below are historical/future capability labels only:
 
 **Literature & Data Sources:**
 - ~~literature database — biomedical literature search
@@ -42,7 +46,8 @@ Test which MCP servers are connected by listing available tools. Group the resul
 - ~~scientific illustration — create scientific figures and diagrams
 - ~~AI research platform — AI for biology (histopathology, drug discovery)
 
-Report which servers are connected and which are not yet set up.
+Report every external category as `blocked / not connected`. Do not describe it
+as merely awaiting setup.
 
 ## Step 3: Survey Available Skills
 
@@ -56,24 +61,23 @@ List the analysis skills available in this plugin:
 | **Instrument Data Converter** | Convert lab instrument output to Allotrope ASM format |
 | **Scientific Problem Selection** | Systematic framework for choosing research problems |
 
-## Step 4: Optional Setup — Binary MCP Servers
+## Step 4: Blocked Local-Runtime Proposals
 
-Mention that two additional MCP servers are available as separate installations:
+If genomics-platform or scientific-tool-database access is requested, record the
+desired outcome, data/permission boundary, owner, and missing provenance,
+security, host, upgrade/restart, release, and rollback evidence.
 
-- **~~genomics platform** — Access cloud analysis data and workflows
-  Install: Download `txg-node.mcpb` from https://github.com/10XGenomics/txg-mcp/releases
-- **~~tool database** (Harvard MIMS) — AI tools for scientific discovery
-  Install: Download `tooluniverse.mcpb` from https://github.com/mims-harvard/ToolUniverse/releases
-
-These require downloading binary files and are optional.
+Do not name or link an archive, download dependencies, install a package, open a
+connector UI, or claim availability. Status remains
+`blocked / non-executable / not installed / not tested`.
 
 ## Step 5: Ask How to Help
 
 Ask the researcher what they're working on today. Suggest starting points based on common workflows:
 
-1. **Literature review** — "Search ~~literature database for recent papers on [topic]"
+1. **Literature review** — ask the user to provide papers/links or authorize ordinary web research
 2. **Analyze sequencing data** — "Run QC on my single-cell data" or "Set up an RNA-seq pipeline"
-3. **Drug discovery** — "Search ~~chemical database for compounds targeting [protein]" or "Find drug targets for [disease]"
+3. **Drug discovery** — analyze user-provided compound/target data or public sources retrieved through ordinary approved research
 4. **Data standardization** — "Convert my instrument data to Allotrope format"
 5. **Research strategy** — "Help me evaluate a new project idea"
 

@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { execFileSync } from "node:child_process";
 import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -61,6 +62,61 @@ describe("version consistency validator", () => {
       },
     ]);
     expect(await validateVersionConsistency(root)).toEqual([]);
+  });
+
+  test("rejects equal but non-strict versions across marketplace, manifest and package", async () => {
+    const root = await makeTempRoot();
+    await scaffold(root, [{
+      name: "alpha",
+      source: "./plugins/alpha",
+      entryVersion: "1.0.0-beta.1",
+      manifestVersion: "1.0.0-beta.1",
+      packageVersion: "1.0.0-beta.1",
+    }]);
+    const messages = (await validateVersionConsistency(root)).map((issue) => issue.message).join("\n");
+    expect(messages).toContain("marketplace version must be strict X.Y.Z");
+    expect(messages).toContain("plugin manifest for \"alpha\" version must be strict X.Y.Z");
+    expect(messages).toContain("package.json for \"alpha\" version must be strict X.Y.Z");
+  });
+
+  test("derives changed plugin bytes from the baseline and rejects an omitted nextPatch record", async () => {
+    const root = await makeTempRoot();
+    await writeJson(path.join(root, ".crabcode-plugin", "marketplace.json"), {
+      metadata: { version: "1.0.0" },
+      plugins: [{ name: "alpha", source: "./plugins/alpha", version: "1.0.0" }],
+    });
+    await writeJson(path.join(root, "plugins/alpha/.crabcode-plugin/plugin.json"), {
+      name: "alpha",
+      version: "1.0.0",
+    });
+    await writeFile(path.join(root, "plugins/alpha/README.md"), "baseline\n");
+    for (const args of [
+      ["init"],
+      ["config", "user.email", "test@example.invalid"],
+      ["config", "user.name", "Version Test"],
+      ["add", "."],
+      ["commit", "-m", "baseline"],
+    ]) execFileSync("git", ["-C", root, ...args]);
+    const baselineCommit = execFileSync("git", ["-C", root, "rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+    const baselineTree = execFileSync("git", ["-C", root, "rev-parse", "HEAD^{tree}"], { encoding: "utf8" }).trim();
+
+    await writeFile(path.join(root, "plugins/alpha/README.md"), "changed\n");
+    await writeJson(path.join(root, ".crabcode-plugin", "marketplace.json"), {
+      metadata: { version: "1.0.1" },
+      plugins: [{ name: "alpha", source: "./plugins/alpha", version: "1.0.0" }],
+    });
+    await writeJson(
+      path.join(root, "docs/audit/evidence/2026-08-23-mcp-remediation/remediation-release.json"),
+      {
+        baseline: { commit: baselineCommit, tree: baselineTree, marketplaceVersion: "1.0.0" },
+        remediation: { marketplaceVersion: "1.0.1" },
+        changedPluginCount: 0,
+        changedPlugins: [],
+      },
+    );
+    const messages = (await validateVersionConsistency(root)).map((issue) => issue.message).join("\n");
+    expect(messages).toContain('plugin "alpha" changed distributable source bytes; expected version 1.0.1, got 1.0.0');
+    expect(messages).toContain('changed plugin "alpha" must be listed with previous=1.0.0 and remediation=1.0.1');
   });
 
   test("flags marketplace version drifting from plugin.json", async () => {

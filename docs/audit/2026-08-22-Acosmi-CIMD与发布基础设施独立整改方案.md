@@ -1,12 +1,14 @@
 # Acosmi CIMD 与发布基础设施独立整改方案
 
+> **2026-08-23 整改修订**：Acosmi R/A/B 源码已合入，但生产门仍为 `blocked/release-infrastructure-unavailable`；公网 CIMD 仍 404，两份 AS metadata 仍广告未实现能力。本修订不改已合入的六字段 JSON，但将它降为“候选 provider 策略”；任何 remote 解锁仍需 MCP `2026-07-28` RFC 9207 `iss`、RFC 8707 `resource`、S256 与逐 provider E2E。发布依赖正式拆为 `ACOSMI-REL-BASE`、`P0-0A-BOOTSTRAP`、`GENESIS-INTEGRATION`，本文中任何旧命名或反向依赖均不再有效。插件分发只使用真实 `plugins/crabcode-plugins-official/latest + <sha>.zip + .sha256` 合同，不创建第二套 marketplace pointer。
+>
 > 日期：2026-08-22（America/Los_Angeles）
 >
 > 合同号：`ACOSMI-MCP-P0-2026-08-22-v1`
 >
 > 文档角色：Acosmi-owned 实施真源
 >
-> 状态：方案已固定，未实施；本次只读审计和文档拆分未修改 Acosmi 源码、生产服务、云资源、账号或密钥
+> 状态：历史方案已实施到 Acosmi Git main（R/A/B 源码与收口证据）；生产 `ACOSMI-REL-BASE`/P0-1 仍 `blocked/release-infrastructure-unavailable`，`P0-0A-BOOTSTRAP` 与 `GENESIS-INTEGRATION` 未实施，不得宣称公网 CIMD 或 remote 解锁完成
 >
 > 上位协调文档：《[插件库全仓 MCP 服务健康度根因审计与修复方案](./2026-08-22-插件库全仓MCP服务健康度-根因审计与修复方案.md)》（以下简称“主方案”）
 >
@@ -14,7 +16,7 @@
 >
 > 生产基线：`root@59.110.139.37`，后端制品 `c0af25ab2aa4c285a5c4869d9ff48fda6a9849af`，构建时间 `2026-08-19T04:38:16Z`
 
-> **协调修订（2026-08-22）**：主方案前置审计已否决全局固定 `3118`，CIMD 改用 portless loopback 注册基值，宿主实际授权使用 OS-assigned 临时端口。P0-0A/全局 release-lock 继续作为未来 remote-capable 解锁门，但不再阻断插件仓 remote=0 止血，也不阻断 Acosmi P0-1 的 metadata-safe/CIMD-safe A→B 发布。本文件后文若有冲突，以本修订及主方案前置审计裁决为准。
+> **协调修订（2026-08-22，2026-08-23 校正）**：全局固定 `3118` 已否决；`http://127.0.0.1/callback` + OS-assigned 实际端口是候选默认，仅在逐 provider 证明 RFC 8252 port exception 后可用。`P0-0A-BOOTSTRAP` 只阻断 `GENESIS-INTEGRATION`/remote-capable 解锁，不阻断插件仓 remote=0 止血或只受 `ACOSMI-REL-BASE` 约束的 A→B。后文不再使用“冲突时看页首”作为机器解析规则；三个 gate 必须逐条无冲突。
 
 SSH 凭据继续使用用户指定的本地私钥文件；私钥路径、内容、指纹和可恢复参数不得写入仓库、制品、命令输出或审计证据。
 
@@ -25,16 +27,17 @@ SSH 凭据继续使用用户指定的本地私钥文件；私钥路径、内容�
 | 工作包 | 内容 | 责任仓/系统 | 是否源码改动 |
 | --- | --- | --- | --- |
 | `ACOSMI-SRC-P0-1` | 删除两份 AS metadata 虚假广告，新增 CrabCode CIMD 公共路由及测试 | `Acosmi/nexus-v4/backend` | 是 |
-| `ACOSMI-REL-P0-1` | 两段完整部署 bundle、发布流水线、生产部署、双地点验收与安全回滚 | Acosmi `.github/workflows/deploy-cn-nexus-backend.yml` 与生产 | 是发布自动化改动，不是业务源码 |
-| `ACOSMI-OPS-P0-0A` | 跨云 DR、WORM、OIDC 双人审批、2-of-3 签名和 bootstrap canary；只阻断未来 remote-capable 解锁 | Acosmi Ops/Release | 否，为独立基础设施子轨 |
+| `ACOSMI-REL-BASE` | backend bundle primary/DR、四个 protected environment、OIDC、fixture、A/B 部署与回滚 | Acosmi Release/生产 | 是发布自动化与外部资源；只阻断 A/B |
+| `P0-0A-BOOTSTRAP` | public lock/evidence 跨云 DR、WORM、2-of-3 key/HMAC/offline-root 和 bootstrap canary | Acosmi Ops/Release | 否；只阻断未来 trust path |
+| `GENESIS-INTEGRATION` | bootstrap + safe artifacts + 必要 backend record 均通过后组合/签名/发布首份 lock | 跨仓 release | 否；不可反向成 bootstrap 前置 |
 
 权威分工固定为：
 
-1. Acosmi 后端文件、测试、两段制品、部署、回滚和 P0-0A 证据以本文档为实施真源。
+1. Acosmi 后端文件、测试、两段制品、部署、回滚与 `ACOSMI-REL-BASE`/`P0-0A-BOOTSTRAP` 证据以本文档为实施真源；两个 gate 不得互相代答。
 2. canonical client ID URL、callback、CIMD JSON、跨仓阻断关系、全局 release-lock schema 和联合解锁顺序以主方案为协调真源。
 3. 两份文档中任一交接合同字段变更，必须使用同一变更同步修订两文档；只修一处即验收失败。
 4. 三个工作包使用独立任务、工作树、评审和发布记录；不与 `CrabCode-Plugin` 或 `CrabCode` 改动合并为一个实施任务。
-5. P0-1 通过只代表 Acosmi 交付闭环，不代表 17 处 CIMD binding 可发布；联合解锁仍受主方案门禁约束。
+5. P0-1 通过只代表 Acosmi 交付闭环，不代表 17 条历史声明/候选映射已生成 generation=2 binding，更不代表它们可发布；联合解锁仍受主方案门禁约束。
 
 ## 1. 已证明的当前状态
 
@@ -189,6 +192,8 @@ root.GET("/oauth/crabcode-client-metadata", handler.CrabCodeClientMetadata)
 }
 ```
 
+上述六字段是 Acosmi 已合入的静态 source contract，不是对任意第三方 AS 的互操作保证。`http://127.0.0.1/callback` 只能在对应 AS 已证明会按 RFC 8252 忽略 loopback port 差异时与 `http://127.0.0.1:<os-assigned-port>/callback` 搭配。Notion/Linear/Canva/Synapse 需分别提交真实授权、reconnect/tools-list/canary 及同意页显示 redirect hostname/本地回调风险的证据。MCP `2026-07-28` 下游宿主还必须实现 RFC 9207 `iss` 验证、RFC 8707 `resource` 同时进 authorization/token request，以及 AS metadata 显式 `S256` 门禁。CIMD localhost-only 无法单独防止其他本地应用复用合法 client ID 冒充 CrabCode；该风险必须在 provider trust policy 中裁决，支持时评估 attestation/非对称客户端认证。`application_type=native` 是待 provider/OIDC E2E 的候选字段；本文档修订不擅自改写已合入源码的 exact key set。
+
 HTTP 合同固定为：
 
 | 项 | 固定值/规则 |
@@ -235,7 +240,7 @@ A 和 B 必须分别在 protected workflow 的 Linux Docker build 中生成两�
 
 `ACOSMI-SRC-P0-1` 完成的充要条件是：A/B 两 commit 可定位，A/B 两制品均通过全量测试和构建，差异只包含本节文件，且 B 的父链包含 A。
 
-## 3. `ACOSMI-REL-P0-1`：发布、验收与回滚
+## 3. `ACOSMI-REL-BASE`：P0-1 发布、验收与回滚
 
 ### 3.1 制品记录
 
@@ -335,7 +340,7 @@ JCS(["acosmi-backend-bundle-approval-v1",{
 }])
 ```
 
-只批 workflow run/environment 而不绑定上述 digest subject 不构成批准。`backend bundle stores + 四个 owner/approver environment + OIDC role + F-A-BIN-01 + F-A-FIXTURE-LIVE-01 + F-B-RBK-01` 是 `ACOSMI-REL-P0-1` 自身的发布安全门，不再归入 P0-0A；它未通过时不部署生产 A/B。P0-0A 的 2-of-3/HMAC/offline-root 等全局 trust-path 门独立并行，只阻断未来 genesis/remote-capable lock。
+只批 workflow run/environment 而不绑定上述 digest subject 不构成批准。`backend bundle stores + 四个 owner/approver environment + OIDC role + F-A-BIN-01 + F-A-FIXTURE-LIVE-01 + F-B-RBK-01` 共同构成 `ACOSMI-REL-BASE`；它未通过时不部署生产 A/B。`P0-0A-BOOTSTRAP` 的 2-of-3/HMAC/offline-root 等全局 trust-path 门独立并行，只阻断未来 `GENESIS-INTEGRATION`/remote-capable lock。
 
 生产 bundle 继续使用 `nexus-v4/backend/Dockerfile` 构建，`GIT_COMMIT=source_commit`，`BUILD_TIME` 只由工作流 UTC 时钟生成。从镜像提取 `server` 与七个 `.so`，生成 payload manifest，打包后按上述 DAG 批准、上传、独立重取并校验 bundle 与内层 manifest，再从已验收 primary 字节部署；禁止直接部署 runner 工作目录或 quarantine 中未双读回的字节。
 
@@ -358,7 +363,7 @@ R 将仓内 `nexus-v4/infra/systemd/nexus-backend.service` 固定改为 `Working
 
 ### 3.3 不可交换的部署顺序
 
-1. 在 `ACOSMI-REL-P0-1` 发布安全门（backend stores+四个 digest-specific approval environments+OIDC role+fixture）已通过后，从 A primary 重取完整 bundle，校验 bundle size/SHA 及内层 manifest，先在不连接生产 DB/Redis/外部服务的隔离 fixture 中验证 health+两份 metadata，再按第 3.2 节原子切换生产 A。P0-0A 全局 trust-path 子轨与 P0-1 并行，不阻断 A/B safe deployment。
+1. 在 `ACOSMI-REL-BASE`（backend stores+四个 digest-specific approval environments+OIDC role+fixture）已通过后，从 A primary 重取完整 bundle，校验 bundle size/SHA 及内层 manifest，先在不连接生产 DB/Redis/外部服务的隔离 fixture 中验证 health+两份 metadata，再按第 3.2 节原子切换生产 A。`P0-0A-BOOTSTRAP` 与 P0-1 并行，不阻断 A/B safe deployment。
 2. 验证 `/opt/acosmi/nexus-backend/current` 解析到 A-BIN-01 的 exact bundle SHA 目录，该目录八个 payload 都匹配 A manifest，`--version`=A commit、health 通过；同时验证普通和 desktop metadata 中 CIMD key 都缺席，且 DCR `registration_endpoint` 仍存在，然后才生成 A-LIVE-01。
 3. 从 B primary 重取完整 bundle，校验 bundle size/SHA 及内层 manifest，部署 B。
 4. 在 Acosmi CN 生产主机使用 loopback/SNI 验收。
@@ -509,23 +514,23 @@ curl --fail-with-body --silent --show-error \
 
 第 3.3 节的计划内回滚演练在完成上述 A 验证后不停留于 A；必须重新部署原 B bundle、重跑 CN/LA CIMD、两份 AS metadata、version 和 Nginx checksum 验收，并生成 `B-FINAL-01`。故障触发的真实回滚则停在 A 并保持 profile fail-close，P0-1 不标记完成。
 
-## 4. `ACOSMI-OPS-P0-0A`：独立运维/发布基础设施子轨
+## 4. `P0-0A-BOOTSTRAP`：独立 trust-path bootstrap
 
-本节与 P0-1 源码改动相互独立，可并行执行，但是首份 production genesis lock 的强制前置。全局 lock schema、component approvals、lease、key-set transition 和宿主验证算法严格以主方案第 6.1、8、10 节为准；下述 Bootstrap canary schema 是主方案第 6.1 节的执行镜像，字段/JCS/locator 任一不一致即 hard fail。
+本节与 P0-1 源码/`ACOSMI-REL-BASE` 相互独立，可并行；它是后续 `GENESIS-INTEGRATION` 的强制前置，但不是 A/B 的前置。全局 lock schema、component approvals、lease、key-set transition 和宿主验证算法严格以主方案第 6.1、8、10 节为准；Bootstrap canary schema 只验 `environment=test` 基础设施，不引用尚未生成的 production lock/plugin/marketplace/host artifact。
 
-P0-0A 必须一次性交付：
+`P0-0A-BOOTSTRAP` 必须交付：
 
 1. 公开 primary 固定为 `Alibaba Cloud OSS/accountAlias=acosmi-release-cn/region=cn-hangzhou/oss://acosmi-mcp-safe-primary-cn-hangzhou/crabcode/mcp-safe/`，`https://updates.acosmi.com/crabcode/mcp-safe/<key>` 逐 key 映射到 `oss://acosmi-mcp-safe-primary-cn-hangzhou/crabcode/mcp-safe/<key>`；primary 开启 versioning+WORM，禁止删除/改写旧 version/bypass retention。在独立 AWS accountAlias=`acosmi-release-dr`/`us-west-2` 创建 `s3://acosmi-mcp-safe-dr-us-west-2/crabcode/`，runtime DR 使用不依赖 `acosmi.com` DNS zone 的 `https://acosmi-mcp-safe-dr-us-west-2.s3.us-west-2.amazonaws.com/crabcode/`。DR bucket policy 只允许 `crabcode/mcp-safe/**` 与 `crabcode/host/**` 两前缀下 exact object GET/HEAD，禁止 public List/Put/Delete；其他 sibling prefix 必须被拒绝。每个 `visibility=public` artifact 必须在签名 lock 中同时绑定 HTTPS primary `artifactRef`、AWS 直接 HTTPS `runtimeMirrorRef` 和同 key S3 `disasterRecoveryRef`，三者 size/SHA 一致；`visibility=release-private` 的 `runtimeMirrorRef=null`。
-2. 建立并验收 backend bundle primary=`Alibaba Cloud OSS/accountAlias=acosmi-release-cn/region=cn-hangzhou/oss://acosmi-private-releases-cn-hangzhou/`，DR=`AWS S3/accountAlias=acosmi-release-dr/region=us-west-2/s3://acosmi-private-releases-dr-us-west-2/`；另创建 evidence primary=`Alibaba Cloud OSS/accountAlias=acosmi-release-cn/region=cn-hangzhou/oss://acosmi-private-release-evidence-cn-hangzhou/`，DR=`Alibaba Cloud OSS/accountAlias=acosmi-legal-dr-cn/region=cn-shanghai/oss://acosmi-private-release-evidence-dr-cn-shanghai/`，provider/component approval 原文只进 evidence 私有库，回滚审计只写两库各自 `rollback-audit/<YYYY>/<rollbackId>.json`。实际 account ID 不入仓，只将与三个稳定 alias 绑定的 salted account-ID hash 写入 bootstrap 证据。建库前 `legal` 和 `data-governance` 必须分别签署数据分类/保留/境内备份 policy 的 digest-specific attestation，缺一即 `release-infrastructure-unavailable`。
-3. 为公开 primary/DR、backend bundle primary/DR、私有 evidence 和回滚审计开启 versioning + Object Lock Compliance/WORM。backend bundle、lock/envelope 和不含个人/合同原文的 component approval attestation 永久保留；provider 合同/批准函/联系人/reviewer 原文只在中国境内 primary/DR 保留至到期、撤销或最后生产引用三者中最晚日期 +7 年，只允许 `legal` 签名 legal hold 延长；回滚记录保留 7 年。业务身份无 delete、无 bypass retention、无改写旧 version 权限。
-4. 使用企业私仓 `workflow_dispatch` 及 OIDC/IdP，固定建立 `backend-release-fixture-owner|backend-release-fixture-approver|backend-release-owner|backend-release-approver` 四个 protected environment；owner/approver 必须是两个不同 IdP subject，并对第 3.2 节同一 bundle digest subject 分别签名，issuer、attestation public-key allowlist 和 environment ID 钉住到 validator。不建常驻审批服务。
+2. 创建 evidence primary=`Alibaba Cloud OSS/accountAlias=acosmi-release-cn/region=cn-hangzhou/oss://acosmi-private-release-evidence-cn-hangzhou/`、DR=`Alibaba Cloud OSS/accountAlias=acosmi-legal-dr-cn/region=cn-shanghai/oss://acosmi-private-release-evidence-dr-cn-shanghai/`；provider/component approval 原文只进 evidence 私有库。实际 account ID 不入仓，只将与稳定 alias 绑定的 salted hash 写入 bootstrap 证据。`legal` 和 `data-governance` 必须分别签署数据分类/保留/境内备份 policy 的 digest-specific attestation。backend bundle primary/DR 与 rollback audit 属 `ACOSMI-REL-BASE`，不在本项重复验收。
+3. 为公开 lock/evidence primary/DR 和私有 evidence 开启 versioning + Object Lock Compliance/WORM。lock/envelope 和不含个人/合同原文的 component approval attestation 永久保留；provider 原文在中国境内 primary/DR 保留至到期、撤销或最后生产引用三者中最晚日期 +7 年，只允许 legal hold 延长。业务身份无 delete、bypass retention 或改写旧 version 权限。backend bundle WORM 由 `ACOSMI-REL-BASE` 独立证明。
+4. `P0-0A-BOOTSTRAP` 只钉住 release-signing/security/legal 这条 trust path 的 IdP subject/public-key allowlist 和审批 subject；`backend-release-*` 四个 protected environment 是 `ACOSMI-REL-BASE` 资源，本节只允许以 `relBaseEvidenceSha256` 引用，不将其存在视为 bootstrap pass。
 5. 创建 `thresholdPolicy=2-of-3` 的 A/B/C 三把 Ed25519 release key：A 归 `release-signing`，B 归独立账号 `security`，C 由 `security` + `acosmi-release` 双人线下保管。另建不参与日常签名的 offline release-root key，只在两把当前 key 永久不可恢复或已泄漏并有 `security`/`acosmi-release` 两份 IdP+WORM 证据时恢复 key set；recovery 演练只使用 test key set/test locator，不销毁或替换生产 key。
 6. 在私有 secret backend 创建 `providerEvidenceCommitmentKey`，备份由 `legal`/`security` 双人恢复；`legal` 与 `security` 分别持有 eligibility-verdict Ed25519 key，公开 verdict 必须两签。provider raw evidence 取回、HMAC 重算与 eligibility validator 固定在中国境内 VPC 的自托管 runner label=`self-hosted,linux,x64,cn-hangzhou,release-legal-validator` 执行，raw bytes 禁止进入 GitHub-hosted runner/artifact/cache/log，境外只接收最小双签 verdict+commitment；必须交付 egress deny 与 log/artifact 泄露扫描证据，并对公开 verdict 执行 provider/app/scope/region/distribution/reviewer/private URI/自由文本泄露扫描。
-7. 生成不可变 `release-infrastructure-bootstrap.json`，包含脱敏 account ID hash、region、公开 primary 底层 locator 及 HTTPS→object mapping SHA、公开 primary/DR/backend bundle primary/backend bundle DR/private evidence primary/private evidence DR 各自的 bucket policy SHA、Object Lock 模式/保留、OIDC issuer、四个 backend protected environment ID、CN 自托管 validator runner-pool digest/egress-policy SHA、retention/residency policy SHA 及 `legal`/`data-governance` attestation refs、releaseKeySetId、三个 keyId、offline-root keyId、thresholdPolicy、两个 verdict public keyId、commitmentKeyId 和验收时间。
+7. 生成不可变 `release-infrastructure-bootstrap.json`，只包含本 gate 拥有的脱敏 account ID hash、region、公开 lock/evidence primary/DR locator 及 policy/WORM SHA、OIDC issuer、CN validator runner-pool/egress-policy SHA、retention/residency attestation refs、releaseKeySetId/三个 keyId/offline-root keyId/thresholdPolicy、verdict public keyId、commitmentKeyId 与验收时间。backend stores/四个 backend environment 只用 `relBaseEvidenceSha256` 引用 `ACOSMI-REL-BASE` 的独立 evidence record，不复制为本 gate 所有。
 
 ### 4.1 Bootstrap canary 固定合同
 
-P0-0A 不使用尚未存在的 production current head 自证。它用 CSPRNG 生成 128-bit random、32 位小写 hex `canaryId` 和独立 32-byte random `payload.bin`，只写 `bootstrap-canary/<canaryId>/`。三类 payload locator 固定为：
+`P0-0A-BOOTSTRAP` 不使用尚未存在的 production current head 自证。它用 CSPRNG 生成 128-bit random、32 位小写 hex `canaryId` 和独立 32-byte random `payload.bin`，只写 `bootstrap-canary/<canaryId>/`。三类 payload locator 固定为：
 
 ```text
 payloadArtifactRef=https://updates.acosmi.com/crabcode/mcp-safe/bootstrap-canary/<canaryId>/payload.bin
@@ -584,23 +589,20 @@ https://acosmi-mcp-safe-dr-us-west-2.s3.us-west-2.amazonaws.com/crabcode/mcp-saf
 s3://acosmi-mcp-safe-dr-us-west-2/crabcode/mcp-safe/bootstrap-canary/<canaryId>/head.json
 ```
 
-三个 bootstrap mutable head 的 origin/CDN/object metadata 都固定 `Cache-Control: no-store`，取回请求发送 `Cache-Control: no-cache`。内容寻址 payload/envelope 与 production lock/envelope/`heads/<lockSequence>.json` 固定 `Cache-Control: public, max-age=31536000, immutable`；production mutable `head.json` 同样固定 `no-store`，宿主取回同样发送 `no-cache`。`https://updates.acosmi.com/crabcode/marketplace/current.json` 的 origin/CDN 也固定 `no-store`，generation=1/2 updater 请求固定 `no-cache`；内容寻址 marketplace 对象固定长缓存+`immutable`。
+三个 bootstrap mutable head 的 origin/CDN/object metadata 都固定 `Cache-Control: no-store`，取回请求发送 `Cache-Control: no-cache`。内容寻址 payload/envelope 与 production lock/envelope/`heads/<lockSequence>.json` 固定 `Cache-Control: public, max-age=31536000, immutable`；production mutable `head.json` 同样固定 `no-store`，宿主取回同样发送 `no-cache`。插件 marketplace 不属 bootstrap canary；它在 `GENESIS-INTEGRATION` 只按真实 `https://updates.acosmi.com/crabcode/plugins/crabcode-plugins-official/{latest,<sha>.zip,<sha>.zip.sha256,marketplace.json,marketplace.json.sha256}` 合同验收。
 
 production validator 只接受 `mcp-release-lock schemaVersion=2,environment=production,lockSequence>=1`，在验签前就必须拒绝 `BootstrapCanaryEnvelope`；canary 不得更新 production `head.json`、不得进入 production lock chain 或宿主高水位。
 
-### 4.2 P0-0A 验收
+### 4.2 `P0-0A-BOOTSTRAP` 验收
 
 以下项目必须全部通过。所有故障演练只操作 `environment=test` canary/test identity/test secret backend：DNS 故障只在 clean fixture 的本地 resolver 对 `acosmi.com` 做 deny，primary 凭据故障只撤掉 canary job identity 或在该 job 内 deny primary egress，HMAC/offline-root recovery 只用 test key copy/test key set。禁止修改生产 DNS、撤销生产 release identity、破坏生产 secret/key 或对非 canary object 执行 delete/retention 负测：
 
 - primary 底层 OSS、`updates.acosmi.com` HTTPS 映射、AWS HTTPS/S3 写入/读回同一 canary payload/envelope，各自 size/SHA 一致且 HTTPS→object key 映射逐字符正确；
-- 同一 canary payload 使用私有 release identity 写入 backend bundle primary/DR 的 `bootstrap-canary/<canaryId>/payload.bin`，两处独立读回的 size/SHA 一致，且该 test object 不被接受为 backend artifactRole；
 - 两处 cloud/account/region 确认不同；
 - 无对象存储凭据 clean fixture 可从 primary 和 AWS 直接域名独立取回、验签、验 payload；
-- 每个 public plugin/marketplace/host artifact 的 primary/runtimeMirror/DR 三定位按签名 lock 取回同一 size/SHA，在 primary 断开 clean fixture 中 generation=2 runtime 无凭据从 exact HTTPS `runtimeMirrorRef` 成功取回；private artifact 的 runtime mirror 必须为 null 且宿主不访问；
 - `crabcode/mcp-safe/**` 与 `crabcode/host/**` 的 canary exact GET/HEAD 均通过，sibling prefix GET 与 ListBucket 均被拒绝；
 - canary head 连续 Put v1/v2 生成两个 version ID，v1 仍可按 version ID 取回；
 - canary head v1→v2 更新后，primary 底层 object、`updates.acosmi.com` CDN、AWS HTTPS/S3 立即无认证 GET 都返回 v2 字节和 `Cache-Control: no-store`；内容寻址对象返回长缓存+`immutable`；
-- marketplace `current.json` 更新后立即无认证 GET 返回新 pointer 字节+`no-store`，generation=1/2 clean fixture 以 request `no-cache` 显式 refresh 后取得新 marketplace，内容寻址 marketplace 返回长缓存+`immutable`；
 - delete、改写旧 version、bypass retention 全部被拒绝；
 - clean fixture 本地 resolver deny `acosmi.com` 后，仍可从 AWS 直接域名取回并验签；生产 DNS 不变；
 - 撤掉 canary job identity 的 primary 权限或在该 job deny primary egress 后从 DR 完成取回；生产 release identity 不撤销；
@@ -609,7 +611,13 @@ production validator 只接受 `mcp-release-lock schemaVersion=2,environment=pro
 - test secret backend 中的 HMAC key copy 故障后双人恢复/重算一致，eligibility verdict 单签/错 profile/fingerprint/篡改 lease 全部拒绝；生产 HMAC key 不破坏、不轮换；
 - 短时 HSM/网络故障禁止启用 offline root，满足永久不可恢复条件时 offline-root recovery 正向演练通过。
 
-任一项失败：不生成首份 production genesis lock，remote profile 不解禁，已发布 emergency safe marketplace 继续生效。canary 保留为证据，不执行例外删除。
+任一项失败：`P0-0A-BOOTSTRAP=blocked`，不进入 `GENESIS-INTEGRATION`，remote profile 不解禁。该失败不改变 `ACOSMI-REL-BASE` 或 A/B 状态。canary 保留为证据，不执行例外删除。
+
+### 4.3 `GENESIS-INTEGRATION` 验收
+
+只在 `P0-0A-BOOTSTRAP=pass`、safe plugin/marketplace/host artifacts 已从真实 locator 发布并读回，且 lock 所引用 backend 已有 `ACOSMI-REL-BASE` exact evidence 时，才允许组合首份 production lock。签名后从 public primary/runtimeMirror/DR 取回 lock 及每个 public artifact 验 size/SHA；private artifact 必须 `runtimeMirrorRef=null`且宿主不访问。backend 只验 `relBaseEvidenceSha256` 指向的独立 record，不倒灌为 bootstrap 证据。
+
+插件镜像没有多文件事务，顺序固定为：上传 immutable `<sha>.zip` + `<sha>.zip.sha256` 并公网读回→复核远端 main/当次 SHA→单文件切 `plugins/crabcode-plugins-official/latest`（runtime 唯一线性化点）→最后更新非权威 `marketplace.json` projection 与 checksum。projection 不一致使全系统审计 blocked，但不得先用新 projection 宣称旧 `latest` runtime 已升级，也不得把 projection 当 runtime pointer。两代 clean fixture 安装并重启后 remote=0。验收器还必须证明不存在“先需 lock 才能 bootstrap，先需 bootstrap 才能生 lock”的环。任一项失败：不更新 production head，remote profile 不解禁，也不回滚已通过的 A/B。
 
 ## 5. 与 CrabCode / CrabCode-Plugin 的交接合同
 
@@ -617,17 +625,17 @@ production validator 只接受 `mcp-release-lock schemaVersion=2,environment=pro
 
 | 交接项 | 固定合同 | Owner | Acosmi 责任 |
 | --- | --- | --- | --- |
-| 输入 callback | CIMD 注册基值 `http://127.0.0.1/callback`；实际授权为 `http://127.0.0.1:<os-assigned-port>/callback` | `crabcode-mcp` | CIMD 只输出 portless 注册基值；不修改宿主 listener；不输出 wildcard/模板字符串 |
+| 输入 callback | 候选 CIMD 注册值 `http://127.0.0.1/callback`；实际授权为 `http://127.0.0.1:<os-assigned-port>/callback`；只在 AS/provider 证明 RFC 8252 port exception 后可用 | `crabcode-mcp` | CIMD 只输出静态注册值；不修改 listener；不输出 wildcard/模板 |
 | 输出 CIMD | public GET 200、固定 JSON/headers、无重定向 | `acosmi-backend` | 实现、测试、双地点发布验收 |
 | 输出 AS metadata | 两份 metadata 都不含虚假 key | `acosmi-backend` | 实现、测试、先 A 后 B 部署 |
 | 证据 | A/B backend commit/version、双地点 CIMD+AS metadata curl、bundle/inner-manifest size/SHA、primary+DR、双人 attestation | `acosmi-ops` | 生成可验、无 secret 的 evidence record |
-| 联合解锁 | generation=2 + release gate + 真实 OAuth/reconnect/tools-list/canary | 联合门 | P0-1 证据只作为其中一个前置 |
+| 联合解锁 | generation=2 + RFC 9207 `iss` + RFC 8707 双请求 `resource` + AS metadata `S256` + 真实 OAuth/reconnect/tools-list/canary/同意页证据 + release gate | 联合门 | P0-1 证据只作为其中一个前置 |
 
-当前 Notion 10、Linear 5、Canva 1、Synapse 1，共 17 处 CIMD binding 继续 blocked。只有在 Acosmi P0-1 通过、CrabCode `authPolicyGeneration=2` 通过、签名 release gate 通过，且对应供应商逐 profile 真实授权、targeted reconnect、`tools/list` 与只读 canary 均通过后，该 profile 才能由更高序号 lock 解锁。
+当前 Notion 10、Linear 5、Canva 1、Synapse 1，共 17 条历史声明/候选映射继续 blocked；当前不存在可被宿主消费的 generation=2 binding artifact。只有在 Acosmi P0-1、CrabCode `authPolicyGeneration=2`、签名 release gate 及对应供应商逐 profile 真实授权、`iss/resource/S256`、targeted reconnect、`tools/list`、只读 canary 与同意页风险证据全部通过后，该 profile 才能由更高序号 lock 解锁。
 
 P0-1 本身不实现下列下游事项：
 
-- CrabCode OS-assigned loopback listener、PKCE、auth policy generation/fingerprint、凭据仓和 targeted reconnect；
+- CrabCode OS-assigned loopback listener、PKCE、RFC 9207 `iss`、RFC 8707 `resource`、S256 metadata gate、auth policy generation/fingerprint、凭据仓和 targeted reconnect；
 - CrabCode-Plugin catalog/binding、provider basis、ToolSearch、Skill capability gate、marketplace 发布；
 - Notion/Linear/Canva/Synapse 供应商账号、审批、scope 和 canary tenant。
 
@@ -654,9 +662,11 @@ P0-1 本身不实现下列下游事项：
 
 P0-1 完成必须同时满足上表全部十四项。任一证据缺失或为 `not-tested` 时，状态固定为 `blocked`，不得写“条件通过”“基本完成”或“等待确认”。
 
-### 6.2 P0-0A 必须证据
+### 6.2 `P0-0A-BOOTSTRAP` 与 `GENESIS-INTEGRATION` 必须证据
 
-P0-0A 完成证据固定为：`release-infrastructure-bootstrap.json`、BootstrapCanaryEnvelope/payload 三类 exact locators/size/SHA、mutable head `no-store`/request `no-cache`/内容寻址 `immutable` 响应头及 v1→v2 立即新字节证据、public artifact primary/runtimeMirror/DR 三定位同 size/SHA 与 primary 断开后 runtime HTTPS mirror 取回证据、backend-store canary primary/DR readback、`mcp-safe/host` 前缀正测与 sibling/List 负测、Object Lock/version IDs/拒绝证据、rollback-audit primary/DR 同字节 size/SHA/readback/version-ID fixture、clean-fixture resolver deny、canary identity/egress 故障演练、四 protected environment 与 owner/approver digest-specific OIDC attestations、2-of-3 正负测、test HMAC recovery、eligibility 双签测试、CN 自托管 validator egress/log/artifact 泄露扫描、`legal`+`data-governance` retention/residency policy attestations 和 test-only offline-root recovery 演练。任一项缺失则 `release-infrastructure-unavailable`。
+`P0-0A-BOOTSTRAP` 证据只包括：`release-infrastructure-bootstrap.json`、BootstrapCanaryEnvelope/payload 三类 exact locators/size/SHA、mutable head `no-store`/request `no-cache`/内容寻址 `immutable` 及 v1→v2 新字节证据、`mcp-safe/host` 前缀正测与 sibling/List 负测、Object Lock/version IDs/拒绝证据、clean-fixture resolver deny、canary identity/egress 故障演练、2-of-3 正负测、test HMAC recovery、eligibility 双签、CN validator egress/log/artifact 泄露扫描、retention/residency attestations 和 test-only offline-root recovery。任一项缺失则 `P0-0A-BOOTSTRAP=blocked`。
+
+`GENESIS-INTEGRATION` 另行要求：public artifact primary/runtimeMirror/DR 三定位同 size/SHA、primary 断开后 runtime HTTPS mirror 取回、`relBaseEvidenceSha256` 绑定 backend/rollback audit/四 protected environments/OIDC attestations，以及真实插件镜像 `latest/<sha>.zip/.sha256/marketplace` 发布与宿主重启验收。任一项缺失则不生 production lock，但不倒推 bootstrap 或 A/B 失败。
 
 公开证据不得包含 token、authorization code、state、client secret、SSH 密钥/路径、完整授权 URL query、供应商合同原文、provider reviewer subject 或 provider/legal evidence private locator。Acosmi backend bundle primary/DR locator 按主方案 `artifacts[] visibility=release-private` 合同记录，不属于上述 provider evidence 禁入字段。
 
@@ -669,11 +679,13 @@ P0-0A 完成证据固定为：`release-infrastructure-bootstrap.json`、Bootstra
 | A/B 构建、digest-specific 双人批准、primary/DR 发布 | `acosmi-ops` | `acosmi-release` | `release-signing`、`security` |
 | CN/LA 双地点验收 | `acosmi-ops` | `acosmi-release` | `qa-release`、`support` |
 | B→A 回滚与演练 | `acosmi-ops` | `acosmi-release` | `acosmi-backend`、`crabcode-mcp`、`security` |
-| P0-0A public/backend 跨云 DR，private evidence 境内 DR/WORM/OIDC | `acosmi-ops` | `acosmi-release` | `security`、`legal`、`data-governance`、`cost-owner`、`qa-release` |
+| `ACOSMI-REL-BASE` backend DR/四环境/OIDC/fixture | `acosmi-ops` | `acosmi-release` | `security`、`qa-release`、`cost-owner` |
+| `P0-0A-BOOTSTRAP` public lock/evidence DR/WORM/key/canary | `acosmi-ops` | `acosmi-release` | `security`、`legal`、`data-governance`、`cost-owner`、`qa-release` |
+| `GENESIS-INTEGRATION` artifact/lock/镜像组合 | `lock-composition` | `marketplace-approver` | `plugin-platform`、`crabcode-release`、`acosmi-release`、`qa-release` |
 | private evidence 分类/保留/驻留地 policy | `data-governance` | `legal` | `security`、`acosmi-ops`、`cost-owner` |
 | 2-of-3 key set/offline root | `release-signing` | `acosmi-release` | `security`、`crabcode-release`、`marketplace-approver` |
-| callback/generation=2/reconnect | `crabcode-mcp` | `crabcode-release` | `acosmi-backend`、`plugin-platform` |
-| 17 处 binding 解锁 | `plugin-platform` | `marketplace-approver` | `provider-integrations`、`qa-release`、`acosmi-release` |
+| callback/`iss`/`resource`/S256/generation=2/reconnect | `crabcode-mcp` | `crabcode-release` | `acosmi-backend`、`plugin-platform`、`security` |
+| 17 条候选映射建 binding/解锁 | `plugin-platform` | `marketplace-approver` | `provider-integrations`、`qa-release`、`acosmi-release` |
 
 Responsible 与 Approver 不得是同一 IdP subject。无法验证身份分离时，发布与回滚演练都不得开始。
 
@@ -697,8 +709,9 @@ Responsible 与 Approver 不得是同一 IdP subject。无法验证身份分离�
 | --- | --- | --- |
 | 第 1 节当前证据 | 第 3.1–3.3 节 | 证据基线变化时两文档同改 |
 | `ACOSMI-SRC-P0-1` | 第 6.2 节 | URL/callback/JSON/headers/metadata 任一变化时两文档同改 |
-| `ACOSMI-REL-P0-1` | 第 8 节发布/回滚顺序 | A/B 角色、发布顺序、回滚目标两文档同改 |
-| `ACOSMI-OPS-P0-0A` | 第 6.1、8、10 节 | 本文只管 Acosmi-owned 落地/证据，全局 schema 主方案真源 |
+| `ACOSMI-REL-BASE` | 第 8 节发布/回滚顺序 | backend stores/四环境/OIDC/fixture、A/B 角色、发布顺序、回滚目标两文档同改 |
+| `P0-0A-BOOTSTRAP` | 第 6.1、8、10 节 | 只管 public lock/evidence DR/WORM/key/canary，不管 A/B |
+| `GENESIS-INTEGRATION` | 第 8、10 节 | safe artifacts + bootstrap + relBase evidence 无环组合，全局 schema 主方案真源 |
 | 交接合同 | 第 4、6.3、8、10、14 节 | 只有跨仓同一变更才可修改 |
 
 实施记录不覆写本方案。执行时应新建以合同号为前缀的 evidence/index 文件，逐项引用本文第 6 节 ID。所有项通过前，状态只能是 `planned`、`in-progress`、`blocked` 或 `passed`；`not-tested` 一律归入 `blocked`。

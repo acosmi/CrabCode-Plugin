@@ -105,28 +105,6 @@ Log all notifications for audit or analysis:
 
 **Use for:** Tracking user notifications or integration with external logging systems.
 
-## Pattern 5: MCP Tool Monitoring
-
-Monitor and validate MCP tool usage:
-
-```json
-{
-  "PreToolUse": [
-    {
-      "matcher": "mcp__.*__delete.*",
-      "hooks": [
-        {
-          "type": "prompt",
-          "prompt": "Deletion operation detected. Verify: Is this deletion intentional? Can it be undone? Are there backups? Return 'approve' only if safe."
-        }
-      ]
-    }
-  ]
-}
-```
-
-**Use for:** Protecting against destructive MCP operations.
-
 ## Pattern 6: Build Verification
 
 Ensure project builds after code changes:

@@ -1,26 +1,17 @@
 # Greptile
 
-> **MCP 安全暂停（2026-08-22）**：安全状态：本版本不发布可执行 MCP 配置；安装不会启动该服务或发起网络请求。 本文保留目标能力与后续接入资料，不代表当前版本已连接或可执行。
+> **MCP 安全暂停（2026-08-22）**：本版本不发布可执行 MCP 配置；安装不会启动该服务或发起网络请求。如果曾安装旧版，请先升级插件并重启 CrabCode；仅重载插件不能证明旧 MCP 客户端或进程已退出。下文任何 Connect、`.mcp.json`、端点、launcher 或启动描述均仅是历史配置/未来恢复审查参考，不代表本版本会生成配置、连接、启动或提供相应工具。
 
 [Greptile](https://greptile.com) is an AI code review agent for GitHub and
-GitLab. This plugin connects CrabCode to your Greptile account so you can
-view and resolve Greptile's review comments directly from your editor.
+GitLab. This file preserves historical integration metadata; the current
+plugin does not connect CrabCode to Greptile.
 
-## Connect
+## Historical connection reference (inactive)
 
-1. Sign in at [greptile.com](https://greptile.com) and link your GitHub or
-   GitLab repositories.
-2. Create an API key at
-   [https://app.greptile.com/settings/api](https://app.greptile.com/settings/api).
-3. Export the key for the shell that launches CrabCode:
+The removed configuration used an API key over remote HTTP. This is incident
+history only; do not create or export a key for this plugin.
 
-   ```bash
-   export GREPTILE_API_KEY="grpt_..."
-   ```
-
-The MCP transport is HTTP; the key is passed as a bearer header.
-
-## What you can do
+## Historical target capabilities (not available)
 
 - List, search, and inspect pull requests and merge requests
 - Trigger a Greptile review on a pull request
@@ -29,6 +20,5 @@ The MCP transport is HTTP; the key is passed as a bearer header.
 
 ## Notes
 
-This plugin only wires the Greptile MCP endpoint into CrabCode. CrabCode does
-not own or maintain that server; authentication, retention, and rate limits
-follow Greptile's policy.
+Future restoration would require provider/host E2E, retention review, scoped
+authentication, and an approved release. No endpoint is wired in this version.

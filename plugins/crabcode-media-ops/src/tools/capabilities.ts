@@ -67,7 +67,7 @@ export async function handler(_args: Record<string, never> = {}, principal?: Tru
       automaticBrowserVisualVerification: true,
       automaticHtmlValidation: 'Nu Html Checker 26.7.15',
       automaticAccessibilityVerification: 'axe-core 4.12.1 automated rules plus manual review',
-      fixedBrowserEvidence: 'Playwright 1.61.1 / Chromium 149.0.7827.55',
+      fixedBrowserEvidence: 'Playwright 1.61.1 / Chromium revision 1228 (darwin 149.0.7827.55; linux 149.0.7827.0)',
       namedVisualReviewAttestation: true,
       renderContract: RENDER_CONTRACT,
       approvalStateMachine: true,

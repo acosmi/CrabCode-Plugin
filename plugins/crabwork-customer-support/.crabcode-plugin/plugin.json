@@ -1,6 +1,6 @@
 {
   "name": "crabwork-customer-support",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Triage tickets, draft responses, escalate issues, and build your knowledge base. Research customer context and turn resolved issues into self-service content. Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"

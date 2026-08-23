@@ -1,8 +1,59 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "baselineId": "mcp-emergency-safe-baseline-v1",
   "auditDate": "2026-08-22",
-  "baselineCommit": "a9dc9abd71e2bdfbf33aafa58bcea0b2d42e3bd3",
+  "amendedAt": "2026-08-23",
+  "evidenceStatus": "historical-inventory-git-object-bound-remediation-rerun-required",
+  "gateEligible": false,
+  "baselineCommit": "0192ec8669e8c76eff64a49ff2257d3c111263d7",
+  "baselineTree": "b29debe0a63118e8130ca3541dc4bdd31ed34134",
+  "targetTaskCommit": "7975750360730d206240a9f7f499a184f9c61120",
+  "targetMergeCommit": "c1c5dd9cd3494af783ce98f49a58e9ba361638aa",
+  "targetTree": "1b11ebaa19a8d3072c04bd7a53e58f5406196a4e",
+  "remediationCommit": null,
+  "remediationTree": null,
+  "parentBinding": {
+    "child": "7975750360730d206240a9f7f499a184f9c61120",
+    "expectedDirectParent": "0192ec8669e8c76eff64a49ff2257d3c111263d7",
+    "actualDirectParent": "0192ec8669e8c76eff64a49ff2257d3c111263d7",
+    "verified": true,
+    "mergeParents": [
+      "0192ec8669e8c76eff64a49ff2257d3c111263d7",
+      "7975750360730d206240a9f7f499a184f9c61120"
+    ],
+    "taskAndMergeTreeMatch": true,
+    "removedConfigShaRule": "sha256(raw bytes from baselineCommit:<configPath>)",
+    "allRemovedConfigShasVerifiedAgainstDirectParent": true
+  },
+  "verificationBinding": {
+    "testedCommit": null,
+    "testedTree": null,
+    "startedAt": null,
+    "finishedAt": null,
+    "exitCode": null,
+    "log": {
+      "relativePath": null,
+      "sizeBytes": null,
+      "sha256": null
+    },
+    "requiredBeforeGate": true,
+    "unfilledReason": "the 2026-08-22 inventory did not bind a test execution log; rerun on the remediation commit and fill all fields"
+  },
+  "distributionObservation": {
+    "observedAt": "2026-08-23T08:58:03Z",
+    "latestUrl": "https://updates.acosmi.com/crabcode/plugins/crabcode-plugins-official/latest",
+    "observedLatestCommit": "2e0b1266dcc4c34f8930cd589ce7aaedd6aa0f10",
+    "containsTargetTaskCommit": false,
+    "marketplaceProjectionUrl": "https://updates.acosmi.com/crabcode/plugins/crabcode-plugins-official/marketplace.json",
+    "marketplaceProjectionAuthoritativeForRuntime": false,
+    "observedProjectionVersions": {
+      "marketplace": "0.4.2",
+      "asana": "0.1.0",
+      "crabcode-html-video": "0.1.2",
+      "crabcode-media-ops": "0.4.2"
+    },
+    "status": "blocked-unsafe-old-mirror"
+  },
   "marketplaceVersion": {
     "previous": "0.4.2",
     "safe": "0.4.3"
@@ -861,13 +912,47 @@
       "action": "removed-from-published-plugin"
     }
   ],
-  "expectedPostContainment": {
-    "mcpConfigFiles": 1,
-    "totalServers": 1,
-    "httpServers": 0,
-    "sseServers": 0,
-    "stdioServers": 1,
+  "historicalTargetTreePostContainment": {
+    "publishedPluginRootMcpConfigFiles": 1,
+    "repositoryMcpConfigFiles": 2,
+    "repositoryAdditionalExecutableConfigPaths": [
+      "templates/plugin-mcp-wrapper/.mcp.json"
+    ],
+    "publishedPluginRootTotalServers": 1,
+    "publishedPluginRootHttpServers": 0,
+    "publishedPluginRootSseServers": 0,
+    "publishedPluginRootStdioServers": 1,
+    "repositoryExecutableServerCount": 2,
     "nonEmptyRequiredMcpPlugins": 1,
-    "pausedMarketplaceDisclosures": 42
+    "pausedMarketplaceDisclosures": 42,
+    "status": "source-tree-partial-pass-repository-template-gap"
+  },
+  "requiredRemediationPostContainment": {
+    "publishedPluginRootMcpConfigFiles": 1,
+    "repositoryExecutableMcpConfigFiles": 1,
+    "allowedExecutableConfigPath": "plugins/crabcode-html-video/.mcp.json",
+    "manifestInlineOrPathMcpServers": 0,
+    "publishedMcpbReferences": 0,
+    "repositoryHttpServers": 0,
+    "repositorySseServers": 0,
+    "repositoryStdioServers": 1,
+    "workflowFiles": 4,
+    "retiredPublisherWorkflowId": 336369746,
+    "retiredPublisherRequiredState": "disabled_manually",
+    "automaticWorkflowTriggers": 0,
+    "distributionLatestMustEqualTestedCommit": true,
+    "distributionOrder": [
+      "upload-and-public-readback-immutable-zip",
+      "upload-and-public-readback-zip-checksum",
+      "revalidate-remote-main-and-dispatched-sha",
+      "switch-latest-runtime-linearization-point",
+      "update-non-authoritative-marketplace-projection",
+      "update-and-readback-marketplace-projection-checksum"
+    ],
+    "runtimeLinearizationPoint": "plugins/crabcode-plugins-official/latest",
+    "marketplaceProjectionAuthoritativeForRuntime": false,
+    "projectionMismatchBlocksOverallAudit": true,
+    "upgradeAndHostRestartFixtureMustPass": true,
+    "status": "not-tested"
   }
 }

@@ -396,14 +396,14 @@ Write using verb-first instructions, not second person:
 **Correct (imperative):**
 ```
 To create a hook, define the event type.
-Configure the MCP server with authentication.
+Record blocked external-capability evidence requirements.
 Validate settings before use.
 ```
 
 **Incorrect (second person):**
 ```
 You should create a hook by defining the event type.
-You need to configure the MCP server.
+You need to record blocked external-capability evidence requirements.
 You must validate settings before use.
 ```
 
@@ -636,7 +636,7 @@ Good for: Complex domains with validation utilities
 Plugin-dev's skills demonstrate best practices:
 - `../hook-development/` - Progressive disclosure, utilities
 - `../agent-development/` - AI-assisted creation, references
-- `../mcp-integration/` - Comprehensive references
+- `../mcp-integration/` - Proposal-only MCP risk and evidence inventory
 - `../plugin-settings/` - Real-world examples
 - `../command-development/` - Clear critical concepts
 - `../plugin-structure/` - Good organization

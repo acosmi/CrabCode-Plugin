@@ -1,6 +1,6 @@
 # lua-lsp
 
-> **MCP 安全暂停（2026-08-22）**：安全状态：本版本不发布可执行 MCP 配置；安装不会启动该服务或发起网络请求。 本文保留目标能力与后续接入资料，不代表当前版本已连接或可执行。
+> **MCP 安全暂停（2026-08-22）**：本版本不发布可执行 MCP 配置；安装不会启动该服务或发起网络请求。如果曾安装旧版，请先升级插件并重启 CrabCode；仅重载插件不能证明旧 MCP 客户端或进程已退出。下文任何 Connect、`.mcp.json`、端点、launcher 或启动描述均仅是历史配置/未来恢复审查参考，不代表本版本会生成配置、连接、启动或提供相应工具。
 
 Lua language server bridge for CrabCode, providing code intelligence and diagnostics.
 
@@ -44,7 +44,7 @@ sudo dnf install lua-language-server
 
 ## Usage
 
-After installing lua-language-server, register this plugin with CrabCode. The runtime entry is declared in `.mcp.json` and starts the wrapper via `bun run src/lsp-wrapper.ts`. The wrapper proxies LSP traffic between the CrabCode host and the upstream server.
+Historical reference only: the removed `.mcp.json` started this wrapper via `bun run src/lsp-wrapper.ts` and proxied LSP traffic. The current version does not register or start the wrapper; installing the upstream binary does not reactivate it.
 
 If `lua-language-server` is missing from `PATH`, the wrapper exits with status 127 and prints an install hint to stderr.
 

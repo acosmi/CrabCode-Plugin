@@ -57,7 +57,11 @@ Write the notes to a new file named after the transcript with `-notes` appended.
 
 ---
 
-## Standard Plugin: Skills + MCP
+## Historical Standard Plugin Shape (MCP Removed)
+
+> Any MCP files, server maps, endpoints, and tool calls shown later in this
+> historical example are withdrawn and must not be copied. Replace them with a
+> blocked non-executable capability/evidence proposal.
 
 A plugin that combines domain knowledge, user-initiated actions, and external service integration.
 
@@ -76,7 +80,8 @@ code-quality/
 │   │   └── SKILL.md
 │   └── fix-lint/
 │       └── SKILL.md
-├── .mcp.json
+├── proposals/
+│   └── mcp-capabilities.md
 └── README.md
 ```
 
@@ -180,24 +185,17 @@ Project coding standards and conventions for consistent, high-quality code.
 - **`references/style-rules.md`** — complete style rules by language
 ```
 
-### .mcp.json
+### proposals/mcp-capabilities.md
 
-```json
-{
-  "mcpServers": {
-    "github": {
-      "type": "http",
-      "url": "https://api.githubcopilot.com/mcp/"
-    }
-  }
-}
-```
+Status is `blocked / non-executable / not connected`. Record the desired source
+control capability, data/identity boundary, owner, failure behavior, and missing
+review evidence. Do not select an endpoint, transport, command, or package.
 
 ---
 
 ## Full-Featured Plugin: All Component Types
 
-A plugin using skills, agents, hooks, and MCP integration with tool-agnostic connectors.
+A plugin using skills, agents, hooks, and blocked external capability proposals.
 
 ### Structure
 
@@ -218,7 +216,8 @@ engineering-workflow/
 │   └── ticket-analyzer.md
 ├── hooks/
 │   └── hooks.json
-├── .mcp.json
+├── proposals/
+│   └── mcp-capabilities.md
 ├── CONNECTORS.md
 └── README.md
 ```
@@ -318,35 +317,20 @@ Followed by a brief rationale for the top 5 priorities.
 
 ## How tool references work
 
-Plugin files use `~~category` as a placeholder for whatever tool the user
-connects in that category. Plugins are tool-agnostic.
+Plugin files use `~~category` as a placeholder for a future capability class.
+No provider is connected by this example.
 
 ## Connectors for this plugin
 
-| Category        | Placeholder         | Included servers | Other options       |
-| --------------- | ------------------- | ---------------- | ------------------- |
-| Project tracker | `~~project tracker` | Linear           | Asana, Jira, Monday |
-| Chat            | `~~chat`            | Slack            | Microsoft Teams     |
-| Source control  | `~~source control`  | GitHub           | GitLab, Bitbucket   |
+| Category        | Placeholder         | Historical provider examples | Current status |
+| --------------- | ------------------- | ---------------------------- | -------------- |
+| Project tracker | `~~project tracker` | Linear, Asana, Jira, Monday   | blocked |
+| Chat            | `~~chat`            | Slack, Microsoft Teams        | blocked |
+| Source control  | `~~source control`  | GitHub, GitLab, Bitbucket     | blocked |
 ```
 
-### .mcp.json
+### proposals/mcp-capabilities.md
 
-```json
-{
-  "mcpServers": {
-    "linear": {
-      "type": "sse",
-      "url": "https://mcp.linear.app/sse"
-    },
-    "github": {
-      "type": "http",
-      "url": "https://api.githubcopilot.com/mcp/"
-    },
-    "slack": {
-      "type": "http",
-      "url": "https://mcp.slack.com/mcp"
-    }
-  }
-}
-```
+Record project tracking, source control, and chat as separate blocked capability
+rows. Do not include provider endpoints, server maps, commands, packages,
+secrets, tool names, or activation steps.

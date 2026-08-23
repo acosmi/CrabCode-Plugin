@@ -1,4 +1,5 @@
 import { existsSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -38,6 +39,7 @@ export type VersionConsistencyIssue = {
  * loosening the rule.
  */
 const PACKAGE_VERSION_BASELINE = new Set<string>([]);
+const STRICT_SEMVER = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/u;
 
 type MarketplaceEntry = {
   name?: unknown;
@@ -62,6 +64,220 @@ function resolveSourceDir(root: string, source: string): string {
 function readVersion(manifest: Record<string, unknown> | null): string | null {
   const raw = manifest?.version;
   return typeof raw === "string" && raw.length > 0 ? raw : null;
+}
+
+function nextPatch(version: string): string | null {
+  const match = STRICT_SEMVER.exec(version);
+  if (!match) return null;
+  return `${match[1]}.${match[2]}.${Number(match[3]) + 1}`;
+}
+
+function gitZeroSeparated(root: string, args: string[]): string[] {
+  const output = execFileSync("git", ["-C", root, ...args]);
+  return output.toString("utf8").split("\0").filter(Boolean);
+}
+
+function gitText(root: string, args: string[]): string {
+  return execFileSync("git", ["-C", root, ...args], { encoding: "utf8" }).trim();
+}
+
+type RemediationEntry = {
+  pluginId?: unknown;
+  previousVersion?: unknown;
+  remediationVersion?: unknown;
+};
+
+async function validateRemediationVersionContract(
+  root: string,
+  marketplace: Record<string, unknown>,
+): Promise<VersionConsistencyIssue[]> {
+  const issues: VersionConsistencyIssue[] = [];
+  const evidencePath = path.join(
+    root,
+    "docs/audit/evidence/2026-08-23-mcp-remediation/remediation-release.json",
+  );
+  if (!existsSync(evidencePath)) return issues;
+  const evidence = await readJson(evidencePath);
+  if (!evidence) {
+    return [{
+      severity: "error",
+      path: path.relative(root, evidencePath),
+      message: "remediation release evidence is not valid JSON",
+    }];
+  }
+  const baseline = evidence?.baseline as Record<string, unknown> | undefined;
+  const remediation = evidence?.remediation as Record<string, unknown> | undefined;
+  const changedEntries = evidence?.changedPlugins;
+  const baselineCommit = typeof baseline?.commit === "string" ? baseline.commit : null;
+  const baselineTree = typeof baseline?.tree === "string" ? baseline.tree : null;
+  const baselineMarketplaceVersion = typeof baseline?.marketplaceVersion === "string"
+    ? baseline.marketplaceVersion
+    : null;
+  const remediationMarketplaceVersion = typeof remediation?.marketplaceVersion === "string"
+    ? remediation.marketplaceVersion
+    : null;
+  if (
+    !baselineCommit ||
+    !/^[0-9a-f]{40}$/u.test(baselineCommit) ||
+    !baselineTree ||
+    !/^[0-9a-f]{40}$/u.test(baselineTree) ||
+    !baselineMarketplaceVersion ||
+    !STRICT_SEMVER.test(baselineMarketplaceVersion) ||
+    !remediationMarketplaceVersion ||
+    !STRICT_SEMVER.test(remediationMarketplaceVersion) ||
+    !Array.isArray(changedEntries)
+  ) {
+    return [{
+      severity: "error",
+      path: path.relative(root, evidencePath),
+      message: "remediation release evidence lacks a strict baseline commit/tree/marketplace version or changedPlugins array",
+    }];
+  }
+
+  let actualBaselineTree: string;
+  let baselineMarketplace: Record<string, unknown>;
+  let changedPaths: Set<string>;
+  try {
+    actualBaselineTree = gitText(root, ["rev-parse", `${baselineCommit}^{tree}`]);
+    baselineMarketplace = JSON.parse(gitText(root, [
+      "show",
+      `${baselineCommit}:.crabcode-plugin/marketplace.json`,
+    ])) as Record<string, unknown>;
+    changedPaths = new Set([
+      ...gitZeroSeparated(root, [
+        "diff",
+        "--name-only",
+        "-z",
+        ["--no-", "ren", "ames"].join(""),
+        baselineCommit,
+        "--",
+      ]),
+      ...gitZeroSeparated(root, ["ls-files", "--others", "--exclude-standard", "-z"]),
+    ]);
+  } catch (error) {
+    return [{
+      severity: "error",
+      path: path.relative(root, evidencePath),
+      message: `unable to verify remediation versions against baseline Git objects (${error instanceof Error ? error.message : String(error)})`,
+    }];
+  }
+  if (actualBaselineTree !== baselineTree) {
+    issues.push({
+      severity: "error",
+      path: path.relative(root, evidencePath),
+      message: `remediation baseline tree mismatch: evidence=${baselineTree}, git=${actualBaselineTree}`,
+    });
+  }
+
+  const currentEntries = Array.isArray(marketplace.plugins)
+    ? marketplace.plugins as MarketplaceEntry[]
+    : [];
+  const baselineEntries = Array.isArray(baselineMarketplace.plugins)
+    ? baselineMarketplace.plugins as MarketplaceEntry[]
+    : [];
+  const baselineByName = new Map<string, MarketplaceEntry>();
+  for (const entry of baselineEntries) {
+    if (typeof entry.name === "string") baselineByName.set(entry.name, entry);
+  }
+  const evidenceByName = new Map<string, RemediationEntry>();
+  for (const raw of changedEntries as RemediationEntry[]) {
+    if (typeof raw?.pluginId !== "string" || evidenceByName.has(raw.pluginId)) {
+      issues.push({
+        severity: "error",
+        path: path.relative(root, evidencePath),
+        message: "changedPlugins contains a missing or duplicate pluginId",
+      });
+      continue;
+    }
+    evidenceByName.set(raw.pluginId, raw);
+  }
+  if (evidence.changedPluginCount !== evidenceByName.size) {
+    issues.push({
+      severity: "error",
+      path: path.relative(root, evidencePath),
+      message: `changedPluginCount=${String(evidence.changedPluginCount)} does not equal unique changedPlugins=${evidenceByName.size}`,
+    });
+  }
+
+  const derivedChanged = new Set<string>();
+  for (const entry of currentEntries) {
+    if (
+      typeof entry.name !== "string" ||
+      typeof entry.source !== "string" ||
+      typeof entry.version !== "string"
+    ) continue;
+    const baselineEntry = baselineByName.get(entry.name);
+    if (!baselineEntry || typeof baselineEntry.version !== "string") {
+      issues.push({
+        severity: "error",
+        path: ".crabcode-plugin/marketplace.json",
+        message: `remediation contract cannot derive baseline version for new or missing plugin "${entry.name}"`,
+      });
+      continue;
+    }
+    const source = entry.source.replace(/^\.\//u, "").replace(/\/+$/u, "");
+    const sourceChanged = source.length === 0
+      ? changedPaths.size > 0
+      : [...changedPaths].some((changed) => changed === source || changed.startsWith(`${source}/`));
+    const sourcePointerChanged = baselineEntry.source !== entry.source;
+    const changed = sourceChanged || sourcePointerChanged;
+    const expectedVersion = changed ? nextPatch(baselineEntry.version) : baselineEntry.version;
+    if (!expectedVersion) {
+      issues.push({
+        severity: "error",
+        path: ".crabcode-plugin/marketplace.json",
+        message: `baseline version for "${entry.name}" is not strict X.Y.Z: ${baselineEntry.version}`,
+      });
+      continue;
+    }
+    if (entry.version !== expectedVersion) {
+      issues.push({
+        severity: "error",
+        path: ".crabcode-plugin/marketplace.json",
+        message: `plugin "${entry.name}" ${changed ? "changed distributable source bytes" : "did not change source bytes"}; expected version ${expectedVersion}, got ${entry.version}`,
+      });
+    }
+    if (!changed) continue;
+    derivedChanged.add(entry.name);
+    const declared = evidenceByName.get(entry.name);
+    if (
+      !declared ||
+      declared.previousVersion !== baselineEntry.version ||
+      declared.remediationVersion !== expectedVersion
+    ) {
+      issues.push({
+        severity: "error",
+        path: path.relative(root, evidencePath),
+        message: `changed plugin "${entry.name}" must be listed with previous=${baselineEntry.version} and remediation=${expectedVersion}`,
+      });
+    }
+  }
+  for (const pluginId of evidenceByName.keys()) {
+    if (!derivedChanged.has(pluginId)) {
+      issues.push({
+        severity: "error",
+        path: path.relative(root, evidencePath),
+        message: `changedPlugins lists "${pluginId}" but its marketplace source has no bytes changed from the baseline`,
+      });
+    }
+  }
+
+  const baselineMetadata = baselineMarketplace.metadata as Record<string, unknown> | undefined;
+  const currentMetadata = marketplace.metadata as Record<string, unknown> | undefined;
+  const expectedMarketplaceVersion = nextPatch(baselineMarketplaceVersion);
+  if (
+    baselineMetadata?.version !== baselineMarketplaceVersion ||
+    currentMetadata?.version !== remediationMarketplaceVersion ||
+    remediationMarketplaceVersion !== expectedMarketplaceVersion
+  ) {
+    issues.push({
+      severity: "error",
+      path: ".crabcode-plugin/marketplace.json",
+      message: `marketplace remediation version must be nextPatch(${baselineMarketplaceVersion})=${String(expectedMarketplaceVersion)}`,
+    });
+  }
+
+  return issues;
 }
 
 /**
@@ -124,6 +340,13 @@ export async function validateVersionConsistency(
       });
       continue;
     }
+    if (!STRICT_SEMVER.test(manifestVersion)) {
+      issues.push({
+        severity: "error",
+        path: relManifest,
+        message: `plugin manifest for "${name}" version must be strict X.Y.Z, got ${manifestVersion}`,
+      });
+    }
 
     // A present-but-non-string version defeats comparison entirely, and
     // marketplaceValidator's required-field check accepts it (isNonEmpty treats any
@@ -133,6 +356,12 @@ export async function validateVersionConsistency(
         severity: "error",
         path: ".crabcode-plugin/marketplace.json",
         message: `"${name}" version must be a string, got ${typeof raw.version}`,
+      });
+    } else if (typeof raw.version === "string" && !STRICT_SEMVER.test(raw.version)) {
+      issues.push({
+        severity: "error",
+        path: ".crabcode-plugin/marketplace.json",
+        message: `"${name}" marketplace version must be strict X.Y.Z, got ${raw.version}`,
       });
     } else if (typeof raw.version === "string" && raw.version !== manifestVersion) {
       issues.push({
@@ -166,6 +395,13 @@ export async function validateVersionConsistency(
       });
       continue;
     }
+    if (!STRICT_SEMVER.test(packageVersion)) {
+      issues.push({
+        severity: "error",
+        path: relPackage,
+        message: `package.json for "${name}" version must be strict X.Y.Z, got ${packageVersion}`,
+      });
+    }
 
     const baselined = baseline.has(name);
     if (baselined) evaluatedBaseline.add(name);
@@ -193,6 +429,8 @@ export async function validateVersionConsistency(
       });
     }
   }
+
+  issues.push(...(await validateRemediationVersionContract(root, marketplace!)));
 
   return issues;
 }

@@ -13,9 +13,24 @@
   },
   "control": {
     "findingId": "P1-REL-02",
-    "type": "delete-historical-runs-after-metadata-capture",
-    "status": "captured-pending-delete",
-    "reason": "All three historical workflow versions ran on push and retain a rerun URL that can reuse repository-level mirror credentials. Current workflow changes cannot constrain those historical reruns. No additional runs were returned by the workflow-scoped GitHub API query."
+    "type": "disable-historical-workflow-id-and-migrate-safe-publisher-identity",
+    "status": "defense-in-depth-disabled-awaiting-unbypassable-control",
+    "reason": "All three historical workflow versions ran on push and retain a rerun URL that can reuse repository-level mirror credentials. Workflow ID 336369746 was disabled through the GitHub API while preserving all run metadata/logs; the old path is retained as a failing tombstone and safe publication moves to publish-safe-to-cn-mirror.yml under a distinct workflow identity. No additional runs were returned by the workflow-scoped GitHub API query.",
+    "disabledWorkflow": {
+      "id": 336369746,
+      "path": ".github/workflows/publish-to-cn-mirror.yml",
+      "requiredState": "disabled_manually",
+      "observedState": "disabled_manually",
+      "observedUpdatedAt": "2026-08-23T10:52:51Z",
+      "safeReplacementPath": ".github/workflows/publish-safe-to-cn-mirror.yml",
+      "safeReplacementWorkflowId": null,
+      "safeReplacementRegistrationStatus": "awaiting-default-branch-merge",
+      "runtimeGate": "scripts/validate-retired-publisher.py"
+    },
+    "rerunNegativeTest": {
+      "status": "not-executed",
+      "reason": "The safety approval layer rejected intentionally invoking the credential-bearing historical publisher. GitHub documents disabled workflows as stopped from being triggered; publisher and auditor additionally fail closed unless the API state remains disabled_manually."
+    }
   },
   "runs": [
     {

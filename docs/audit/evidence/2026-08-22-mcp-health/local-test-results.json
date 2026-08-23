@@ -1,8 +1,47 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "auditDate": "2026-08-22",
+  "amendedAt": "2026-08-23",
   "executionPolicy": "local-only-no-automatic-ci",
+  "evidenceStatus": "historical-results-unbound-remediation-rerun-required",
+  "gateEligible": false,
   "baselineCommit": "0192ec8669e8c76eff64a49ff2257d3c111263d7",
+  "baselineTree": "b29debe0a63118e8130ca3541dc4bdd31ed34134",
+  "targetTaskCommit": "7975750360730d206240a9f7f499a184f9c61120",
+  "targetMergeCommit": "c1c5dd9cd3494af783ce98f49a58e9ba361638aa",
+  "targetTree": "1b11ebaa19a8d3072c04bd7a53e58f5406196a4e",
+  "remediationCommit": null,
+  "remediationTree": null,
+  "testedCommit": null,
+  "testedTree": null,
+  "parentBinding": {
+    "targetTaskDirectParent": "0192ec8669e8c76eff64a49ff2257d3c111263d7",
+    "targetMergeParents": [
+      "0192ec8669e8c76eff64a49ff2257d3c111263d7",
+      "7975750360730d206240a9f7f499a184f9c61120"
+    ],
+    "taskAndMergeTreeMatch": true,
+    "verified": true
+  },
+  "requiredRunRecordContract": {
+    "requiredFields": [
+      "id",
+      "command",
+      "workingDirectoryOrTree",
+      "testedCommit",
+      "testedTree",
+      "startedAt",
+      "finishedAt",
+      "exitCode",
+      "result",
+      "log.relativePath",
+      "log.sizeBytes",
+      "log.sha256"
+    ],
+    "timestampFormat": "UTC RFC3339",
+    "logSha256Rule": "lowercase SHA-256 of exact raw log bytes",
+    "gateRule": "every required run must bind the same testedCommit/testedTree and have exitCode=0, result=pass, and a present log record"
+  },
   "environment": {
     "os": "macOS 26.5.2",
     "architecture": "arm64",
@@ -12,18 +51,26 @@
     "actionlint": "1.7.12"
   },
   "automaticCiTriggered": false,
+  "historicalRunBinding": {
+    "testedCommit": null,
+    "testedTree": null,
+    "logsBound": false,
+    "status": "blocked"
+  },
   "requiredRuns": [
     {
       "id": "clean-task-root-typecheck",
       "command": "bun run typecheck",
       "workingTree": "isolated task-only worktree",
-      "result": "pass"
+      "result": "historical-pass-unbound",
+      "gateEligible": false
     },
     {
       "id": "clean-task-root-tests",
       "command": "bun test ./tests/",
       "workingTree": "isolated task-only worktree",
-      "result": "pass",
+      "result": "historical-pass-unbound",
+      "gateEligible": false,
       "passed": 257,
       "failed": 0,
       "skipped": 8,
@@ -33,13 +80,15 @@
       "id": "clean-task-root-build",
       "command": "bun run build",
       "workingTree": "isolated task-only worktree",
-      "result": "pass"
+      "result": "historical-pass-unbound",
+      "gateEligible": false
     },
     {
       "id": "clean-task-root-validate",
       "command": "bun run lint:brand && bun run scripts/lint-brand.ts dist && bun run validate",
       "workingTree": "isolated task-only worktree",
-      "result": "pass",
+      "result": "historical-pass-unbound",
+      "gateEligible": false,
       "warnings": [
         "pre-existing crabfin audit-xls office-spreadsheets routing warning",
         "30 pre-existing doc-facts warnings inherited from origin/main"
@@ -49,13 +98,16 @@
       "id": "manual-workflow-gates",
       "command": "actionlint .github/workflows/*.yml && bun run lint:workflow-triggers",
       "workingTree": "isolated task-only worktree",
-      "result": "pass"
+      "result": "historical-pass-unbound",
+      "gateEligible": false,
+      "workflowFilesObserved": 3
     },
     {
       "id": "html-video-full",
       "command": "bun run validate",
       "workingDirectory": "plugins/crabcode-html-video",
-      "result": "pass",
+      "result": "historical-pass-unbound",
+      "gateEligible": false,
       "passed": 44,
       "failed": 0,
       "checks": [
@@ -72,7 +124,8 @@
       "id": "mediaops-core",
       "command": "bun run typecheck && bun run check:distribution && bun run test && bun run validate",
       "workingDirectory": "plugins/crabcode-media-ops",
-      "result": "pass",
+      "result": "historical-pass-unbound",
+      "gateEligible": false,
       "passed": 109,
       "failed": 0,
       "checks": [
@@ -86,7 +139,8 @@
       "id": "mediaops-full-qa",
       "command": "bun run test:qa && bun run qa:release",
       "workingDirectory": "plugins/crabcode-media-ops",
-      "result": "pass",
+      "result": "historical-pass-unbound",
+      "gateEligible": false,
       "passed": 9,
       "failed": 0,
       "checks": [
@@ -99,7 +153,8 @@
       "id": "media-publisher",
       "command": "bun run lint && bun run test && bun run qa:nu && CRABPUBLISH_SKIP_VISUAL=1 bun run test:browser",
       "workingDirectory": "plugins/crabcode-media-publisher",
-      "result": "pass",
+      "result": "historical-pass-unbound",
+      "gateEligible": false,
       "passed": 64,
       "failed": 0,
       "details": {
@@ -112,7 +167,8 @@
       "id": "security-locked-upstream",
       "command": "verify port; build FULL-PORT.patch --check; CRABCODE_SECURITY_UPSTREAM_CHECKOUT=<locked-checkout> bun test ./tests/crabcode-security/",
       "workingDirectory": "repository root",
-      "result": "pass",
+      "result": "historical-pass-unbound",
+      "gateEligible": false,
       "passed": 88,
       "failed": 0,
       "skipped": 1,
@@ -123,9 +179,10 @@
     {
       "id": "crabcopyright-merged-base",
       "scope": "independently merged origin/main base commit ecbe2d2; not modified by the MCP commit",
-      "result": "pass",
+      "result": "historical-pass-unbound",
+      "gateEligible": false,
       "pluginTests": 11,
-      "strongPdfRepositoryTests": 13,
+      "strongPdfRepositoryTests": 14,
       "checks": [
         "typecheck",
         "distribution freshness",
@@ -135,13 +192,64 @@
       ]
     }
   ],
+  "requiredRunEvidenceFillState": {
+    "status": "not-filled",
+    "runIds": [
+      "clean-task-root-typecheck",
+      "clean-task-root-tests",
+      "clean-task-root-build",
+      "clean-task-root-validate",
+      "manual-workflow-gates",
+      "html-video-full",
+      "mediaops-core",
+      "mediaops-full-qa",
+      "media-publisher",
+      "security-locked-upstream",
+      "crabcopyright-merged-base"
+    ],
+    "fieldsToPopulateForEveryRun": {
+      "testedCommit": null,
+      "testedTree": null,
+      "startedAt": null,
+      "finishedAt": null,
+      "exitCode": null,
+      "result": null,
+      "log": {
+        "relativePath": null,
+        "sizeBytes": null,
+        "sha256": null
+      }
+    },
+    "note": "this template is not evidence; materialize one complete record per run after rerunning on the remediation commit"
+  },
+  "supportMatrix": [
+    {
+      "cell": "macOS-arm64-bun-1.3.11-python-3.14-java-21",
+      "status": "historical-unbound"
+    },
+    {
+      "cell": "linux-amd64-pinned-playwright",
+      "status": "not-tested",
+      "blocksFinalGate": true
+    },
+    {
+      "cell": "python-3.9",
+      "status": "not-tested",
+      "blocksFinalGate": true
+    },
+    {
+      "cell": "python-3.13",
+      "status": "not-tested",
+      "blocksFinalGate": true
+    }
+  ],
   "supplementalAttempts": [
     {
       "id": "pinned-playwright-linux-container",
       "result": "not-tested",
       "reason": "MCR layer downloads repeatedly failed or stalled with EOF; exact image digest was verified but the local content store lacked required layers",
-      "mergeGate": false,
-      "rationale": "all required test commands ran locally on macOS with the pinned Bun, Playwright, Java and Python versions; no remote CI result is used"
+      "mergeGate": true,
+      "rationale": "the 2026-08-23 remediation source of truth requires every declared matrix cell to run; this not-tested cell blocks a new pass conclusion"
     }
   ]
 }

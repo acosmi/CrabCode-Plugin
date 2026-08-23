@@ -1,6 +1,6 @@
 {
   "name": "clangd-lsp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "type": "module",
   "description": "C/C++ language server (clangd) bridge for CrabCode, providing code intelligence, diagnostics, and formatting.",

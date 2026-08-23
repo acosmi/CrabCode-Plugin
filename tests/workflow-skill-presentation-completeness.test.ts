@@ -6,9 +6,13 @@ import { basename, join, resolve } from 'node:path'
 const root = resolve(import.meta.dir, '..')
 const EXPECTED_WORKFLOW_SKILLS = 316
 const EXPECTED_INVOCATION_SET_SHA256 = '8fdfcd6fdd39d7fa952c6d0f554ed675429597869cac28f9239269588228ab33'
-// Updated for the audited crabcopyright-cn v0.3.0 workflow-content migration;
-// the 316 invocation identities remain unchanged and are pinned independently.
-const EXPECTED_MODEL_CONTENT_SHA256 = '832c879eff1367a3b4ab2656e30c2dd81434e010bb17229cfef7d90c04ed122f'
+// Updated after semantic review of the MCP containment rewrite in ten workflow
+// skills: four plugin-dev authoring skills, two crabwork-plugin-management
+// skills, all three mcp-server-dev skills, and crabwork-bio-research:start.
+// They now stop at blocked non-executable proposals or user-provided-data
+// fallbacks; the 316 invocation identities remain unchanged and are pinned
+// independently.
+const EXPECTED_MODEL_CONTENT_SHA256 = '6ff0f0a4ada34a88b3c24b3ad089d3649efcdf686fea2b615379fcadc858b69b'
 const HAN = /[\u3400-\u9fff]/u
 
 function sha256(value: string): string {
@@ -79,7 +83,7 @@ describe('official workflow skill presentation completeness', () => {
     expect(new Set(invocationKeys).size).toBe(EXPECTED_WORKFLOW_SKILLS)
     expect(sha256(JSON.stringify(invocationKeys))).toBe(EXPECTED_INVOCATION_SET_SHA256)
     expect(sha256(JSON.stringify(modelContentHashes))).toBe(EXPECTED_MODEL_CONTENT_SHA256)
-    expect(marketplace.metadata.version).toBe('0.4.3')
+    expect(marketplace.metadata.version).toBe('0.4.4')
 
     const mediaEntry = workflows.find((entry) => entry.name === 'crabcode-media-ops')
     expect(mediaEntry).toBeDefined()

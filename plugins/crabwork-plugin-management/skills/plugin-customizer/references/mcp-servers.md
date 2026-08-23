@@ -1,28 +1,22 @@
-# MCP Discovery and Connection
+# MCP Capability Inventory During Containment
 
-How to find and connect MCPs during plugin customization.
+This reference defines a documentation-only workflow. It does not discover,
+install, connect, configure, or activate an MCP server.
 
-## Available Tools
+## Hard Boundary
 
-### `search_mcp_registry`
-Search the MCP directory for available connectors.
+During the emergency MCP safe baseline:
 
-**Input:** `{ "keywords": ["array", "of", "search", "terms"] }`
+- do not call registry search or connector-installation actions for the purpose
+  of wiring a plugin;
+- do not create or edit `.mcp.json`;
+- do not add manifest `mcpServers`, JSON paths, MCPB paths, or MCPB URLs;
+- do not emit an endpoint, launcher command, package coordinate, headers, or
+  environment-variable binding;
+- do not state that a proposal is available, installed, connected, or tested.
 
-**Output:** Up to 10 results, each with:
-- `name`: MCP display name
-- `description`: One-liner description
-- `tools`: List of tool names the MCP provides
-- `url`: MCP endpoint URL (use this in `.mcp.json`)
-- `directoryUuid`: UUID for use with suggest_connectors
-- `connected`: Boolean - whether user has this MCP connected
-
-### `suggest_connectors`
-Display Connect buttons to let users install/connect MCPs.
-
-**Input:** `{ "directoryUuids": ["uuid1", "uuid2"] }`
-
-**Output:** Renders UI with Connect buttons for each MCP
+The only permitted artifact is a Markdown inventory marked
+`blocked / non-executable / not connected`.
 
 ## Category-to-Keywords Mapping
 
@@ -41,51 +35,19 @@ Display Connect buttons to let users install/connect MCPs.
 | `data-warehouse` | `["bigquery", "snowflake", "redshift"]` |
 | `conversation-intelligence` | `["gong", "chorus", "call recording"]` |
 
-## Workflow
+## Proposal Workflow
 
-1. **Find customization point**: Look for `~~`-prefixed values (e.g., `~~Jira`)
-2. **Check earlier phase findings**: Did you already learn which tool they use?
-   - **Yes**: Search for that specific tool to get its `url`, skip to step 5
-   - **No**: Continue to step 3
-3. **Search**: Call `search_mcp_registry` with mapped keywords
-4. **Present choices and ask user**: Show all results, ask which they use
-5. **Connect if needed**: If not connected, call `suggest_connectors`
-6. **Update MCP config**: Add config using the `url` from search results
+1. Identify the user-visible capability, not a server implementation.
+2. Record the provider name if the user already supplied it. Do not discover or
+   guess an endpoint.
+3. Record data read/write classes, expected identity, consent, and approval
+   boundaries.
+4. Record the desired failure behavior when the capability is unavailable.
+5. Mark runtime, endpoint, artifact, and activation `not selected`.
+6. List evidence required before any future executable proposal can be reviewed:
+   provenance, exact-version distribution, security controls, local tests,
+   host activation policy, upgrade/restart behavior, and rollback.
+7. Use `../examples/mcp-integration-proposal.md`; keep status `blocked`.
 
-## Updating Plugin MCP Configuration
-
-### Finding the Config File
-
-1. **Check `plugin.json`** for an `mcpServers` field:
-   ```json
-   {
-     "name": "my-plugin",
-     "mcpServers": "./config/servers.json"
-   }
-   ```
-   If present, edit the file at that path.
-
-2. **If no `mcpServers` field**, use `.mcp.json` at the plugin root (default).
-
-3. **If `mcpServers` points only to `.mcpb` files** (bundled servers), create a new `.mcp.json` at the plugin root.
-
-### Config File Format
-
-Both wrapped and unwrapped formats are supported:
-
-```json
-{
-  "mcpServers": {
-    "github": {
-      "type": "http",
-      "url": "https://api.githubcopilot.com/mcp/"
-    }
-  }
-}
-```
-
-Use the `url` field from `search_mcp_registry` results.
-
-### Directory Entries Without a URL
-
-Some directory entries have no `url` because the endpoint is dynamic — the admin provides it when connecting the server. These servers can still be referenced in the plugin's MCP config by **name**: if the MCP server name in the config matches the directory entry name, it is treated the same as a URL match.
+The resulting inventory is useful input to a later review but cannot be copied
+into a plugin manifest or renamed into an MCP configuration.

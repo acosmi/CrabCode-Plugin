@@ -6,16 +6,24 @@ description: >
   component planning, design, implementation, and packaging into an installable .plugin file.
   Use when the user wants to create, build, make, develop, scaffold, design, or start a new plugin,
   "turn this workflow into a plugin", "I want my own plugin", or needs to author plugin components
-  (skills, agents, hooks, MCP servers) or a plugin.json manifest from nothing.
+  (skills, agents, hooks, or blocked non-executable MCP capability proposals) or a plugin.json manifest from nothing.
 ---
 
 # Create CrabCode Plugin
 
 Build a new plugin from scratch through guided conversation. Walk the user through discovery, planning, design, implementation, and packaging — delivering a ready-to-install `.plugin` file at the end.
 
+> **Emergency MCP boundary:** This skill must not create or package
+> `.mcp.json`, manifest `mcpServers`, external JSON/MCPB references, endpoints,
+> launcher commands, packages, headers, environment bindings, or connection
+> instructions. MCP requests produce only a blocked, non-executable Markdown
+> capability/evidence proposal and must not be described as connected or tested.
+
 ## Overview
 
-A plugin is a self-contained directory that extends CrabCode's capabilities with skills, agents, hooks, and MCP server integrations. This skill encodes the full plugin architecture and a five-phase workflow for creating one conversationally.
+A plugin is a self-contained directory that extends CrabCode with skills,
+agents, and hooks. External MCP-backed capabilities remain proposal-only during
+the current safe baseline.
 
 The process:
 
@@ -42,7 +50,7 @@ plugin-name/
 │       ├── SKILL.md
 │       └── references/
 ├── agents/                   # Subagent definitions (.md files)
-├── .mcp.json                 # MCP server definitions
+├── proposals/                # Optional blocked capability inventories
 └── README.md                 # Plugin documentation
 ```
 
@@ -82,12 +90,11 @@ Custom component paths can be specified (supplements, does not replace, auto-dis
   "commands": "./custom-commands",
   "agents": ["./extra/reviewer.md", "./extra/collector.md"],
   "skills": ["./section-a/skills/foo"],
-  "hooks": "./config/hooks.json",
-  "mcpServers": "./.mcp.json"
+  "hooks": "./config/hooks.json"
 }
 ```
 
-Path rules (enforced by the manifest schema; a violation fails validation and the whole plugin is rejected): `agents` entries must be individual `.md` **files**; `skills` and `commands` entries may be directories; `hooks`/`mcpServers` must be `.json` files; all paths must start with `./`.
+Path rules (enforced by the manifest schema; a violation fails validation and the whole plugin is rejected): `agents` entries must be individual `.md` **files**; `skills` and `commands` entries may be directories; `hooks` must be a `.json` file; all paths must start with `./`. Do not add the host-supported historical `mcpServers` field during containment.
 
 ### Component Schemas
 
@@ -96,7 +103,7 @@ Detailed schemas for each component type are in `references/component-schemas.md
 | Component                          | Location            | Format                      |
 | ---------------------------------- | ------------------- | --------------------------- |
 | Skills                             | `skills/*/SKILL.md` | Markdown + YAML frontmatter |
-| MCP Servers                        | `.mcp.json`         | JSON                        |
+| MCP capability proposal            | `proposals/*.md`    | Markdown; blocked/non-executable |
 | Agents (uncommonly used)           | `agents/*.md`       | Markdown + YAML frontmatter |
 | Hooks (rarely used)                | `hooks/hooks.json`  | JSON                        |
 | Commands (legacy)                  | `commands/*.md`     | Markdown + YAML frontmatter |
@@ -133,7 +140,7 @@ workflows in terms of categories rather than specific products.
 
 ### ${CRABCODE_PLUGIN_ROOT} Variable
 
-Use `${CRABCODE_PLUGIN_ROOT}` for all intra-plugin path references in hooks and MCP configs. Never hardcode absolute paths.
+Use `${CRABCODE_PLUGIN_ROOT}` for intra-plugin hook paths. Never hardcode absolute paths.
 
 ## Guided Workflow
 
@@ -161,7 +168,7 @@ Summarize understanding and confirm before proceeding.
 Based on the discovery answers, determine:
 
 - **Skills** — Does it need specialized knowledge that CrabCode should load on-demand, or user-initiated actions? (domain expertise, reference schemas, workflow guides, deploy/configure/analyze/review actions)
-- **MCP Servers** — Does it need external service integration? (databases, APIs, SaaS tools)
+- **MCP capability proposal** — Would it eventually need external service integration? Record only the desired outcome and missing evidence.
 - **Agents (uncommon)** — Are there autonomous multi-step tasks? (validation, generation, analysis)
 - **Hooks (rare)** — Should something happen automatically on certain events? (enforce policies, load context, validate operations)
 
@@ -173,7 +180,7 @@ Present a component plan table, including component types you decided not to cre
 | Skills    | 3     | Domain knowledge for X, /do-thing, /check-thing |
 | Agents    | 0     | Not needed |
 | Hooks     | 1     | Validate writes |
-| MCP       | 1     | Connect to service Y |
+| MCP proposal | 1  | Blocked future capability for service Y; no config or connection |
 ```
 
 Get user confirmation or adjustments before proceeding.
@@ -205,11 +212,15 @@ For each component type in the plan, ask targeted design questions. Present ques
 - What behavior — validate, block, modify, add context?
 - Prompt-based (LLM-driven) or command-based (deterministic script)?
 
-**MCP Servers:**
+**MCP capability proposal:**
 
-- What server type? (stdio for local, SSE for hosted with OAuth, HTTP for REST APIs)
-- What authentication method?
-- What tools should be exposed?
+- What user-visible outcome is desired?
+- What data classes, identity, consent, and approval boundaries apply?
+- What fail-closed behavior and accountable owner are required?
+- Which provenance, security, release, host lifecycle, upgrade/restart, E2E,
+  and rollback evidence remains missing?
+
+Do not select a transport, endpoint, command, package, secret, or tool name.
 
 If the user says "whatever you think is best," provide specific recommendations and get explicit confirmation.
 
@@ -231,7 +242,8 @@ If the user says "whatever you think is best," provide specific recommendations 
 - **Skills** use progressive disclosure: lean SKILL.md body (under 3,000 words), detailed content in `references/`. Frontmatter description must be third-person with specific trigger phrases. Skill bodies are instructions FOR CrabCode, not messages to the user — write them as directives about what to do.
 - **Agents** need a description with `<example>` blocks showing triggering conditions, plus a system prompt in the markdown body.
 - **Hooks** config goes in `hooks/hooks.json`. Use `${CRABCODE_PLUGIN_ROOT}` for script paths. Prefer prompt-based hooks for complex logic.
-- **MCP configs** go in `.mcp.json` at plugin root. Use `${CRABCODE_PLUGIN_ROOT}` for local server paths. Document required env vars in README.
+- **MCP requests** produce only `proposals/mcp-capabilities.md`, marked
+  `blocked / non-executable / not connected`, with no runtime details.
 
 ### Phase 5: Review & Package
 

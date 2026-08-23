@@ -1,6 +1,6 @@
 {
   "name": "linear",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Linear MCP integration for CrabCode. Create issues, manage projects, update statuses, and search across Linear workspaces from the CrabCode session. Executable MCP configuration is intentionally paused in this release.",
   "author": {
     "name": "CrabCode"
