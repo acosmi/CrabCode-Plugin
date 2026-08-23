@@ -91,6 +91,7 @@ def build(args: argparse.Namespace) -> dict[str, object]:
     logs_output = output / "logs"
     logs_output.mkdir(parents=True, mode=0o700)
     runs: list[dict[str, object]] = []
+    seen_log_sources: set[tuple[int, int]] = set()
     try:
         for cell in sorted(cells):
             if SAFE_CELL.fullmatch(cell) is None:
@@ -119,9 +120,17 @@ def build(args: argparse.Namespace) -> dict[str, object]:
             source_raw = record.get("logPath")
             if not isinstance(source_raw, str):
                 raise ValueError(f"cell {cell} logPath must be a string")
-            source = Path(source_raw).resolve(strict=True)
-            if not source.is_file() or source.is_symlink():
+            authored_source = Path(source_raw)
+            if authored_source.is_symlink():
                 raise ValueError(f"cell {cell} log must be an ordinary file")
+            source = authored_source.resolve(strict=True)
+            if not source.is_file():
+                raise ValueError(f"cell {cell} log must be an ordinary file")
+            source_stat = source.stat()
+            source_identity = (source_stat.st_dev, source_stat.st_ino)
+            if source_identity in seen_log_sources:
+                raise ValueError(f"cell {cell} reuses another cell's raw log file")
+            seen_log_sources.add(source_identity)
             data = source.read_bytes()
             if not data:
                 raise ValueError(f"cell {cell} log is empty")

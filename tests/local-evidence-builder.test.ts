@@ -1,5 +1,5 @@
 import { afterAll, describe, expect, test } from 'bun:test'
-import { mkdir, mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, readdir, rm, stat, symlink, writeFile } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 
@@ -30,7 +30,7 @@ function run(args: string[], cwd: string) {
   })
 }
 
-async function fixture(secret = false) {
+async function fixture(mutation?: 'secret' | 'symlink' | 'duplicate') {
   const directory = await mkdtemp(path.join(os.tmpdir(), 'local-evidence-builder-'))
   fixtures.push(directory)
   const repo = path.join(directory, 'release')
@@ -44,20 +44,27 @@ async function fixture(secret = false) {
   expect(run(['git', 'commit', '-qm', 'release'], repo).exitCode).toBe(0)
   const contract = JSON.parse(await readFile(matrix, 'utf8')) as { cells: Record<string, unknown> }
   const records: Record<string, unknown> = {}
+  let firstLogPath = ''
   for (const [index, cell] of Object.keys(contract.cells).sort().entries()) {
     const logPath = path.join(logs, `${cell}.log`)
     await writeFile(
       logPath,
-      secret && index === 0
+      mutation === 'secret' && index === 0
         ? `token=${['gh', 'p_', 'A'.repeat(36)].join('')}\n`
         : `${cell}: pass\n`,
     )
+    if (index === 0) firstLogPath = logPath
+    let recordLogPath = mutation === 'duplicate' && index === 1 ? firstLogPath : logPath
+    if (mutation === 'symlink' && index === 0) {
+      recordLogPath = path.join(logs, `${cell}.link.log`)
+      await symlink(logPath, recordLogPath)
+    }
     records[cell] = {
       startedAt: '2026-08-23T10:00:00Z',
       finishedAt: '2026-08-23T10:00:01Z',
       exitCode: 0,
       result: 'pass',
-      logPath,
+      logPath: recordLogPath,
     }
   }
   const recordsPath = path.join(directory, 'records.json')
@@ -96,17 +103,21 @@ describe('local remediation evidence builder', () => {
     expect(overwrite.stderr.toString()).toContain('output-root must not already exist')
   })
 
-  test('refuses credential-shaped raw logs and removes the partial output', async () => {
-    const item = await fixture(true)
-    const result = run([
-      'python3', builder,
-      '--release-repo', item.repo,
-      '--records-json', item.recordsPath,
-      '--matrix-contract-json', matrix,
-      '--output-root', item.output,
-    ], root)
-    expect(result.exitCode).not.toBe(0)
-    expect(result.stderr.toString()).toContain('credential-shaped bytes')
-    await expect(stat(item.output)).rejects.toThrow()
+  test('refuses secrets, symlinks, and reused raw logs and removes partial output', async () => {
+    for (const mutation of ['secret', 'symlink', 'duplicate'] as const) {
+      const item = await fixture(mutation)
+      const result = run([
+        'python3', builder,
+        '--release-repo', item.repo,
+        '--records-json', item.recordsPath,
+        '--matrix-contract-json', matrix,
+        '--output-root', item.output,
+      ], root)
+      expect(result.exitCode).not.toBe(0)
+      expect(result.stderr.toString()).toMatch(
+        /credential-shaped bytes|ordinary file|reuses another cell's raw log/u,
+      )
+      await expect(stat(item.output)).rejects.toThrow()
+    }
   })
 })
