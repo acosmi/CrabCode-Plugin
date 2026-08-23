@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-08-23T09:28:15Z",
+  "repository": "acosmi/CrabCode-Plugin",
+  "workflow": {
+    "id": 336369746,
+    "name": "Publish official plugin marketplace to China mirror",
+    "path": ".github/workflows/publish-to-cn-mirror.yml"
+  },
+  "githubListEvidence": {
+    "command": "gh run list --repo acosmi/CrabCode-Plugin --workflow publish-to-cn-mirror.yml --limit 100 --json databaseId,headSha,event,status,conclusion,createdAt,updatedAt,url,workflowName",
+    "returnedRunCount": 3
+  },
+  "control": {
+    "findingId": "P1-REL-02",
+    "type": "delete-historical-runs-after-metadata-capture",
+    "status": "captured-pending-delete",
+    "reason": "All three historical workflow versions ran on push and retain a rerun URL that can reuse repository-level mirror credentials. Current workflow changes cannot constrain those historical reruns. No additional runs were returned by the workflow-scoped GitHub API query."
+  },
+  "runs": [
+    {
+      "databaseId": 32579374255,
+      "runNumber": 3,
+      "runAttempt": 1,
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "headBranch": "main",
+      "headSha": "2e0b1266dcc4c34f8930cd589ce7aaedd6aa0f10",
+      "headTree": "ff937e235237c40c9ff43702ec5ae5b520f3fdaf",
+      "createdAt": "2026-08-22T14:40:09Z",
+      "updatedAt": "2026-08-22T14:40:48Z",
+      "actor": "acosmi-fushihua",
+      "checkSuiteId": 88302863441,
+      "displayTitle": "Merge pull request #18 from codex/crablaw-legal-skills-research-plan",
+      "url": "https://github.com/acosmi/CrabCode-Plugin/actions/runs/32579374255"
+    },
+    {
+      "databaseId": 32579303978,
+      "runNumber": 2,
+      "runAttempt": 1,
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "headBranch": "main",
+      "headSha": "c09298c49d2030392a5d388a8a4d997743c7870c",
+      "headTree": "7c2b47aa58a50a3bdfe80d46d3cb10d508a2bac6",
+      "createdAt": "2026-08-22T14:38:46Z",
+      "updatedAt": "2026-08-22T14:39:26Z",
+      "actor": "acosmi-fushihua",
+      "checkSuiteId": 88302696920,
+      "displayTitle": "Merge pull request #19 from acosmi/codex/acosmi-mcp-audit-plan",
+      "url": "https://github.com/acosmi/CrabCode-Plugin/actions/runs/32579303978"
+    },
+    {
+      "databaseId": 32050757636,
+      "runNumber": 1,
+      "runAttempt": 1,
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "headBranch": "main",
+      "headSha": "1e808becab96e67e0684d8301411879eca674309",
+      "headTree": "739149a4a5cb3a1144869467d32feba59b7de3f5",
+      "createdAt": "2026-08-17T17:32:06Z",
+      "updatedAt": "2026-08-17T17:32:47Z",
+      "actor": "acosmi-fushihua",
+      "checkSuiteId": 86886432399,
+      "displayTitle": "Merge pull request #16 from acosmi/feat/publish-workflow-migration-20260817",
+      "url": "https://github.com/acosmi/CrabCode-Plugin/actions/runs/32050757636"
+    }
+  ]
+}
