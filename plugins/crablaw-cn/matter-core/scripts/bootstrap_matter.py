@@ -16,10 +16,14 @@ from typing import Any, Optional
 
 from _matter_common import (
     PENDING_MATTER_MESSAGE,
+    ConflictPolicyError,
     append_jsonl,
     atomic_write_json,
+    conflict_disposition,
+    conflict_policy_record,
     ensure_private_dir,
     file_lock,
+    load_conflict_policy,
     load_json,
     matter_is_pending,
     pending_marker_path,
@@ -36,6 +40,7 @@ EXIT_OK = 0
 EXIT_USAGE_OR_IO = 2
 EXIT_CONFLICT = 3
 EXIT_REVIEW_REQUIRED = 10
+EXIT_POLICY_UNUSABLE = 11
 
 CLIENT_SIDE_ROLES = {"client", "client-record"}
 ADVERSE_ROLES = {"counterparty"}
@@ -247,10 +252,13 @@ def classify_relation(existing_role: str, new_role: str) -> str:
 
 
 def conflict_hits(
-    root: Path, matter_id: str, parties: list[dict[str, Any]]
-) -> tuple[list[dict[str, str]], dict[str, Any]]:
+    root: Path, matter_id: str, parties: list[dict[str, Any]], policy: dict[str, Any]
+) -> tuple[list[dict[str, str]], list[dict[str, str]], dict[str, Any]]:
+    """Screen, then let the lawyer-issued policy — not this code — say what a match means."""
+
     existing, coverage = existing_name_records(root, matter_id)
-    hits: list[dict[str, str]] = []
+    blocking: list[dict[str, str]] = []
+    informational: list[dict[str, str]] = []
     seen: set[tuple[str, str, str, str]] = set()
     for party in parties:
         new_role = str(party.get("role") or "unknown")
@@ -268,19 +276,28 @@ def conflict_hits(
                 if key in seen:
                     continue
                 seen.add(key)
-                hits.append(
-                    {
-                        "source": record.source,
-                        "matchedValue": record.value,
-                        "existingRole": record.role,
-                        "newRole": new_role,
-                        "relation": classify_relation(record.role, new_role),
-                        "summary": f"Local matter-store normalized-name match for {record.value}",
-                        "risk": "unknown",
-                        "recommendedAction": "Stop substantive work until the responsible lawyer reviews the match.",
-                    }
-                )
-    return hits, coverage
+                relation = classify_relation(record.role, new_role)
+                disposition = conflict_disposition(policy, relation)
+                hit = {
+                    "source": record.source,
+                    "matchedValue": record.value,
+                    "existingRole": record.role,
+                    "newRole": new_role,
+                    "relation": relation,
+                    "policyDisposition": disposition,
+                    "summary": f"Local matter-store normalized-name match for {record.value}",
+                    "risk": "unknown",
+                    "recommendedAction": "Stop substantive work until the responsible lawyer reviews the match.",
+                }
+                if disposition == "informational":
+                    hit["recommendedAction"] = (
+                        "Recorded for the reviewing lawyer; the firm's conflict policy classifies "
+                        "this relation as informational."
+                    )
+                    informational.append(hit)
+                else:
+                    blocking.append(hit)
+    return blocking, informational, coverage
 
 
 def main() -> int:
@@ -308,6 +325,9 @@ def main() -> int:
         if not all(value.strip() for value in (args.client_name, args.title, args.scope, args.responsible_lawyer, args.review_owner)):
             raise ValueError("client-name, title, scope, responsible-lawyer and review-owner must not be empty")
         root = resolve_root(args.root)
+        # Load the disposition policy before anything is created: a store whose
+        # policy cannot be read must not gain a half-screened matter directory.
+        policy = load_conflict_policy(root)
         ensure_private_dir(safe_path(root, "clients"))
         ensure_private_dir(safe_path(root, "matters"))
         matter_dir = safe_path(root, "matters", matter_id)
@@ -348,7 +368,7 @@ def main() -> int:
                 pass
             touch_private(pending_marker_path(matter_dir))
 
-            hits, coverage = conflict_hits(root, matter_id, parties)
+            hits, informational_hits, coverage = conflict_hits(root, matter_id, parties, policy)
             if coverage["status"] != "complete":
                 conflict_status = "coverage-incomplete"
             elif hits:
@@ -412,6 +432,8 @@ def main() -> int:
                     }
                 ),
                 "hits": hits,
+                "informationalHits": informational_hits,
+                "policy": conflict_policy_record(policy),
                 "coverage": coverage,
                 "lawyerConfirmation": {
                     "status": "not-reviewed",
@@ -450,11 +472,18 @@ def main() -> int:
                     "conflictStatus": conflict_status,
                     "substantiveWorkAllowed": conflict_status == "no-hit",
                     "coverage": coverage,
+                    "policy": conflict_policy_record(policy),
+                    "informationalHitCount": len(informational_hits),
                 },
                 ensure_ascii=False,
             )
         )
         return EXIT_OK if conflict_status == "no-hit" else EXIT_REVIEW_REQUIRED
+    except ConflictPolicyError as exc:
+        # Deliberately not a usage error: the store is intact, the caller did
+        # nothing wrong, and nothing was screened. Retrying is not the fix.
+        print(json.dumps({"status": "policy-unusable", "error": str(exc)}, ensure_ascii=False))
+        return EXIT_POLICY_UNUSABLE
     except (OSError, ValueError) as exc:
         print(json.dumps({"status": "failed", "error": str(exc)}, ensure_ascii=False))
         return EXIT_USAGE_OR_IO

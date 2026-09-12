@@ -20,7 +20,20 @@
     "confidentiality": { "enum": ["standard", "heightened", "clean-team"] },
     "accessScope": { "type": "string", "minLength": 1 },
     "status": { "enum": ["unreviewed", "verified", "lawyer-reviewed", "source-needs-check", "superseded", "unknown"] },
-    "reviewer": { "type": "string", "minLength": 1 }
+    "reviewer": { "type": "string", "minLength": 1 },
+    "importedFrom": {
+      "description": "Provenance for a record that belongs to another matter. Its presence is the only thing that lets `matterId` differ from the matter holding the file, and it is checked against that matter's crossMatterAccess authorization.",
+      "type": "object",
+      "required": ["matterId", "sourceId", "importedBy", "importedAt", "authorizedBy"],
+      "properties": {
+        "matterId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,100}$" },
+        "sourceId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,120}$" },
+        "importedBy": { "type": "string", "minLength": 1 },
+        "importedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "format": "date" },
+        "authorizedBy": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    }
   },
   "allOf": [
     {

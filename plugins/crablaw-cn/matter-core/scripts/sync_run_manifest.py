@@ -17,31 +17,14 @@ from _matter_common import (
     atomic_write_json,
     file_lock,
     load_json,
-    load_jsonl,
     require_id,
     resolve_root,
+    review_binding_blocking_reason,
     safe_path,
     sha256_file,
-    sha256_text,
+    source_digests,
     utc_now,
 )
-
-
-def source_digests(matter_dir: Path) -> list[dict[str, str]]:
-    """Hash every source record so a source edit is as detectable as a document edit."""
-
-    sources_path = safe_path(matter_dir, "sources.jsonl")
-    if not sources_path.exists():
-        return []
-    digests: dict[str, str] = {}
-    for row in load_jsonl(safe_path(matter_dir, "sources.jsonl", must_exist=True)):
-        if not isinstance(row, dict):
-            continue
-        source_id = row.get("sourceId")
-        if not isinstance(source_id, str) or not source_id:
-            continue
-        digests[source_id] = sha256_text(json.dumps(row, sort_keys=True))
-    return [{"sourceId": key, "sha256": digests[key]} for key in sorted(digests)]
 
 
 def issues_touching_sources(
@@ -218,6 +201,15 @@ def synchronize(matter_dir: Path, run_dir: Path, matter_id: str, run_id: str, ap
     manifest["staleIssueIds"] = sorted(stale_issue_ids)
     if changed_document_ids or changed_source_ids or stale_issue_ids:
         manifest["status"] = "stale"
+    if changed_document_ids or changed_source_ids:
+        # The bytes a lawyer approved are gone, so the approval is gone with them.
+        # The decisions themselves stay on the record: they are history, not state.
+        manifest["reviewState"] = "not-ready"
+        manifest["externalRelease"] = "prohibited"
+        reason = review_binding_blocking_reason(revision)
+        blocking_reasons = manifest.setdefault("blockingReasons", [])
+        if reason not in blocking_reasons:
+            blocking_reasons.append(reason)
 
     result = {
         "status": "apply-ready" if (changed_document_ids or changed_source_ids) else "unchanged",
@@ -226,6 +218,8 @@ def synchronize(matter_dir: Path, run_dir: Path, matter_id: str, run_id: str, ap
         "changedDocumentIds": sorted(changed_document_ids),
         "changedSourceIds": sorted(changed_source_ids),
         "staleIssueIds": sorted(stale_issue_ids),
+        "reviewState": manifest.get("reviewState"),
+        "externalRelease": manifest.get("externalRelease"),
         "applied": apply,
     }
     if apply:

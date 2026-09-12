@@ -35,6 +35,11 @@ Manage review queue records. Every substantive output from a domain plugin must 
 3. External delivery requires an explicit approved status and destination record.
 4. Returned items must keep the review comments and prior output path.
 5. Every status change must append to `audit-log.jsonl`.
+6. A queue status is not itself a release permission. After moving a deep-analysis item to
+   `approved-internal` / `approved-external`, the run-level effect is established only by
+   `matter-core/scripts/finalize_run.py record`, which binds the named reviewer's decision to the
+   run's current bytes. Any later edit to a document, source record or artifact ends that effect;
+   the item must be reviewed and recorded again.
 
 ## Output
 

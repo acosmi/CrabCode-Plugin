@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crablaw.local/schemas/matter-core/conflict-policy.schema.json",
+  "title": "CrabLaw-CN Conflict Disposition Policy",
+  "description": "A lawyer-issued policy saying what each screening relation means for this firm. The rule set must cover every relation the screen can produce, so a relation can never fall through unclassified.",
+  "type": "object",
+  "required": ["schemaVersion", "policyVersion", "approvedBy", "approvedAt", "rules"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "policyVersion": { "type": "string", "minLength": 1 },
+    "approvedBy": { "type": "string", "minLength": 1 },
+    "approvedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "format": "date" },
+    "notes": { "type": "string", "minLength": 1 },
+    "rules": {
+      "type": "object",
+      "required": ["same-side-existing-client", "potential-adverse", "name-match-unclassified"],
+      "properties": {
+        "same-side-existing-client": {
+          "type": "object",
+          "required": ["disposition"],
+          "properties": {
+            "disposition": { "enum": ["lawyer-review-required", "informational"] },
+            "note": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": false
+        },
+        "potential-adverse": {
+          "type": "object",
+          "required": ["disposition"],
+          "properties": {
+            "disposition": { "enum": ["lawyer-review-required", "informational"] },
+            "note": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": false
+        },
+        "name-match-unclassified": {
+          "type": "object",
+          "required": ["disposition"],
+          "properties": {
+            "disposition": { "enum": ["lawyer-review-required", "informational"] },
+            "note": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

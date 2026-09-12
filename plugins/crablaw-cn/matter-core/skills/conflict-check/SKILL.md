@@ -27,7 +27,14 @@ Run an initial conflicts screening workflow. This is not a final conflicts concl
    - recommended lawyer action.
    - the matched value, the role it holds in the existing record, the role it holds in this matter, and the resulting relation (`same-side-existing-client`, `potential-adverse`, or `name-match-unclassified`). A relation is context for the reviewing lawyer, never a conclusion.
 5. Record what the screen could not read in the `coverage` block: records that failed to parse, records that are not JSON objects, and records refused because they sit behind a symlink or Windows directory junction.
-6. Set status:
+6. Apply the lawyer-issued conflict policy — `<store-root>/conflict-policy.json`, else the shipped
+   `matter-core/conflict-policy.json`, described in `matter-core/PRACTICE.md`. It decides what each
+   relation means: `lawyer-review-required` matches stay in `hits`; `informational` matches are
+   recorded in `informationalHits` and do not change the status. Record which policy was applied in
+   the `policy` block. **The model must never edit the policy file and never remove or downgrade a
+   recorded hit.** An unreadable or invalid policy is exit code 11 — report it and stop; it is not
+   permission to screen without one.
+7. Set status:
    - `no-hit` if coverage is complete and no relevant hit was found.
    - `hit-review-required` if any relevant hit exists.
    - `coverage-incomplete` if any record could not be read. An incomplete screen is not a `no-hit`, and it blocks substantive work exactly like a hit does.

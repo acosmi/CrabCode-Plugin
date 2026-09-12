@@ -131,6 +131,35 @@ python3 ${CRABCODE_PLUGIN_ROOT}/matter-core/scripts/validate_run.py \
 Add `--require-verified-source` when the memo contains any verified legal conclusion. A failed
 validator blocks completion.
 
+## Release gate
+
+Being ready for review is not permission to send. Before any send, filing, or external delivery,
+run:
+
+```text
+python3 ${CRABCODE_PLUGIN_ROOT}/matter-core/scripts/finalize_run.py gate \
+  --matter-id <matter-id> --run-id <run-id> --require lawyer-reviewed
+```
+
+Use `--require approved-external` for anything leaving the firm. A non-zero exit blocks the send;
+read the reported `reasons` instead of retrying.
+
+The lawyer's decision is registered in two steps, never one: the named reviewer updates the
+review-queue item (`approved-internal`, then `approved-external` with a destination for external
+delivery), and that decision is bound to the run with:
+
+```text
+python3 ${CRABCODE_PLUGIN_ROOT}/matter-core/scripts/finalize_run.py record \
+  --matter-id <matter-id> --run-id <run-id> --kind lawyer-reviewed --by <reviewer name>
+```
+
+`--by` must be the reviewer named on the queue item. Every decision is bound to the exact bytes of
+the documents, source records and artifacts at that moment, so editing the memo, any matter
+document, or any source record afterwards makes the decision ineffective automatically — the run
+returns to internal-draft and must be reviewed and recorded again. Never edit the manifest's
+`reviewState` or `externalRelease` by hand; `validate_run.py` rejects a claim that has no bound
+decision behind it.
+
 ## Deliverable
 
 Produce an internal memo containing reviewer note, scope/coverage, RED→YELLOW→GREEN findings,
