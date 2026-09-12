@@ -20,3 +20,5 @@ description: 对最终媒体变体执行完整 Media Gate、请求并记录人�
 7. 默认交付 HTML 路径，Markdown 标注为备份，并给出 `recoveryMode`、全部追溯哈希、QA 工具版本和身份 assurance；最终发布仍由人工在平台后台完成。
 
 缺可信 principal、pending、rejected、revoked、stale、自动 QA 失败或输入不匹配时停止，不提供绕过步骤。`host_principal` 是宿主信任断言，不应描述为插件已完成强身份认证；完整 WCAG 认证和真实平台发布也不在本门禁保证范围内。
+
+`mediaops.delivery.export_draft` 的产物不是交付候选：它写在独立的 draft-exports 目录、记录在独立集合、标记 `releaseStatus=unapproved` / `qaLevel=none`，本门禁只认 `mediaops.delivery.verify` 验证过的交付清单。见到草稿导出物、草稿导出 ID 或其哈希一律不接受，也不得据此跳过第 1–3 步；缺少验证过的交付时照常返回 `DELIVERY_VERIFICATION_REQUIRED`。

@@ -49,13 +49,20 @@ Create a matter workspace. This skill opens the matter record but does not autho
 4. Read the exit code, not just the text. `0` means created with no local match; `10` means created
    but blocked (`hit-review-required` or `coverage-incomplete`); `3` means the command refused
    because the matter id already exists or is an interrupted (`.pending`) bootstrap; `2` means bad
-   arguments, an unreadable store, or a store lock held by a live writer. On Windows without a
-   `python3` alias, invoke the same command with `py -3`.
-5. Inspect the returned preliminary conflict status. A local name match sets
+   arguments, an unreadable store, or a store lock held by a live writer; `11` means the conflict
+   policy could not be read or is invalid, so nothing was screened and nothing was created. On
+   Windows without a `python3` alias, invoke the same command with `py -3`.
+5. What a match means comes from the lawyer-issued conflict policy —
+   `<store-root>/conflict-policy.json`, else the shipped `matter-core/conflict-policy.json`,
+   described in `matter-core/PRACTICE.md`. The screening record names the policy that produced it,
+   and matches the policy calls informational are kept in `informationalHits` without changing the
+   status. **Never edit the policy file and never remove or downgrade a recorded hit.** On exit code
+   11, report the error and stop; it is not permission to open a matter without a policy.
+6. Inspect the returned preliminary conflict status. A local name match sets
    `hit-review-required` and blocks substantive work; absence of a local match is not a final lawyer
    conflict opinion. A `coverage-incomplete` status means the screen could not read part of the
    store — report the `coverage` block verbatim and treat it as blocking, never as "nothing found".
-6. Stop before substantive analysis and direct the user to `crablaw-cn:conflict-check` for the
+7. Stop before substantive analysis and direct the user to `crablaw-cn:conflict-check` for the
    responsible lawyer's workflow.
 
 ## Output

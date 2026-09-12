@@ -1,5 +1,7 @@
 import { ok, type Envelope } from '../envelope.ts'
 import { PLATFORMS } from '../platforms/registry.ts'
+import { buildSources, describeSourceRegions } from '../sources/index.ts'
+import { CHINESE_HOT_SOURCES_UNCONFIGURED_NOTE } from './capabilities.ts'
 import { resolveDataDir, ensureDir } from '../storage.ts'
 import { VERSION } from '../domain.ts'
 import { describePrincipal, isSecondHumanGate, principalHasRole, serviceActorCovers, toolRolePolicies, type TrustedPrincipal } from '../identity.ts'
@@ -102,6 +104,30 @@ export async function handler(_args: Record<string, never> = {}, principal?: Tru
     return { tool, role, readiness, ...(blockedBy ? { blockedBy } : {}), ...(hint ? { hint } : {}) }
   })
 
+  // Source coverage is a configuration probe, not a QA dependency and not a
+  // tool-stage gate, so it gets its own list rather than being folded into one
+  // of those and quietly changing what they mean. "Not configured" is reported,
+  // never treated as a failure: having no Chinese source is a legitimate state.
+  const registry = buildSources()
+  const regions = describeSourceRegions(registry.sources)
+  warnings.push(...registry.warnings)
+  const sourceProbes = [
+    {
+      id: 'chinese-hot-sources',
+      status: regions.cnConfigured ? ('configured' as const) : ('not-configured' as const),
+      sources: regions.cn,
+      detail: regions.cnConfigured
+        ? `已配置：${regions.cn.join(', ')}`
+        : CHINESE_HOT_SOURCES_UNCONFIGURED_NOTE,
+    },
+    {
+      id: 'global-hot-sources',
+      status: regions.global.length ? ('configured' as const) : ('not-configured' as const),
+      sources: regions.global,
+      detail: regions.global.length ? `已配置：${regions.global.join(', ')}` : '没有任何全球来源被注册。',
+    },
+  ]
+
   const platforms = PLATFORMS.map((p) => ({
     id: p.id,
     displayName: p.displayName,
@@ -128,6 +154,7 @@ export async function handler(_args: Record<string, never> = {}, principal?: Tru
       },
       identity,
       qaReadiness,
+      sourceProbes,
       stages,
       platforms,
       summary: 'Gate A: deterministic I/O only. No platform credentials configured; real publish APIs are disabled.',

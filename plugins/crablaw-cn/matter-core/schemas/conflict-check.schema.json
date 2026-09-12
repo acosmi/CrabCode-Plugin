@@ -26,10 +26,46 @@
           "newRole": { "type": "string", "minLength": 1 },
           "relation": {
             "enum": ["same-side-existing-client", "potential-adverse", "name-match-unclassified"]
-          }
+          },
+          "policyDisposition": { "enum": ["lawyer-review-required", "informational"] }
         },
         "additionalProperties": false
       }
+    },
+    "informationalHits": {
+      "description": "Matches the firm's conflict policy classified as informational. They do not change status, and they are never deleted: a lawyer still sees what was matched.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source", "summary", "risk", "policyDisposition"],
+        "properties": {
+          "source": { "type": "string", "minLength": 1 },
+          "matchedMatterId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,100}$" },
+          "summary": { "type": "string", "minLength": 1 },
+          "risk": { "enum": ["low", "medium", "high", "unknown"] },
+          "recommendedAction": { "type": "string", "minLength": 1 },
+          "matchedValue": { "type": "string", "minLength": 1 },
+          "existingRole": { "type": "string", "minLength": 1 },
+          "newRole": { "type": "string", "minLength": 1 },
+          "relation": {
+            "enum": ["same-side-existing-client", "potential-adverse", "name-match-unclassified"]
+          },
+          "policyDisposition": { "const": "informational" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "policy": {
+      "description": "Which lawyer-issued conflict policy produced this record. A later policy change is then detectable instead of silently reinterpreting an old screen.",
+      "type": "object",
+      "required": ["policyVersion", "policyDigest", "approvedBy", "source"],
+      "properties": {
+        "policyVersion": { "type": "string", "minLength": 1 },
+        "policyDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "approvedBy": { "type": "string", "minLength": 1 },
+        "source": { "enum": ["store", "plugin-default"] }
+      },
+      "additionalProperties": false
     },
     "coverage": {
       "type": "object",

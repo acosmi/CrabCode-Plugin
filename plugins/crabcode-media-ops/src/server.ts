@@ -25,6 +25,7 @@ import * as research from './tools/research.ts'
 import * as originality from './tools/originality.ts'
 import * as editorialReview from './tools/editorial-review.ts'
 import * as delivery from './tools/delivery.ts'
+import * as draftExport from './tools/draft-export.ts'
 import * as profiles from './tools/profiles.ts'
 import * as preview from './tools/preview.ts'
 import * as readiness from './tools/readiness.ts'
@@ -86,6 +87,7 @@ register(originality.reviewName, originality.reviewDescription, originality.revi
 register(editorialReview.name, editorialReview.description, editorialReview.inputSchema, editorialReview.handler)
 register(delivery.renderName, delivery.renderDescription, delivery.renderInputSchema, delivery.renderHandler)
 register(delivery.verifyName, delivery.verifyDescription, delivery.verifyInputSchema, delivery.verifyHandler)
+register(draftExport.exportDraftName, draftExport.exportDraftDescription, draftExport.exportDraftInputSchema, draftExport.exportDraftHandler)
 
 register(profiles.saveName, profiles.saveDescription, profiles.saveInputSchema, profiles.saveHandler)
 register(profiles.getName, profiles.getDescription, profiles.getInputSchema, profiles.getHandler)

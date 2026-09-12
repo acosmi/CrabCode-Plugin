@@ -53,6 +53,25 @@
         "additionalProperties": false
       }
     },
+    "reviewDecisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["decisionId", "kind", "decidedBy", "decidedAt", "boundRevision", "boundDigest", "reviewItemId"],
+        "properties": {
+          "decisionId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,120}$" },
+          "kind": { "enum": ["lawyer-reviewed", "approved-external"] },
+          "decidedBy": { "type": "string", "minLength": 1 },
+          "decidedAt": { "type": "string", "format": "date-time" },
+          "boundRevision": { "type": "integer", "minimum": 1 },
+          "boundDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "reviewItemId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,120}$" },
+          "destination": { "type": "string", "minLength": 1 },
+          "note": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
     "staleIssueIds": { "type": "array", "items": { "type": "string", "minLength": 2 }, "uniqueItems": true },
     "completedStepIds": { "type": "array", "items": { "type": "string", "minLength": 2 }, "uniqueItems": true },
     "reviewState": { "enum": ["not-ready", "pending-lawyer-review", "lawyer-reviewed"] },

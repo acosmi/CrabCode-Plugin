@@ -4,18 +4,21 @@
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from _matter_common import (
     PENDING_MATTER_MESSAGE,
+    load_conflict_policy,
     load_json,
     load_jsonl,
     matter_is_pending,
     require_id,
     resolve_root,
+    run_dependency_digest,
     safe_path,
     sha256_file,
 )
@@ -67,6 +70,84 @@ def require_refs(values: list[str], available: set[str], label: str, errors: lis
             errors.append(f"{label} references unknown id: {value}")
 
 
+def validate_conflict_policy_binding(root: Path, conflict: dict[str, Any], errors: list[str]) -> None:
+    """A screening record means whatever the policy in force at the time said it meant.
+
+    Re-reading an old `no-hit` under today's policy would silently reinterpret a
+    decision nobody re-made, so the record names its policy and the answer is
+    refused when that policy is no longer the one in force.
+    """
+
+    try:
+        policy = load_conflict_policy(root)
+    except ValueError as exc:
+        errors.append(str(exc))
+        return
+    record = conflict.get("policy")
+    if not isinstance(record, dict):
+        errors.append("conflict screening predates policy binding; rerun")
+        return
+    if record.get("policyDigest") != policy["policyDigest"]:
+        errors.append(
+            f"conflict screening ran under a different policy "
+            f"({record.get('policyVersion')} -> {policy['policyVersion']}); rerun conflict screening"
+        )
+
+
+def iso_date(value: Any) -> Optional[dt.date]:
+    if not isinstance(value, str):
+        return None
+    try:
+        return dt.date.fromisoformat(value)
+    except ValueError:
+        return None
+
+
+def validate_source_provenance(
+    matter_id: str,
+    source_rows: list[Any],
+    permissions: dict[str, Any],
+    errors: list[str],
+) -> None:
+    """A record owned by another matter needs live authorization, not just a field claiming it."""
+
+    cross = permissions.get("crossMatterAccess")
+    if not isinstance(cross, dict):
+        cross = {}
+    for source in source_rows:
+        if not isinstance(source, dict):
+            continue
+        origin = source.get("matterId")
+        if origin == matter_id:
+            continue
+        imported = source.get("importedFrom")
+        if not isinstance(imported, dict):
+            reason = "no importedFrom provenance is recorded"
+        elif cross.get("enabled") is not True:
+            reason = "this matter does not enable crossMatterAccess"
+        elif not imported.get("authorizedBy") or imported.get("authorizedBy") != cross.get("authorizedBy"):
+            reason = (
+                f"importedFrom.authorizedBy {imported.get('authorizedBy')!r} is not this matter's "
+                f"authorizer {cross.get('authorizedBy')!r}"
+            )
+        else:
+            expires = iso_date(cross.get("expiresAt"))
+            imported_at = iso_date(imported.get("importedAt"))
+            if expires is None or imported_at is None:
+                reason = "the authorization window or the import date is not a usable date"
+            elif expires < imported_at:
+                reason = (
+                    f"the authorization expired on {cross.get('expiresAt')}, "
+                    f"before the import on {imported.get('importedAt')}"
+                )
+            else:
+                continue
+        errors.append(
+            f"source {source.get('sourceId')} is imported from matter {origin} without valid "
+            f"cross-matter authorization: {reason}"
+        )
+
+
 def validate_base_store(root: Path, matter_id: str, errors: list[str]) -> dict[str, Any]:
     matter_dir = safe_path(root, "matters", matter_id, must_exist=True)
     if matter_is_pending(matter_dir):
@@ -97,6 +178,7 @@ def validate_base_store(root: Path, matter_id: str, errors: list[str]) -> dict[s
         errors.append(f"conflict status blocks substantive work: {conflict.get('status')}")
     if not permissions.get("allowedUsers"):
         errors.append("permissions.json allowedUsers must not be empty")
+    validate_conflict_policy_binding(root, conflict, errors)
 
     sources_path = safe_path(matter_dir, "sources.jsonl", must_exist=True)
     source_rows = load_jsonl(sources_path)
@@ -104,13 +186,63 @@ def validate_base_store(root: Path, matter_id: str, errors: list[str]) -> dict[s
     for position, source in enumerate(source_rows, 1):
         for error in validate_instance(source, source_schema):
             errors.append(f"sources.jsonl[{position}]: {error}")
+    validate_source_provenance(matter_id, source_rows, permissions, errors)
     state["sources"] = source_rows
     state["sourceIndex"] = index_rows(source_rows, "sourceId", "sources", errors)
     return state
 
 
+def validate_review_decisions(
+    matter_dir: Path,
+    run_dir: Path,
+    manifest: dict[str, Any],
+    errors: list[str],
+) -> None:
+    """`reviewState` and `externalRelease` are claims; only a bound decision is evidence.
+
+    A string in the manifest cannot certify itself: the run is approved only while
+    a recorded decision still binds to the bytes that are on disk right now.
+    """
+
+    decisions = [item for item in manifest.get("reviewDecisions", []) or [] if isinstance(item, dict)]
+    revision = manifest.get("revision")
+    if isinstance(revision, int) and not isinstance(revision, bool):
+        for decision in decisions:
+            bound_revision = decision.get("boundRevision")
+            if (
+                isinstance(bound_revision, int)
+                and not isinstance(bound_revision, bool)
+                and bound_revision > revision
+            ):
+                errors.append(
+                    f"review decision {decision.get('decisionId')} claims revision {bound_revision}, "
+                    f"which is ahead of the manifest revision {revision}"
+                )
+
+    effective: set[Any] = set()
+    try:
+        current = run_dependency_digest(matter_dir, run_dir, manifest)
+        effective = {
+            decision.get("kind") for decision in decisions if decision.get("boundDigest") == current["digest"]
+        }
+    except (OSError, ValueError) as exc:
+        errors.append(f"run dependency digest could not be recomputed: {exc}")
+
+    if manifest.get("reviewState") == "lawyer-reviewed" and not (
+        effective & {"lawyer-reviewed", "approved-external"}
+    ):
+        errors.append(
+            "reviewState lawyer-reviewed has no review decision bound to the current bytes; "
+            "record it with finalize_run.py"
+        )
+    if manifest.get("externalRelease") == "approved" and "approved-external" not in effective:
+        errors.append("external release approval is not bound to the current bytes")
+
+
 def validate_cross_references(
     matter_dir: Path,
+    run_dir: Path,
+    matter_id: str,
     run_id: str,
     payloads: dict[str, Any],
     sources: dict[str, dict[str, Any]],
@@ -128,9 +260,17 @@ def validate_cross_references(
     manifest = payloads["run-manifest"]
     review_item = payloads["review-item"]
 
+    # Ownership is checked on every payload that claims one, lists included: a file
+    # sitting in this matter's run directory while naming another matter is either a
+    # mis-filed artifact or a leak, and neither may pass as "just a stale field".
     for label, payload in payloads.items():
-        if isinstance(payload, dict) and "runId" in payload and payload.get("runId") != run_id:
-            errors.append(f"{label} runId mismatch")
+        for entry in payload if isinstance(payload, list) else [payload]:
+            if not isinstance(entry, dict):
+                continue
+            if "runId" in entry and entry.get("runId") != run_id:
+                errors.append(f"{label} runId mismatch")
+            if "matterId" in entry and entry.get("matterId") != matter_id:
+                errors.append(f"{label} matterId mismatch")
 
     document_rows = documents.get("documents", [])
     document_index = index_rows(document_rows, "documentId", "documents", errors)
@@ -168,6 +308,15 @@ def validate_cross_references(
                 errors.append(f"document {document_id} differs from its source record documentId")
             if source_record.get("contentHash") and source_record.get("contentHash") != document.get("sha256"):
                 errors.append(f"document {document_id} differs from its source record contentHash")
+            if source_record.get("importedFrom") and document.get("confidentiality") != source_record.get(
+                "confidentiality"
+            ):
+                # Importing a record must not relabel it: the receiving matter
+                # inherits the confidentiality it was granted, never a looser one.
+                errors.append(
+                    f"document {document_id} confidentiality {document.get('confidentiality')!r} does not match "
+                    f"its imported source record's {source_record.get('confidentiality')!r}"
+                )
         require_refs(document.get("issueIds", []), issue_ids, f"document {document_id}", errors)
         try:
             managed_path = safe_path(
@@ -303,6 +452,7 @@ def validate_cross_references(
 
     if manifest.get("externalRelease") == "approved" and manifest.get("reviewState") != "lawyer-reviewed":
         errors.append("external release cannot be approved before lawyer review")
+    validate_review_decisions(matter_dir, run_dir, manifest, errors)
     if strict and (manifest.get("status") == "stale" or manifest.get("staleIssueIds")):
         errors.append("strict validation blocks stale runs and stale issues")
     if strict and manifest.get("status") == "ready-for-review":
@@ -381,6 +531,8 @@ def main() -> int:
 
         validate_cross_references(
             matter_dir,
+            run_dir,
+            matter_id,
             run_id,
             payloads,
             state["sourceIndex"],

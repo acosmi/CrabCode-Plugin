@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "policyVersion": "2026-09-12-default",
+  "approvedBy": "未签发（默认政策：所有命中一律律师复核）",
+  "approvedAt": "2026-09-12",
+  "rules": {
+    "same-side-existing-client": { "disposition": "lawyer-review-required", "note": "同向既有客户仍可能因对手方/事项类型构成冲突" },
+    "potential-adverse": { "disposition": "lawyer-review-required", "note": "潜在对立关系" },
+    "name-match-unclassified": { "disposition": "lawyer-review-required", "note": "同名不确定" }
+  }
+}

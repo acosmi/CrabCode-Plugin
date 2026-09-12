@@ -1,6 +1,6 @@
 import { ok, type Envelope } from '../envelope.ts'
 import { PLATFORMS } from '../platforms/registry.ts'
-import { buildSources } from '../sources/index.ts'
+import { buildSources, describeSourceRegions } from '../sources/index.ts'
 import { VERSION } from '../domain.ts'
 import { describePrincipal, type TrustedPrincipal } from '../identity.ts'
 import { RENDER_CONTRACT } from '../rendering/renderer.ts'
@@ -22,8 +22,20 @@ export const description =
 
 export const inputSchema = {}
 
+/**
+ * What the server is allowed to say about Chinese hot topics.
+ *
+ * With no `region: 'cn'` source registered, a trend result is a global-only
+ * result. Returning that list with no further comment reads as Chinese coverage
+ * and is the exact misunderstanding §8.2 asks us to prevent, so the absence is
+ * reported as a fact rather than left to be inferred from a list of names.
+ */
+export const CHINESE_HOT_SOURCES_UNCONFIGURED_NOTE =
+  '未配置：中文平台接入需有授权的来源、用户自备数据或研究代理（WebSearch/WebFetch）；本服务不抓取无官方 API 的平台。'
+
 export async function handler(_args: Record<string, never> = {}, principal?: TrustedPrincipal): Promise<Envelope> {
   const registry = buildSources()
+  const regions = describeSourceRegions(registry.sources)
   const identity = describePrincipal(principal ?? null)
   return ok({
     version: VERSION,
@@ -38,6 +50,11 @@ export async function handler(_args: Record<string, never> = {}, principal?: Tru
       apiPublishGate: p.apiPublishGate,
     })),
     availableSources: Object.keys(registry.sources),
+    chineseHotSources: {
+      configured: regions.cnConfigured,
+      sources: regions.cn,
+      note: regions.cnConfigured ? `已配置：${regions.cn.join(', ')}` : CHINESE_HOT_SOURCES_UNCONFIGURED_NOTE,
+    },
     dangerousCapabilities: {
       publish: false,
       autoComment: false,
@@ -62,6 +79,7 @@ export async function handler(_args: Record<string, never> = {}, principal?: Tru
       actorRoles: principal?.roles ?? [],
       defaultDeliveryFormat: 'html',
       backupFormat: 'markdown',
+      unapprovedDraftExport: 'mediaops.delivery.export_draft — releaseStatus=unapproved, qaLevel=none, stored apart from delivery-manifests',
       deliveryCandidateFreeze: true,
       deliveryByteVerification: true,
       automaticBrowserVisualVerification: true,

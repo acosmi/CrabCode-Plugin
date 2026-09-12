@@ -356,3 +356,187 @@ def sha256_file(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def canonical_json(payload: Any) -> str:
+    """One byte-stable rendering, so the same content always hashes the same."""
+
+    return json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+
+
+# One spelling of the reason `sync_run_manifest.py` records and `finalize_run.py`
+# retires, so the two can never drift into writing and matching different strings.
+REVIEW_BINDING_BLOCKING_REASON_PREFIX = "review decisions no longer bind to the current bytes"
+
+
+def review_binding_blocking_reason(revision: int) -> str:
+    return f"{REVIEW_BINDING_BLOCKING_REASON_PREFIX} (revision {revision})"
+
+
+CONFLICT_POLICY_FILE_NAME = "conflict-policy.json"
+CONFLICT_RELATIONS = (
+    "same-side-existing-client",
+    "potential-adverse",
+    "name-match-unclassified",
+)
+CONFLICT_DISPOSITIONS = ("lawyer-review-required", "informational")
+
+
+class ConflictPolicyError(ValueError):
+    """A policy that cannot be read is never a reason to let a hit through.
+
+    Screening without a disposition policy would have to guess what a match means,
+    and the only convenient guess — "clear it" — is the one a firm can never
+    accept. Every failure to load raises, and the caller refuses to screen at all.
+    """
+
+
+def plugin_conflict_policy_path() -> Path:
+    return Path(__file__).resolve().parents[1] / CONFLICT_POLICY_FILE_NAME
+
+
+def conflict_policy_schema_path() -> Path:
+    return Path(__file__).resolve().parents[1] / "schemas" / "conflict-policy.schema.json"
+
+
+def load_conflict_policy(root: Path) -> dict[str, Any]:
+    """Load the firm's policy if the store carries one, else the shipped default.
+
+    The result carries provenance and a digest: a screening record states which
+    policy produced it, so a later policy change is detectable instead of
+    retroactively rewriting what an old screen meant.
+    """
+
+    from schema_validation import validate_instance
+
+    try:
+        store_path = safe_path(root, CONFLICT_POLICY_FILE_NAME)
+        source = "store" if store_path.exists() else "plugin-default"
+        path = store_path if source == "store" else plugin_conflict_policy_path()
+        payload = load_json(path)
+        schema = load_json(conflict_policy_schema_path())
+    except (OSError, ValueError) as exc:
+        raise ConflictPolicyError(f"conflict policy could not be loaded: {exc}") from exc
+
+    if not isinstance(payload, dict):
+        raise ConflictPolicyError(f"conflict policy must be a JSON object: {path}")
+    schema_errors = validate_instance(payload, schema)
+    if schema_errors:
+        raise ConflictPolicyError(
+            f"conflict policy is invalid ({source} {path.name}): {'; '.join(schema_errors)}"
+        )
+
+    # The schema pins the relations a policy must cover; this pins the ones the
+    # screening code can actually produce. Adding a relation to the code without
+    # adding it to the schema would otherwise reach a screen unclassified.
+    uncovered = [relation for relation in CONFLICT_RELATIONS if relation not in payload["rules"]]
+    if uncovered:
+        raise ConflictPolicyError(
+            f"conflict policy does not classify every screening relation "
+            f"({source} {path.name}): {', '.join(uncovered)}"
+        )
+
+    return {
+        "policy": payload,
+        "source": source,
+        "path": path,
+        "policyVersion": payload["policyVersion"],
+        "approvedBy": payload["approvedBy"],
+        "policyDigest": sha256_text(canonical_json(payload)),
+    }
+
+
+def conflict_disposition(loaded_policy: dict[str, Any], relation: str) -> str:
+    """The schema guarantees every relation is covered, so this never invents one."""
+
+    rule = loaded_policy["policy"]["rules"].get(relation)
+    if not isinstance(rule, dict) or rule.get("disposition") not in CONFLICT_DISPOSITIONS:
+        raise ConflictPolicyError(f"conflict policy does not classify relation {relation!r}")
+    return rule["disposition"]
+
+
+def conflict_policy_record(loaded_policy: dict[str, Any]) -> dict[str, str]:
+    return {
+        "policyVersion": loaded_policy["policyVersion"],
+        "policyDigest": loaded_policy["policyDigest"],
+        "approvedBy": loaded_policy["approvedBy"],
+        "source": loaded_policy["source"],
+    }
+
+
+def source_digests(matter_dir: Path) -> list[dict[str, str]]:
+    """Hash every source record so a source edit is as detectable as a document edit."""
+
+    sources_path = safe_path(matter_dir, "sources.jsonl")
+    if not sources_path.exists():
+        return []
+    digests: dict[str, str] = {}
+    for row in load_jsonl(safe_path(matter_dir, "sources.jsonl", must_exist=True)):
+        if not isinstance(row, dict):
+            continue
+        source_id = row.get("sourceId")
+        if not isinstance(source_id, str) or not source_id:
+            continue
+        digests[source_id] = sha256_text(json.dumps(row, sort_keys=True))
+    return [{"sourceId": key, "sha256": digests[key]} for key in sorted(digests)]
+
+
+# A review-queue item changes *because* a decision was recorded on it, so it can
+# never be part of the digest that decision binds to: including it would make
+# every decision invalidate itself the moment it is taken.
+DIGEST_EXCLUDED_ARTIFACT_TYPES = {"review-item"}
+
+
+def _managed_file_digest(matter_dir: Path, relative_path: str, label: str) -> str:
+    try:
+        managed = safe_path(matter_dir, *Path(relative_path).parts, must_exist=True)
+        return sha256_file(managed)
+    except OSError as exc:
+        raise ValueError(f"{label} is missing or unreadable: {relative_path} ({exc})") from exc
+
+
+def run_dependency_digest(matter_dir: Path, run_dir: Path, manifest: dict[str, Any]) -> dict[str, Any]:
+    """Recompute, from the bytes on disk, everything a review decision depends on.
+
+    The digest is deliberately derived from the files themselves rather than from
+    the hashes a previous sync wrote into the manifest: a decision must bind to
+    what is actually there, not to what the manifest remembers.
+    """
+
+    documents: list[dict[str, str]] = []
+    document_index = load_json(safe_path(run_dir, "document-index.json", must_exist=True))
+    for document in document_index.get("documents", []) or []:
+        if not isinstance(document, dict):
+            continue
+        document_id = document.get("documentId")
+        relative_path = document.get("path")
+        if not document_id or not relative_path:
+            raise ValueError("document-index entry requires documentId and path")
+        documents.append(
+            {
+                "documentId": document_id,
+                "sha256": _managed_file_digest(matter_dir, relative_path, f"document {document_id}"),
+            }
+        )
+
+    artifacts: list[dict[str, str]] = []
+    for artifact in manifest.get("artifacts", []) or []:
+        if not isinstance(artifact, dict):
+            continue
+        if artifact.get("type") in DIGEST_EXCLUDED_ARTIFACT_TYPES:
+            continue
+        artifact_id = artifact.get("artifactId")
+        relative_path = artifact.get("path")
+        if not artifact_id or not relative_path:
+            raise ValueError("run-manifest artifact requires artifactId and path")
+        artifacts.append(
+            {
+                "artifactId": artifact_id,
+                "sha256": _managed_file_digest(matter_dir, relative_path, f"artifact {artifact_id}"),
+            }
+        )
+
+    documents.sort(key=lambda item: item["documentId"])
+    artifacts.sort(key=lambda item: item["artifactId"])
+    body = {"documents": documents, "sources": source_digests(matter_dir), "artifacts": artifacts}
+    return {"digest": sha256_text(canonical_json(body)), **body}

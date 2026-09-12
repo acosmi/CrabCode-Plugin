@@ -24,6 +24,24 @@ function nextPatch(version: string): string {
   return `${match[1]}.${match[2]}.${Number(match[3]) + 1}`;
 }
 
+function parseVersion(version: string): [number, number, number] {
+  const match = /^(\d+)\.(\d+)\.(\d+)$/u.exec(version);
+  if (!match) throw new Error(`invalid version ${version}`);
+  return [Number(match[1]), Number(match[2]), Number(match[3])];
+}
+
+/** Semver-ish ordering for the three version fields the inventory binds. */
+function versionAtLeast(candidate: string, floor: string): boolean {
+  const a = parseVersion(candidate);
+  const b = parseVersion(floor);
+  for (let index = 0; index < 3; index += 1) {
+    const left = a[index] ?? 0;
+    const right = b[index] ?? 0;
+    if (left !== right) return left > right;
+  }
+  return true;
+}
+
 function pluginDirectories(): string[] {
   return readdirSync(path.join(root, "plugins"), { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
@@ -181,10 +199,18 @@ describe("MCP first-party local baseline", () => {
       expect(createHash("sha256").update(bytes).digest("hex"), entry.pluginId).toBe(entry.configSha256);
       expect(entry.restoredVersion, entry.pluginId).toBe(nextPatch(entry.previousVersion));
 
-      expect(json(`plugins/${entry.pluginId}/.crabcode-plugin/plugin.json`).version, entry.pluginId).toBe(entry.restoredVersion);
-      expect(JSON.parse(readFileSync(path.join(root, "plugins", entry.pluginId, "package.json"), "utf8")).version, entry.pluginId).toBe(entry.restoredVersion);
+      // The inventory records the version that carried the restore. Later
+      // releases of the same plugin move forward from it (0.4.5 on 2026-09-12
+      // added the draft-export line); they never move back below it, and the
+      // three version carriers must still agree with each other.
+      const manifestVersion = json(`plugins/${entry.pluginId}/.crabcode-plugin/plugin.json`).version as string;
+      const packageVersion = JSON.parse(readFileSync(path.join(root, "plugins", entry.pluginId, "package.json"), "utf8")).version as string;
       const marketplaceEntry = marketplace.plugins.find((item: any) => item.name === entry.pluginId);
-      expect(marketplaceEntry.version, entry.pluginId).toBe(entry.restoredVersion);
+      expect(versionAtLeast(manifestVersion, entry.restoredVersion), `${entry.pluginId} ${manifestVersion} < restored ${entry.restoredVersion}`).toBe(true);
+      expect(packageVersion, entry.pluginId).toBe(manifestVersion);
+      expect(marketplaceEntry.version, entry.pluginId).toBe(manifestVersion);
+      // Positive control: the ordering helper is not vacuous.
+      expect(versionAtLeast(entry.previousVersion, entry.restoredVersion)).toBe(false);
     }
   });
 

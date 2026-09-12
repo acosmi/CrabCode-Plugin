@@ -29,6 +29,23 @@ export function isSafeLinkUrl(value: string): boolean {
 
 export const SafeHttpUrlSchema = z.string().refine(isSafeHttpUrl, 'URL must use http:// or https://')
 
+/**
+ * One canonical identity for a URL, shared by citation matching (readiness) and
+ * hot-topic signal IDs (sources). Two spellings of the same address — fragment,
+ * default port, trailing slash, host case, query order — must collapse to one
+ * string, or the same page is counted twice in one place and matched nowhere in
+ * the other.
+ */
+export function canonicalUrlIdentity(value: string): string {
+  const url = new URL(value)
+  url.hash = ''
+  url.hostname = url.hostname.toLowerCase()
+  if ((url.protocol === 'https:' && url.port === '443') || (url.protocol === 'http:' && url.port === '80')) url.port = ''
+  if (url.pathname.length > 1) url.pathname = url.pathname.replace(/\/+$/, '')
+  url.searchParams.sort()
+  return url.toString()
+}
+
 export const BrandIdSchema = z
   .string()
   .regex(/^[a-z0-9][a-z0-9-]{0,63}$/, 'brandId must be a lowercase slug (a-z, 0-9, hyphens)')
@@ -699,6 +716,71 @@ export const DeliveryManifestSchema = z.object({
 })
 
 export type DeliveryManifest = z.infer<typeof DeliveryManifestSchema>
+
+/**
+ * Unapproved draft export (RC-14).
+ *
+ * This is deliberately NOT a DeliveryManifest and is stored in its own
+ * collection under its own directory: `getLatestVerifiedDelivery` and
+ * `verifyDeliveryBytes` resolve candidates inside `<data>/delivery-candidates`,
+ * so a draft export is structurally invisible to the approval chain rather than
+ * being kept out of it by a flag someone could flip. `releaseStatus` and
+ * `qaLevel` are literals for the same reason: there is no second value they
+ * could ever take.
+ *
+ * Governance state is reported exactly as found — `missing` and `stale` are
+ * first-class answers, never smoothed into something friendlier.
+ */
+export const DraftExportGovernanceSchema = z.object({
+  research: z.enum(['bound', 'stale', 'missing']),
+  originalityScan: z.enum(['bound', 'stale', 'missing']),
+  editorialReview: z.enum(['bound', 'stale', 'missing']),
+  // A personal, unapproved preference profile (`manual-import`) and an
+  // organization-confirmed one (`confirmed-form`) are both usable for a draft;
+  // the export states which one it used instead of blurring them.
+  profile: z.enum(['confirmed-form', 'manual-import', 'rollback', 'missing']),
+  verifiedDelivery: z.enum(['present', 'none']),
+}).strict()
+
+export type DraftExportGovernance = z.infer<typeof DraftExportGovernanceSchema>
+
+export const DraftExportManifestSchema = z.object({
+  schemaVersion: z.literal('mediaops-draft-export@1'),
+  exportId: z.string().uuid(),
+  contentId: z.string().uuid(),
+  revisionId: z.string().uuid(),
+  revision: z.number().int().positive(),
+  stage: z.enum(['intake', 'researched', 'drafted', 'reviewed']),
+  contentHash: Sha256Schema,
+  articleDocHash: Sha256Schema,
+  releaseStatus: z.literal('unapproved'),
+  qaLevel: z.literal('none'),
+  governance: DraftExportGovernanceSchema,
+  blockers: z.array(z.object({
+    code: z.string().min(1).max(120),
+    severity: z.enum(['error', 'warning']),
+    message: z.string().min(1).max(2000),
+  }).strict()).max(200),
+  assetRightsPending: z.array(z.string().uuid()).max(100),
+  primaryArtifact: DeliveryArtifactSchema,
+  backupArtifact: DeliveryArtifactSchema,
+  channelArtifacts: z.array(DeliveryArtifactSchema).default([]),
+  assets: z.array(z.object({
+    assetId: z.string().uuid(),
+    relativePath: z.string().min(1),
+    sha256: Sha256Schema,
+    byteSize: z.number().int().positive(),
+    mediaType: z.string().min(1),
+  }).strict()).max(100),
+  rendererVersion: z.string().min(1),
+  templateId: z.string().min(1),
+  exportedAt: z.string().datetime(),
+  exportedBy: z.string().trim().min(1).max(300),
+  exportRoot: z.string().min(1),
+  exportManifestHash: Sha256Schema,
+}).strict()
+
+export type DraftExportManifest = z.infer<typeof DraftExportManifestSchema>
 
 const PackageRelativePathSchema = z.string().min(1).refine((value) =>
   /^[A-Za-z0-9._/-]+$/.test(value) && !value.startsWith('/') && !value.includes(':') && value.split('/').every((part) => part && part !== '.' && part !== '..'),

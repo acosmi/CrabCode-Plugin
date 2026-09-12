@@ -18,7 +18,7 @@ import { fileURLToPath } from 'node:url'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 
-const EXPECTED_TOOL_COUNT = 38
+const EXPECTED_TOOL_COUNT = 39
 const STARTUP_BUDGET_MS = Number(process.env.MEDIAOPS_SMOKE_TIMEOUT_MS ?? 10_000)
 
 const pluginRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')

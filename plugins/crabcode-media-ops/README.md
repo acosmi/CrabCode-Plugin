@@ -1,10 +1,19 @@
-# crabcode-media-ops 0.4.4
+# crabcode-media-ops 0.4.5
 
 > **本机执行配置状态（2026-09-12，三仓根因修复裁决 D-0(c)）**：本版本随包发布 `.mcp.json`，`requiredMcpServers: ["mediaops"]`，宿主安装后自动激活本机 stdio sidecar。安装后需在插件设置里填写“本机编辑者 ID / 显示名”，宿主经 `user_config` 注入 `local-editorial` 低保证主体；未填写时宿主显示“需要配置”，写入工具仍以 `AUTHENTICATION_REQUIRED` 安全失败。
 
 可审计的新媒体运营插件：参考材料防火墙、联网可信来源研究、独立原创风险复核、创作者风格管理、精排白底 HTML 交付、可信身份约束的审批，以及冻结发布包。
 
-## 0.4.4 变更（本机执行配置恢复 + QA 等级不混用）
+## 0.4.5 变更（未批准草稿导出 + 出站安全单点 + 热点稳定 ID）
+
+- **未批准草稿导出（新工具 `mediaops.delivery.export_draft`）**：任何阶段（intake / researched / drafted / reviewed）的任一 revision 都能导出可直接打开的 `article.html` 与 `article.md`，正文内带可见的“未批准草稿”提示。产物写入 `<data>/draft-exports/<exportId>/`，记录进独立的 `draft-exports` 集合，**不是** `delivery-candidates` 目录、**不是** `delivery-manifests` 集合——正式链的 `getLatestVerifiedDelivery` / `verifyDeliveryBytes` 只在候选目录内解析，所以草稿在结构上就看不见，而不是靠一个可以被翻转的开关挡住。响应固定 `releaseStatus=unapproved`、`qaLevel=none`，并如实列出 `governance`（research / originalityScan / editorialReview 各为 bound / stale / missing，profile 为其真实来源或 missing，verifiedDelivery 为 present / none）与仍然成立的 `blockers`。素材字节仍逐个校验，`rightsStatus=pending` 允许导出但会记入 `assetRightsPending`。`preview.create`、`readiness.inspect`、`approval.*`、`publish.package` 一行未改，语义零变化。
+- **出站安全单点 `src/outbound.ts`**：SSRF 校验、地址钉连、重定向预算、字节与 MIME 上限、整体 deadline 现在只有一份实现，`research.capture` 与全部热点源（内置 HackerNews + 配置 json-feed）共用。此前热点源走全局 `fetch`，完全不做地址核验：一个被加进 `MEDIAOPS_FEED_HOST_ALLOWLIST` 却解析到内网地址的主机（或跳转到内网的响应）会被照常抓取。主机名 allowlist 是独立于此的另一道限制，保持不变。
+- **热点信号稳定 ID 与时间字段**：信号 id 依次取 `idPath` 的值、条目 URL 的规范化哈希（`<源>:url:<16 位 sha256>`），都没有时才退化为 `<源>:index:<位置>` 并在 id 里说明它依赖位置——旧实现一律用数组下标，同一条新闻换个位置就换了身份。新增 `rawScore` / `scoreUnit` / `sourceRank` / `publishedAt` / `eventAt`；`publishedAt` 只接受能解析的字符串时间戳，取不到就是 `null`，绝不用 `capturedAt` 顶替。`mediaops.trends.search` 不再跨源按 `hotScore` 排序（HN points、博客 heat、阅读量不是同一个量），改为各源按自己的 `sourceRank` 轮转交错，响应带 `ordering: 'source-rank-interleave'`；`hotScore` 保留为 `rawScore ?? 0`。
+- **热点排序可解释**：`mediaops.trends.search` 的 `ordering` 为 `explainable@1`，响应带 `rules`（五条中文规则）与 `maxAgeHours`（默认 72），每条信号带 `ranking { queryMatch, recency, ageHours, sourceRank, duplicateOf, reasons }`。重复事件判据复用 `trends.cluster` 的同一份 token/相似度实现与同一阈值，不写第二份。详见下文〈热点排序如何解释自己〉。
+- **中文热点源「未配置」明说**：`region` / `authorization` 契约落地，`region:'cn'` 的条目缺授权依据即跳过并告警；`capabilities.chineseHotSources`、`doctor.sourceProbes` 与中文查询时的 trends 警告三处同时明说未配置。**不建抓取平台**：本服务仍不抓取没有官方 API 的平台。详见下文〈中文热点源〉。
+- **工具数 38 → 39**，`SCHEMA_VERSION=2`、存储结构与审批状态机不变。
+
+## 0.4.4 历史变更（本机执行配置恢复 + QA 等级不混用）
 
 - **发布面恢复**：`.mcp.json` 直接执行入库的 `dist/server.js`（`bun --no-env-file`），`requiredMcpServers: ["mediaops"]`；服务为本机 stdio，不含任何远程端点。该配置随 `crabcode-html-video` 一起进入第一方本机允许表，其余 41 个连接器继续暂停。
 - **身份注入**：`.mcp.json` 固定 `MEDIAOPS_IDENTITY_MODE=local-editorial` 与 `MEDIAOPS_TRUSTED_PRINCIPAL_ISSUER=crabcode-local-editorial`，主体 ID 与显示名来自宿主 `user_config`（两项都是 `required: true` —— 宿主在缺值时替换会抛错，且不会把声明里的 `default` 写进去）。授予的角色是除“第二真人门”以外的全部治理角色；`originality.review`、`editorial.review`、`approval.decide`、`profile.confirm` 仍保持 pending，不伪造多人治理。host-principal 仍是宿主未来的接线项。
@@ -58,6 +67,7 @@
 - `mediaops.originality.scan/review`
 - `mediaops.editorial.review`
 - `mediaops.delivery.render/verify`
+- `mediaops.delivery.export_draft`（未批准草稿导出；独立目录与集合，不进审批链）
 
 `media-ops` 负责完整、多阶段或多平台编排；单篇公众号观点稿由 `wechat-original-opinion` 路由，但同样必须遵守参考隔离、联网研究、陈述覆盖和原创门禁。
 
@@ -74,6 +84,8 @@ reference.register
 ```
 
 默认向用户呈现 `article.html`：单一 H1、语义化 H2–H4、明确标题/摘要/正文/来源/披露层级、响应式排版、打印样式、系统字体和所有基础表面 `#FFFFFF`。`article.md` 是同一 ArticleDoc 的可追溯备份；`wechat-richtext.html` 是复制到微信编辑器的渠道档案，不能替代 HTML 主交付。
+
+这条链之外另有一条只读的旁路：`mediaops.delivery.export_draft` 让单人 / 本机模式在任何阶段拿到可打开的草稿文件。它与上面的顺序没有交点——产物与记录都在独立的 `draft-exports` 目录与集合里，固定标记 `releaseStatus=unapproved` / `qaLevel=none`，不产生交付候选、不进审批、不推动任何阶段，也不会被 `readiness.inspect` 或 `publish.package` 看见。需要“可以发的东西”时，走的仍然只有 `delivery.render` → `delivery.verify` → `readiness.inspect` → 审批 → `publish.package`。
 
 任何改稿、研究/参考变化、素材换字节、模板/依赖变化或交付物篡改都会使相应门禁失效。pending、rejected、revoked、stale、坏存储或完整性失败均返回明确停止码。
 
@@ -117,6 +129,52 @@ reference.register
 `mediaops.research.complete` 成功后用公开只读工具 `mediaops.research.get(researchId)` 取回完整结构化研究包；写作者和核查者不得依赖进程内部 getter 或从日志猜测服务端生成的 `sourceId`。
 
 `mediaops.editorial.review` 必须提交 `statementCoverage`。推荐先对当前 revision 提交完整 claims/法律/披露数据和空或不完整 coverage；工具以 `action_required` 返回服务端生成的 `statementLedgerHash`、`statements[]` 及每项 `statementId`。核查者为每项可见句选择一种分类：`verified_fact` 需映射状态为 `verified` 的 `claimIds` 并设置 `directionConfirmed: true`；`author_inference` 除此之外还必须提供正文中实际出现的 `inferenceMarker`；`opinion`/`non_claim` 必须保持空 `claimIds`，不得携带事实方向或推论标记。四类都要写具体 `rationale`。调用方不应复制内部哈希算法自行制造 ID；任何可见文本变化都会使 ledger 失效并需重新获取。
+
+## 中文热点源
+
+**本插件不随包附带任何中文热点源，也不抓取没有官方 API 的平台。** 安装后若未自行配置，`mediaops.trends.search` 返回的就只是全球来源的结果——这一点不留给用户推断：
+
+- `mediaops.capabilities` 的 `chineseHotSources.configured` 为 `false`，`note` 写明「未配置：中文平台接入需有授权的来源、用户自备数据或研究代理（WebSearch/WebFetch）；本服务不抓取无官方 API 的平台。」
+- `mediaops.doctor` 的 `sourceProbes` 中 `chinese-hot-sources` 状态为 `not-configured`（这是配置探针，**不算失败**——没有中文源是合法状态）。
+- 查询词含中文时，`mediaops.trends.search` 的 warnings 直接给出「中文热点源未配置：结果只来自 …，不能代表中文平台热度」。
+
+要接入中文来源，在 `<MEDIAOPS_DATA_DIR>/sources.config.json` 登记 `region: "cn"` 的 json-feed，并**必须**声明授权依据：
+
+```json
+{
+  "id": "cn-newsroom-mirror",
+  "type": "json-feed",
+  "region": "cn",
+  "url": "https://feeds.example.com/cn/newsroom.json",
+  "itemsPath": "items",
+  "idPath": "id",
+  "titlePath": "title",
+  "urlPath": "url",
+  "scorePath": "hot",
+  "scoreUnit": "hot",
+  "publishedAtPath": "published_at",
+  "authorization": {
+    "basis": "self-hosted",
+    "note": "本机构自建并自行运营的聚合服务，数据来自各来源的官方授权接口"
+  }
+}
+```
+
+`authorization.basis` 四选一：`official-api`（平台官方开放接口）、`self-hosted`（自建/自运营服务）、`user-provided`（用户自备数据）、`licensed`（已获授权的数据源）。缺失或取值非法时该条目被跳过并告警「中文来源必须声明授权依据（authorization.basis）」—— 写不出授权依据，就不该接。完整示例见 [`docs/sources.config.example.json`](sources.config.example.json)。
+
+三重限制同时生效、缺一不可：`MEDIAOPS_FEED_HOST_ALLOWLIST` 主机名允许表、仅 HTTPS、以及出站层的逐跳地址核验（解析到非公网地址一律拒绝，允许表绕不过它）。
+
+## 热点排序如何解释自己
+
+`mediaops.trends.search` 的 `data.ordering` 为 `explainable@1`，`data.rules` 原样给出下面五步，每条信号带 `ranking`：
+
+1. 各来源先按自己的 `sourceRank` 排好自己的结果；
+2. 标题高度相似的信号归为同一事件，只有代表参与后续排序，其余成员紧跟代表并标 `duplicateOf`（判据与 `mediaops.trends.cluster` 是同一份实现、同一阈值）；
+3. 给了 `query` 时按 `queryMatch`（标题命中查询词的比例）降序；
+4. 再按时效分桶 `fresh`（`maxAgeHours` 之内，默认 72）→ `unknown`（来源未给发布时间）→ `aged`；
+5. 仍并列时按源内名次轮转交错，来源顺序即请求或注册顺序。
+
+`ranking.reasons` 是可直接展示给人看的中文短句（如「查询词命中 2/3」「发布于 5 小时前」「发布时间未知」「hackernews 源内第 2 名」）。**`capturedAt` 永远不会被当作发布时间**：来源没给就是 `recency: 'unknown'` / `ageHours: null`，不猜。
 
 ## 创作者风格与数据存储
 
