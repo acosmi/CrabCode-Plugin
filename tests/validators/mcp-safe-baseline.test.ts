@@ -35,7 +35,9 @@ function versionAtLeast(candidate: string, floor: string): boolean {
   const a = parseVersion(candidate);
   const b = parseVersion(floor);
   for (let index = 0; index < 3; index += 1) {
-    if (a[index] !== b[index]) return a[index] > b[index];
+    const left = a[index] ?? 0;
+    const right = b[index] ?? 0;
+    if (left !== right) return left > right;
   }
   return true;
 }
