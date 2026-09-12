@@ -19,15 +19,18 @@ Run an initial conflicts screening workflow. This is not a final conflicts concl
    - Counterparties, affiliates, third parties, actual controllers, beneficial owners, opposing counsel, and natural persons.
    - Transaction or dispute subject matter.
    - Former names, aliases, English names, and normalized variants.
-3. Search only authorized matter indexes or user-provided conflict records. Do not read unrelated matter files unless cross-matter access is explicitly authorized in `permissions.json`.
+3. Search only authorized matter indexes or user-provided conflict records, including archived matters under `matters/_archived/`. Do not read unrelated matter files unless cross-matter access is explicitly authorized in `permissions.json`.
 4. Record hits in `conflict-check.json`:
    - matched source or matter id.
    - hit summary.
    - preliminary risk.
    - recommended lawyer action.
-5. Set status:
-   - `no-hit` if no relevant hit was found.
+   - the matched value, the role it holds in the existing record, the role it holds in this matter, and the resulting relation (`same-side-existing-client`, `potential-adverse`, or `name-match-unclassified`). A relation is context for the reviewing lawyer, never a conclusion.
+5. Record what the screen could not read in the `coverage` block: records that failed to parse, records that are not JSON objects, and records refused because they sit behind a symlink or Windows directory junction.
+6. Set status:
+   - `no-hit` if coverage is complete and no relevant hit was found.
    - `hit-review-required` if any relevant hit exists.
+   - `coverage-incomplete` if any record could not be read. An incomplete screen is not a `no-hit`, and it blocks substantive work exactly like a hit does.
    - never set `cleared-by-lawyer` unless the reviewing lawyer explicitly confirms.
 
 ## Stop Conditions
@@ -50,6 +53,7 @@ After this skill finishes, route based on the screening status:
   AI-governance, regulatory, product, legal-aid, or matter operations. A caller that already names a
   bounded leaf task may route directly to that canonical `crablaw-cn:<skill>` after the gate passes.
 - `hit-review-required`: stop substantive domain work; escalate to the responsible lawyer for `cleared-by-lawyer` confirmation or matter decline.
+- `coverage-incomplete`: stop substantive domain work; report exactly which records could not be read, repair or remove them, and re-run the screen. Do not ask a lawyer to clear a screen that never completed.
 - `pending`: re-run after the responsible lawyer reviews; do not allow domain skills to proceed.
 
 ## Schemas

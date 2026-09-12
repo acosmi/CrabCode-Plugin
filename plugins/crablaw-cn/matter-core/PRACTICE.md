@@ -45,7 +45,8 @@ Every substantive domain workflow must verify:
 
 - Active matter exists.
 - Matter is within the user's authorized scope.
-- Conflict screening status is `no-hit` or `cleared-by-lawyer`; `pending` and `hit-review-required` block substantive work.
+- Conflict screening status is `no-hit` or `cleared-by-lawyer`; `pending`, `hit-review-required` and `coverage-incomplete` block substantive work.
+- The matter directory carries no `.pending` marker. A marker means a bootstrap was interrupted before it finished writing; the matter is not active and must be resolved by a human, never reused or overwritten.
 - Domain work fits the engagement scope.
 - Output destination is internal unless review status is approved.
 - Source records can be written for legal and factual references.
@@ -72,7 +73,12 @@ For substantive legal analysis, also apply `legal-core/PRACTICE.md` and
 
 - Matter documents, facts/evidence, legal authorities, and model knowledge remain separate records.
 - `[已核验-来源]` requires a resolvable current source record; model knowledge cannot be upgraded by
-  confident wording.
+  confident wording. Concretely, the tag is satisfied only by a source record whose `sourceType` is
+  `official-law`, `official-guidance` or `case` **and** whose `status` is `verified` or
+  `lawyer-reviewed`. `verified` means the record was produced by a real retrieval action in this
+  session; `lawyer-reviewed` means a named reviewer confirmed it. Older records keep their
+  `unreviewed` status and stay readable, but `unreviewed`, `unknown`, `superseded` and
+  `source-needs-check` never satisfy the tag: not having been checked is not a check.
 - Findings that apply law to matter facts carry source-record IDs and fact/evidence IDs.
 - Outcome/practice-sensitive issues require a case comparison or a documented search limitation.
 - Engineering validation does not certify legal accuracy; the review queue remains mandatory.
@@ -87,7 +93,41 @@ Deterministic tools live under `${CRABCODE_PLUGIN_ROOT}/matter-core/scripts/`. T
 - Use private permissions, atomic JSON replacement, and non-sensitive audit events.
 - Existing Matter records remain readable; missing fields block a new substantive run with a
   correction list rather than being guessed or silently migrated.
-- A stale deep-analysis issue must be explicitly rerun before ready-for-review status.
+- A stale deep-analysis issue must be explicitly rerun before ready-for-review status. A sync that
+  finds no new change is not evidence that a previous change was addressed, so `unchanged` keeps the
+  existing `staleIssueIds`; a mark is cleared only when the issue tree itself no longer says `stale`.
+- Source records are hashed alongside documents. Editing `sources.jsonl` makes every issue and
+  artifact that relies on the edited record stale, exactly like editing a document would.
+- Conflict screening reports its own coverage. A record that cannot be parsed, is not a JSON object,
+  or sits behind a symlink or Windows directory junction is counted in `conflict-check.json`'s
+  `coverage` block and forces status `coverage-incomplete` — an unreadable store is never reported as
+  "nothing found".
+- Archived matters (`matters/_archived/<matter-id>/parties.json`) are inside the screening scope.
+- Matter creation is exclusive: the directory is created with an atomic exclusive `mkdir` under the
+  store lock, so two simultaneous writers cannot both create one matter id.
+- A stale lock is reclaimed only when its recorded host matches this machine and its recorded process
+  is provably gone. Locks are never removed because they look old.
+
+## Runtime Environment
+
+The deterministic tools are plain Python 3 with no third-party packages, and every skill invokes them
+as `python3`.
+
+- Windows without a `python3` alias: use `py -3` in place of `python3`, or create a `python3.exe`
+  copy/alias next to `python.exe` on `PATH`. Nothing else in the toolchain is platform-specific.
+- Do not install packages for these scripts; a script that needs a dependency is a defect.
+
+`bootstrap_matter.py` exit codes:
+
+| Code | Meaning |
+|---|---|
+| 0 | Matter created and the local screen found nothing (`no-hit`) |
+| 2 | Invalid arguments, unreadable store, or the store lock is held by a live writer |
+| 3 | Refused: the matter id already exists, or it exists as an interrupted (`.pending`) bootstrap |
+| 10 | Matter created but substantive work is blocked — `hit-review-required` or `coverage-incomplete` |
+
+`sync_run_manifest.py` and `validate_run.py` return 0 on success, 1 for validation failures
+(`validate_run.py` only), and 2 for argument or IO errors.
 
 ## Currency Gate
 

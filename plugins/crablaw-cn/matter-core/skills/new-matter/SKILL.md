@@ -46,10 +46,16 @@ Create a matter workspace. This skill opens the matter record but does not autho
    - empty `matters/<matter-id>/sources.jsonl`
    - empty `matters/<matter-id>/audit-log.jsonl`
    - `matters/<matter-id>/outputs/`
-4. Inspect the returned preliminary conflict status. A local name match sets
+4. Read the exit code, not just the text. `0` means created with no local match; `10` means created
+   but blocked (`hit-review-required` or `coverage-incomplete`); `3` means the command refused
+   because the matter id already exists or is an interrupted (`.pending`) bootstrap; `2` means bad
+   arguments, an unreadable store, or a store lock held by a live writer. On Windows without a
+   `python3` alias, invoke the same command with `py -3`.
+5. Inspect the returned preliminary conflict status. A local name match sets
    `hit-review-required` and blocks substantive work; absence of a local match is not a final lawyer
-   conflict opinion.
-5. Stop before substantive analysis and direct the user to `crablaw-cn:conflict-check` for the
+   conflict opinion. A `coverage-incomplete` status means the screen could not read part of the
+   store — report the `coverage` block verbatim and treat it as blocking, never as "nothing found".
+6. Stop before substantive analysis and direct the user to `crablaw-cn:conflict-check` for the
    responsible lawyer's workflow.
 
 ## Output

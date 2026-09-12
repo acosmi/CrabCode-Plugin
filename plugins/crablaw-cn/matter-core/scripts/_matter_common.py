@@ -9,6 +9,8 @@ import hashlib
 import json
 import os
 import re
+import socket
+import stat as stat_module
 import tempfile
 import time
 from pathlib import Path
@@ -16,6 +18,8 @@ from typing import Any, Iterator, Optional
 
 
 ID_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{1,120}$")
+PENDING_MARKER_NAME = ".pending"
+PENDING_MATTER_MESSAGE = "matter is pending (incomplete bootstrap)"
 MATTER_TYPES = {
     "contract",
     "data-compliance",
@@ -78,8 +82,49 @@ def resolve_root(raw: Optional[str], create: bool = True) -> Path:
     return root.resolve()
 
 
+LINK_LIKE_REPARSE_TAGS = {
+    tag
+    for tag in (
+        getattr(stat_module, "IO_REPARSE_TAG_SYMLINK", None),
+        getattr(stat_module, "IO_REPARSE_TAG_MOUNT_POINT", None),
+        getattr(stat_module, "IO_REPARSE_TAG_APPEXECLINK", None),
+    )
+    if tag is not None
+}
+
+
+def is_link_like(path: Path) -> bool:
+    """True for anything that redirects to another location.
+
+    POSIX symlinks are reported by ``S_ISLNK``. Windows directory junctions are
+    NOT: ``Path.is_symlink()`` and ``os.path.islink()`` both return False for a
+    junction on CPython 3.11 (``os.path.isjunction`` only exists from 3.12), and
+    the only signal available is the reparse tag on ``lstat``. A junction is a
+    redirection just like a symlink, so it must be refused the same way.
+    """
+
+    try:
+        info = path.lstat()
+    except (OSError, ValueError):
+        return False
+    if stat_module.S_ISLNK(info.st_mode):
+        return True
+    return getattr(info, "st_reparse_tag", 0) in LINK_LIKE_REPARSE_TAGS
+
+
 def safe_path(root: Path, *parts: str, must_exist: bool = False) -> Path:
     candidate = root.joinpath(*parts)
+
+    try:
+        relative_parts = candidate.relative_to(root).parts
+    except ValueError as exc:
+        raise ValueError("managed path escapes the matter-store root") from exc
+    current = root
+    for part in relative_parts:
+        current = current / part
+        if is_link_like(current):
+            raise ValueError(f"managed path crosses a symbolic link: {current.relative_to(root)}")
+
     resolved = candidate.resolve(strict=must_exist)
     try:
         common = Path(os.path.commonpath([str(root), str(resolved)]))
@@ -87,12 +132,6 @@ def safe_path(root: Path, *parts: str, must_exist: bool = False) -> Path:
         raise ValueError("managed path escapes the matter-store root") from exc
     if common != root:
         raise ValueError("managed path escapes the matter-store root")
-
-    current = root
-    for part in candidate.relative_to(root).parts:
-        current = current / part
-        if current.exists() and current.is_symlink():
-            raise ValueError(f"managed path crosses a symbolic link: {current.relative_to(root)}")
     return resolved
 
 
@@ -172,6 +211,107 @@ def append_jsonl(path: Path, payload: Any) -> None:
         os.fsync(handle.fileno())
 
 
+def lock_payload() -> str:
+    return f"pid={os.getpid()} host={socket.gethostname()} created={utc_now()}\n"
+
+
+def parse_lock_metadata(content: str) -> dict[str, str]:
+    metadata: dict[str, str] = {}
+    for token in content.split():
+        key, separator, value = token.partition("=")
+        if separator and key and value:
+            metadata.setdefault(key, value)
+    return metadata
+
+
+def process_is_alive(pid: int) -> bool:
+    """Liveness probe that never disturbs the probed process.
+
+    ``os.kill(pid, 0)`` must not be used on Windows: CPython implements
+    ``os.kill`` there as ``TerminateProcess(handle, sig)``, so signal 0 would
+    kill the holder instead of reporting on it. Windows therefore goes through
+    ``OpenProcess`` + ``GetExitCodeProcess``. Every undecidable answer is
+    resolved as "alive" so an ambiguous probe can never delete a live lock.
+    """
+
+    if pid <= 0:
+        return False
+    if os.name == "nt":
+        import ctypes
+        from ctypes import wintypes
+
+        process_query_limited_information = 0x1000
+        still_active = 259
+        error_invalid_parameter = 87
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel32.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+        kernel32.OpenProcess.restype = wintypes.HANDLE
+        kernel32.GetExitCodeProcess.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD)]
+        kernel32.GetExitCodeProcess.restype = wintypes.BOOL
+        kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
+        handle = kernel32.OpenProcess(process_query_limited_information, False, pid)
+        if not handle:
+            # 87 is the only answer that means "no such process id"; every other
+            # failure (for example access denied) means the process exists.
+            return ctypes.get_last_error() != error_invalid_parameter
+        try:
+            exit_code = wintypes.DWORD()
+            if not kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code)):
+                return True
+            return exit_code.value == still_active
+        finally:
+            kernel32.CloseHandle(handle)
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    except OSError:
+        return True
+    return True
+
+
+def reclaim_stale_lock(path: Path) -> bool:
+    """Remove a lock whose owning process is provably gone. Never age-based.
+
+    The lock is retired by renaming it to a private name first: on Windows that
+    rename fails while any process still holds the file open, and on every
+    platform only one racing reclaimer can win the rename, so a live lock cannot
+    be deleted by a slow read followed by a fast unlink.
+    """
+
+    try:
+        content = path.read_text(encoding="utf-8", errors="replace")
+    except FileNotFoundError:
+        return True
+    except OSError:
+        return False
+    metadata = parse_lock_metadata(content)
+    raw_pid = metadata.get("pid")
+    host = metadata.get("host")
+    if not raw_pid or not host:
+        return False
+    if host != socket.gethostname():
+        return False
+    try:
+        pid = int(raw_pid)
+    except ValueError:
+        return False
+    if process_is_alive(pid):
+        return False
+    staged = path.with_name(f"{path.name}.stale-{os.getpid()}-{time.monotonic_ns()}")
+    try:
+        os.rename(path, staged)
+    except OSError:
+        return False
+    try:
+        os.unlink(staged)
+    except OSError:
+        pass
+    return True
+
+
 @contextlib.contextmanager
 def file_lock(path: Path, timeout_seconds: float = 0.0) -> Iterator[None]:
     ensure_private_dir(path.parent)
@@ -180,8 +320,10 @@ def file_lock(path: Path, timeout_seconds: float = 0.0) -> Iterator[None]:
     while descriptor is None:
         try:
             descriptor = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
-            os.write(descriptor, f"pid={os.getpid()} created={utc_now()}\n".encode("utf-8"))
+            os.write(descriptor, lock_payload().encode("utf-8"))
         except FileExistsError:
+            if reclaim_stale_lock(path):
+                continue
             if time.monotonic() >= deadline:
                 raise ValueError(f"matter store is locked: {path}")
             time.sleep(0.05)
@@ -194,6 +336,18 @@ def file_lock(path: Path, timeout_seconds: float = 0.0) -> Iterator[None]:
             path.unlink()
         except FileNotFoundError:
             pass
+
+
+def pending_marker_path(matter_dir: Path) -> Path:
+    return matter_dir / PENDING_MARKER_NAME
+
+
+def matter_is_pending(matter_dir: Path) -> bool:
+    return pending_marker_path(matter_dir).exists()
+
+
+def sha256_text(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
 def sha256_file(path: Path) -> str:
