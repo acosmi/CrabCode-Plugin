@@ -19,7 +19,7 @@
     "contentHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
     "confidentiality": { "enum": ["standard", "heightened", "clean-team"] },
     "accessScope": { "type": "string", "minLength": 1 },
-    "status": { "enum": ["unreviewed", "lawyer-reviewed", "source-needs-check", "superseded", "unknown"] },
+    "status": { "enum": ["unreviewed", "verified", "lawyer-reviewed", "source-needs-check", "superseded", "unknown"] },
     "reviewer": { "type": "string", "minLength": 1 }
   },
   "allOf": [
@@ -36,6 +36,13 @@
         "required": ["sourceType"]
       },
       "then": { "required": ["authority", "urlOrRecordId", "effectiveStatus"] }
+    },
+    {
+      "if": {
+        "properties": { "status": { "const": "verified" } },
+        "required": ["status"]
+      },
+      "then": { "required": ["urlOrRecordId", "effectiveStatus"] }
     },
     {
       "if": {

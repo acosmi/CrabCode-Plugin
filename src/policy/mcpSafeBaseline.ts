@@ -1,14 +1,39 @@
 /**
- * Emergency executable MCP baseline established by the 2026-08-22 health audit.
+ * First-party local MCP baseline.
  *
- * Generation-1 hosts execute `.mcp.json` directly and do not understand a
- * connector catalog or release leases. Until a host-side fail-closed loader is
- * released, the official marketplace therefore publishes exactly one locally
- * bundled MCP server and no remote/external-service connector configuration.
+ * v1 (2026-08-22 health audit) published exactly one locally bundled MCP server
+ * because generation-1 hosts execute `.mcp.json` directly and understood neither
+ * a connector catalog nor release leases.
+ *
+ * v2 (2026-09-12, three-repo root-cause remediation, decision D-0(c)) widens the
+ * allow list to the two *first-party* servers that ship their own prebuilt
+ * artifact inside the plugin and speak stdio to a sibling process: html-video
+ * and media-ops. Nothing else changes — the remaining 41 connectors stay paused,
+ * remote/SSE transport stays forbidden, and every allowed server must still be
+ * fully pinned, install nothing on launch and reference a committed artifact.
+ *
+ * media-ops additionally injects its trusted local principal from host
+ * `user_config`, so an allowed plugin's `.mcp.json` may only reference
+ * `${user_config.X}` keys the manifest declares as `required: true` (the host
+ * throws on substitution when a value is missing and never writes `default`).
  */
 
-export const MCP_SAFE_BASELINE_ID = "mcp-emergency-safe-baseline-v1";
+export const MCP_SAFE_BASELINE_ID = "mcp-safe-baseline-v2-first-party-local";
 
+/** pluginId → the single stdio server name that plugin may publish. */
+export const MCP_ALLOWED_LOCAL_SERVERS: ReadonlyMap<string, string> = new Map([
+  ["crabcode-html-video", "html-video"],
+  ["crabcode-media-ops", "mediaops"],
+]);
+
+export const MCP_ALLOWED_PLUGIN_SET: ReadonlySet<string> = new Set(
+  MCP_ALLOWED_LOCAL_SERVERS.keys(),
+);
+
+/**
+ * v1 aliases, kept because scripts and tests still name the html-video sidecar
+ * through them. New code should read MCP_ALLOWED_LOCAL_SERVERS.
+ */
 export const MCP_ALLOWED_PLUGIN = "crabcode-html-video";
 export const MCP_ALLOWED_SERVER = "html-video";
 
@@ -18,14 +43,13 @@ export const MCP_PAUSED_MARKETPLACE_MARKER =
 
 /**
  * Every marketplace plugin that shipped `.mcp.json` immediately before the
- * containment release, except the one allowed local sidecar.
+ * containment release and is still paused under v2.
  */
 export const MCP_PAUSED_PLUGINS = [
   "asana",
   "clangd-lsp",
   "context7",
   "crabcode-example-plugin",
-  "crabcode-media-ops",
   "crabwork-bio-research",
   "crabwork-customer-support",
   "crabwork-data",

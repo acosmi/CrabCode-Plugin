@@ -1,8 +1,8 @@
 import { createHash, randomUUID } from 'node:crypto'
 import { setDefaultTimeout } from 'bun:test'
-import { realpath, writeFile } from 'node:fs/promises'
+import { realpath, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { ResearchCaptureSchema, ResearchReviewSchema, stableHash } from '../src/domain.ts'
+import { DeliveryManifestSchema, ResearchCaptureSchema, ResearchReviewSchema, stableHash } from '../src/domain.ts'
 import { extractVerifiableStatements, factualCompatibility } from '../src/factual-integrity.ts'
 import { bodyPlainText } from '../src/rendering/article-doc.ts'
 import { appendRecord } from '../src/storage.ts'
@@ -11,7 +11,13 @@ import { getLatestContent, saveHandler as saveContent } from '../src/tools/conte
 import { getHandler as getResearch, handler as completeResearch } from '../src/tools/research.ts'
 import { scanHandler } from '../src/tools/originality.ts'
 import { handler as completeEditorialReview } from '../src/tools/editorial-review.ts'
-import { renderHandler, verifyHandler } from '../src/tools/delivery.ts'
+import {
+  deliveryHashPayload,
+  getDeliveryManifest,
+  renderHandler,
+  resolveMediaOpsQaMode,
+  verifyHandler,
+} from '../src/tools/delivery.ts'
 import type { TrustedPrincipal } from '../src/identity.ts'
 
 export const DISCLOSURE = '本文包含 AI 辅助创作内容'
@@ -74,10 +80,85 @@ export async function createProfile(brandId: string, bannedWords: string[] = [])
 type TestClaim = { id: string; claim: string; status?: 'verified' | 'doubtful' | 'unsourced'; core?: boolean }
 
 /**
+ * Replace a candidate's QA evidence with full-grade fixture evidence.
+ *
+ * The Media Gate requires `qaEvidence.mode === 'full'` before approval, and full
+ * mode means a real Nu + Playwright/axe run — which this machine cannot do in the
+ * default suite (that is what `MEDIAOPS_QA_MODE=static` exists for). Suites about
+ * the *approval state machine* (approval/package/readiness/preview) still need a
+ * delivery that a real full run would have produced, so the fixture mints one
+ * here rather than letting static evidence quietly count as full — the exact
+ * confusion 0.4.4 removed from production.
+ *
+ * The written reports say plainly that they are fixtures; nothing in src/ can
+ * produce them. Under `MEDIAOPS_QA_MODE=full` this is a no-op and the real
+ * evidence stands (tests/delivery.qa.test.ts).
+ */
+export async function mintFullQaEvidenceFixture(deliveryId: string): Promise<string> {
+  const manifest = await getDeliveryManifest(deliveryId)
+  if (!manifest) throw new Error(`qa fixture: no delivery ${deliveryId}`)
+  if (manifest.qaEvidence?.mode === 'full') return manifest.renderManifestHash
+  const root = await realpath(manifest.artifactRoot)
+  const htmlSha256 = manifest.primaryArtifact.artifactHash
+  const completedAt = new Date().toISOString()
+  const fixtureNote = 'TEST FIXTURE: stands in for a real Nu/Playwright/axe run; produced by tests/helpers.ts, never by src/.'
+  const checks = [
+    { id: 'nu-html-validity', status: 'passed' as const, detail: `${fixtureNote} Nu reported no errors for ${htmlSha256}.` },
+    { id: 'axe-accessibility', status: 'passed' as const, detail: `${fixtureNote} axe-core reported no violations.` },
+    { id: 'viewport-matrix', status: 'passed' as const, detail: `${fixtureNote} light/dark, 320/768/1440 and print all clean.` },
+  ]
+  const bodies: Array<[string, unknown]> = [
+    ['qa/nu-report.json', { schemaVersion: 'mediaops-nu-qa@1', fixture: true, status: 'passed', htmlSha256, completedAt, detail: fixtureNote }],
+    ['qa/browser-report.json', { schemaVersion: 'mediaops-browser-qa@1', fixture: true, status: 'passed', mode: 'full', htmlSha256, completedAt, detail: fixtureNote }],
+    ['qa/summary.json', { schemaVersion: 'mediaops-delivery-qa-summary@1', fixture: true, status: 'passed', mode: 'full', htmlSha256, generatedAt: completedAt, checks, errors: [] }],
+  ]
+  await rm(join(root, 'qa', 'static-report.json'), { force: true })
+  const artifacts = []
+  for (const [relativePath, body] of bodies) {
+    const bytes = new TextEncoder().encode(JSON.stringify(body, null, 2) + '\n')
+    await writeFile(join(root, relativePath), bytes)
+    artifacts.push({
+      relativePath,
+      mediaType: 'application/json',
+      byteSize: bytes.byteLength,
+      sha256: createHash('sha256').update(bytes).digest('hex'),
+    })
+  }
+  const { renderManifestHash: _previous, ...withoutHash } = manifest
+  const promotedWithoutHash = {
+    ...withoutHash,
+    checks: [
+      ...manifest.checks.filter((item) => !item.id.startsWith('automated-')),
+      ...checks.map((item) => ({ id: `automated-${item.id}`, status: item.status, detail: item.detail })),
+      { id: 'automated-qa-source-binding', status: 'passed' as const, detail: `${fixtureNote} Evidence binds to primary HTML ${htmlSha256}.` },
+    ],
+    qaEvidence: {
+      schemaVersion: 'mediaops-delivery-qa-evidence@1' as const,
+      status: 'passed' as const,
+      mode: 'full' as const,
+      htmlSha256,
+      tools: manifest.qaEvidence?.tools ?? { java: null, vnuPackage: '26.7.15', vnuRuntime: null, playwright: '1.61.1', chromium: null, axe: '4.12.1' },
+      checks,
+      artifacts,
+      completedAt,
+    },
+  }
+  const renderManifestHash = stableHash(deliveryHashPayload(promotedWithoutHash))
+  const promoted = DeliveryManifestSchema.parse({ ...promotedWithoutHash, renderManifestHash })
+  await writeFile(join(root, 'delivery-manifest.json'), JSON.stringify(promoted, null, 2) + '\n', 'utf8')
+  await appendRecord('delivery-manifests', { id: randomUUID(), ...promoted })
+  return renderManifestHash
+}
+
+/**
  * deliveryMode:
  * - none: stop after reviewed (no deliveryId)
  * - render-only (default): freeze/render delivery candidate without verify/QA
- * - verified: call delivery.verify (honours MEDIAOPS_QA_MODE full|static|off)
+ * - verified: call delivery.verify, then mint full-grade QA evidence when the
+ *   run was not MEDIAOPS_QA_MODE=full, so the Media Gate sees what a real full
+ *   run would have produced (see mintFullQaEvidenceFixture)
+ * - verified-static: call delivery.verify and keep whatever grade it produced —
+ *   for tests about the evidence grade itself
  */
 export async function createReviewedContent(args: {
   dir: string
@@ -93,7 +174,7 @@ export async function createReviewedContent(args: {
   lateReviewedSummary?: string
   lateReviewedCitationUrl?: string
   assetCaption?: string
-  deliveryMode?: 'none' | 'render-only' | 'verified'
+  deliveryMode?: 'none' | 'render-only' | 'verified' | 'verified-static'
 }): Promise<{ contentId: string; revisionId: string; contentHash: string; articleDocHash: string; assetPath: string; deliveryId: string; renderManifestHash: string }> {
   const deliveryMode = args.deliveryMode ?? 'render-only'
   const platform = args.platform ?? 'wechat'
@@ -260,9 +341,9 @@ export async function createReviewedContent(args: {
     notes: ['测试夹具：静态与多视口视觉门禁通过'],
   })
   if (verified.status !== 'ok') throw new Error(`delivery verify failed: ${JSON.stringify(verified)}`)
-  return {
-    ...base,
-    deliveryId,
-    renderManifestHash: (verified.data as any).renderManifestHash,
+  const verifiedManifestHash = (verified.data as any).renderManifestHash as string
+  if (deliveryMode === 'verified-static' || resolveMediaOpsQaMode() === 'full') {
+    return { ...base, deliveryId, renderManifestHash: verifiedManifestHash }
   }
+  return { ...base, deliveryId, renderManifestHash: await mintFullQaEvidenceFixture(deliveryId) }
 }

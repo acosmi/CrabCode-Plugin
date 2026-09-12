@@ -630,9 +630,18 @@ const DeliveryQaArtifactSchema = z.object({
   sha256: Sha256Schema,
 })
 
+/**
+ * QA evidence carries its own grade and never borrows another one.
+ *
+ * `status` says what the recorded run concluded; `mode` says how much of the
+ * pipeline actually ran. `mode` is optional only because records written before
+ * 0.4.4 have no such field — a missing `mode` is legacy-unknown and readers must
+ * never treat it as `full` (see readiness.ts::inspectContent).
+ */
 const DeliveryQaEvidenceSchema = z.object({
   schemaVersion: z.literal('mediaops-delivery-qa-evidence@1'),
-  status: z.literal('passed'),
+  status: z.enum(['passed', 'static']),
+  mode: z.enum(['full', 'static']).optional(),
   htmlSha256: Sha256Schema,
   tools: z.object({
     java: z.string().nullable(),
@@ -642,7 +651,7 @@ const DeliveryQaEvidenceSchema = z.object({
     chromium: z.string().nullable(),
     axe: z.string().min(1),
   }).strict(),
-  checks: z.array(z.object({ id: z.string().min(1), status: z.literal('passed'), detail: z.string().min(1) })).min(1),
+  checks: z.array(z.object({ id: z.string().min(1), status: z.enum(['passed', 'skipped']), detail: z.string().min(1) })).min(1),
   artifacts: z.array(DeliveryQaArtifactSchema).min(3),
   completedAt: z.string().datetime(),
 })
@@ -669,7 +678,10 @@ export const DeliveryManifestSchema = z.object({
   semanticStatus: z.enum(['passed', 'failed']),
   accessibilityStatus: z.enum(['passed', 'failed', 'manual_required']),
   visualReviewStatus: z.enum(['pending', 'passed', 'failed']),
-  checks: z.array(z.object({ id: z.string().min(1), status: z.enum(['passed', 'failed']), detail: z.string().min(1) })),
+  // 'skipped' records a check that was deliberately not executed (static QA
+  // mode); it is not a pass and must never be written as one, but it also does
+  // not block the static byte/security verdict.
+  checks: z.array(z.object({ id: z.string().min(1), status: z.enum(['passed', 'failed', 'skipped']), detail: z.string().min(1) })),
   qaEvidence: DeliveryQaEvidenceSchema.optional(),
   visualReview: z.object({
     reviewedBy: z.string().trim().min(1).max(300),

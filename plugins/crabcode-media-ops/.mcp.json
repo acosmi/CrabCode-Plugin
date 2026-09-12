@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "mediaops": {
+      "command": "bun",
+      "args": ["--no-env-file", "--cwd", "${CRABCODE_PLUGIN_ROOT}", "${CRABCODE_PLUGIN_ROOT}/dist/server.js"],
+      "env": {
+        "MEDIAOPS_DATA_DIR": "${CRABCODE_PLUGIN_DATA}",
+        "MEDIAOPS_IDENTITY_MODE": "local-editorial",
+        "MEDIAOPS_TRUSTED_PRINCIPAL_ISSUER": "crabcode-local-editorial",
+        "MEDIAOPS_TRUSTED_PRINCIPAL_ID": "${user_config.principal_id}",
+        "MEDIAOPS_TRUSTED_PRINCIPAL_NAME": "${user_config.principal_name}",
+        "MEDIAOPS_TRUSTED_PRINCIPAL_ROLES": "author,reference_curator,researcher,fact_checker,originality_scanner,renderer,delivery_reviewer,profile_editor,approval_requester,publisher"
+      }
+    }
+  }
+}

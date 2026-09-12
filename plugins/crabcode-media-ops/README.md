@@ -1,14 +1,21 @@
-# crabcode-media-ops 0.4.3
+# crabcode-media-ops 0.4.4
 
-> **MCP 安全暂停（2026-08-22）**：安全状态：本版本不发布可执行 MCP 配置；安装不会启动该服务或发起网络请求。 本文保留目标能力与后续接入资料，不代表当前版本已连接或可执行。
+> **本机执行配置状态（2026-09-12，三仓根因修复裁决 D-0(c)）**：本版本随包发布 `.mcp.json`，`requiredMcpServers: ["mediaops"]`，宿主安装后自动激活本机 stdio sidecar。安装后需在插件设置里填写“本机编辑者 ID / 显示名”，宿主经 `user_config` 注入 `local-editorial` 低保证主体；未填写时宿主显示“需要配置”，写入工具仍以 `AUTHENTICATION_REQUIRED` 安全失败。
 
 可审计的新媒体运营插件：参考材料防火墙、联网可信来源研究、独立原创风险复核、创作者风格管理、精排白底 HTML 交付、可信身份约束的审批，以及冻结发布包。
 
-## 0.4.3 变更（MCP 紧急安全暂停）
+## 0.4.4 变更（本机执行配置恢复 + QA 等级不混用）
 
-- **发布面 fail-closed**：当前版本不发布 `.mcp.json`，`requiredMcpServers` 为空；安装或升级不会启动 mediaops sidecar，也不会由插件配置发起网络请求。
+- **发布面恢复**：`.mcp.json` 直接执行入库的 `dist/server.js`（`bun --no-env-file`），`requiredMcpServers: ["mediaops"]`；服务为本机 stdio，不含任何远程端点。该配置随 `crabcode-html-video` 一起进入第一方本机允许表，其余 41 个连接器继续暂停。
+- **身份注入**：`.mcp.json` 固定 `MEDIAOPS_IDENTITY_MODE=local-editorial` 与 `MEDIAOPS_TRUSTED_PRINCIPAL_ISSUER=crabcode-local-editorial`，主体 ID 与显示名来自宿主 `user_config`（两项都是 `required: true` —— 宿主在缺值时替换会抛错，且不会把声明里的 `default` 写进去）。授予的角色是除“第二真人门”以外的全部治理角色；`originality.review`、`editorial.review`、`approval.decide`、`profile.confirm` 仍保持 pending，不伪造多人治理。host-principal 仍是宿主未来的接线项。
+- **业务失败不再伪装成功**：MCP 工具结果对 `error` / `blocked` 两种信封状态带 `isError: true`，宿主与模型看到的是失败，而不是“成功返回一段错误 JSON”。
+- **QA 等级不混用**：`MEDIAOPS_QA_MODE=static` 的证据记为 `status: 'static'` / `mode: 'static'`，未跑的 Chromium/Nu 检查记为 `skipped` 而不是 `passed`；Media Gate 只接受 `mode='full'` 的证据放行审批，static 证据只支持本地草稿链路。
+- **版本单一真源**：runtime/serverInfo 从 `package.json` 派生 `0.4.4`，manifest、marketplace、package、dist 与 CycloneDX SBOM 同步。
+
+## 0.4.3 历史变更（MCP 紧急安全暂停，已由 0.4.4 恢复）
+
+- **发布面 fail-closed**：该版本不发布 `.mcp.json`，`requiredMcpServers` 为空；安装或升级不会启动 mediaops sidecar，也不会由插件配置发起网络请求。
 - **能力边界**：sidecar 源码与确定性测试继续保留，供本机验证和后续宿主 principal 合同验收；依赖 `mediaops.*` 的治理步骤必须以 `MCP_INACTIVE` / `GATE_NOT_EXECUTED` 停止，不能把手工替代写成已治理结果。
-- **版本单一真源**：runtime/serverInfo 从 `package.json` 派生 `0.4.3`，manifest、marketplace、package、dist 与 CycloneDX SBOM 同步。
 
 ## 0.4.2 变更（分发验证硬化）
 
@@ -16,7 +23,7 @@
 - **dist Linux 字节确定性确证**：经精确 CI 容器（digest 锁定）本地复现，`check:distribution` 重建的 `dist/server.js` 与入库产物字节一致，像素级黄金截图与全套测试（109 单测 + 全 QA）全绿；本版 `dist/server.js` 以 Linux 容器权威重建。
 - **运行时功能与 0.4.1 等价**：仅 `VERSION` 串更新与 dist 平台权威重建，无工具/schema/存储变化（工具数 38，`SCHEMA_VERSION=2` 不变）。
 
-## 0.4.1 历史变更（MCP 可用性修复，已由 0.4.3 暂停）
+## 0.4.1 历史变更（MCP 可用性修复，经 0.4.3 暂停后于 0.4.4 恢复）
 
 - **生命周期声明**：manifest 增加 `requiredMcpServers: ["mediaops"]`，CrabCode ≥1.0.16 安装后自动激活本地 sidecar；用户显式 disable 始终优先。旧宿主上退化为 inactive，不崩溃。
 - **自包含发行物**：`.mcp.json` 直接执行入库的 `dist/server.js`（`bun --no-env-file`），启动不再执行任何安装步骤，离线冷启动实测亚秒到 2 秒完成 initialize/tools/list。Playwright/axe/vnu 为交付 QA 的惰性可选依赖，缺失时基础 MCP 全量可用、`delivery.verify` full 模式返回 `DEPENDENCY_NOT_READY`（static 模式始终可用）。`bun run check:distribution` 校验发行物新鲜度并做清洁目录冷启动 smoke。
@@ -79,7 +86,7 @@ reference.register
 1. `mcp_oauth`：宿主在 MCP `authInfo` 中提供未过期的 subject、issuer，以及 scopes 或 roles。这是多用户部署的首选模式。
 2. `host_principal`：受信宿主显式设置 `MEDIAOPS_IDENTITY_MODE=host-principal`、`MEDIAOPS_TRUSTED_PRINCIPAL_ID`、`MEDIAOPS_TRUSTED_PRINCIPAL_ISSUER` 和 `MEDIAOPS_TRUSTED_PRINCIPAL_ROLES`。这是宿主配置断言，不是插件自行完成的登录或强身份认证。
 
-0.4.1 历史 `.mcp.json` 只配置数据目录，不伪造 principal；0.4.3 当前安全基线已移除该执行配置。未来恢复时，没有宿主身份注入的变更操作仍必须安全失败。请求人与批准人、作者与独立核查人等隔离比较的是可信 `issuer:principalId`；一个 host principal 即使拥有多个角色，也不能充当需要不同人的两端。正式多人审批应使用能为每位用户注入不同 subject 的 MCP OAuth 或等价宿主认证。
+0.4.1 历史 `.mcp.json` 只配置数据目录，不伪造 principal；0.4.3 安全基线移除了该执行配置；0.4.4 以 `local-editorial` + 宿主 `user_config` 注入主体的形式恢复它——主体 ID 与显示名由用户在插件设置中填写，插件自身不做任何认证，缺少注入时变更操作仍以 `AUTHENTICATION_REQUIRED` 安全失败。host-principal 仍是宿主未来的接线项。请求人与批准人、作者与独立核查人等隔离比较的是可信 `issuer:principalId`；一个 host principal 即使拥有多个角色，也不能充当需要不同人的两端。正式多人审批应使用能为每位用户注入不同 subject 的 MCP OAuth 或等价宿主认证。
 
 角色按职责最小授权：`author`、`reference_curator`、`researcher`、`fact_checker`、`originality_scanner`、`originality_reviewer`、`editorial_reviewer`、`renderer`、`delivery_reviewer`、`profile_editor`、`profile_approver`、`approval_requester`、`approver`、`publisher`。服务端也识别 `mediaops:<role>`、`mediaops:*` 和 `*`，但多人生产环境不应以通配角色代替职责隔离。
 

@@ -6,9 +6,10 @@ import { basename, join, resolve } from 'node:path'
 const root = resolve(import.meta.dir, '..')
 const EXPECTED_WORKFLOW_SKILLS = 316
 const EXPECTED_INVOCATION_SET_SHA256 = '8fdfcd6fdd39d7fa952c6d0f554ed675429597869cac28f9239269588228ab33'
-// Updated for the audited crabcopyright-cn v0.3.0 workflow-content migration;
-// the 316 invocation identities remain unchanged and are pinned independently.
-const EXPECTED_MODEL_CONTENT_SHA256 = '832c879eff1367a3b4ab2656e30c2dd81434e010bb17229cfef7d90c04ed122f'
+// Updated 2026-09-12 for the crablaw-cn matter-core conflict-check / new-matter
+// SKILL.md routing changes (coverage-incomplete, .pending, exit code 3); the 316
+// invocation identities remain unchanged and are pinned independently.
+const EXPECTED_MODEL_CONTENT_SHA256 = '15a239a090ab580cded72a6f721b130be98c04dd9e6f9d24d225e5a21d5bc9ab'
 const HAN = /[\u3400-\u9fff]/u
 
 function sha256(value: string): string {
@@ -79,7 +80,7 @@ describe('official workflow skill presentation completeness', () => {
     expect(new Set(invocationKeys).size).toBe(EXPECTED_WORKFLOW_SKILLS)
     expect(sha256(JSON.stringify(invocationKeys))).toBe(EXPECTED_INVOCATION_SET_SHA256)
     expect(sha256(JSON.stringify(modelContentHashes))).toBe(EXPECTED_MODEL_CONTENT_SHA256)
-    expect(marketplace.metadata.version).toBe('0.4.3')
+    expect(marketplace.metadata.version).toBe('0.4.4')
 
     const mediaEntry = workflows.find((entry) => entry.name === 'crabcode-media-ops')
     expect(mediaEntry).toBeDefined()

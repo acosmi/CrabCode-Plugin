@@ -10,8 +10,10 @@ from pathlib import Path
 from typing import Any
 
 from _matter_common import (
+    PENDING_MATTER_MESSAGE,
     load_json,
     load_jsonl,
+    matter_is_pending,
     require_id,
     resolve_root,
     safe_path,
@@ -26,6 +28,12 @@ BASE_SCHEMAS = PLUGIN_ROOT / "matter-core" / "schemas"
 CORE_SCHEMAS = PLUGIN_ROOT / "legal-core" / "schemas"
 ALLOWED_CONFLICT = {"no-hit", "cleared-by-lawyer"}
 TERMINAL_SPECIALIST = {"integrated", "reviewed", "closed"}
+# A `[已核验-来源]` claim means the record was actually retrieved this session or
+# confirmed by a lawyer. Anything that only failed to be marked as needing a check
+# (`unreviewed`), or that is positively doubtful (`unknown`, `superseded`), is not
+# a verification and must not satisfy the tag.
+VERIFIED_SOURCE_TYPES = {"official-law", "official-guidance", "case"}
+VERIFIED_SOURCE_STATUSES = {"verified", "lawyer-reviewed"}
 
 
 def add_schema_errors(
@@ -61,6 +69,8 @@ def require_refs(values: list[str], available: set[str], label: str, errors: lis
 
 def validate_base_store(root: Path, matter_id: str, errors: list[str]) -> dict[str, Any]:
     matter_dir = safe_path(root, "matters", matter_id, must_exist=True)
+    if matter_is_pending(matter_dir):
+        errors.append(f"{PENDING_MATTER_MESSAGE}: {matter_id}")
     files = {
         "matter": ("matter.json", "matter.schema.json"),
         "parties": ("parties.json", "parties.schema.json"),
@@ -229,8 +239,8 @@ def validate_cross_references(
             verified = [
                 source
                 for source in source_records
-                if source.get("sourceType") in {"official-law", "official-guidance", "case"}
-                and source.get("status") != "source-needs-check"
+                if source.get("sourceType") in VERIFIED_SOURCE_TYPES
+                and source.get("status") in VERIFIED_SOURCE_STATUSES
             ]
             if not verified:
                 errors.append(f"finding {finding_id} marks verified but has no verified official/case source")

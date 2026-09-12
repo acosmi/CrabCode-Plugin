@@ -6,7 +6,7 @@
   "required": ["matterId", "status", "screenedAt", "queries", "hits"],
   "properties": {
     "matterId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,100}$" },
-    "status": { "enum": ["pending", "no-hit", "hit-review-required", "cleared-by-lawyer", "declined"] },
+    "status": { "enum": ["pending", "no-hit", "hit-review-required", "coverage-incomplete", "cleared-by-lawyer", "declined"] },
     "screenedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "format": "date" },
     "screenedBy": { "type": "string", "minLength": 1 },
     "queries": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
@@ -20,10 +20,29 @@
           "matchedMatterId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,100}$" },
           "summary": { "type": "string", "minLength": 1 },
           "risk": { "enum": ["low", "medium", "high", "unknown"] },
-          "recommendedAction": { "type": "string", "minLength": 1 }
+          "recommendedAction": { "type": "string", "minLength": 1 },
+          "matchedValue": { "type": "string", "minLength": 1 },
+          "existingRole": { "type": "string", "minLength": 1 },
+          "newRole": { "type": "string", "minLength": 1 },
+          "relation": {
+            "enum": ["same-side-existing-client", "potential-adverse", "name-match-unclassified"]
+          }
         },
         "additionalProperties": false
       }
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["status", "scanned", "scopes"],
+      "properties": {
+        "status": { "enum": ["complete", "partial"] },
+        "scanned": { "type": "integer", "minimum": 0 },
+        "corrupt": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "refused": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "typeErrors": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "scopes": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      },
+      "additionalProperties": false
     },
     "lawyerConfirmation": {
       "type": "object",

@@ -2,8 +2,7 @@ import { readdir, readFile, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import {
-  MCP_ALLOWED_PLUGIN,
-  MCP_ALLOWED_SERVER,
+  MCP_ALLOWED_LOCAL_SERVERS,
   MCP_PAUSED_MARKETPLACE_MARKER,
   MCP_PAUSED_PLUGIN_SET,
 } from "./mcpSafeBaseline.ts";
@@ -11,9 +10,10 @@ import {
 /**
  * Repo-wide MCP executable contract checks.
  *
- * The 2026-08-22 emergency baseline is deliberately small: generation-1 hosts
- * execute `.mcp.json` directly, so only the fully bundled html-video local
- * sidecar may ship until host-side connector profiles and release gates exist.
+ * The baseline is deliberately small: generation-1 hosts execute `.mcp.json`
+ * directly, so only the fully bundled first-party local sidecars in
+ * MCP_ALLOWED_LOCAL_SERVERS may ship until host-side connector profiles and
+ * release gates exist.
  */
 
 export type McpContractIssue = {
@@ -60,6 +60,29 @@ function serverArgStrings(definition: ServerDefinition): string[] {
     for (const value of definition.args) if (typeof value === "string") parts.push(value);
   }
   return parts;
+}
+
+/**
+ * `${user_config.KEY}` references the host substitutes from the value the user
+ * supplied for `plugin.json.userConfig[KEY]`. Substitution throws when the value
+ * is missing and the host never writes the declared `default`, so an allowed
+ * plugin may only reference keys it declares as `required: true`.
+ */
+const USER_CONFIG_REFERENCE = /\$\{user_config\.([A-Za-z0-9_]+)\}/gu;
+
+function userConfigReferences(definition: ServerDefinition): string[] {
+  const env = definition.env;
+  if (!env || typeof env !== "object" || Array.isArray(env)) return [];
+  const keys = new Set<string>();
+  for (const value of Object.values(env as Record<string, unknown>)) {
+    if (typeof value !== "string") continue;
+    for (const match of value.matchAll(USER_CONFIG_REFERENCE)) keys.add(match[1]!);
+  }
+  return [...keys];
+}
+
+function allowedPluginList(): string {
+  return [...MCP_ALLOWED_LOCAL_SERVERS.keys()].join(", ");
 }
 
 function hasFloatingVersion(parts: string[]): boolean {
@@ -133,15 +156,16 @@ export async function validateMcpContract(root: string): Promise<McpContractIssu
     const required = Array.isArray(manifest.requiredMcpServers)
       ? manifest.requiredMcpServers.filter((name): name is string => typeof name === "string")
       : [];
-    if (pluginName === MCP_ALLOWED_PLUGIN) {
-      if (required.length !== 1 || required[0] !== MCP_ALLOWED_SERVER) {
-        issues.push({ severity: "error", path: path.relative(root, manifestPath), message: `emergency MCP safe baseline requires requiredMcpServers=["${MCP_ALLOWED_SERVER}"]` });
+    const allowedServer = MCP_ALLOWED_LOCAL_SERVERS.get(pluginName);
+    if (allowedServer !== undefined) {
+      if (required.length !== 1 || required[0] !== allowedServer) {
+        issues.push({ severity: "error", path: path.relative(root, manifestPath), message: `MCP safe baseline requires requiredMcpServers=["${allowedServer}"]` });
       }
       if (!existsSync(path.join(pluginRoot, ".mcp.json"))) {
-        issues.push({ severity: "error", path: path.relative(root, manifestPath), message: "emergency MCP safe baseline requires the bundled html-video .mcp.json" });
+        issues.push({ severity: "error", path: path.relative(root, manifestPath), message: `MCP safe baseline requires the bundled ${allowedServer} .mcp.json` });
       }
     } else if (required.length > 0) {
-      issues.push({ severity: "error", path: path.relative(root, manifestPath), message: `requiredMcpServers is reserved for ${MCP_ALLOWED_PLUGIN} during the emergency MCP safe baseline` });
+      issues.push({ severity: "error", path: path.relative(root, manifestPath), message: `requiredMcpServers is reserved for the first-party local servers (${allowedPluginList()}) during the MCP safe baseline` });
     }
 
     if (MCP_PAUSED_PLUGIN_SET.has(pluginName)) {
@@ -158,8 +182,9 @@ export async function validateMcpContract(root: string): Promise<McpContractIssu
     if (!existsSync(mcpPath)) continue;
     const relativeMcp = path.relative(root, mcpPath);
 
-    if (pluginName !== MCP_ALLOWED_PLUGIN) {
-      issues.push({ severity: "error", path: relativeMcp, message: `emergency MCP safe baseline permits .mcp.json only for ${MCP_ALLOWED_PLUGIN}` });
+    const allowedServer = MCP_ALLOWED_LOCAL_SERVERS.get(pluginName);
+    if (allowedServer === undefined) {
+      issues.push({ severity: "error", path: relativeMcp, message: `MCP safe baseline permits .mcp.json only for the first-party local servers (${allowedPluginList()})` });
     }
 
     const parsed = await readJson(mcpPath);
@@ -172,7 +197,7 @@ export async function validateMcpContract(root: string): Promise<McpContractIssu
     const manifestPath = existsSync(path.join(pluginRoot, ".crabcode-plugin", "plugin.json"))
       ? path.join(pluginRoot, ".crabcode-plugin", "plugin.json")
       : path.join(pluginRoot, "plugin.json");
-    const manifest = await readJson(manifestPath) as { version?: unknown; requiredMcpServers?: unknown; channels?: unknown } | null;
+    const manifest = await readJson(manifestPath) as { version?: unknown; requiredMcpServers?: unknown; channels?: unknown; userConfig?: unknown } | null;
     if (!manifest) {
       issues.push({ severity: "error", path: relativeMcp, message: "plugin declares MCP servers but has no parseable plugin manifest" });
       continue;
@@ -183,10 +208,28 @@ export async function validateMcpContract(root: string): Promise<McpContractIssu
 
     const serverNames = Object.keys(servers);
     if (
-      pluginName === MCP_ALLOWED_PLUGIN &&
-      (serverNames.length !== 1 || serverNames[0] !== MCP_ALLOWED_SERVER)
+      allowedServer !== undefined &&
+      (serverNames.length !== 1 || serverNames[0] !== allowedServer)
     ) {
-      issues.push({ severity: "error", path: relativeMcp, message: `emergency MCP safe baseline permits exactly one server named "${MCP_ALLOWED_SERVER}"` });
+      issues.push({ severity: "error", path: relativeMcp, message: `MCP safe baseline permits exactly one server named "${allowedServer}" for ${pluginName}` });
+    }
+    if (allowedServer !== undefined) {
+      const declared = manifest.userConfig && typeof manifest.userConfig === "object" && !Array.isArray(manifest.userConfig)
+        ? manifest.userConfig as Record<string, unknown>
+        : {};
+      for (const definition of Object.values(servers)) {
+        for (const key of userConfigReferences(definition)) {
+          const field = declared[key];
+          const isRequired = Boolean(field && typeof field === "object" && !Array.isArray(field) && (field as Record<string, unknown>).required === true);
+          if (!isRequired) {
+            issues.push({
+              severity: "error",
+              path: relativeMcp,
+              message: `env references \${user_config.${key}} but plugin.json userConfig.${key} is not declared with required: true; the host throws on substitution when the value is missing and never writes the declared default`,
+            });
+          }
+        }
+      }
     }
     for (const name of required) {
       if (!servers[name]) {

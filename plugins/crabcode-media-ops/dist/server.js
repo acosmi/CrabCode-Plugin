@@ -10577,7 +10577,7 @@ var package_default;
 var init_package = __esm(() => {
   package_default = {
     name: "crabcode-media-ops-mcp",
-    version: "0.4.3",
+    version: "0.4.4",
     license: "Apache-2.0",
     type: "module",
     bin: "./dist/server.js",
@@ -11187,7 +11187,8 @@ var init_domain = __esm(() => {
   });
   DeliveryQaEvidenceSchema = exports_external.object({
     schemaVersion: exports_external.literal("mediaops-delivery-qa-evidence@1"),
-    status: exports_external.literal("passed"),
+    status: exports_external.enum(["passed", "static"]),
+    mode: exports_external.enum(["full", "static"]).optional(),
     htmlSha256: Sha256Schema,
     tools: exports_external.object({
       java: exports_external.string().nullable(),
@@ -11197,7 +11198,7 @@ var init_domain = __esm(() => {
       chromium: exports_external.string().nullable(),
       axe: exports_external.string().min(1)
     }).strict(),
-    checks: exports_external.array(exports_external.object({ id: exports_external.string().min(1), status: exports_external.literal("passed"), detail: exports_external.string().min(1) })).min(1),
+    checks: exports_external.array(exports_external.object({ id: exports_external.string().min(1), status: exports_external.enum(["passed", "skipped"]), detail: exports_external.string().min(1) })).min(1),
     artifacts: exports_external.array(DeliveryQaArtifactSchema).min(3),
     completedAt: exports_external.string().datetime()
   });
@@ -11223,7 +11224,7 @@ var init_domain = __esm(() => {
     semanticStatus: exports_external.enum(["passed", "failed"]),
     accessibilityStatus: exports_external.enum(["passed", "failed", "manual_required"]),
     visualReviewStatus: exports_external.enum(["pending", "passed", "failed"]),
-    checks: exports_external.array(exports_external.object({ id: exports_external.string().min(1), status: exports_external.enum(["passed", "failed"]), detail: exports_external.string().min(1) })),
+    checks: exports_external.array(exports_external.object({ id: exports_external.string().min(1), status: exports_external.enum(["passed", "failed", "skipped"]), detail: exports_external.string().min(1) })),
     qaEvidence: DeliveryQaEvidenceSchema.optional(),
     visualReview: exports_external.object({
       reviewedBy: exports_external.string().trim().min(1).max(300),
@@ -38585,7 +38586,8 @@ function err(code, message, warnings) {
   return env;
 }
 function toToolResult(envelope) {
-  return { content: [{ type: "text", text: JSON.stringify(envelope) }] };
+  const content = [{ type: "text", text: JSON.stringify(envelope) }];
+  return envelope.success === false ? { content, isError: true } : { content };
 }
 
 // src/platforms/registry.ts
@@ -50656,14 +50658,14 @@ async function writeStaticQaEvidence(args) {
   };
   const browserReport = {
     schemaVersion: "mediaops-browser-qa@1",
-    status: "passed",
+    status: "skipped",
     mode: "static-skip",
     detail: "Browser QA skipped under MEDIAOPS_QA_MODE=static.",
     completedAt
   };
   const summary = {
     schemaVersion: "mediaops-delivery-qa-summary@1",
-    status: "passed",
+    status: "static",
     mode: "static",
     generatedAt: completedAt,
     htmlSha256: args.htmlSha256,
@@ -50676,7 +50678,7 @@ async function writeStaticQaEvidence(args) {
       axe: "4.12.1"
     },
     checks: [
-      { id: "static-qa-mode", status: "passed", detail: "Static verification mode: automated Chromium/Nu deferred to MEDIAOPS_QA_MODE=full." }
+      { id: "static-qa-mode", status: "skipped", detail: "Static verification mode: automated Chromium/Nu deferred to MEDIAOPS_QA_MODE=full." }
     ],
     errors: []
   };
@@ -50700,7 +50702,8 @@ async function writeStaticQaEvidence(args) {
   ];
   return {
     schemaVersion: "mediaops-delivery-qa-evidence@1",
-    status: "passed",
+    status: "static",
+    mode: "static",
     htmlSha256: args.htmlSha256,
     tools: {
       java: null,
@@ -50711,7 +50714,7 @@ async function writeStaticQaEvidence(args) {
       axe: "4.12.1"
     },
     checks: [
-      { id: "static-qa-mode", status: "passed", detail: "Static verification mode: automated Chromium/Nu deferred to MEDIAOPS_QA_MODE=full." },
+      { id: "static-qa-mode", status: "skipped", detail: "Static verification mode: automated Chromium/Nu deferred to MEDIAOPS_QA_MODE=full." },
       { id: "static-html-binding", status: "passed", detail: `Evidence bound to primary HTML ${args.htmlSha256}.` }
     ],
     artifacts,
@@ -50984,8 +50987,8 @@ async function verifyDeliveryBytes(manifest) {
     if (bytes.byteLength !== asset.byteSize || sha256(bytes) !== asset.sha256)
       throw new Error(`DELIVERY_ASSET_HASH_MISMATCH:${asset.assetId}`);
   }
-  if (manifest.visualReviewStatus === "passed" && (!manifest.qaEvidence || manifest.qaEvidence.status !== "passed")) {
-    throw new Error("DELIVERY_QA_EVIDENCE_MISSING: verified delivery has no passed Nu/axe/Playwright evidence");
+  if (manifest.visualReviewStatus === "passed" && !manifest.qaEvidence) {
+    throw new Error("DELIVERY_QA_EVIDENCE_MISSING: verified delivery has no Nu/axe/Playwright evidence");
   }
   if (manifest.qaEvidence) {
     if (manifest.qaEvidence.htmlSha256 !== manifest.primaryArtifact.artifactHash)
@@ -51027,8 +51030,11 @@ async function verifyHandler(args) {
   if (!insideRoot2(root5, candidatesRoot))
     return err("DELIVERY_PATH_INVALID", "Delivery root escapes the candidate directory.");
   const checks5 = [];
+  const recordCheck = (id, status, detail) => {
+    checks5.push({ id, status, detail });
+  };
   const check2 = (id, passed, detail) => {
-    checks5.push({ id, status: passed ? "passed" : "failed", detail });
+    recordCheck(id, passed ? "passed" : "failed", detail);
   };
   try {
     const primaryBytes = await readArtifact(root5, manifest.primaryArtifact.relativePath);
@@ -51071,7 +51077,7 @@ async function verifyHandler(args) {
       try {
         qaEvidence = await writeStaticQaEvidence({ root: root5, htmlSha256: manifest.primaryArtifact.artifactHash });
         for (const item of qaEvidence.checks)
-          check2(`automated-${item.id}`, true, item.detail);
+          recordCheck(`automated-${item.id}`, item.status, item.detail);
         check2("automated-qa-source-binding", true, "Static-mode evidence binds to the exact primary HTML artifact hash.");
       } catch (error2) {
         checks5.push({ id: "automated-delivery-qa", status: "failed", detail: error2 instanceof Error ? error2.message : String(error2) });
@@ -51097,6 +51103,7 @@ async function verifyHandler(args) {
           qaEvidence = {
             schemaVersion: "mediaops-delivery-qa-evidence@1",
             status: "passed",
+            mode: "full",
             htmlSha256: qa.html.sha256,
             tools: qa.tools,
             checks: qa.checks.map(({ id, status, detail }) => ({ id, status, detail })),
@@ -51121,7 +51128,7 @@ async function verifyHandler(args) {
   const viewportCoverage = input.viewports.some((item) => item.width <= 375) && input.viewports.some((item) => item.width >= 768) && input.viewports.some((item) => item.width >= 1200);
   const visualPassed = reviewerIndependent && input.visualReviewStatus === "passed" && viewportCoverage && input.printChecked && input.viewports.every((item) => item.noHorizontalOverflow && item.whiteBackground && item.readable);
   check2("visual-evidence", visualPassed, "Visual review covers mobile, tablet/desktop, wide desktop, print, white background, readability and horizontal overflow.");
-  const staticPassed = checks5.filter((item) => item.id !== "visual-evidence").every((item) => item.status === "passed");
+  const staticPassed = checks5.filter((item) => item.id !== "visual-evidence").every((item) => item.status !== "failed");
   const verifiedAt = new Date().toISOString();
   const { renderManifestHash: _previousManifestHash, ...baseManifest } = manifest;
   const updatedWithoutHash = {
@@ -51674,6 +51681,13 @@ ${content3.bodyMarkdown}`;
   if (!delivery || delivery.contentHash !== content3.contentHash || delivery.articleDocHash !== content3.articleDocHash) {
     issues.push({ code: "DELIVERY_VERIFICATION_REQUIRED", severity: "error", message: "No verified white-background HTML-primary/Markdown-backup delivery manifest binds to this exact revision." });
   } else {
+    if (delivery.qaEvidence?.mode !== "full") {
+      issues.push({
+        code: "DELIVERY_QA_LEVEL_INSUFFICIENT",
+        severity: "error",
+        message: `Delivery QA evidence is ${delivery.qaEvidence?.mode ?? "legacy-unknown"}; the Media Gate requires MEDIAOPS_QA_MODE=full evidence bound to this revision before approval.`
+      });
+    }
     try {
       await verifyDeliveryBytes(delivery);
     } catch (error2) {

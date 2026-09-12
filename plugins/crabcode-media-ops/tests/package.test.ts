@@ -50,6 +50,8 @@ describe('hash-bound publish packaging', () => {
     expect(manifest.backupArtifact.format).toBe('markdown')
     expect(existsSync(join(path, manifest.assets[0].relativePath))).toBe(true)
     expect(manifest.qaEvidence.status).toBe('passed')
+    // Only full-grade evidence can reach an approved package (Media Gate, RC-24).
+    expect(manifest.qaEvidence.mode).toBe('full')
     expect(existsSync(join(path, 'qa/summary.json'))).toBe(true)
     // Full Chromium screenshots only exist under MEDIAOPS_QA_MODE=full; static mode still packages summary evidence.
     if ((process.env.MEDIAOPS_QA_MODE ?? 'full') === 'full') {

@@ -120,11 +120,46 @@ if (!pkg.scripts?.start?.includes('dist/server.js')) errors.push('start script m
 if (pkg.bin !== './dist/server.js') errors.push('package bin must point at the prebuilt dist/server.js')
 if (!existsSync(join(pluginRoot, 'dist', 'server.js'))) errors.push('dist/server.js is missing; run `bun run build` (the distribution bundle ships in-repo)')
 
-if (existsSync(join(pluginRoot, '.mcp.json'))) {
-  errors.push('.mcp.json must remain absent while mediaops principal-config-missing containment is active')
+// 2026-09-12 decision D-0(c): the principal-config-missing containment is lifted
+// because the host now injects the trusted local principal from user_config, so
+// the executable configuration must be present and bound to that injection.
+const mcpConfigPath = join(pluginRoot, '.mcp.json')
+if (!existsSync(mcpConfigPath)) {
+  errors.push('.mcp.json is missing; the mediaops sidecar is a required local server since 0.4.4')
+} else {
+  const mcpConfig = await json(mcpConfigPath)
+  const servers: Record<string, any> = mcpConfig?.mcpServers ?? {}
+  const serverNames = Object.keys(servers)
+  if (serverNames.length !== 1 || serverNames[0] !== 'mediaops') {
+    errors.push(`.mcp.json must declare exactly one server named "mediaops", found [${serverNames.join(', ')}]`)
+  }
+  const mediaops = servers.mediaops
+  if (mediaops) {
+    if (mediaops.url !== undefined || mediaops.type === 'http' || mediaops.type === 'sse') {
+      errors.push('.mcp.json mediaops must stay a local stdio server; remote transport is not permitted')
+    }
+    const env: Record<string, unknown> = mediaops.env ?? {}
+    if (env.MEDIAOPS_IDENTITY_MODE !== 'local-editorial') {
+      errors.push('.mcp.json must pin MEDIAOPS_IDENTITY_MODE=local-editorial; the sidecar never invents an identity mode')
+    }
+    // Every ${user_config.X} the host substitutes must be a required manifest
+    // field: substitution throws when the value is missing and the host never
+    // writes the declared default.
+    const declaredUserConfig: Record<string, any> = manifest.userConfig ?? {}
+    for (const value of Object.values(env)) {
+      if (typeof value !== 'string') continue
+      for (const match of value.matchAll(/\$\{user_config\.([A-Za-z0-9_]+)\}/g)) {
+        if (declaredUserConfig[match[1]!]?.required !== true) {
+          errors.push(`.mcp.json references \${user_config.${match[1]}} but plugin.json userConfig.${match[1]} is not declared required: true`)
+        }
+      }
+    }
+  }
 }
 const requiredServers: unknown[] = Array.isArray(manifest.requiredMcpServers) ? manifest.requiredMcpServers : []
-if (requiredServers.length !== 0) errors.push('requiredMcpServers must stay empty while mediaops is contained')
+if (requiredServers.length !== 1 || requiredServers[0] !== 'mediaops') {
+  errors.push('requiredMcpServers must be exactly ["mediaops"] so the host activates the bundled sidecar on install')
+}
 if (pkg.overrides?.hono !== '4.12.25') errors.push('Hono security override must remain pinned at 4.12.25 until the SDK resolves above it')
 if (existsSync(join(pluginRoot, 'editorial', 'scripts', '__pycache__'))) errors.push('generated __pycache__ must not ship in the plugin')
 
@@ -189,4 +224,4 @@ if (errors.length) {
   process.stderr.write(errors.map((error) => `ERROR ${error}`).join('\n') + '\n')
   process.exit(1)
 }
-process.stdout.write(`validate-media-plugin: contained executable, ${skillNames.size} skills, ${declaredTools.size} tested tools, ${schemaNames.length} schemas, runtime/docs/manifest/marketplace/SBOM aligned at ${manifest.version}\n`)
+process.stdout.write(`validate-media-plugin: bundled local stdio sidecar, ${skillNames.size} skills, ${declaredTools.size} tested tools, ${schemaNames.length} schemas, runtime/docs/manifest/marketplace/SBOM aligned at ${manifest.version}\n`)
