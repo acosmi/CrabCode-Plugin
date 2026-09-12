@@ -175,7 +175,8 @@ async function pluginLockHash(): Promise<string> {
   return sha256(bytes)
 }
 
-function artifact(args: {
+/** Single DeliveryArtifact constructor; the draft export reuses it rather than growing a second one. */
+export function artifact(args: {
   role: DeliveryArtifact['role']
   format: DeliveryArtifact['format']
   mediaType: string

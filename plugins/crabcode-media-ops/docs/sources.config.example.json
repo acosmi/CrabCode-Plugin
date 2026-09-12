@@ -1,0 +1,46 @@
+{
+  "_comment": "把本文件复制为 <MEDIAOPS_DATA_DIR>/sources.config.json 后按需修改。仅 HTTPS，且主机名必须出现在 MEDIAOPS_FEED_HOST_ALLOWLIST（逗号分隔）中；解析到非公网地址的主机会在出站层被拒绝，允许表不能绕过它。region 为 'cn' 的条目必须声明 authorization.basis，否则该条目被跳过并告警。本服务不抓取没有官方 API 的平台。",
+  "sources": [
+    {
+      "id": "hackernews",
+      "type": "builtin",
+      "enabled": true
+    },
+    {
+      "id": "company-blog",
+      "type": "json-feed",
+      "region": "global",
+      "url": "https://feeds.example.com/blog/hot.json",
+      "itemsPath": "data.items",
+      "idPath": "guid",
+      "titlePath": "headline",
+      "urlPath": "link",
+      "scorePath": "stats.views",
+      "scoreUnit": "views",
+      "publishedAtPath": "published_at",
+      "queryParam": "q",
+      "authorization": {
+        "basis": "official-api",
+        "note": "站点公开发布的只读 JSON feed"
+      }
+    },
+    {
+      "id": "cn-newsroom-mirror",
+      "type": "json-feed",
+      "region": "cn",
+      "url": "https://feeds.example.com/cn/newsroom.json",
+      "itemsPath": "items",
+      "idPath": "id",
+      "titlePath": "title",
+      "urlPath": "url",
+      "scorePath": "hot",
+      "scoreUnit": "hot",
+      "publishedAtPath": "published_at",
+      "eventAtPath": "happened_at",
+      "authorization": {
+        "basis": "self-hosted",
+        "note": "本机构自建并自行运营的聚合服务，数据来自各来源的官方授权接口；不是对第三方平台的抓取"
+      }
+    }
+  ]
+}

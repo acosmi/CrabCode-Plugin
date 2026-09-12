@@ -35,13 +35,18 @@ export class IdentityError extends Error {
 
 /**
  * Deterministic machine operations that the server-owned service actor performs
- * in local-editorial mode (audit §7.5): originality scanning and delivery
- * rendering are pure computation over stored records, so attributing them to a
- * service identity keeps the single trusted human as the accountable author
- * without faking a second person. Human-judgment attestations (research
- * completion, reviews, approvals, profile confirmation) are never service work.
+ * in local-editorial mode (audit §7.5): originality scanning, delivery
+ * rendering and unapproved draft export are pure computation over stored
+ * records, so attributing them to a service identity keeps the single trusted
+ * human as the accountable author without faking a second person. Human-judgment
+ * attestations (research completion, reviews, approvals, profile confirmation)
+ * are never service work.
  */
-const SERVICE_ACTOR_TOOLS = new Set(['mediaops.originality.scan', 'mediaops.delivery.render'])
+const SERVICE_ACTOR_TOOLS = new Set([
+  'mediaops.originality.scan',
+  'mediaops.delivery.render',
+  'mediaops.delivery.export_draft',
+])
 const SERVICE_IMPORT_TOOL = 'mediaops.content.save'
 
 const SERVICE_ACTOR: TrustedPrincipal = Object.freeze({
@@ -62,6 +67,9 @@ const POLICIES: Record<string, ToolIdentityPolicy> = {
   'mediaops.originality.review': { role: 'originality_reviewer', actorFields: ['reviewedBy'] },
   'mediaops.editorial.review': { role: 'editorial_reviewer', actorFields: ['completedBy'] },
   'mediaops.delivery.render': { role: 'renderer', actorFields: ['generatedBy'] },
+  // Same deterministic rendering work, no approval meaning: the draft export
+  // demands the renderer role and nothing more, and grants nothing downstream.
+  'mediaops.delivery.export_draft': { role: 'renderer', actorFields: ['exportedBy'] },
   'mediaops.delivery.verify': { role: 'delivery_reviewer', actorFields: ['verifiedBy'] },
   'mediaops.profile.save': { role: 'profile_editor', actorFields: ['confirmedBy'] },
   'mediaops.profile.rollback': { role: 'profile_editor', actorFields: ['confirmedBy'] },

@@ -32,6 +32,7 @@ const knownTools = new Set([
   'mediaops.publish.history', 'mediaops.platform.rules.get', 'mediaops.reference.register',
   'mediaops.reference.get_metadata', 'mediaops.research.capture', 'mediaops.research.complete', 'mediaops.research.get', 'mediaops.originality.scan',
   'mediaops.originality.review', 'mediaops.editorial.review', 'mediaops.delivery.render', 'mediaops.delivery.verify',
+  'mediaops.delivery.export_draft',
 ])
 
 if (!manifest || !pkg) process.exit(1)

@@ -19,3 +19,5 @@ description: 对已有媒体稿进行去 AI 味、结构压缩、语言自然化
 - 输出“改后稿 + 关键改动 + 未解决风险”。
 
 编辑后的稿件必须保存为新 drafted revision，再运行绑定该最终 revision 的 `mediaops.originality.scan`；任何后续改字都使扫描失效。若旧稿已审批，明确提示审批会失效。
+
+单人 / 本机（local-editorial）模式下需要真正打开稿件通读排版时，对当前 revision 调用 `mediaops.delivery.export_draft`，拿到可直接打开的 HTML 与 Markdown（正文内带可见的“未批准草稿”提示）。它在任何阶段都可用，产物落在独立的 draft-exports 目录，明示 `releaseStatus=unapproved`、`qaLevel=none`，并如实列出仍然成立的 `blockers`。草稿导出与 `mediaops.delivery.render` / `mediaops.delivery.verify` → `mediaops.readiness.inspect` → 审批的正式链严格分开：它不产生交付候选、不推进任何门禁，导出过一次也绝不能在报告里写成“已交付”。

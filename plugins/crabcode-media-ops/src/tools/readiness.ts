@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { actionRequired, err, ok, type Envelope } from '../envelope.ts'
-import type { ContentManifest, ContentManifestV2 } from '../domain.ts'
+import { canonicalUrlIdentity, type ContentManifest, type ContentManifestV2 } from '../domain.ts'
 import { getPlatform, platformIds, type PlatformDescriptor } from '../platforms/registry.ts'
 import { getLatestContent } from './content.ts'
 import { getLatestVerifiedDelivery, verifyDeliveryBytes } from './delivery.ts'
@@ -27,15 +27,8 @@ function daysBetween(now: Date, thenIso: string): number {
   return (now.getTime() - new Date(thenIso).getTime()) / 86_400_000
 }
 
-function citationUrlIdentity(value: string): string {
-  const url = new URL(value)
-  url.hash = ''
-  url.hostname = url.hostname.toLowerCase()
-  if ((url.protocol === 'https:' && url.port === '443') || (url.protocol === 'http:' && url.port === '80')) url.port = ''
-  if (url.pathname.length > 1) url.pathname = url.pathname.replace(/\/+$/, '')
-  url.searchParams.sort()
-  return url.toString()
-}
+/** Citation matching uses the shared URL identity (`domain.ts::canonicalUrlIdentity`). */
+const citationUrlIdentity = canonicalUrlIdentity
 
 function addStructuralIssues(content: ContentManifestV2, platform: PlatformDescriptor, issues: ReadinessIssue[]): void {
   const severity = platform.rules.some((rule) => rule.ruleType !== 'editorial-guidance') ? 'error' : 'warning'

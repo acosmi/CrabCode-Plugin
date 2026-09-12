@@ -4,7 +4,7 @@
     "name": "CrabCode"
   },
   "metadata": {
-    "version": "0.4.4",
+    "version": "0.4.5",
     "description": "Official CrabCode plugin marketplace hosted at acosmi/CrabCode-Plugin."
   },
   "plugins": [
@@ -1576,7 +1576,7 @@
     {
       "name": "crabcode-media-ops",
       "source": "./plugins/crabcode-media-ops",
-      "version": "0.4.4",
+      "version": "0.4.5",
       "displayName": "CrabCode 新媒体运营",
       "shortDescription": "参考隔离、联网可信来源、原创审校与精排白底 HTML 交付",
       "longDescription": "面向媒体与自媒体团队的可审计工作流：第三方参考原文隔离、可核验联网研究、公众号独立观点、工具生成的原创与编辑复核、快速/完整/增量风格表单、多平台适配、精排白底 HTML 主交付、Markdown 备份，以及绑定内容/渲染/产物字节的人工审批与冻结发布包。 安装后需在插件设置中填写本机编辑者 ID 与显示名（local-editorial 低保证身份），随后 mediaops 本地服务自动启动；正式多人审批仍需宿主注入不同主体。",

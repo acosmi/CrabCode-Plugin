@@ -10577,7 +10577,7 @@ var package_default;
 var init_package = __esm(() => {
   package_default = {
     name: "crabcode-media-ops-mcp",
-    version: "0.4.4",
+    version: "0.4.5",
     license: "Apache-2.0",
     type: "module",
     bin: "./dist/server.js",
@@ -10644,6 +10644,17 @@ function isSafeLinkUrl(value) {
     return false;
   }
 }
+function canonicalUrlIdentity(value) {
+  const url = new URL(value);
+  url.hash = "";
+  url.hostname = url.hostname.toLowerCase();
+  if (url.protocol === "https:" && url.port === "443" || url.protocol === "http:" && url.port === "80")
+    url.port = "";
+  if (url.pathname.length > 1)
+    url.pathname = url.pathname.replace(/\/+$/, "");
+  url.searchParams.sort();
+  return url.toString();
+}
 function namedActorKey(value) {
   return value.normalize("NFKC").trim().replace(/\s+/gu, " ").toLowerCase();
 }
@@ -10674,7 +10685,7 @@ function assertStoredContentHash(content) {
     throw new Error(`CONTENT_HASH_MISMATCH:${content.contentId}:${content.revisionId}`);
   }
 }
-var VERSION, SCHEMA_VERSION = 2, Sha256Schema, SafeHttpUrlSchema, BrandIdSchema, ReferenceRoleSchema, ReferenceAllowedUseSchema, ReferenceMaterialSchema, ResearchCaptureSchema, SourceAssessmentSchema, EvidenceSourceSchema, ResearchClaimSchema, ClaimEvidenceLinkSchema, ResearchSearchLogSchema, ResearchReviewSchema, ClaimSchema, VerifiableStatementSchema, StatementCoverageSchema, ReviewSchema, LegalReviewSchema, AiDisclosureSchema, AssetInputSchema, AssetSchema, ArticleNodeTypeSchema, ArticleNodeSchema, CitationSchema, ArticleDocSchema, OriginalityHumanReviewSchema, OriginalityScanSchema, EditorialReviewRecordSchema, BaseContentSchema, ContentManifestV2Schema, LegacyClaimSchema, LegacyReviewSchema, LegacyOriginalityReviewSchema, ContentManifestV1Schema, ContentManifestSchema, DeliveryArtifactSchema, DeliveryQaArtifactSchema, DeliveryQaEvidenceSchema, DeliveryManifestSchema, PackageRelativePathSchema, PrincipalAssuranceSchema, PackageIdentitySchema, PackageManifestSchema;
+var VERSION, SCHEMA_VERSION = 2, Sha256Schema, SafeHttpUrlSchema, BrandIdSchema, ReferenceRoleSchema, ReferenceAllowedUseSchema, ReferenceMaterialSchema, ResearchCaptureSchema, SourceAssessmentSchema, EvidenceSourceSchema, ResearchClaimSchema, ClaimEvidenceLinkSchema, ResearchSearchLogSchema, ResearchReviewSchema, ClaimSchema, VerifiableStatementSchema, StatementCoverageSchema, ReviewSchema, LegalReviewSchema, AiDisclosureSchema, AssetInputSchema, AssetSchema, ArticleNodeTypeSchema, ArticleNodeSchema, CitationSchema, ArticleDocSchema, OriginalityHumanReviewSchema, OriginalityScanSchema, EditorialReviewRecordSchema, BaseContentSchema, ContentManifestV2Schema, LegacyClaimSchema, LegacyReviewSchema, LegacyOriginalityReviewSchema, ContentManifestV1Schema, ContentManifestSchema, DeliveryArtifactSchema, DeliveryQaArtifactSchema, DeliveryQaEvidenceSchema, DeliveryManifestSchema, DraftExportGovernanceSchema, DraftExportManifestSchema, PackageRelativePathSchema, PrincipalAssuranceSchema, PackageIdentitySchema, PackageManifestSchema;
 var init_domain = __esm(() => {
   init_zod();
   init_package();
@@ -11240,6 +11251,48 @@ var init_domain = __esm(() => {
     generatedBy: exports_external.string().trim().min(1).max(300),
     artifactRoot: exports_external.string().min(1)
   });
+  DraftExportGovernanceSchema = exports_external.object({
+    research: exports_external.enum(["bound", "stale", "missing"]),
+    originalityScan: exports_external.enum(["bound", "stale", "missing"]),
+    editorialReview: exports_external.enum(["bound", "stale", "missing"]),
+    profile: exports_external.enum(["confirmed-form", "manual-import", "rollback", "missing"]),
+    verifiedDelivery: exports_external.enum(["present", "none"])
+  }).strict();
+  DraftExportManifestSchema = exports_external.object({
+    schemaVersion: exports_external.literal("mediaops-draft-export@1"),
+    exportId: exports_external.string().uuid(),
+    contentId: exports_external.string().uuid(),
+    revisionId: exports_external.string().uuid(),
+    revision: exports_external.number().int().positive(),
+    stage: exports_external.enum(["intake", "researched", "drafted", "reviewed"]),
+    contentHash: Sha256Schema,
+    articleDocHash: Sha256Schema,
+    releaseStatus: exports_external.literal("unapproved"),
+    qaLevel: exports_external.literal("none"),
+    governance: DraftExportGovernanceSchema,
+    blockers: exports_external.array(exports_external.object({
+      code: exports_external.string().min(1).max(120),
+      severity: exports_external.enum(["error", "warning"]),
+      message: exports_external.string().min(1).max(2000)
+    }).strict()).max(200),
+    assetRightsPending: exports_external.array(exports_external.string().uuid()).max(100),
+    primaryArtifact: DeliveryArtifactSchema,
+    backupArtifact: DeliveryArtifactSchema,
+    channelArtifacts: exports_external.array(DeliveryArtifactSchema).default([]),
+    assets: exports_external.array(exports_external.object({
+      assetId: exports_external.string().uuid(),
+      relativePath: exports_external.string().min(1),
+      sha256: Sha256Schema,
+      byteSize: exports_external.number().int().positive(),
+      mediaType: exports_external.string().min(1)
+    }).strict()).max(100),
+    rendererVersion: exports_external.string().min(1),
+    templateId: exports_external.string().min(1),
+    exportedAt: exports_external.string().datetime(),
+    exportedBy: exports_external.string().trim().min(1).max(300),
+    exportRoot: exports_external.string().min(1),
+    exportManifestHash: Sha256Schema
+  }).strict();
   PackageRelativePathSchema = exports_external.string().min(1).refine((value) => /^[A-Za-z0-9._/-]+$/.test(value) && !value.startsWith("/") && !value.includes(":") && value.split("/").every((part) => part && part !== "." && part !== ".."), "package path must be a safe relative POSIX path");
   PrincipalAssuranceSchema = exports_external.enum(["mcp_oauth", "host_principal", "local_editorial", "service_account"]);
   PackageIdentitySchema = exports_external.object({
@@ -28599,11 +28652,11 @@ var init_renderer = __esm(() => {
 });
 
 // src/qa/artifacts.ts
-import { createHash as createHash6 } from "crypto";
+import { createHash as createHash7 } from "crypto";
 import { readFile as readFile3, writeFile as writeFile2 } from "fs/promises";
 import { extname, relative as relative2, resolve as resolve2, sep } from "path";
 function sha256Bytes(bytes) {
-  return createHash6("sha256").update(bytes).digest("hex");
+  return createHash7("sha256").update(bytes).digest("hex");
 }
 async function writeJson(path2, value) {
   await writeFile2(path2, `${JSON.stringify(value, null, 2)}
@@ -38688,6 +38741,7 @@ function platformIds() {
 }
 
 // src/sources/index.ts
+import { createHash as createHash3 } from "crypto";
 import { readFileSync as readFileSync2, existsSync as existsSync2 } from "fs";
 import { join as join2 } from "path";
 
@@ -39179,42 +39233,270 @@ async function releaseEntityLease(collection, entityKey, owner) {
 
 // src/sources/index.ts
 init_domain();
+
+// src/outbound.ts
+import { lookup } from "dns/promises";
+import { request as httpRequest } from "http";
+import { request as httpsRequest } from "https";
+import { BlockList, isIP } from "net";
+var forbiddenV4 = new BlockList;
+for (const [base, prefix] of [
+  ["0.0.0.0", 8],
+  ["10.0.0.0", 8],
+  ["100.64.0.0", 10],
+  ["127.0.0.0", 8],
+  ["169.254.0.0", 16],
+  ["172.16.0.0", 12],
+  ["192.0.0.0", 24],
+  ["192.0.2.0", 24],
+  ["192.168.0.0", 16],
+  ["198.18.0.0", 15],
+  ["198.51.100.0", 24],
+  ["203.0.113.0", 24],
+  ["224.0.0.0", 4],
+  ["240.0.0.0", 4]
+])
+  forbiddenV4.addSubnet(base, prefix, "ipv4");
+var globalV6 = new BlockList;
+globalV6.addSubnet("2000::", 3, "ipv6");
+var forbiddenV6 = new BlockList;
+for (const [base, prefix] of [
+  ["2001::", 23],
+  ["2001:db8::", 32],
+  ["2002::", 16],
+  ["3fff::", 20]
+])
+  forbiddenV6.addSubnet(base, prefix, "ipv6");
+function forbiddenIp(value) {
+  if (isIP(value) === 4)
+    return forbiddenV4.check(value, "ipv4");
+  if (isIP(value) === 6)
+    return !globalV6.check(value, "ipv6") || forbiddenV6.check(value, "ipv6");
+  return true;
+}
+var resolverOverride = null;
+var dialerOverride = null;
+async function resolveHostname(hostname2) {
+  if (resolverOverride)
+    return resolverOverride(hostname2);
+  return lookup(hostname2, { all: true, verbatim: true });
+}
+function remainingTime(deadline) {
+  const remaining = deadline - Date.now();
+  if (remaining <= 0)
+    throw new Error("request deadline exceeded");
+  return remaining;
+}
+async function deadlineBound(promise2, deadline) {
+  const remaining = remainingTime(deadline);
+  let timer;
+  try {
+    return await Promise.race([
+      promise2,
+      new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error("request deadline exceeded")), remaining);
+      })
+    ]);
+  } finally {
+    if (timer)
+      clearTimeout(timer);
+  }
+}
+function normalizedHostname(url) {
+  return url.hostname.toLowerCase().replace(/^\[|\]$/g, "").replace(/\.$/, "");
+}
+async function assertPublicUrl(value, deadline) {
+  const url = new URL(value);
+  if (!["http:", "https:"].includes(url.protocol))
+    throw new Error("only HTTP(S) evidence URLs are allowed");
+  if (url.username || url.password)
+    throw new Error("URL credentials are not allowed");
+  if (url.protocol === "http:" && url.port && url.port !== "80" || url.protocol === "https:" && url.port && url.port !== "443") {
+    throw new Error("custom network ports are not allowed");
+  }
+  const hostname2 = normalizedHostname(url);
+  if (!hostname2 || hostname2 === "localhost" || hostname2.endsWith(".localhost") || hostname2.endsWith(".local") || hostname2.endsWith(".internal") || hostname2.endsWith(".lan") || hostname2.endsWith(".home")) {
+    throw new Error("local/internal hostnames are not allowed");
+  }
+  if (isIP(hostname2)) {
+    if (forbiddenIp(hostname2))
+      throw new Error(`non-public address ${hostname2} is not allowed`);
+    url.hash = "";
+    return { url, addresses: [{ address: hostname2, family: isIP(hostname2) }] };
+  }
+  const resolved = await deadlineBound(resolveHostname(hostname2), deadline);
+  if (!resolved.length || resolved.some(({ address }) => forbiddenIp(address)))
+    throw new Error(`hostname ${hostname2} did not resolve exclusively to public addresses`);
+  const addresses = resolved.filter((item) => item.family === 4 || item.family === 6).sort((left, right) => left.family - right.family || (left.address < right.address ? -1 : left.address > right.address ? 1 : 0));
+  if (!addresses.length)
+    throw new Error(`hostname ${hostname2} has no usable IPv4/IPv6 address`);
+  url.hash = "";
+  return { url, addresses };
+}
+function pinnedRequestOptions(target, extra) {
+  const selected = target.addresses[0];
+  const authorityHostname = normalizedHostname(target.url);
+  return {
+    protocol: target.url.protocol,
+    hostname: selected.address,
+    port: target.url.port || (target.url.protocol === "https:" ? 443 : 80),
+    path: `${target.url.pathname}${target.url.search}`,
+    method: "GET",
+    headers: {
+      host: target.url.host,
+      accept: extra.accept,
+      "accept-encoding": "identity",
+      "user-agent": extra.userAgent
+    },
+    ...target.url.protocol === "https:" && !isIP(authorityHostname) ? { servername: authorityHostname } : {}
+  };
+}
+function normalizeRemoteAddress(value) {
+  return value.toLowerCase().replace(/^::ffff:/, "");
+}
+function firstHeader(headers, name) {
+  const value = headers[name];
+  return Array.isArray(value) ? value[0] ?? "" : value ?? "";
+}
+function readLimitedBody(response, deadline, maxBytes) {
+  const declared = Number(response.headers["content-length"] ?? 0);
+  if (Number.isFinite(declared) && declared > maxBytes)
+    throw new Error(`response exceeds ${maxBytes} bytes`);
+  return deadlineBound(new Promise((resolve, reject) => {
+    const chunks = [];
+    let total = 0;
+    response.on("data", (chunk) => {
+      const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+      total += bytes.byteLength;
+      if (total > maxBytes) {
+        response.destroy(new Error(`response exceeds ${maxBytes} bytes`));
+        return;
+      }
+      chunks.push(bytes);
+    });
+    response.once("end", () => resolve(new Uint8Array(Buffer.concat(chunks, total))));
+    response.once("error", reject);
+  }), deadline);
+}
+async function requestPinned(target, deadline, extra) {
+  const selected = target.addresses[0];
+  const dial = dialerOverride ?? ((options) => (target.url.protocol === "https:" ? httpsRequest : httpRequest)(options));
+  return deadlineBound(new Promise((resolve, reject) => {
+    const req = dial(pinnedRequestOptions(target, extra));
+    const timer = setTimeout(() => req.destroy(new Error("request deadline exceeded")), remainingTime(deadline));
+    req.once("response", (response) => {
+      clearTimeout(timer);
+      const remote = response.socket?.remoteAddress;
+      if (remote && (normalizeRemoteAddress(remote) !== normalizeRemoteAddress(selected.address) || forbiddenIp(remote))) {
+        response.destroy();
+        reject(new Error(`connected address ${remote} does not match vetted address ${selected.address}`));
+        return;
+      }
+      resolve({ response, connectedAddress: remote ?? selected.address, resolvedAddresses: target.addresses.map((item) => item.address) });
+    });
+    req.once("error", (error2) => {
+      clearTimeout(timer);
+      reject(error2);
+    });
+    req.end();
+  }), deadline);
+}
+async function fetchPinned(options) {
+  const deadline = Date.now() + options.timeoutMs;
+  const extra = { accept: options.accept, userAgent: options.userAgent };
+  let current = await assertPublicUrl(options.url, deadline);
+  for (let redirect = 0;redirect <= options.maxRedirects; redirect++) {
+    const { response, connectedAddress, resolvedAddresses } = await requestPinned(current, deadline, extra);
+    const status = response.statusCode ?? 0;
+    if (status >= 300 && status < 400) {
+      response.resume();
+      if (redirect === options.maxRedirects)
+        throw new Error(`redirect limit ${options.maxRedirects} exceeded`);
+      const location = firstHeader(response.headers, "location");
+      if (!location)
+        throw new Error(`redirect HTTP ${status} has no Location header`);
+      current = await assertPublicUrl(new URL(location, current.url).toString(), deadline);
+      continue;
+    }
+    if (status < 200 || status > 299) {
+      response.resume();
+      throw new Error(`source returned HTTP ${status}`);
+    }
+    const contentType = firstHeader(response.headers, "content-type").split(";", 1)[0].trim().toLowerCase();
+    if (!options.acceptContentTypes.test(contentType)) {
+      response.resume();
+      throw new Error(`unsupported content type ${contentType || "(missing)"}`);
+    }
+    return {
+      finalUrl: current.url.toString(),
+      status,
+      contentType,
+      bytes: await readLimitedBody(response, deadline, options.maxBytes),
+      connectedAddress,
+      resolvedAddresses
+    };
+  }
+  throw new Error("unreachable redirect state");
+}
+
+// src/sources/index.ts
 var MAX_FEED_BYTES = 2 * 1024 * 1024;
 var FETCH_TIMEOUT_MS = 1e4;
-async function readJsonResponse(res, sourceId) {
-  const type = res.headers.get("content-type") ?? "";
-  if (!/^(application\/(?:[a-z0-9.+-]*\+)?json)(?:;|$)/i.test(type))
-    throw new Error(`${sourceId}: unsupported content type ${type || "(missing)"}`);
-  const declared = Number(res.headers.get("content-length") ?? 0);
-  if (Number.isFinite(declared) && declared > MAX_FEED_BYTES)
-    throw new Error(`${sourceId}: response exceeds ${MAX_FEED_BYTES} bytes`);
-  if (!res.body)
-    throw new Error(`${sourceId}: response body is missing`);
-  const reader = res.body.getReader();
-  const chunks = [];
-  let total = 0;
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done)
-      break;
-    total += value.byteLength;
-    if (total > MAX_FEED_BYTES) {
-      await reader.cancel();
-      throw new Error(`${sourceId}: response exceeds ${MAX_FEED_BYTES} bytes`);
-    }
-    chunks.push(value);
-  }
-  const bytes = new Uint8Array(total);
-  let offset = 0;
-  for (const chunk of chunks) {
-    bytes.set(chunk, offset);
-    offset += chunk.byteLength;
-  }
-  return JSON.parse(new TextDecoder().decode(bytes));
+var FEED_ACCEPT = "application/json";
+var FEED_CONTENT_TYPES = /^application\/(?:[a-z0-9.+-]*\+)?json$/;
+var FEED_USER_AGENT = "CrabCode-MediaOps/0.4 trend-feed";
+var SOURCE_AUTHORIZATION_BASES = Object.freeze([
+  "official-api",
+  "self-hosted",
+  "user-provided",
+  "licensed"
+]);
+var CN_SOURCE_AUTHORIZATION_REQUIRED = "\u4E2D\u6587\u6765\u6E90\u5FC5\u987B\u58F0\u660E\u6388\u6743\u4F9D\u636E\uFF08authorization.basis\uFF09";
+function isoTimestampOrNull(value) {
+  if (typeof value !== "string" || !value.trim())
+    return null;
+  const time3 = new Date(value).getTime();
+  return Number.isFinite(time3) ? new Date(time3).toISOString() : null;
+}
+function withSourceRanks(signals) {
+  const ordered = signals.map((signal, index) => ({ signal, index }));
+  ordered.sort((left, right) => {
+    const leftScore = left.signal.rawScore;
+    const rightScore = right.signal.rawScore;
+    if (leftScore === null && rightScore === null)
+      return left.index - right.index;
+    if (leftScore === null)
+      return 1;
+    if (rightScore === null)
+      return -1;
+    return rightScore - leftScore || left.index - right.index;
+  });
+  const rankByIndex = new Map;
+  ordered.forEach((item, position) => rankByIndex.set(item.index, position + 1));
+  return signals.map((signal, index) => ({ ...signal, sourceRank: rankByIndex.get(index) ?? index + 1 }));
+}
+function feedWarning(id, error2) {
+  const message = error2 instanceof Error ? error2.message : String(error2);
+  const httpStatus = /^source returned HTTP (\d+)$/.exec(message);
+  return httpStatus ? `${id}: HTTP ${httpStatus[1]}` : `${id}: fetch failed (${message})`;
+}
+async function fetchFeedJson(url) {
+  const response = await fetchPinned({
+    url,
+    timeoutMs: FETCH_TIMEOUT_MS,
+    maxBytes: MAX_FEED_BYTES,
+    maxRedirects: 0,
+    accept: FEED_ACCEPT,
+    acceptContentTypes: FEED_CONTENT_TYPES,
+    userAgent: FEED_USER_AGENT
+  });
+  return JSON.parse(new TextDecoder().decode(response.bytes));
 }
 
 class HackerNewsSource {
   id = "hackernews";
+  region = "global";
+  authorization = { basis: "official-api", note: "Algolia \u516C\u5F00\u53EA\u8BFB\u641C\u7D22 API\uFF0C\u65E0\u9700\u9274\u6743" };
   async fetch(query, limit = 20) {
     const base = "https://hn.algolia.com/api/v1/search";
     const params = new URLSearchParams;
@@ -39225,29 +39507,27 @@ class HackerNewsSource {
     }
     params.set("hitsPerPage", String(Math.max(1, Math.min(limit, 50))));
     try {
-      const res = await fetch(`${base}?${params.toString()}`, {
-        headers: { accept: "application/json" },
-        redirect: "error",
-        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)
-      });
-      if (!res.ok) {
-        return { signals: [], warnings: [`hackernews: HTTP ${res.status}`] };
-      }
-      const json = await readJsonResponse(res, this.id);
+      const json = await fetchFeedJson(`${base}?${params.toString()}`);
       const hits = Array.isArray(json.hits) ? json.hits : [];
       const capturedAt = new Date().toISOString();
-      const signals = hits.slice(0, limit).map((hit) => ({
-        id: `hackernews:${hit.objectID}`,
-        source: this.id,
-        title: hit.title ?? hit.story_title ?? "(untitled)",
-        url: hit.url ?? hit.story_url ?? `https://news.ycombinator.com/item?id=${hit.objectID}`,
-        hotScore: typeof hit.points === "number" ? hit.points : 0,
-        capturedAt
-      }));
-      return { signals, warnings: [] };
+      const signals = hits.slice(0, limit).map((hit) => {
+        const rawScore = typeof hit.points === "number" ? hit.points : null;
+        return {
+          id: `hackernews:${hit.objectID}`,
+          source: this.id,
+          title: hit.title ?? hit.story_title ?? "(untitled)",
+          url: hit.url ?? hit.story_url ?? `https://news.ycombinator.com/item?id=${hit.objectID}`,
+          hotScore: rawScore ?? 0,
+          rawScore,
+          scoreUnit: "points",
+          publishedAt: isoTimestampOrNull(hit.created_at),
+          eventAt: null,
+          capturedAt
+        };
+      });
+      return { signals: withSourceRanks(signals), warnings: [] };
     } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      return { signals: [], warnings: [`hackernews: fetch failed (${msg})`] };
+      return { signals: [], warnings: [feedWarning(this.id, e)] };
     }
   }
 }
@@ -39262,6 +39542,21 @@ function getByPath(obj, path) {
   }
   return cur;
 }
+function signalId(config2, item, index) {
+  if (config2.idPath) {
+    const declared = getByPath(item, config2.idPath);
+    if (typeof declared === "string" || typeof declared === "number") {
+      const value = String(declared).trim();
+      if (value)
+        return `${config2.id}:${value}`;
+    }
+  }
+  const url = getByPath(item, config2.urlPath);
+  if (typeof url === "string" && isSafeHttpUrl(url)) {
+    return `${config2.id}:url:${createHash3("sha256").update(canonicalUrlIdentity(url)).digest("hex").slice(0, 16)}`;
+  }
+  return `${config2.id}:index:${index}`;
+}
 function mapJsonFeedItems(config2, json, limit) {
   const items = getByPath(json, config2.itemsPath);
   if (!Array.isArray(items))
@@ -39274,16 +39569,21 @@ function mapJsonFeedItems(config2, json, limit) {
       continue;
     const url = getByPath(item, config2.urlPath);
     const score = getByPath(item, config2.scorePath);
+    const rawScore = typeof score === "number" ? score : null;
     signals.push({
-      id: `${config2.id}:${index}`,
+      id: signalId(config2, item, index),
       source: config2.id,
       title,
       url: typeof url === "string" && isSafeHttpUrl(url) ? url : config2.url,
-      hotScore: typeof score === "number" ? score : 0,
+      hotScore: rawScore ?? 0,
+      rawScore,
+      scoreUnit: config2.scoreUnit ?? null,
+      publishedAt: isoTimestampOrNull(getByPath(item, config2.publishedAtPath)),
+      eventAt: isoTimestampOrNull(getByPath(item, config2.eventAtPath)),
       capturedAt
     });
   }
-  return signals;
+  return withSourceRanks(signals);
 }
 
 class JsonFeedSource {
@@ -39294,24 +39594,22 @@ class JsonFeedSource {
   get id() {
     return this.config.id;
   }
+  get region() {
+    return this.config.region ?? "global";
+  }
+  get authorization() {
+    return this.config.authorization;
+  }
   async fetch(query, limit = 20) {
     const requestUrl = new URL(this.config.url);
     if (query && query.trim() && this.config.queryParam) {
       requestUrl.searchParams.set(this.config.queryParam, query.trim());
     }
     try {
-      const res = await fetch(requestUrl, {
-        headers: { accept: "application/json" },
-        redirect: "error",
-        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)
-      });
-      if (!res.ok)
-        return { signals: [], warnings: [`${this.id}: HTTP ${res.status}`] };
-      const json = await readJsonResponse(res, this.id);
+      const json = await fetchFeedJson(requestUrl.toString());
       return { signals: mapJsonFeedItems(this.config, json, limit), warnings: [] };
     } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      return { signals: [], warnings: [`${this.id}: fetch failed (${msg})`] };
+      return { signals: [], warnings: [feedWarning(this.id, e)] };
     }
   }
 }
@@ -39364,12 +39662,29 @@ function buildSources() {
         warnings.push(`sources.config.json: json-feed '${entry.id}' is disabled (${allowed.reason})`);
         continue;
       }
+      if ((entry.region ?? "global") === "cn" && !SOURCE_AUTHORIZATION_BASES.includes(entry.authorization?.basis)) {
+        warnings.push(`sources.config.json: json-feed '${entry.id}' \u88AB\u8DF3\u8FC7\uFF1A${CN_SOURCE_AUTHORIZATION_REQUIRED}`);
+        continue;
+      }
       sources[entry.id] = new JsonFeedSource(entry);
       continue;
     }
     warnings.push(`sources.config.json: '${entry.id}' has unsupported type; skipped`);
   }
   return { sources, warnings };
+}
+function describeSourceRegions(registry2) {
+  const cn = [];
+  const global = [];
+  for (const [id, source] of Object.entries(registry2)) {
+    if (source.region === "cn")
+      cn.push(id);
+    else
+      global.push(id);
+  }
+  cn.sort();
+  global.sort();
+  return { cn, global, cnConfigured: cn.length > 0 };
 }
 
 // src/tools/capabilities.ts
@@ -39384,7 +39699,11 @@ class IdentityError extends Error {
     this.code = code;
   }
 }
-var SERVICE_ACTOR_TOOLS = new Set(["mediaops.originality.scan", "mediaops.delivery.render"]);
+var SERVICE_ACTOR_TOOLS = new Set([
+  "mediaops.originality.scan",
+  "mediaops.delivery.render",
+  "mediaops.delivery.export_draft"
+]);
 var SERVICE_IMPORT_TOOL = "mediaops.content.save";
 var SERVICE_ACTOR = Object.freeze({
   principalId: "service",
@@ -39403,6 +39722,7 @@ var POLICIES = {
   "mediaops.originality.review": { role: "originality_reviewer", actorFields: ["reviewedBy"] },
   "mediaops.editorial.review": { role: "editorial_reviewer", actorFields: ["completedBy"] },
   "mediaops.delivery.render": { role: "renderer", actorFields: ["generatedBy"] },
+  "mediaops.delivery.export_draft": { role: "renderer", actorFields: ["exportedBy"] },
   "mediaops.delivery.verify": { role: "delivery_reviewer", actorFields: ["verifiedBy"] },
   "mediaops.profile.save": { role: "profile_editor", actorFields: ["confirmedBy"] },
   "mediaops.profile.rollback": { role: "profile_editor", actorFields: ["confirmedBy"] },
@@ -39587,8 +39907,10 @@ var STOP_CODES = Object.freeze([
 var name = "mediaops.capabilities";
 var description = "Report what this media-ops server can do: enabled platforms, available trend sources, and which dangerous capabilities are disabled.";
 var inputSchema = {};
+var CHINESE_HOT_SOURCES_UNCONFIGURED_NOTE = "\u672A\u914D\u7F6E\uFF1A\u4E2D\u6587\u5E73\u53F0\u63A5\u5165\u9700\u6709\u6388\u6743\u7684\u6765\u6E90\u3001\u7528\u6237\u81EA\u5907\u6570\u636E\u6216\u7814\u7A76\u4EE3\u7406\uFF08WebSearch/WebFetch\uFF09\uFF1B\u672C\u670D\u52A1\u4E0D\u6293\u53D6\u65E0\u5B98\u65B9 API \u7684\u5E73\u53F0\u3002";
 async function handler(_args = {}, principal) {
   const registry2 = buildSources();
+  const regions = describeSourceRegions(registry2.sources);
   const identity = describePrincipal(principal ?? null);
   return ok({
     version: VERSION,
@@ -39603,6 +39925,11 @@ async function handler(_args = {}, principal) {
       apiPublishGate: p2.apiPublishGate
     })),
     availableSources: Object.keys(registry2.sources),
+    chineseHotSources: {
+      configured: regions.cnConfigured,
+      sources: regions.cn,
+      note: regions.cnConfigured ? `\u5DF2\u914D\u7F6E\uFF1A${regions.cn.join(", ")}` : CHINESE_HOT_SOURCES_UNCONFIGURED_NOTE
+    },
     dangerousCapabilities: {
       publish: false,
       autoComment: false
@@ -39627,6 +39954,7 @@ async function handler(_args = {}, principal) {
       actorRoles: principal?.roles ?? [],
       defaultDeliveryFormat: "html",
       backupFormat: "markdown",
+      unapprovedDraftExport: "mediaops.delivery.export_draft \u2014 releaseStatus=unapproved, qaLevel=none, stored apart from delivery-manifests",
       deliveryCandidateFreeze: true,
       deliveryByteVerification: true,
       automaticBrowserVisualVerification: true,
@@ -39729,6 +40057,23 @@ async function handler2(_args = {}, principal) {
     }
     return { tool, role, readiness, ...blockedBy ? { blockedBy } : {}, ...hint ? { hint } : {} };
   });
+  const registry2 = buildSources();
+  const regions = describeSourceRegions(registry2.sources);
+  warnings.push(...registry2.warnings);
+  const sourceProbes = [
+    {
+      id: "chinese-hot-sources",
+      status: regions.cnConfigured ? "configured" : "not-configured",
+      sources: regions.cn,
+      detail: regions.cnConfigured ? `\u5DF2\u914D\u7F6E\uFF1A${regions.cn.join(", ")}` : CHINESE_HOT_SOURCES_UNCONFIGURED_NOTE
+    },
+    {
+      id: "global-hot-sources",
+      status: regions.global.length ? "configured" : "not-configured",
+      sources: regions.global,
+      detail: regions.global.length ? `\u5DF2\u914D\u7F6E\uFF1A${regions.global.join(", ")}` : "\u6CA1\u6709\u4EFB\u4F55\u5168\u7403\u6765\u6E90\u88AB\u6CE8\u518C\u3002"
+    }
+  ];
   const platforms = PLATFORMS.map((p2) => ({
     id: p2.id,
     displayName: p2.displayName,
@@ -39752,6 +40097,7 @@ async function handler2(_args = {}, principal) {
     },
     identity,
     qaReadiness,
+    sourceProbes,
     stages,
     platforms,
     summary: "Gate A: deterministic I/O only. No platform credentials configured; real publish APIs are disabled."
@@ -39777,18 +40123,116 @@ async function handler3() {
 // src/tools/trends.ts
 init_zod();
 var searchName = "mediaops.trends.search";
-var searchDescription = "Fetch hot-topic signals from registered free, no-auth sources (built-in examples plus <data>/sources.config.json entries). Does not call any LLM; pure feed retrieval. Sources without an official API belong to the trend-researcher agent, not here.";
+var searchDescription = "Fetch hot-topic signals from registered free, no-auth sources (built-in examples plus <data>/sources.config.json entries). Does not call any LLM; pure feed retrieval. Results are ordered by an explainable, deterministic pipeline and every signal carries the reasons for its position. Sources without an official API belong to the trend-researcher agent, not here.";
+var DEFAULT_MAX_AGE_HOURS = 72;
+var DUPLICATE_SIMILARITY_THRESHOLD = 0.3;
+var RECENCY_ORDER = { fresh: 0, unknown: 1, aged: 2 };
 var searchInputSchema = {
   query: exports_external.string().optional().describe("Optional keyword filter passed to sources that support search."),
   sources: exports_external.array(exports_external.string()).optional().describe("Source ids to query; defaults to all registered sources."),
-  limit: exports_external.number().int().positive().max(50).optional().describe("Max signals to return (default 20).")
+  limit: exports_external.number().int().positive().max(50).optional().describe("Max signals to return (default 20)."),
+  maxAgeHours: exports_external.number().positive().max(24 * 365).optional().describe('How old a signal may be and still count as fresh (default 72). Signals whose source gave no publication time stay "unknown"; capturedAt is never used as a publication time.')
 };
+var RANKING_RULES = Object.freeze([
+  "\u7B2C\u4E00\u6B65\uFF1A\u6BCF\u4E2A\u6765\u6E90\u5148\u6309\u5B83\u81EA\u5DF1\u7ED9\u51FA\u7684\u6E90\u5185\u540D\u6B21\uFF08sourceRank\uFF09\u6392\u597D\u81EA\u5DF1\u7684\u7ED3\u679C\u3002",
+  "\u7B2C\u4E8C\u6B65\uFF1A\u6807\u9898\u9AD8\u5EA6\u76F8\u4F3C\u7684\u4FE1\u53F7\u5F52\u4E3A\u540C\u4E00\u4E8B\u4EF6\uFF0C\u53EA\u6709\u4EE3\u8868\u53C2\u4E0E\u540E\u7EED\u6392\u5E8F\uFF0C\u5176\u4F59\u6210\u5458\u7D27\u8DDF\u4EE3\u8868\u5E76\u6807\u6CE8 duplicateOf\u3002",
+  "\u7B2C\u4E09\u6B65\uFF1A\u7ED9\u4E86 query \u65F6\uFF0C\u6309\u6807\u9898\u547D\u4E2D\u67E5\u8BE2\u8BCD\u7684\u6BD4\u4F8B\uFF08queryMatch\uFF09\u4ECE\u9AD8\u5230\u4F4E\u3002",
+  "\u7B2C\u56DB\u6B65\uFF1A\u518D\u6309\u53D1\u5E03\u65F6\u6548\u5206\u6876\u2014\u2014maxAgeHours \u4E4B\u5185\u4E3A fresh\uFF0C\u6765\u6E90\u672A\u7ED9\u53D1\u5E03\u65F6\u95F4\u4E3A unknown\uFF0C\u66F4\u65E9\u4E3A aged\uFF1B\u987A\u5E8F\u4E3A fresh\u3001unknown\u3001aged\u3002",
+  "\u7B2C\u4E94\u6B65\uFF1A\u4ECD\u7136\u5E76\u5217\u65F6\uFF0C\u6309\u5404\u6765\u6E90\u7684\u6E90\u5185\u540D\u6B21\u8F6E\u8F6C\u4EA4\u9519\uFF0C\u6765\u6E90\u987A\u5E8F\u5373\u8BF7\u6C42\u6216\u6CE8\u518C\u987A\u5E8F\u3002"
+]);
+function interleaveGroups(groups, sourceOf, rankOf, sourceOrder) {
+  const perSource = new Map;
+  for (const item of groups) {
+    const list5 = perSource.get(sourceOf(item));
+    if (list5)
+      list5.push(item);
+    else
+      perSource.set(sourceOf(item), [item]);
+  }
+  for (const list5 of perSource.values())
+    list5.sort((left, right) => rankOf(left) - rankOf(right));
+  const queues = sourceOrder.map((id) => perSource.get(id)).filter((queue) => Boolean(queue?.length));
+  const merged = [];
+  const deepest = Math.max(0, ...queues.map((queue) => queue.length));
+  for (let position3 = 0;position3 < deepest; position3++) {
+    for (const queue of queues) {
+      const item = queue[position3];
+      if (item)
+        merged.push(item);
+    }
+  }
+  return merged;
+}
+function queryMatchOf(query, title) {
+  if (!query || !query.trim())
+    return { ratio: null, hit: 0, total: 0 };
+  const queryTokens = tokenSet(query);
+  if (!queryTokens.size)
+    return { ratio: null, hit: 0, total: 0 };
+  const titleTokens = tokenSet(title);
+  let hit = 0;
+  for (const token of queryTokens)
+    if (titleTokens.has(token))
+      hit += 1;
+  return { ratio: Math.round(hit / queryTokens.size * 100) / 100, hit, total: queryTokens.size };
+}
+function recencyOf(signal, now, maxAgeHours) {
+  if (!signal.publishedAt)
+    return { recency: "unknown", ageHours: null };
+  const published = new Date(signal.publishedAt).getTime();
+  if (!Number.isFinite(published))
+    return { recency: "unknown", ageHours: null };
+  const ageHours = Math.round((now - published) / 3600000 * 100) / 100;
+  return { recency: ageHours <= maxAgeHours ? "fresh" : "aged", ageHours };
+}
+function recencyReason(recency, ageHours) {
+  if (recency === "unknown" || ageHours === null)
+    return "\u53D1\u5E03\u65F6\u95F4\u672A\u77E5";
+  if (ageHours < 0)
+    return "\u53D1\u5E03\u65F6\u95F4\u665A\u4E8E\u5F53\u524D\u65F6\u949F";
+  return `\u53D1\u5E03\u4E8E ${Math.round(ageHours)} \u5C0F\u65F6\u524D`;
+}
+function groupSameEvent(signals) {
+  const groups = [];
+  for (const signal of signals) {
+    const tokens = tokenSet(signal.title);
+    const existing = groups.find((group) => similarity(tokens, group.tokens) >= DUPLICATE_SIMILARITY_THRESHOLD);
+    if (existing)
+      existing.members.push(signal);
+    else
+      groups.push({ members: [signal], tokens });
+  }
+  return groups.map(({ members }) => {
+    const byPreference = [...members].sort((left, right) => {
+      const leftTime = left.publishedAt ? new Date(left.publishedAt).getTime() : null;
+      const rightTime = right.publishedAt ? new Date(right.publishedAt).getTime() : null;
+      if (leftTime !== null && rightTime !== null && leftTime !== rightTime)
+        return rightTime - leftTime;
+      if (leftTime !== null && rightTime === null)
+        return -1;
+      if (leftTime === null && rightTime !== null)
+        return 1;
+      return left.ranking.sourceRank - right.ranking.sourceRank;
+    });
+    const [representative, ...rest] = byPreference;
+    for (const member of rest) {
+      member.ranking.duplicateOf = representative.id;
+      member.ranking.reasons.push(`\u4E0E ${representative.id} \u4E3A\u540C\u4E00\u4E8B\u4EF6`);
+    }
+    return { representative, members: rest.sort((left, right) => left.ranking.sourceRank - right.ranking.sourceRank) };
+  });
+}
 async function searchHandler(args) {
   const limit = args.limit ?? 20;
+  const maxAgeHours = args.maxAgeHours ?? DEFAULT_MAX_AGE_HOURS;
   const registry2 = buildSources();
+  const regions = describeSourceRegions(registry2.sources);
   const wanted = args.sources && args.sources.length ? args.sources : Object.keys(registry2.sources);
   const warnings = [...registry2.warnings];
-  const signals = [];
+  const sourceOrder = [];
+  const collected = [];
+  const now = Date.now();
+  const hasQuery = Boolean(args.query && args.query.trim());
   for (const id of wanted) {
     const source = registry2.sources[id];
     if (!source) {
@@ -39797,14 +40241,49 @@ async function searchHandler(args) {
     }
     try {
       const result = await source.fetch(args.query, limit);
-      signals.push(...result.signals);
+      sourceOrder.push(id);
       warnings.push(...result.warnings);
+      for (const signal of [...result.signals].sort((left, right) => left.sourceRank - right.sourceRank)) {
+        const match = queryMatchOf(args.query, signal.title);
+        const { recency, ageHours } = recencyOf(signal, now, maxAgeHours);
+        const reasons = [];
+        if (match.ratio !== null)
+          reasons.push(`\u67E5\u8BE2\u8BCD\u547D\u4E2D ${match.hit}/${match.total}`);
+        reasons.push(recencyReason(recency, ageHours));
+        reasons.push(`${signal.source} \u6E90\u5185\u7B2C ${signal.sourceRank} \u540D`);
+        collected.push({ ...signal, ranking: { queryMatch: match.ratio, recency, ageHours, sourceRank: signal.sourceRank, duplicateOf: null, reasons } });
+      }
     } catch (error2) {
       warnings.push(`${id}: ${error2 instanceof Error ? error2.message : String(error2)}`);
     }
   }
-  signals.sort((a, b) => b.hotScore - a.hotScore);
-  const data = { count: signals.length, signals: signals.slice(0, limit) };
+  const groups = groupSameEvent(collected);
+  const bucketed = new Map;
+  for (const group of groups) {
+    const match = hasQuery ? group.representative.ranking.queryMatch ?? 0 : 0;
+    const key2 = `${(1 - match).toFixed(2)}|${RECENCY_ORDER[group.representative.ranking.recency]}`;
+    const list5 = bucketed.get(key2);
+    if (list5)
+      list5.push(group);
+    else
+      bucketed.set(key2, [group]);
+  }
+  const signals = [];
+  for (const key2 of [...bucketed.keys()].sort()) {
+    const ordered = interleaveGroups(bucketed.get(key2) ?? [], (group) => group.representative.source, (group) => group.representative.ranking.sourceRank, sourceOrder);
+    for (const group of ordered)
+      signals.push(group.representative, ...group.members);
+  }
+  if (/[\u3400-\u9FFF]/u.test(args.query ?? "") && !regions.cnConfigured) {
+    warnings.push(`\u4E2D\u6587\u70ED\u70B9\u6E90\u672A\u914D\u7F6E\uFF1A\u7ED3\u679C\u53EA\u6765\u81EA ${regions.global.join("\u3001") || "\uFF08\u65E0\u5DF2\u6CE8\u518C\u6765\u6E90\uFF09"}\uFF0C\u4E0D\u80FD\u4EE3\u8868\u4E2D\u6587\u5E73\u53F0\u70ED\u5EA6`);
+  }
+  const data = {
+    count: signals.length,
+    ordering: "explainable@1",
+    rules: RANKING_RULES,
+    maxAgeHours,
+    signals: signals.slice(0, limit)
+  };
   return signals.length ? ok(data, warnings) : actionRequired(data, [...warnings, "No usable trend signals were retrieved; do not treat this as completed web research."]);
 }
 var clusterName = "mediaops.trends.cluster";
@@ -39816,6 +40295,12 @@ var clusterInputSchema = {
     title: exports_external.string(),
     url: exports_external.string().optional(),
     hotScore: exports_external.number().optional(),
+    rawScore: exports_external.number().nullable().optional(),
+    scoreUnit: exports_external.string().nullable().optional(),
+    sourceRank: exports_external.number().optional(),
+    publishedAt: exports_external.string().nullable().optional(),
+    eventAt: exports_external.string().nullable().optional(),
+    ranking: exports_external.any().optional(),
     capturedAt: exports_external.string().optional()
   })).describe("Topic signals to cluster (typically the output of mediaops.trends.search).")
 };
@@ -39890,7 +40375,7 @@ async function clusterHandler(args) {
 
 // src/tools/content.ts
 init_zod();
-import { createHash as createHash5, randomUUID as randomUUID7 } from "crypto";
+import { createHash as createHash6, randomUUID as randomUUID7 } from "crypto";
 import { lstat, readFile as readFile2, realpath } from "fs/promises";
 import { isAbsolute, relative, resolve } from "path";
 init_domain();
@@ -39902,7 +40387,7 @@ import { randomUUID as randomUUID6 } from "crypto";
 init_domain();
 
 // src/factual-integrity.ts
-import { createHash as createHash3 } from "crypto";
+import { createHash as createHash4 } from "crypto";
 var PREDICATES = [
   ["increase", /\u589E\u957F|\u4E0A\u6DA8|\u4E0A\u5347|\u589E\u52A0|\u63D0\u5347|\u6269\u5927|\u6500\u5347|\u7FFB\u756A|\u540C\u6BD4\u589E|\u73AF\u6BD4\u589E|\bincreas(?:e|ed|ing)\b|\bgrow(?:s|th|n|ing)?\b|\brose\b/i],
   ["decrease", /\u4E0B\u964D|\u4E0B\u8DCC|\u51CF\u5C11|\u964D\u4F4E|\u6536\u7F29|\u4E0B\u6ED1|\u540C\u6BD4\u964D|\u73AF\u6BD4\u964D|\bdecreas(?:e|ed|ing)\b|\bdeclin(?:e|ed|ing)\b|\bfell\b/i],
@@ -40014,7 +40499,7 @@ function extractVerifiableStatements(input) {
   for (const [location, value] of locations) {
     for (const [ordinal, text8] of sentenceParts(value).entries()) {
       const signals = statementSignals(text8);
-      const statementId = createHash3("sha256").update(JSON.stringify({ location, ordinal, text: normalizeText(text8) })).digest("hex");
+      const statementId = createHash4("sha256").update(JSON.stringify({ location, ordinal, text: normalizeText(text8) })).digest("hex");
       output.push({ statementId, location, ordinal, text: text8, signals });
     }
   }
@@ -40614,11 +41099,7 @@ import { randomUUID as randomUUID5 } from "crypto";
 init_domain();
 
 // src/tools/research-capture.ts
-import { createHash as createHash4, randomUUID as randomUUID4 } from "crypto";
-import { lookup } from "dns/promises";
-import { request as httpRequest } from "http";
-import { request as httpsRequest } from "https";
-import { BlockList, isIP } from "net";
+import { createHash as createHash5, randomUUID as randomUUID4 } from "crypto";
 
 // node_modules/unist-util-find-after/lib/index.js
 init_unist_util_is();
@@ -49251,6 +49732,9 @@ init_domain();
 var MAX_CAPTURE_BYTES = 2000000;
 var MAX_REDIRECTS = 5;
 var FETCH_TIMEOUT_MS2 = 12000;
+var CAPTURE_ACCEPT = "text/html, text/plain, application/json, application/xhtml+xml;q=0.9";
+var CAPTURE_USER_AGENT = "CrabCode-MediaOps/0.4 evidence-capture";
+var CAPTURE_CONTENT_TYPES = /^(?:text\/(?:html|plain)|application\/(?:json|xhtml\+xml))$/;
 var captureSchema = exports_external.object({ url: SafeHttpUrlSchema, capturedBy: exports_external.string().min(1) });
 var name4 = "mediaops.research.capture";
 var description4 = "Fetch one public HTTP(S) evidence page under SSRF, redirect, timeout, MIME and byte limits. Returns hash-bound capture metadata; research.complete accepts only these server-generated captures.";
@@ -49297,197 +49781,16 @@ function visibleSnapshot(bytes, contentType) {
   }
   throw new Error(`unsupported content type ${contentType || "(missing)"}`);
 }
-var forbiddenV4 = new BlockList;
-for (const [base2, prefix] of [
-  ["0.0.0.0", 8],
-  ["10.0.0.0", 8],
-  ["100.64.0.0", 10],
-  ["127.0.0.0", 8],
-  ["169.254.0.0", 16],
-  ["172.16.0.0", 12],
-  ["192.0.0.0", 24],
-  ["192.0.2.0", 24],
-  ["192.168.0.0", 16],
-  ["198.18.0.0", 15],
-  ["198.51.100.0", 24],
-  ["203.0.113.0", 24],
-  ["224.0.0.0", 4],
-  ["240.0.0.0", 4]
-])
-  forbiddenV4.addSubnet(base2, prefix, "ipv4");
-var globalV6 = new BlockList;
-globalV6.addSubnet("2000::", 3, "ipv6");
-var forbiddenV6 = new BlockList;
-for (const [base2, prefix] of [
-  ["2001::", 23],
-  ["2001:db8::", 32],
-  ["2002::", 16],
-  ["3fff::", 20]
-])
-  forbiddenV6.addSubnet(base2, prefix, "ipv6");
-function forbiddenIp(value) {
-  if (isIP(value) === 4)
-    return forbiddenV4.check(value, "ipv4");
-  if (isIP(value) === 6)
-    return !globalV6.check(value, "ipv6") || forbiddenV6.check(value, "ipv6");
-  return true;
-}
-function remainingTime(deadline) {
-  const remaining = deadline - Date.now();
-  if (remaining <= 0)
-    throw new Error(`capture deadline ${FETCH_TIMEOUT_MS2}ms exceeded`);
-  return remaining;
-}
-async function deadlineBound(promise2, deadline) {
-  const remaining = remainingTime(deadline);
-  let timer;
-  try {
-    return await Promise.race([
-      promise2,
-      new Promise((_, reject) => {
-        timer = setTimeout(() => reject(new Error(`capture deadline ${FETCH_TIMEOUT_MS2}ms exceeded`)), remaining);
-      })
-    ]);
-  } finally {
-    if (timer)
-      clearTimeout(timer);
-  }
-}
-function normalizedHostname(url) {
-  return url.hostname.toLowerCase().replace(/^\[|\]$/g, "").replace(/\.$/, "");
-}
-async function assertPublicUrl(value, deadline) {
-  const url = new URL(value);
-  if (!["http:", "https:"].includes(url.protocol))
-    throw new Error("only HTTP(S) evidence URLs are allowed");
-  if (url.username || url.password)
-    throw new Error("URL credentials are not allowed");
-  if (url.protocol === "http:" && url.port && url.port !== "80" || url.protocol === "https:" && url.port && url.port !== "443") {
-    throw new Error("custom network ports are not allowed");
-  }
-  const hostname2 = normalizedHostname(url);
-  if (!hostname2 || hostname2 === "localhost" || hostname2.endsWith(".localhost") || hostname2.endsWith(".local") || hostname2.endsWith(".internal") || hostname2.endsWith(".lan") || hostname2.endsWith(".home")) {
-    throw new Error("local/internal hostnames are not allowed");
-  }
-  if (isIP(hostname2)) {
-    if (forbiddenIp(hostname2))
-      throw new Error(`non-public address ${hostname2} is not allowed`);
-    url.hash = "";
-    return { url, addresses: [{ address: hostname2, family: isIP(hostname2) }] };
-  } else {
-    const resolved = await deadlineBound(lookup(hostname2, { all: true, verbatim: true }), deadline);
-    if (!resolved.length || resolved.some(({ address }) => forbiddenIp(address)))
-      throw new Error(`hostname ${hostname2} did not resolve exclusively to public addresses`);
-    const addresses = resolved.filter((item) => item.family === 4 || item.family === 6).sort((left, right) => left.family - right.family || (left.address < right.address ? -1 : left.address > right.address ? 1 : 0));
-    if (!addresses.length)
-      throw new Error(`hostname ${hostname2} has no usable IPv4/IPv6 address`);
-    url.hash = "";
-    return { url, addresses };
-  }
-}
-function normalizeRemoteAddress(value) {
-  return value.toLowerCase().replace(/^::ffff:/, "");
-}
-function readLimitedBody(response, deadline) {
-  const declared = Number(response.headers["content-length"] ?? 0);
-  if (Number.isFinite(declared) && declared > MAX_CAPTURE_BYTES)
-    throw new Error(`response exceeds ${MAX_CAPTURE_BYTES} bytes`);
-  return deadlineBound(new Promise((resolve, reject) => {
-    const chunks = [];
-    let total = 0;
-    response.on("data", (chunk) => {
-      const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-      total += bytes.byteLength;
-      if (total > MAX_CAPTURE_BYTES) {
-        response.destroy(new Error(`response exceeds ${MAX_CAPTURE_BYTES} bytes`));
-        return;
-      }
-      chunks.push(bytes);
-    });
-    response.once("end", () => resolve(new Uint8Array(Buffer.concat(chunks, total))));
-    response.once("error", reject);
-  }), deadline);
-}
-function firstHeader(headers, name5) {
-  const value = headers[name5];
-  return Array.isArray(value) ? value[0] ?? "" : value ?? "";
-}
-async function requestPinned(target, deadline) {
-  const selected = target.addresses[0];
-  const request = target.url.protocol === "https:" ? httpsRequest : httpRequest;
-  return deadlineBound(new Promise((resolve, reject) => {
-    const req = request(pinnedRequestOptions(target));
-    const timer = setTimeout(() => req.destroy(new Error(`capture deadline ${FETCH_TIMEOUT_MS2}ms exceeded`)), remainingTime(deadline));
-    req.once("response", (response) => {
-      clearTimeout(timer);
-      const remote = response.socket.remoteAddress;
-      if (remote && (normalizeRemoteAddress(remote) !== normalizeRemoteAddress(selected.address) || forbiddenIp(remote))) {
-        response.destroy();
-        reject(new Error(`connected address ${remote} does not match vetted address ${selected.address}`));
-        return;
-      }
-      resolve({ response, connectedAddress: remote ?? selected.address, resolvedAddresses: target.addresses.map((item) => item.address) });
-    });
-    req.once("error", (error2) => {
-      clearTimeout(timer);
-      reject(error2);
-    });
-    req.end();
-  }), deadline);
-}
-function pinnedRequestOptions(target) {
-  const selected = target.addresses[0];
-  const authorityHostname = normalizedHostname(target.url);
-  return {
-    protocol: target.url.protocol,
-    hostname: selected.address,
-    port: target.url.port || (target.url.protocol === "https:" ? 443 : 80),
-    path: `${target.url.pathname}${target.url.search}`,
-    method: "GET",
-    headers: {
-      host: target.url.host,
-      accept: "text/html, text/plain, application/json, application/xhtml+xml;q=0.9",
-      "accept-encoding": "identity",
-      "user-agent": "CrabCode-MediaOps/0.4 evidence-capture"
-    },
-    ...target.url.protocol === "https:" && !isIP(authorityHostname) ? { servername: authorityHostname } : {}
-  };
-}
 async function fetchCapture(requestedUrl) {
-  const deadline = Date.now() + FETCH_TIMEOUT_MS2;
-  let current = await assertPublicUrl(requestedUrl, deadline);
-  for (let redirect = 0;redirect <= MAX_REDIRECTS; redirect++) {
-    const { response, connectedAddress, resolvedAddresses } = await requestPinned(current, deadline);
-    const status = response.statusCode ?? 0;
-    if (status >= 300 && status < 400) {
-      response.resume();
-      if (redirect === MAX_REDIRECTS)
-        throw new Error(`redirect limit ${MAX_REDIRECTS} exceeded`);
-      const location2 = firstHeader(response.headers, "location");
-      if (!location2)
-        throw new Error(`redirect HTTP ${status} has no Location header`);
-      current = await assertPublicUrl(new URL(location2, current.url).toString(), deadline);
-      continue;
-    }
-    if (status < 200 || status > 299) {
-      response.resume();
-      throw new Error(`source returned HTTP ${status}`);
-    }
-    const contentType = firstHeader(response.headers, "content-type").split(";", 1)[0].trim().toLowerCase();
-    if (!/^(?:text\/(?:html|plain)|application\/(?:json|xhtml\+xml))$/.test(contentType)) {
-      response.resume();
-      throw new Error(`unsupported content type ${contentType || "(missing)"}`);
-    }
-    return {
-      finalUrl: current.url.toString(),
-      status,
-      contentType,
-      bytes: await readLimitedBody(response, deadline),
-      connectedAddress,
-      resolvedAddresses
-    };
-  }
-  throw new Error("unreachable redirect state");
+  return fetchPinned({
+    url: requestedUrl,
+    timeoutMs: FETCH_TIMEOUT_MS2,
+    maxBytes: MAX_CAPTURE_BYTES,
+    maxRedirects: MAX_REDIRECTS,
+    accept: CAPTURE_ACCEPT,
+    acceptContentTypes: CAPTURE_CONTENT_TYPES,
+    userAgent: CAPTURE_USER_AGENT
+  });
 }
 async function handler4(args) {
   const parsed = captureSchema.safeParse(args);
@@ -49517,7 +49820,7 @@ async function handler4(args) {
     contentType: fetched.contentType,
     snapshotText,
     snapshotHash: stableHash(snapshotText),
-    contentHash: createHash4("sha256").update(fetched.bytes).digest("hex"),
+    contentHash: createHash5("sha256").update(fetched.bytes).digest("hex"),
     byteSize: fetched.bytes.byteLength,
     connectedAddress: fetched.connectedAddress,
     resolvedAddresses: fetched.resolvedAddresses,
@@ -50379,7 +50682,7 @@ async function freezeAssetMetadata(input) {
     ...input,
     path: candidate,
     assetId: randomUUID7(),
-    sha256: createHash5("sha256").update(bytes).digest("hex"),
+    sha256: createHash6("sha256").update(bytes).digest("hex"),
     byteSize: bytes.length,
     mediaType,
     registeredAt: new Date().toISOString()
@@ -50630,7 +50933,7 @@ async function listHandler(args) {
 
 // src/tools/delivery.ts
 init_zod();
-import { createHash as createHash7, randomUUID as randomUUID8 } from "crypto";
+import { createHash as createHash8, randomUUID as randomUUID8 } from "crypto";
 import { copyFile, lstat as lstat2, mkdir as mkdir4, readFile as readFile5, realpath as realpath3, rename, rm as rm2, writeFile as writeFile5 } from "fs/promises";
 import { basename, isAbsolute as isAbsolute3, join as join7, relative as relative4, resolve as resolve5 } from "path";
 init_domain();
@@ -50744,7 +51047,7 @@ var verifyName = "mediaops.delivery.verify";
 var verifyDescription = "Re-read and regenerate a frozen delivery candidate, verify every byte/hash/security/semantic invariant, and bind named multi-viewport visual evidence. Approval requires this verified manifest.";
 var verifyInputSchema = verifySchema.shape;
 function sha256(bytes) {
-  return createHash7("sha256").update(bytes).digest("hex");
+  return createHash8("sha256").update(bytes).digest("hex");
 }
 function deliveryHashPayload(manifest) {
   return { ...manifest };
@@ -51172,6 +51475,14 @@ async function verifyHandler(args) {
   return data.verified ? ok(data, storageWarnings()) : actionRequired(data, storageWarnings());
 }
 
+// src/tools/draft-export.ts
+init_zod();
+import { createHash as createHash9, randomUUID as randomUUID10 } from "crypto";
+import { copyFile as copyFile2, lstat as lstat3, mkdir as mkdir5, readFile as readFile7, rename as rename3, rm as rm3, writeFile as writeFile7 } from "fs/promises";
+import { basename as basename2, join as join9 } from "path";
+init_domain();
+init_renderer();
+
 // src/tools/profiles.ts
 init_zod();
 init_domain();
@@ -51471,58 +51782,12 @@ async function rollbackHandler(args) {
   return ok({ brandId: args.brandId, profileVersion: profile.profile_version, rolledBackFrom: args.targetVersion }, profileStorageWarnings());
 }
 
-// src/tools/preview.ts
-init_zod();
-import { join as join9 } from "path";
-init_article_doc();
-var name7 = "mediaops.preview.create";
-var description7 = "Return the exact verified HTML-primary delivery candidate for preview. It never rerenders or creates an approval-divergent preview.";
-var inputSchema7 = {
-  contentId: exports_external.string().uuid(),
-  platform: exports_external.enum(["wechat", "xhs", "toutiao"]).optional()
-};
-async function handler7(args) {
-  const content3 = await getLatestContent(args.contentId);
-  if (!content3)
-    return err("NOT_FOUND", `No content ${args.contentId}.`);
-  if (!("schemaVersion" in content3) || content3.schemaVersion !== 2)
-    return err("SCHEMA_UPGRADE_REQUIRED", "Legacy content has no verified HTML delivery candidate.");
-  if (args.platform && content3.platform && args.platform !== content3.platform)
-    return err("PACKAGE_INPUT_MISMATCH", `Content targets ${content3.platform}, not ${args.platform}.`);
-  const delivery = await getLatestVerifiedDelivery(content3.contentId, content3.revisionId);
-  if (!delivery || delivery.contentHash !== content3.contentHash || delivery.articleDocHash !== content3.articleDocHash) {
-    return err("DELIVERY_VERIFICATION_REQUIRED", "Render and verify the exact reviewed revision before preview.");
-  }
-  try {
-    await verifyDeliveryBytes(delivery);
-  } catch (error2) {
-    return err("DELIVERY_INTEGRITY_FAILED", error2 instanceof Error ? error2.message : String(error2));
-  }
-  const plain = bodyPlainText(content3.articleDoc);
-  const summary = content3.summary ?? (plain.length > 280 ? `${plain.slice(0, 280)}\u2026` : plain);
-  return ok({
-    id: delivery.deliveryId,
-    path: join9(delivery.artifactRoot, delivery.primaryArtifact.relativePath),
-    format: "html",
-    role: "primary",
-    backupPath: join9(delivery.artifactRoot, delivery.backupArtifact.relativePath),
-    backupFormat: "markdown",
-    summary,
-    contentId: content3.contentId,
-    revisionId: content3.revisionId,
-    contentHash: content3.contentHash,
-    articleDocHash: content3.articleDocHash,
-    renderManifestHash: delivery.renderManifestHash,
-    primaryArtifactHash: delivery.primaryArtifact.artifactHash,
-    platform: args.platform ?? content3.platform ?? null
-  }, storageWarnings());
-}
-
 // src/tools/readiness.ts
 init_zod();
-var name8 = "mediaops.readiness.inspect";
-var description8 = "Run the fail-closed Media Gate against tool-generated, hash-bound research, originality, editorial and verified HTML-delivery records for the latest v2 revision.";
-var inputSchema8 = {
+init_domain();
+var name7 = "mediaops.readiness.inspect";
+var description7 = "Run the fail-closed Media Gate against tool-generated, hash-bound research, originality, editorial and verified HTML-delivery records for the latest v2 revision.";
+var inputSchema7 = {
   contentId: exports_external.string().uuid(),
   platform: exports_external.enum(["wechat", "xhs", "toutiao"]).optional()
 };
@@ -51532,17 +51797,7 @@ function isV22(content3) {
 function daysBetween(now, thenIso) {
   return (now.getTime() - new Date(thenIso).getTime()) / 86400000;
 }
-function citationUrlIdentity(value) {
-  const url = new URL(value);
-  url.hash = "";
-  url.hostname = url.hostname.toLowerCase();
-  if (url.protocol === "https:" && url.port === "443" || url.protocol === "http:" && url.port === "80")
-    url.port = "";
-  if (url.pathname.length > 1)
-    url.pathname = url.pathname.replace(/\/+$/, "");
-  url.searchParams.sort();
-  return url.toString();
-}
+var citationUrlIdentity = canonicalUrlIdentity;
 function addStructuralIssues(content3, platform, issues) {
   const severity = platform.rules.some((rule) => rule.ruleType !== "editorial-guidance") ? "error" : "warning";
   const titleLength = [...content3.title].length;
@@ -51696,7 +51951,7 @@ ${content3.bodyMarkdown}`;
   }
   return issues;
 }
-async function handler8(args) {
+async function handler7(args) {
   const content3 = await getLatestContent(args.contentId);
   if (!content3)
     return err("NOT_FOUND", `No content ${args.contentId}.`);
@@ -51726,9 +51981,282 @@ async function handler8(args) {
   return data.ready ? ok(data) : actionRequired(data);
 }
 
+// src/tools/draft-export.ts
+var DRAFT_EXPORT_NOTICE_HTML = '<p class="draft-export-notice">\u8349\u7A3F\u5BFC\u51FA\uFF08\u672A\u6279\u51C6\uFF09\uFF1A\u672C\u6587\u4EF6\u672A\u7ECF\u5BA1\u6279\u3001\u672A\u7ECF\u4EA4\u4ED8 QA\uFF0C\u4E0D\u662F\u4EA4\u4ED8\u5019\u9009\uFF0C\u4E0D\u80FD\u7528\u4E8E\u53D1\u5E03\u6216\u5BF9\u5916\u5206\u53D1\u3002</p>';
+var DRAFT_EXPORT_NOTICE_MARKDOWN = "> \u8349\u7A3F\u5BFC\u51FA\uFF08\u672A\u6279\u51C6\uFF09\uFF1A\u672C\u6587\u4EF6\u672A\u7ECF\u5BA1\u6279\u3001\u672A\u7ECF\u4EA4\u4ED8 QA\uFF0C\u4E0D\u662F\u4EA4\u4ED8\u5019\u9009\uFF0C\u4E0D\u80FD\u7528\u4E8E\u53D1\u5E03\u6216\u5BF9\u5916\u5206\u53D1\u3002";
+var DRAFT_EXPORTS_DIRECTORY = "draft-exports";
+var draftExportSchema = exports_external.object({
+  contentId: exports_external.string().uuid(),
+  revisionId: exports_external.string().uuid().optional(),
+  platform: exports_external.enum(["wechat", "xhs", "toutiao"]).optional(),
+  exportedBy: exports_external.string().min(1)
+});
+var exportDraftName = "mediaops.delivery.export_draft";
+var exportDraftDescription = "Export an openable HTML/Markdown draft of any content revision at any stage (intake through reviewed). This is NOT a delivery candidate: the export is written to a separate draft-exports directory and collection, is marked releaseStatus=unapproved / qaLevel=none, never enters approval and cannot advance any governed state. Use it in single-person local-editorial mode to actually read your draft; the formal chain stays delivery.render/verify -> readiness.inspect -> approval -> publish.package. The response lists real governance state (bound/stale/missing) and the blockers that still stand.";
+var exportDraftInputSchema = draftExportSchema.shape;
+function sha2562(bytes) {
+  return createHash9("sha256").update(bytes).digest("hex");
+}
+function safeAssetName2(index2, path2) {
+  const normalized = basename2(path2).replace(/[^A-Za-z0-9._-]+/g, "-") || "asset";
+  return `${String(index2 + 1).padStart(3, "0")}-${normalized}`;
+}
+async function draftAssetBytes(content3) {
+  const frozen = [];
+  const rightsPending = [];
+  for (const [index2, asset] of content3.assets.entries()) {
+    if (asset.rightsStatus === "pending")
+      rightsPending.push(asset.assetId);
+    let stat2;
+    try {
+      stat2 = await lstat3(asset.path);
+    } catch (error2) {
+      throw new Error(`ASSET_INVALID:${asset.assetId}: ${error2 instanceof Error ? error2.message : String(error2)}`);
+    }
+    if (!stat2.isFile() || stat2.isSymbolicLink())
+      throw new Error(`ASSET_INVALID:${asset.assetId}`);
+    const bytes = await readFile7(asset.path);
+    if (bytes.byteLength !== asset.byteSize || sha2562(bytes) !== asset.sha256)
+      throw new Error(`ASSET_HASH_MISMATCH:${asset.assetId}`);
+    frozen.push({ asset, bytes, relativePath: `assets/${safeAssetName2(index2, asset.path)}` });
+  }
+  return { frozen, rightsPending };
+}
+function withDraftNoticeHtml(html7) {
+  const marker = "<body>";
+  const at = html7.indexOf(marker);
+  if (at < 0)
+    throw new Error("rendered draft HTML has no <body> element to mark as unapproved");
+  const marked = `${html7.slice(0, at + marker.length)}
+${DRAFT_EXPORT_NOTICE_HTML}${html7.slice(at + marker.length)}`;
+  assertSafeHtml(marked);
+  return marked;
+}
+function withDraftNoticeMarkdown(markdown) {
+  return `${DRAFT_EXPORT_NOTICE_MARKDOWN}
+
+${markdown}`;
+}
+function withDraftNoticeFragment(fragment) {
+  const marked = `${DRAFT_EXPORT_NOTICE_HTML}
+${fragment}`;
+  assertSafeHtml(marked);
+  return marked;
+}
+async function researchState(content3) {
+  if (!content3.researchId)
+    return "missing";
+  const research = await getResearchReview(content3.researchId);
+  return research && research.status === "completed" && research.contentId === content3.contentId && Boolean(content3.researchBundleHash) && research.researchBundleHash === content3.researchBundleHash ? "bound" : "stale";
+}
+async function originalityState(content3) {
+  if (!content3.originalityScanId)
+    return "missing";
+  const scan = await getOriginalityScan(content3.originalityScanId);
+  return scan && scan.contentId === content3.contentId && scan.subjectHash === content3.originalitySubjectHash && originalityScanPasses(scan) ? "bound" : "stale";
+}
+async function editorialState(content3) {
+  if (!content3.editorialReviewId)
+    return "missing";
+  const editorial = await getEditorialReview(content3.editorialReviewId);
+  return editorial && editorial.contentId === content3.contentId && editorial.subjectHash === content3.originalitySubjectHash && editorial.originalityScanId === content3.originalityScanId && editorial.factReview.researchBundleHash === content3.researchBundleHash ? "bound" : "stale";
+}
+async function describeGovernance(content3) {
+  const profile = await loadProfile(content3.brandId, content3.profileVersion);
+  const verified = await getLatestVerifiedDelivery(content3.contentId, content3.revisionId);
+  return {
+    research: await researchState(content3),
+    originalityScan: await originalityState(content3),
+    editorialReview: await editorialState(content3),
+    profile: profile ? profile.source : "missing",
+    verifiedDelivery: verified ? "present" : "none"
+  };
+}
+async function exportDraftHandler(args) {
+  const parsed = draftExportSchema.safeParse(args);
+  if (!parsed.success)
+    return err("INVALID_DRAFT_EXPORT_REQUEST", parsed.error.issues.map((issue2) => `${issue2.path.join(".")}: ${issue2.message}`).join("; "));
+  const input = parsed.data;
+  let content3;
+  try {
+    content3 = input.revisionId ? await getContentRevision(input.revisionId) : await getLatestContent(input.contentId);
+  } catch (error2) {
+    return err("INVALID_STORED_CONTENT", error2 instanceof Error ? error2.message : String(error2));
+  }
+  if (!content3)
+    return err("NOT_FOUND", input.revisionId ? `No content revision ${input.revisionId}.` : `No content ${input.contentId}.`);
+  if (content3.contentId !== input.contentId)
+    return err("PACKAGE_INPUT_MISMATCH", "contentId and revisionId do not match.");
+  if (!("schemaVersion" in content3) || content3.schemaVersion !== 2)
+    return err("SCHEMA_UPGRADE_REQUIRED", "Draft export requires schema-v2 content.");
+  let frozen;
+  let assetRightsPending;
+  try {
+    const resolved = await draftAssetBytes(content3);
+    frozen = resolved.frozen;
+    assetRightsPending = resolved.rightsPending;
+  } catch (error2) {
+    const message = error2 instanceof Error ? error2.message : String(error2);
+    return err(message.split(":")[0] || "ASSET_INVALID", message);
+  }
+  const assetMap = new Map(frozen.map(({ asset, relativePath }) => [asset.assetId, relativePath]));
+  let html7;
+  let markdown;
+  let wechatHtml;
+  try {
+    const rendered = renderArticle(content3.articleDoc, assetMap, {
+      contentId: content3.contentId,
+      revisionId: content3.revisionId,
+      articleDocHash: content3.articleDocHash
+    });
+    html7 = withDraftNoticeHtml(rendered.html);
+    markdown = withDraftNoticeMarkdown(rendered.markdown);
+    wechatHtml = withDraftNoticeFragment(rendered.wechatHtml);
+  } catch (error2) {
+    return err("DRAFT_EXPORT_RENDER_FAILED", error2 instanceof Error ? error2.message : String(error2));
+  }
+  const platformId = input.platform ?? content3.platform;
+  let blockers;
+  if (!platformId) {
+    blockers = [{
+      code: "PLATFORM_UNSPECIFIED",
+      severity: "error",
+      message: "No target platform is recorded or supplied, so platform limits and rule freshness were not evaluated for this draft."
+    }];
+  } else {
+    const platform = getPlatform(platformId);
+    if (!platform)
+      return err("UNKNOWN_PLATFORM", `Unknown platform '${platformId}'. Known: ${platformIds().join(", ")}`);
+    blockers = await inspectContent(content3, platform);
+  }
+  const governance = await describeGovernance(content3);
+  const exportId = randomUUID10();
+  const exportsRoot = join9(dataDir(), DRAFT_EXPORTS_DIRECTORY);
+  const exportRoot = join9(exportsRoot, exportId);
+  const temporaryRoot = join9(exportsRoot, `.tmp-${exportId}-${randomUUID10()}`);
+  await ensureDir(exportsRoot);
+  const primaryArtifact = artifact({ role: "primary", format: "html", mediaType: "text/html; charset=utf-8", relativePath: "article.html", bytes: html7, contentHash: content3.contentHash, renderProfile: "draft-web@1" });
+  const backupArtifact = artifact({ role: "backup", format: "markdown", mediaType: "text/markdown; charset=utf-8", relativePath: "article.md", bytes: markdown, contentHash: content3.contentHash, renderProfile: "draft-markdown@1" });
+  const channelArtifact = artifact({ role: "channel_variant", format: "html", mediaType: "text/html; charset=utf-8", relativePath: "wechat-richtext.html", bytes: wechatHtml, contentHash: content3.contentHash, renderProfile: "draft-wechat-richtext@1" });
+  const manifestAssets = frozen.map(({ asset, relativePath }) => ({ assetId: asset.assetId, relativePath, sha256: asset.sha256, byteSize: asset.byteSize, mediaType: asset.mediaType }));
+  const withoutHash = {
+    schemaVersion: "mediaops-draft-export@1",
+    exportId,
+    contentId: content3.contentId,
+    revisionId: content3.revisionId,
+    revision: content3.revision,
+    stage: content3.stage,
+    contentHash: content3.contentHash,
+    articleDocHash: content3.articleDocHash,
+    releaseStatus: "unapproved",
+    qaLevel: "none",
+    governance,
+    blockers,
+    assetRightsPending,
+    primaryArtifact,
+    backupArtifact,
+    channelArtifacts: [channelArtifact],
+    assets: manifestAssets,
+    rendererVersion: RENDER_CONTRACT.rendererVersion,
+    templateId: RENDER_CONTRACT.templateId,
+    exportedAt: new Date().toISOString(),
+    exportedBy: input.exportedBy,
+    exportRoot
+  };
+  const exportManifestHash = stableHash(withoutHash);
+  const manifest = DraftExportManifestSchema.parse({ ...withoutHash, exportManifestHash });
+  try {
+    await mkdir5(join9(temporaryRoot, "assets"), { recursive: true });
+    for (const item of frozen)
+      await copyFile2(item.asset.path, join9(temporaryRoot, item.relativePath));
+    await writeFile7(join9(temporaryRoot, primaryArtifact.relativePath), html7, "utf8");
+    await writeFile7(join9(temporaryRoot, backupArtifact.relativePath), markdown, "utf8");
+    await writeFile7(join9(temporaryRoot, channelArtifact.relativePath), wechatHtml, "utf8");
+    await writeFile7(join9(temporaryRoot, "draft-export-manifest.json"), JSON.stringify(manifest, null, 2) + `
+`, "utf8");
+    await rename3(temporaryRoot, exportRoot);
+  } catch (error2) {
+    await rm3(temporaryRoot, { recursive: true, force: true });
+    return err("DELIVERY_WRITE_FAILED", error2 instanceof Error ? error2.message : String(error2));
+  }
+  await appendRecordsAtomically([
+    { collection: "draft-exports", record: { id: exportId, ...manifest } },
+    { collection: "audit-events", record: {
+      event: "delivery.draft_exported",
+      exportId,
+      contentId: content3.contentId,
+      revisionId: content3.revisionId,
+      stage: content3.stage,
+      releaseStatus: "unapproved",
+      actor: input.exportedBy
+    } }
+  ]);
+  return ok({
+    exportId,
+    releaseStatus: "unapproved",
+    qaLevel: "none",
+    stage: content3.stage,
+    primaryPath: join9(exportRoot, primaryArtifact.relativePath),
+    backupPath: join9(exportRoot, backupArtifact.relativePath),
+    channelPath: join9(exportRoot, channelArtifact.relativePath),
+    exportRoot,
+    governance,
+    blockers,
+    assetRightsPending,
+    exportManifestHash
+  }, storageWarnings());
+}
+
+// src/tools/preview.ts
+init_zod();
+import { join as join10 } from "path";
+init_article_doc();
+var name8 = "mediaops.preview.create";
+var description8 = "Return the exact verified HTML-primary delivery candidate for preview. It never rerenders or creates an approval-divergent preview.";
+var inputSchema8 = {
+  contentId: exports_external.string().uuid(),
+  platform: exports_external.enum(["wechat", "xhs", "toutiao"]).optional()
+};
+async function handler8(args) {
+  const content3 = await getLatestContent(args.contentId);
+  if (!content3)
+    return err("NOT_FOUND", `No content ${args.contentId}.`);
+  if (!("schemaVersion" in content3) || content3.schemaVersion !== 2)
+    return err("SCHEMA_UPGRADE_REQUIRED", "Legacy content has no verified HTML delivery candidate.");
+  if (args.platform && content3.platform && args.platform !== content3.platform)
+    return err("PACKAGE_INPUT_MISMATCH", `Content targets ${content3.platform}, not ${args.platform}.`);
+  const delivery = await getLatestVerifiedDelivery(content3.contentId, content3.revisionId);
+  if (!delivery || delivery.contentHash !== content3.contentHash || delivery.articleDocHash !== content3.articleDocHash) {
+    return err("DELIVERY_VERIFICATION_REQUIRED", "Render and verify the exact reviewed revision before preview.");
+  }
+  try {
+    await verifyDeliveryBytes(delivery);
+  } catch (error2) {
+    return err("DELIVERY_INTEGRITY_FAILED", error2 instanceof Error ? error2.message : String(error2));
+  }
+  const plain = bodyPlainText(content3.articleDoc);
+  const summary = content3.summary ?? (plain.length > 280 ? `${plain.slice(0, 280)}\u2026` : plain);
+  return ok({
+    id: delivery.deliveryId,
+    path: join10(delivery.artifactRoot, delivery.primaryArtifact.relativePath),
+    format: "html",
+    role: "primary",
+    backupPath: join10(delivery.artifactRoot, delivery.backupArtifact.relativePath),
+    backupFormat: "markdown",
+    summary,
+    contentId: content3.contentId,
+    revisionId: content3.revisionId,
+    contentHash: content3.contentHash,
+    articleDocHash: content3.articleDocHash,
+    renderManifestHash: delivery.renderManifestHash,
+    primaryArtifactHash: delivery.primaryArtifact.artifactHash,
+    platform: args.platform ?? content3.platform ?? null
+  }, storageWarnings());
+}
+
 // src/tools/approval.ts
 init_zod();
-import { randomUUID as randomUUID10 } from "crypto";
+import { randomUUID as randomUUID11 } from "crypto";
 init_domain();
 var approvalSchema = exports_external.object({
   schemaVersion: exports_external.literal(3),
@@ -51858,7 +52386,7 @@ async function markApprovalPackaged(approvalId, expectedTransitionVersion, packa
   const transitionVersion = current.transitionVersion + 1;
   const record3 = projectApprovalPackaged(current, packageId, principal, options.packagedAt);
   await appendRecordsAtomically([
-    { collection: "approvals", record: { id: randomUUID10(), ...record3 }, guard: {
+    { collection: "approvals", record: { id: randomUUID11(), ...record3 }, guard: {
       entityKey: approvalId,
       expectedEntityVersion: expectedTransitionVersion,
       entityVersion: transitionVersion
@@ -51906,7 +52434,7 @@ async function requestHandler(args, principal) {
   } catch (error2) {
     return err("DELIVERY_INTEGRITY_FAILED", error2 instanceof Error ? error2.message : String(error2));
   }
-  const approvalId = randomUUID10();
+  const approvalId = randomUUID11();
   const binding = {
     contentId: content3.contentId,
     revisionId: content3.revisionId,
@@ -52019,7 +52547,7 @@ async function decideHandler(args, principal) {
     await appendRecordsAtomically([
       { collection: "approvals", record: {
         ...approvalData(current),
-        id: randomUUID10(),
+        id: randomUUID11(),
         createdAt: decidedAt,
         transitionVersion,
         state: args.decision,
@@ -52078,10 +52606,10 @@ async function listHandler3(args = {}) {
 
 // src/tools/package.ts
 init_zod();
-import { createHash as createHash8, randomUUID as randomUUID11 } from "crypto";
+import { createHash as createHash10, randomUUID as randomUUID12 } from "crypto";
 import { existsSync as existsSync5 } from "fs";
-import { copyFile as copyFile2, lstat as lstat3, mkdir as mkdir5, open, readFile as readFile7, readdir as readdir2, rename as rename3, rm as rm3, writeFile as writeFile7 } from "fs/promises";
-import { dirname as dirname2, join as join10 } from "path";
+import { copyFile as copyFile3, lstat as lstat4, mkdir as mkdir6, open, readFile as readFile8, readdir as readdir2, rename as rename4, rm as rm4, writeFile as writeFile8 } from "fs/promises";
+import { dirname as dirname2, join as join11 } from "path";
 init_domain();
 var name9 = "mediaops.publish.package";
 var description9 = "Recoverably copy an approved, verified and frozen delivery into a manual publish package. A DO-NOT-PUBLISH marker remains until approval, package state, history and audit commit atomically.";
@@ -52147,8 +52675,8 @@ class PackageLeaseLostError extends Error {
     this.name = "PackageLeaseLostError";
   }
 }
-function sha2562(bytes) {
-  return createHash8("sha256").update(bytes).digest("hex");
+function sha2563(bytes) {
+  return createHash10("sha256").update(bytes).digest("hex");
 }
 function operationBindingPayload(operation) {
   return {
@@ -52199,16 +52727,16 @@ function safeRelativePath(value) {
   return Boolean(value) && /^[A-Za-z0-9._/-]+$/.test(value) && !value.startsWith("/") && !value.includes(":") && value.split("/").every((part) => part && part !== "." && part !== "..");
 }
 async function walkTree(root5, relativeRoot = "") {
-  const absolute = relativeRoot ? join10(root5, relativeRoot) : root5;
-  const rootStat = await lstat3(absolute);
+  const absolute = relativeRoot ? join11(root5, relativeRoot) : root5;
+  const rootStat = await lstat4(absolute);
   if (rootStat.isSymbolicLink() || !rootStat.isDirectory())
     throw new Error(`package path ${absolute} is not a regular directory`);
   const files = [];
   const directories = [absolute];
   for (const entry of await readdir2(absolute, { withFileTypes: true })) {
     const relative5 = relativeRoot ? `${relativeRoot}/${entry.name}` : entry.name;
-    const path2 = join10(root5, relative5);
-    const stat2 = await lstat3(path2);
+    const path2 = join11(root5, relative5);
+    const stat2 = await lstat4(path2);
     if (stat2.isSymbolicLink())
       throw new Error(`package contains symbolic link ${relative5}`);
     if (stat2.isDirectory()) {
@@ -52233,7 +52761,7 @@ async function syncPath(path2) {
 async function syncTree(root5) {
   const tree = await walkTree(root5);
   for (const relativePath of tree.files)
-    await syncPath(join10(root5, relativePath));
+    await syncPath(join11(root5, relativePath));
   for (const directory of tree.directories.sort((left, right) => right.length - left.length))
     await syncPath(directory);
 }
@@ -52314,7 +52842,7 @@ function buildPackageDocuments(args) {
   return { files, packageManifest, approvalSnapshot, checklist: copyChecklist(args.platform.displayName) };
 }
 async function verifyPackageRoot(root5, delivery, operation, allowPendingMarker) {
-  const packageManifest = PackageManifestSchema.parse(JSON.parse(await readFile7(join10(root5, "package-manifest.json"), "utf8")));
+  const packageManifest = PackageManifestSchema.parse(JSON.parse(await readFile8(join11(root5, "package-manifest.json"), "utf8")));
   if (stableHash(packageManifest) !== operation.packageManifestHash)
     throw new Error("package manifest does not match the prepared operation binding");
   if (!Array.isArray(packageManifest.files) || packageManifest.files.some((file) => typeof file !== "string" || !safeRelativePath(file))) {
@@ -52324,37 +52852,37 @@ async function verifyPackageRoot(root5, delivery, operation, allowPendingMarker)
   const tree = await walkTree(root5);
   if (stableHash(tree.files) !== stableHash(expectedFiles))
     throw new Error("package filesystem inventory differs from the bound manifest");
-  const approvalSnapshot = JSON.parse(await readFile7(join10(root5, "approval.json"), "utf8"));
+  const approvalSnapshot = JSON.parse(await readFile8(join11(root5, "approval.json"), "utf8"));
   if (stableHash(approvalSnapshot) !== operation.approvalSnapshotHash)
     throw new Error("package approval snapshot differs from the prepared operation binding");
-  const checklist = await readFile7(join10(root5, "copy-checklist.md"), "utf8");
+  const checklist = await readFile8(join11(root5, "copy-checklist.md"), "utf8");
   if (stableHash(checklist) !== operation.copyChecklistHash)
     throw new Error("package copy checklist differs from the prepared operation binding");
-  const copiedDeliveryManifest = DeliveryManifestSchema.parse(JSON.parse(await readFile7(join10(root5, "delivery-manifest.json"), "utf8")));
+  const copiedDeliveryManifest = DeliveryManifestSchema.parse(JSON.parse(await readFile8(join11(root5, "delivery-manifest.json"), "utf8")));
   if (stableHash(copiedDeliveryManifest) !== stableHash(delivery))
     throw new Error("copied delivery manifest failed canonical hash verification");
   for (const item of [delivery.primaryArtifact, delivery.backupArtifact, ...delivery.channelArtifacts]) {
-    const bytes = await readFile7(join10(root5, item.relativePath));
-    if (bytes.byteLength !== item.byteSize || sha2562(bytes) !== item.artifactHash)
+    const bytes = await readFile8(join11(root5, item.relativePath));
+    if (bytes.byteLength !== item.byteSize || sha2563(bytes) !== item.artifactHash)
       throw new Error(`copied artifact ${item.artifactId} failed hash verification`);
   }
   for (const asset of delivery.assets) {
-    const bytes = await readFile7(join10(root5, asset.relativePath));
-    if (bytes.byteLength !== asset.byteSize || sha2562(bytes) !== asset.sha256)
+    const bytes = await readFile8(join11(root5, asset.relativePath));
+    if (bytes.byteLength !== asset.byteSize || sha2563(bytes) !== asset.sha256)
       throw new Error(`copied asset ${asset.assetId} failed hash verification`);
   }
   for (const qaArtifact of delivery.qaEvidence?.artifacts ?? []) {
-    const bytes = await readFile7(join10(root5, qaArtifact.relativePath));
-    if (bytes.byteLength !== qaArtifact.byteSize || sha2562(bytes) !== qaArtifact.sha256)
+    const bytes = await readFile8(join11(root5, qaArtifact.relativePath));
+    if (bytes.byteLength !== qaArtifact.byteSize || sha2563(bytes) !== qaArtifact.sha256)
       throw new Error(`copied QA artifact ${qaArtifact.relativePath} failed hash verification`);
   }
   return { files: packageManifest.files, packageManifest };
 }
 async function finalizeCommittedPackage(root5, delivery, operation) {
-  const markerPath = join10(root5, PENDING_MARKER);
+  const markerPath = join11(root5, PENDING_MARKER);
   if (existsSync5(markerPath)) {
     await verifyPackageRoot(root5, delivery, operation, true);
-    await rm3(markerPath);
+    await rm4(markerPath);
     await syncPath(root5);
     await syncPath(dirname2(root5));
   }
@@ -52372,8 +52900,8 @@ function packageResponse(operation, delivery, approvalTransitionVersion, files, 
     approvalId: operation.approvalId,
     approvalTransitionVersion,
     platform: operation.platform,
-    primary: { path: join10(operation.finalRoot, delivery.primaryArtifact.relativePath), format: "html", hash: delivery.primaryArtifact.artifactHash },
-    backup: { path: join10(operation.finalRoot, delivery.backupArtifact.relativePath), format: "markdown", hash: delivery.backupArtifact.artifactHash },
+    primary: { path: join11(operation.finalRoot, delivery.primaryArtifact.relativePath), format: "html", hash: delivery.primaryArtifact.artifactHash },
+    backup: { path: join11(operation.finalRoot, delivery.backupArtifact.relativePath), format: "markdown", hash: delivery.backupArtifact.artifactHash },
     files,
     recoveryMode,
     recovered: recoveryMode !== "new"
@@ -52389,7 +52917,7 @@ function packageRecoveryRequired(operation, code4, message, samePrincipalRequire
     contentId: operation.contentId,
     approvalId: operation.approvalId,
     finalRoot: operation.finalRoot,
-    markerPath: join10(operation.finalRoot, PENDING_MARKER),
+    markerPath: join11(operation.finalRoot, PENDING_MARKER),
     safeToPublish: false,
     retryRequired: true,
     samePrincipalRequired,
@@ -52407,7 +52935,7 @@ function packageAborted(operation) {
     packageId: operation.packageId,
     state: operation.state,
     finalRoot: operation.finalRoot,
-    markerPath: join10(operation.finalRoot, PENDING_MARKER),
+    markerPath: join11(operation.finalRoot, PENDING_MARKER),
     safeToPublish: false,
     retryRequired: false,
     requiredAction: "Keep or quarantine the marked directory for audit, then create a new revision and approval."
@@ -52430,7 +52958,7 @@ async function abortPreparedOperation(operation, reason, actor) {
     abortedReason: reason
   });
   await appendRecordsAtomically([
-    { collection: "package-operations", record: { id: randomUUID11(), createdAt: abortedAt, ...aborted2 }, guard: {
+    { collection: "package-operations", record: { id: randomUUID12(), createdAt: abortedAt, ...aborted2 }, guard: {
       entityKey: operation.approvalId,
       expectedEntityVersion: 1,
       entityVersion: 2
@@ -52472,7 +53000,7 @@ async function handler9(args, principal) {
       return err("PACKAGE_STATE_CORRUPT", "Committed package delivery metadata is missing.");
     try {
       await finalizeCommittedPackage(existingOperation.finalRoot, delivery, existingOperation);
-      const manifest = PackageManifestSchema.parse(JSON.parse(await readFile7(join10(existingOperation.finalRoot, "package-manifest.json"), "utf8")));
+      const manifest = PackageManifestSchema.parse(JSON.parse(await readFile8(join11(existingOperation.finalRoot, "package-manifest.json"), "utf8")));
       return packageResponse(existingOperation, delivery, approval.transitionVersion, manifest.files, "idempotent");
     } catch (error2) {
       return err("PACKAGE_INTEGRITY_FAILED", error2 instanceof Error ? error2.message : String(error2));
@@ -52491,7 +53019,7 @@ async function handler9(args, principal) {
   if (existingOperation && !sameIdentity(existingOperation, principal)) {
     return err("PACKAGE_RESUME_IDENTITY_MISMATCH", "A preparing package must be resumed by the same authenticated principal that created it.");
   }
-  const leaseOwner = `${packagedBy}:${randomUUID11()}`;
+  const leaseOwner = `${packagedBy}:${randomUUID12()}`;
   const approvalLease = await acquireEntityLease("approvals", approval.approvalId, leaseOwner, LEASE_TTL_MS);
   if (!approvalLease)
     return err("APPROVAL_BUSY", "Another package operation holds this approval lease.");
@@ -52548,12 +53076,12 @@ async function handler9(args, principal) {
     let operation = existingOperation;
     let documents;
     if (!operation) {
-      const packageId = randomUUID11();
-      const operationId = randomUUID11();
+      const packageId = randomUUID12();
+      const operationId = randomUUID12();
       const preparedAt = new Date().toISOString();
-      const packagesRoot = join10(dataDir(), "publish-packages");
-      const finalRoot = join10(packagesRoot, `${platform.id}-${preparedAt.slice(0, 10)}-${packageId}`);
-      const temporaryRoot = join10(packagesRoot, `.tmp-${packageId}`);
+      const packagesRoot = join11(dataDir(), "publish-packages");
+      const finalRoot = join11(packagesRoot, `${platform.id}-${preparedAt.slice(0, 10)}-${packageId}`);
+      const temporaryRoot = join11(packagesRoot, `.tmp-${packageId}`);
       documents = buildPackageDocuments({
         packageId,
         pluginVersion: VERSION,
@@ -52649,43 +53177,43 @@ async function handler9(args, principal) {
         finalVerified = true;
       } catch {
         const quarantine = `${operation.finalRoot}.quarantine-${new Date().toISOString().replace(/[:.]/g, "-")}`;
-        await rename3(operation.finalRoot, quarantine);
+        await rename4(operation.finalRoot, quarantine);
         await syncPath(dirname2(operation.finalRoot));
       }
     }
     if (!finalVerified) {
-      await rm3(operation.temporaryRoot, { recursive: true, force: true });
+      await rm4(operation.temporaryRoot, { recursive: true, force: true });
       try {
         for (const relativePath of documents.files)
-          await mkdir5(dirname2(join10(operation.temporaryRoot, relativePath)), { recursive: true });
+          await mkdir6(dirname2(join11(operation.temporaryRoot, relativePath)), { recursive: true });
         const frozenEntries = [delivery.primaryArtifact, delivery.backupArtifact, ...delivery.channelArtifacts];
         for (const item of frozenEntries) {
           await ensureLeases();
-          await copyFile2(join10(sourceRoot, item.relativePath), join10(operation.temporaryRoot, item.relativePath));
+          await copyFile3(join11(sourceRoot, item.relativePath), join11(operation.temporaryRoot, item.relativePath));
         }
         for (const asset of delivery.assets) {
           await ensureLeases();
-          await copyFile2(join10(sourceRoot, asset.relativePath), join10(operation.temporaryRoot, asset.relativePath));
+          await copyFile3(join11(sourceRoot, asset.relativePath), join11(operation.temporaryRoot, asset.relativePath));
         }
         for (const qaArtifact of delivery.qaEvidence?.artifacts ?? []) {
           await ensureLeases();
-          await copyFile2(join10(sourceRoot, qaArtifact.relativePath), join10(operation.temporaryRoot, qaArtifact.relativePath));
+          await copyFile3(join11(sourceRoot, qaArtifact.relativePath), join11(operation.temporaryRoot, qaArtifact.relativePath));
         }
-        await copyFile2(join10(sourceRoot, "delivery-manifest.json"), join10(operation.temporaryRoot, "delivery-manifest.json"));
-        await writeFile7(join10(operation.temporaryRoot, "approval.json"), JSON.stringify(documents.approvalSnapshot, null, 2) + `
+        await copyFile3(join11(sourceRoot, "delivery-manifest.json"), join11(operation.temporaryRoot, "delivery-manifest.json"));
+        await writeFile8(join11(operation.temporaryRoot, "approval.json"), JSON.stringify(documents.approvalSnapshot, null, 2) + `
 `, "utf8");
-        await writeFile7(join10(operation.temporaryRoot, "package-manifest.json"), JSON.stringify(documents.packageManifest, null, 2) + `
+        await writeFile8(join11(operation.temporaryRoot, "package-manifest.json"), JSON.stringify(documents.packageManifest, null, 2) + `
 `, "utf8");
-        await writeFile7(join10(operation.temporaryRoot, "copy-checklist.md"), documents.checklist, "utf8");
-        await writeFile7(join10(operation.temporaryRoot, PENDING_MARKER), `This package is not committed. Do not publish it. Resume mediaops.publish.package with the same approval and authenticated principal.
+        await writeFile8(join11(operation.temporaryRoot, "copy-checklist.md"), documents.checklist, "utf8");
+        await writeFile8(join11(operation.temporaryRoot, PENDING_MARKER), `This package is not committed. Do not publish it. Resume mediaops.publish.package with the same approval and authenticated principal.
 `, "utf8");
         await verifyPackageRoot(operation.temporaryRoot, delivery, operation, true);
         await ensureLeases(true);
         await syncTree(operation.temporaryRoot);
-        await rename3(operation.temporaryRoot, operation.finalRoot);
+        await rename4(operation.temporaryRoot, operation.finalRoot);
         await syncPath(dirname2(operation.finalRoot));
       } catch (error2) {
-        await rm3(operation.temporaryRoot, { recursive: true, force: true });
+        await rm4(operation.temporaryRoot, { recursive: true, force: true });
         if (error2 instanceof PackageLeaseLostError)
           return packageRecoveryRequired(operation, "PACKAGE_LEASE_LOST", error2.message);
         return packageRecoveryRequired(operation, "PACKAGE_WRITE_FAILED", error2 instanceof Error ? error2.message : String(error2));
@@ -52728,7 +53256,7 @@ async function handler9(args, principal) {
       const transition = await markApprovalPackaged(approval.approvalId, approval.transitionVersion, operation.packageId, principal, {
         packagedAt: operation.preparedAt,
         additionalEntries: [
-          { collection: "package-operations", record: { id: randomUUID11(), createdAt: committedAt, ...committedOperation }, guard: {
+          { collection: "package-operations", record: { id: randomUUID12(), createdAt: committedAt, ...committedOperation }, guard: {
             entityKey: approval.approvalId,
             expectedEntityVersion: 1,
             entityVersion: 2
@@ -52815,9 +53343,9 @@ async function handler10(args) {
 // src/tools/style.ts
 init_zod();
 init_domain();
-import { randomUUID as randomUUID12 } from "crypto";
-import { writeFile as writeFile8 } from "fs/promises";
-import { join as join11 } from "path";
+import { randomUUID as randomUUID13 } from "crypto";
+import { writeFile as writeFile9 } from "fs/promises";
+import { join as join12 } from "path";
 var CREATOR_TYPES = [
   "opinion-commentary",
   "knowledge-explainer",
@@ -53089,10 +53617,10 @@ async function templateHandler(args) {
   const currentProfile = args.mode === "incremental" ? await loadProfile(args.brandId) : null;
   if (args.mode === "incremental" && !currentProfile)
     return err("PROFILE_REQUIRED", "Incremental mode requires an existing confirmed profile.");
-  const dir = join11(dataDir(), "style-forms", args.brandId, "templates");
+  const dir = join12(dataDir(), "style-forms", args.brandId, "templates");
   await ensureDir(dir);
-  const path2 = join11(dir, `${args.mode}.html`);
-  await writeFile8(path2, registeredReferenceHtml(args.mode, args.brandId, currentProfile?.profile_version), "utf8");
+  const path2 = join12(dir, `${args.mode}.html`);
+  await writeFile9(path2, registeredReferenceHtml(args.mode, args.brandId, currentProfile?.profile_version), "utf8");
   return ok({
     brandId: args.brandId,
     mode: args.mode,
@@ -53114,7 +53642,7 @@ var saveDraftInputSchema = {
   updatedBy: exports_external.string().min(1)
 };
 async function saveDraftHandler(args) {
-  const formId = args.formId ?? randomUUID12();
+  const formId = args.formId ?? randomUUID13();
   const previous3 = await getLatestForm(args.brandId, formId);
   if (previous3 && previous3.state !== "draft")
     return err("FORM_NOT_EDITABLE", `Form ${formId} is ${previous3.state}; create a new draft.`);
@@ -53246,7 +53774,7 @@ async function proposeHandler(args) {
   if (unknownFields.length)
     return err("INVALID_STYLE_CORPUS", `Unknown abstract feature paths: ${unknownFields.join(", ")}`);
   const conflicts = Object.entries(corpus.features).filter(([field, observed]) => (field in preferences) && stableHash(preferences[field]) !== stableHash(observed)).map(([field, observed]) => ({ id: stableHash([field, observed]).slice(0, 16), field, formValue: preferences[field], corpusValue: observed }));
-  const proposalId = randomUUID12();
+  const proposalId = randomUUID13();
   const entityKey = `${args.brandId}:${proposalId}`;
   try {
     await appendRecordsAtomically([
@@ -53418,6 +53946,7 @@ register(reviewName, reviewDescription, reviewInputSchema, reviewHandler);
 register(name6, description6, inputSchema6, handler6);
 register(renderName, renderDescription, renderInputSchema, renderHandler);
 register(verifyName, verifyDescription, verifyInputSchema, verifyHandler);
+register(exportDraftName, exportDraftDescription, exportDraftInputSchema, exportDraftHandler);
 register(saveName2, saveDescription2, saveInputSchema2, saveHandler2);
 register(getName4, getDescription4, getInputSchema4, getHandler4);
 register(listName2, listDescription2, listInputSchema2, listHandler2);
@@ -53429,8 +53958,8 @@ register(submitName, submitDescription, submitInputSchema, submitHandler);
 register(getFormName, getFormDescription, getFormInputSchema, getFormHandler);
 register(proposeName, proposeDescription, proposeInputSchema, proposeHandler);
 register(confirmName, confirmDescription, confirmInputSchema, confirmHandler);
-register(name7, description7, inputSchema7, handler7);
 register(name8, description8, inputSchema8, handler8);
+register(name7, description7, inputSchema7, handler7);
 register(requestName, requestDescription, requestInputSchema, requestHandler);
 register(decideName, decideDescription, decideInputSchema, decideHandler);
 register(getName5, getDescription5, getInputSchema5, getHandler5);

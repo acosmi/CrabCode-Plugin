@@ -21,6 +21,7 @@ description: 编排从选题研究、创作审校、多平台适配到人工审�
 5. 无 profile 或需要更新风格：`media-style-intake` → `media-style-manager`。
 6. 平台变体：`media-platform-adapter`。
 7. `mediaops.delivery.render` 冻结用户实际看到的 HTML；`mediaops.delivery.verify` 对同一字节运行自动 QA 并记录独立视觉确认；审批与发布包：`media-publish-gate`。
+8. 单人 / 本机（local-editorial）模式下只是想打开稿件看看——任何阶段都可以，包括 intake 与 drafted——调用 `mediaops.delivery.export_draft`，得到可直接打开的 HTML 与 Markdown（正文内带可见的“未批准草稿”提示）。产物写在独立的 draft-exports 目录，明示 `releaseStatus=unapproved`、`qaLevel=none`，并如实列出 `governance`（bound / stale / missing）和仍然成立的 `blockers`。它**不是**交付候选、不进审批、不推动任何正式状态；正式链仍然是 `mediaops.delivery.render` / `mediaops.delivery.verify` → `mediaops.readiness.inspect` → 审批 → 发布包。两条路径严格分开：草稿导出不能替代其中任何一步，也不能被写成“已交付/已通过”。
 
 ## 状态流
 

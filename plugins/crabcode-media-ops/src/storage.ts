@@ -27,6 +27,9 @@ export type Collection =
   | 'originality-scans'
   | 'editorial-reviews'
   | 'delivery-manifests'
+  // Unapproved draft exports live in their own collection so the approval chain,
+  // which reads 'delivery-manifests', cannot see them at all (RC-14).
+  | 'draft-exports'
   | 'package-operations'
 
 export type StoredRecord = {
