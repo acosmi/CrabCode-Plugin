@@ -164,6 +164,16 @@ export async function inspectContent(content: ContentManifest, platform: Platfor
   if (!delivery || delivery.contentHash !== content.contentHash || delivery.articleDocHash !== content.articleDocHash) {
     issues.push({ code: 'DELIVERY_VERIFICATION_REQUIRED', severity: 'error', message: 'No verified white-background HTML-primary/Markdown-backup delivery manifest binds to this exact revision.' })
   } else {
+    // Evidence grade is part of the gate, not a presentation detail. A static
+    // run never launched Chromium or Nu, and a pre-0.4.4 record does not say
+    // what it ran — neither may be read as a full pass.
+    if (delivery.qaEvidence?.mode !== 'full') {
+      issues.push({
+        code: 'DELIVERY_QA_LEVEL_INSUFFICIENT',
+        severity: 'error',
+        message: `Delivery QA evidence is ${delivery.qaEvidence?.mode ?? 'legacy-unknown'}; the Media Gate requires MEDIAOPS_QA_MODE=full evidence bound to this revision before approval.`,
+      })
+    }
     try {
       await verifyDeliveryBytes(delivery)
     } catch (error) {

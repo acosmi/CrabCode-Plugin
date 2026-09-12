@@ -46,6 +46,81 @@ describe("mcp contract validator", () => {
     expect(await validateMcpContract(root)).toEqual([]);
   });
 
+  test("accepts the media-ops sidecar with host-injected user_config principals", async () => {
+    const root = await makeTempRoot();
+    await writeMarketplace(root, [{ name: "crabcode-media-ops", version: "0.4.4" }]);
+    await writePlugin(root, "crabcode-media-ops", {
+      ".crabcode-plugin/plugin.json": {
+        name: "crabcode-media-ops",
+        version: "0.4.4",
+        requiredMcpServers: ["mediaops"],
+        userConfig: {
+          principal_id: { type: "string", title: "id", required: true },
+          principal_name: { type: "string", title: "name", required: true },
+        },
+      },
+      "package.json": { name: "crabcode-media-ops-mcp", version: "0.4.4", scripts: { start: "bun --no-env-file dist/server.js" } },
+      ".mcp.json": {
+        mcpServers: {
+          mediaops: {
+            command: "bun",
+            args: ["--no-env-file", "${CRABCODE_PLUGIN_ROOT}/dist/server.js"],
+            env: {
+              MEDIAOPS_IDENTITY_MODE: "local-editorial",
+              MEDIAOPS_TRUSTED_PRINCIPAL_ID: "${user_config.principal_id}",
+              MEDIAOPS_TRUSTED_PRINCIPAL_NAME: "${user_config.principal_name}",
+            },
+          },
+        },
+      },
+      "dist/server.js": "// bundled",
+    });
+    expect(await validateMcpContract(root)).toEqual([]);
+  });
+
+  test("still rejects .mcp.json from a plugin outside the allow table", async () => {
+    const root = await makeTempRoot();
+    await writePlugin(root, "crabwork-data", {
+      ".crabcode-plugin/plugin.json": { name: "crabwork-data", version: "0.1.1", requiredMcpServers: ["crabwork-data"] },
+      ".mcp.json": { mcpServers: { "crabwork-data": { command: "bun", args: ["${CRABCODE_PLUGIN_ROOT}/dist/server.js"] } } },
+      "dist/server.js": "// bundled",
+    });
+    const messages = errorsOf(await validateMcpContract(root)).map((issue) => issue.message).join("\n");
+    expect(messages).toContain("permits .mcp.json only");
+    expect(messages).toContain("requiredMcpServers is reserved");
+  });
+
+  // The host throws when a ${user_config.X} value is missing and never writes the
+  // declared default, so referencing an optional field turns a normal install
+  // into a server that cannot start.
+  test("rejects a user_config reference that is undeclared or merely optional", async () => {
+    const root = await makeTempRoot();
+    await writePlugin(root, "crabcode-media-ops", {
+      ".crabcode-plugin/plugin.json": {
+        name: "crabcode-media-ops",
+        version: "0.4.4",
+        requiredMcpServers: ["mediaops"],
+        userConfig: { principal_name: { type: "string", default: "editor" } },
+      },
+      ".mcp.json": {
+        mcpServers: {
+          mediaops: {
+            command: "bun",
+            args: ["${CRABCODE_PLUGIN_ROOT}/dist/server.js"],
+            env: {
+              MEDIAOPS_TRUSTED_PRINCIPAL_ID: "${user_config.principal_id}",
+              MEDIAOPS_TRUSTED_PRINCIPAL_NAME: "${user_config.principal_name}",
+            },
+          },
+        },
+      },
+      "dist/server.js": "// bundled",
+    });
+    const messages = errorsOf(await validateMcpContract(root)).map((issue) => issue.message).join("\n");
+    expect(messages).toContain("${user_config.principal_id} but plugin.json userConfig.principal_id is not declared with required: true");
+    expect(messages).toContain("${user_config.principal_name} but plugin.json userConfig.principal_name is not declared with required: true");
+  });
+
   test("rejects required names without a server, installers, floating versions and missing artifacts", async () => {
     const root = await makeTempRoot();
     await writeMarketplace(root, [{ name: "beta", version: "2.0.0" }]);

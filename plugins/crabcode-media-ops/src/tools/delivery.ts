@@ -43,14 +43,14 @@ async function writeStaticQaEvidence(args: {
   }
   const browserReport = {
     schemaVersion: 'mediaops-browser-qa@1',
-    status: 'passed',
+    status: 'skipped',
     mode: 'static-skip',
     detail: 'Browser QA skipped under MEDIAOPS_QA_MODE=static.',
     completedAt,
   }
   const summary = {
     schemaVersion: 'mediaops-delivery-qa-summary@1',
-    status: 'passed',
+    status: 'static',
     mode: 'static',
     generatedAt: completedAt,
     htmlSha256: args.htmlSha256,
@@ -63,7 +63,7 @@ async function writeStaticQaEvidence(args: {
       axe: '4.12.1',
     },
     checks: [
-      { id: 'static-qa-mode', status: 'passed', detail: 'Static verification mode: automated Chromium/Nu deferred to MEDIAOPS_QA_MODE=full.' },
+      { id: 'static-qa-mode', status: 'skipped', detail: 'Static verification mode: automated Chromium/Nu deferred to MEDIAOPS_QA_MODE=full.' },
     ],
     errors: [],
   }
@@ -86,7 +86,10 @@ async function writeStaticQaEvidence(args: {
   ]
   return {
     schemaVersion: 'mediaops-delivery-qa-evidence@1',
-    status: 'passed',
+    // Static evidence declares its own grade. It is not a pass of the full
+    // pipeline and must never be recorded as one: Chromium and Nu never ran.
+    status: 'static',
+    mode: 'static',
     htmlSha256: args.htmlSha256,
     tools: {
       java: null,
@@ -97,7 +100,7 @@ async function writeStaticQaEvidence(args: {
       axe: '4.12.1',
     },
     checks: [
-      { id: 'static-qa-mode', status: 'passed', detail: 'Static verification mode: automated Chromium/Nu deferred to MEDIAOPS_QA_MODE=full.' },
+      { id: 'static-qa-mode', status: 'skipped', detail: 'Static verification mode: automated Chromium/Nu deferred to MEDIAOPS_QA_MODE=full.' },
       { id: 'static-html-binding', status: 'passed', detail: `Evidence bound to primary HTML ${args.htmlSha256}.` },
     ],
     artifacts,
@@ -136,7 +139,8 @@ function sha256(bytes: Uint8Array | string): string {
   return createHash('sha256').update(bytes).digest('hex')
 }
 
-function deliveryHashPayload(manifest: Omit<DeliveryManifest, 'renderManifestHash'>): unknown {
+/** Single derivation of `renderManifestHash`; exported so nobody re-implements it. */
+export function deliveryHashPayload(manifest: Omit<DeliveryManifest, 'renderManifestHash'>): unknown {
   return { ...manifest }
 }
 
@@ -380,8 +384,13 @@ export async function verifyDeliveryBytes(manifest: DeliveryManifest): Promise<s
     const bytes = await readArtifact(root, asset.relativePath)
     if (bytes.byteLength !== asset.byteSize || sha256(bytes) !== asset.sha256) throw new Error(`DELIVERY_ASSET_HASH_MISMATCH:${asset.assetId}`)
   }
-  if (manifest.visualReviewStatus === 'passed' && (!manifest.qaEvidence || manifest.qaEvidence.status !== 'passed')) {
-    throw new Error('DELIVERY_QA_EVIDENCE_MISSING: verified delivery has no passed Nu/axe/Playwright evidence')
+  // Integrity asserts that a verified delivery carries evidence bound to these
+  // exact bytes, at whatever grade that evidence declares. Whether the grade is
+  // good enough to approve is the Media Gate's call
+  // (readiness.ts::inspectContent → DELIVERY_QA_LEVEL_INSUFFICIENT), so that the
+  // two questions cannot drift apart.
+  if (manifest.visualReviewStatus === 'passed' && !manifest.qaEvidence) {
+    throw new Error('DELIVERY_QA_EVIDENCE_MISSING: verified delivery has no Nu/axe/Playwright evidence')
   }
   if (manifest.qaEvidence) {
     if (manifest.qaEvidence.htmlSha256 !== manifest.primaryArtifact.artifactHash) throw new Error('DELIVERY_QA_SOURCE_MISMATCH: QA did not run against the approved primary HTML bytes')
@@ -419,8 +428,11 @@ export async function verifyHandler(args: z.input<typeof verifySchema>): Promise
   if (!insideRoot(root, candidatesRoot)) return err('DELIVERY_PATH_INVALID', 'Delivery root escapes the candidate directory.')
 
   const checks: DeliveryManifest['checks'] = []
+  const recordCheck = (id: string, status: DeliveryManifest['checks'][number]['status'], detail: string): void => {
+    checks.push({ id, status, detail })
+  }
   const check = (id: string, passed: boolean, detail: string): void => {
-    checks.push({ id, status: passed ? 'passed' : 'failed', detail })
+    recordCheck(id, passed ? 'passed' : 'failed', detail)
   }
   try {
     const primaryBytes = await readArtifact(root, manifest.primaryArtifact.relativePath)
@@ -463,7 +475,9 @@ export async function verifyHandler(args: z.input<typeof verifySchema>): Promise
     } else if (qaMode === 'static') {
       try {
         qaEvidence = await writeStaticQaEvidence({ root, htmlSha256: manifest.primaryArtifact.artifactHash })
-        for (const item of qaEvidence.checks) check(`automated-${item.id}`, true, item.detail)
+        // A skipped automated check is recorded as skipped. Writing it as passed
+        // is how static evidence used to masquerade as a full Nu/axe/Playwright run.
+        for (const item of qaEvidence.checks) recordCheck(`automated-${item.id}`, item.status, item.detail)
         check('automated-qa-source-binding', true, 'Static-mode evidence binds to the exact primary HTML artifact hash.')
       } catch (error) {
         checks.push({ id: 'automated-delivery-qa', status: 'failed', detail: error instanceof Error ? error.message : String(error) })
@@ -493,6 +507,7 @@ export async function verifyHandler(args: z.input<typeof verifySchema>): Promise
           qaEvidence = {
             schemaVersion: 'mediaops-delivery-qa-evidence@1',
             status: 'passed',
+            mode: 'full',
             htmlSha256: qa.html.sha256,
             tools: qa.tools,
             checks: qa.checks.map(({ id, status, detail }) => ({ id, status: status as 'passed', detail })),
@@ -519,7 +534,9 @@ export async function verifyHandler(args: z.input<typeof verifySchema>): Promise
   const viewportCoverage = input.viewports.some((item) => item.width <= 375) && input.viewports.some((item) => item.width >= 768) && input.viewports.some((item) => item.width >= 1200)
   const visualPassed = reviewerIndependent && input.visualReviewStatus === 'passed' && viewportCoverage && input.printChecked && input.viewports.every((item) => item.noHorizontalOverflow && item.whiteBackground && item.readable)
   check('visual-evidence', visualPassed, 'Visual review covers mobile, tablet/desktop, wide desktop, print, white background, readability and horizontal overflow.')
-  const staticPassed = checks.filter((item) => item.id !== 'visual-evidence').every((item) => item.status === 'passed')
+  // A skipped check does not block the byte/security verdict; only a failure does.
+  // The full-vs-static level decision belongs to the Media Gate (readiness.ts).
+  const staticPassed = checks.filter((item) => item.id !== 'visual-evidence').every((item) => item.status !== 'failed')
   const verifiedAt = new Date().toISOString()
   const { renderManifestHash: _previousManifestHash, ...baseManifest } = manifest
   const updatedWithoutHash: Omit<DeliveryManifest, 'renderManifestHash'> = {

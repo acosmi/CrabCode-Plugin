@@ -40,9 +40,19 @@ export function err(code: string, message: string, warnings?: string[]): Envelop
   return env
 }
 
-/** Wrap an envelope into the MCP tool result shape. */
+/**
+ * Wrap an envelope into the MCP tool result shape.
+ *
+ * A business failure must arrive as a failure: `error` and `blocked` set
+ * `isError: true` so the host and the model see a failed tool call instead of a
+ * successful call whose text happens to describe a refusal. The JSON body is
+ * unchanged in every case — the host surfaces the first text block as the error
+ * detail, and the model still reads the full envelope.
+ */
 export function toToolResult(envelope: Envelope): {
   content: { type: 'text'; text: string }[]
+  isError?: true
 } {
-  return { content: [{ type: 'text', text: JSON.stringify(envelope) }] }
+  const content = [{ type: 'text' as const, text: JSON.stringify(envelope) }]
+  return envelope.success === false ? { content, isError: true } : { content }
 }

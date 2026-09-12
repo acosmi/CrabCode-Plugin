@@ -88,11 +88,15 @@ describe('trusted MCP/host identity binding', () => {
     delete baseEnv.MEDIAOPS_TRUSTED_PRINCIPAL_ROLES
     const anonymous = await stdioClient({ ...baseEnv, MEDIAOPS_DATA_DIR: dataDir })
     try {
-      const rejected = parseToolResult(await anonymous.client.callTool({
+      const rejectedResult = await anonymous.client.callTool({
         name: 'mediaops.content.save',
         arguments: { kind: 'brief', brandId: 'identity-brand', profileVersion: 'v1', stage: 'intake', title: '身份测试', researchSubject: '身份测试', bodyMarkdown: '', savedBy: 'spoofed' },
-      }))
+      })
+      const rejected = parseToolResult(rejectedResult)
       expect(rejected.error.code).toBe('AUTHENTICATION_REQUIRED')
+      // The refusal must reach the host as a failed tool call, not as a
+      // successful call whose text happens to describe a refusal.
+      expect(rejectedResult.isError).toBe(true)
     } finally {
       await anonymous.client.close()
     }
@@ -109,11 +113,14 @@ describe('trusted MCP/host identity binding', () => {
       const capability = parseToolResult(await authenticated.client.callTool({ name: 'mediaops.capabilities', arguments: {} }))
       expect(capability.data.governedCapabilities.authenticatedActorIdentity).toBe(true)
       expect(capability.data.governedCapabilities.actorPrincipalId).toBe('desktop-user')
-      const saved = parseToolResult(await authenticated.client.callTool({
+      const savedResult = await authenticated.client.callTool({
         name: 'mediaops.content.save',
         arguments: { kind: 'brief', brandId: 'identity-brand', profileVersion: 'v1', stage: 'intake', title: '身份测试', researchSubject: '身份测试', bodyMarkdown: '', savedBy: 'spoofed' },
-      }))
+      })
+      const saved = parseToolResult(savedResult)
       expect(saved.status).toBe('ok')
+      // Positive control: a real save must not be marked as an error.
+      expect(savedResult.isError).toBeUndefined()
       const content = parseToolResult(await authenticated.client.callTool({ name: 'mediaops.content.get', arguments: { contentId: saved.data.contentId } }))
       expect(content.data.savedBy).toBe('crabcode-host:desktop-user')
     } finally {

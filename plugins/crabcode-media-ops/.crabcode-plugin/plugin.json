@@ -1,12 +1,26 @@
 {
   "name": "crabcode-media-ops",
-  "version": "0.4.3",
-  "description": "Governed media operations for CrabCode: clean-room references, verifiable research, originality review, refined white HTML delivery, hash-bound approval, and frozen local publish packages. Executable MCP configuration is intentionally paused in this release.",
+  "version": "0.4.4",
+  "description": "Governed media operations for CrabCode: clean-room references, verifiable research, originality review, refined white HTML delivery, hash-bound approval, and frozen local publish packages.",
   "author": {
     "name": "CrabCode"
   },
   "license": "Apache-2.0",
-  "requiredMcpServers": [],
+  "requiredMcpServers": ["mediaops"],
+  "userConfig": {
+    "principal_id": {
+      "type": "string",
+      "title": "本机编辑者 ID",
+      "description": "本机低保证身份声明（local-editorial），不是登录、也不做强身份认证：宿主把它注入 mediaops 服务，作为全部写入操作的可信主体 ID。建议使用稳定的英文短标识（例如 editor-01）。规则：去掉首尾空白后不能为空、不超过 180 个字符、不能包含控制字符。同一个 ID 不能充当需要第二个真人的审批/复核门（原创复核、编辑复核、审批决定、profile 确认），这些门禁会保持 pending。",
+      "required": true
+    },
+    "principal_name": {
+      "type": "string",
+      "title": "编辑者显示名",
+      "description": "审计记录与报告中展示的人名或角色名（例如 张三 / 主编）。与本机编辑者 ID 一样，只是宿主注入的本机身份声明，不是登录凭据；服务端在取不到显示名时回退显示 ID 本身。",
+      "required": true
+    }
+  },
   "keywords": [
     "media-ops",
     "publishing",

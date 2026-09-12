@@ -40,4 +40,24 @@ describe('envelope factories', () => {
     expect(result.content[0].type).toBe('text')
     expect(JSON.parse(result.content[0].text)).toEqual({ success: true, status: 'ok', data: { a: 2 } })
   })
+
+  // A business failure has to arrive as a failed tool call. Returning
+  // `{content: [...]}` with no isError told the host "this call succeeded" and
+  // left the refusal buried in a JSON string the host never inspects.
+  test('toToolResult marks the two non-success statuses as tool errors', () => {
+    expect(toToolResult(err('AUTHENTICATION_REQUIRED', 'no principal')).isError).toBe(true)
+    expect(toToolResult(blocked({ reason: 'gate-b' })).isError).toBe(true)
+  })
+
+  test('toToolResult leaves the two success statuses unmarked', () => {
+    expect(toToolResult(ok({ a: 2 })).isError).toBeUndefined()
+    expect(toToolResult(actionRequired({ issues: [] })).isError).toBeUndefined()
+  })
+
+  test('the JSON body is identical whether or not the call is marked as an error', () => {
+    const envelope = err('NOT_FOUND', 'missing')
+    const result = toToolResult(envelope)
+    expect(result.content).toHaveLength(1)
+    expect(JSON.parse(result.content[0].text)).toEqual(envelope)
+  })
 })

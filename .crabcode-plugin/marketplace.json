@@ -4,7 +4,7 @@
     "name": "CrabCode"
   },
   "metadata": {
-    "version": "0.4.3",
+    "version": "0.4.4",
     "description": "Official CrabCode plugin marketplace hosted at acosmi/CrabCode-Plugin."
   },
   "plugins": [
@@ -1576,10 +1576,10 @@
     {
       "name": "crabcode-media-ops",
       "source": "./plugins/crabcode-media-ops",
-      "version": "0.4.3",
+      "version": "0.4.4",
       "displayName": "CrabCode 新媒体运营",
-      "shortDescription": "【连接暂停】参考隔离、联网可信来源、原创审校与精排白底 HTML 交付",
-      "longDescription": "面向媒体与自媒体团队的可审计工作流：第三方参考原文隔离、可核验联网研究、公众号独立观点、工具生成的原创与编辑复核、快速/完整/增量风格表单、多平台适配、精排白底 HTML 主交付、Markdown 备份，以及绑定内容/渲染/产物字节的人工审批与冻结发布包。 安全状态：本版本不发布可执行 MCP 配置；安装不会启动该服务或发起网络请求。 现有说明描述目标能力，不代表当前已连接或可执行。",
+      "shortDescription": "参考隔离、联网可信来源、原创审校与精排白底 HTML 交付",
+      "longDescription": "面向媒体与自媒体团队的可审计工作流：第三方参考原文隔离、可核验联网研究、公众号独立观点、工具生成的原创与编辑复核、快速/完整/增量风格表单、多平台适配、精排白底 HTML 主交付、Markdown 备份，以及绑定内容/渲染/产物字节的人工审批与冻结发布包。 安装后需在插件设置中填写本机编辑者 ID 与显示名（local-editorial 低保证身份），随后 mediaops 本地服务自动启动；正式多人审批仍需宿主注入不同主体。",
       "defaultPrompt": [
         "参考这篇文章但不要洗稿，联网核验后独立创作",
         "把这篇内容适配成小红书风格并生成白底 HTML 预览",
@@ -1588,7 +1588,7 @@
       "brandColor": "#8957e5",
       "composerIcon": "./assets/icon.png",
       "logo": "./assets/icon.png",
-      "description": "Governed media operations with clean-room references, verifiable research, originality gates, refined white HTML delivery and artifact-bound approval. Executable MCP configuration is intentionally paused in this release.",
+      "description": "Governed media operations with clean-room references, verifiable research, originality gates, refined white HTML delivery and artifact-bound approval. After install, fill in the local editor ID and display name in plugin settings (local-editorial low-assurance identity); the mediaops local server then starts automatically. Multi-person approval still requires the host to inject distinct principals.",
       "category": "media-ops",
       "tags": [
         "media-ops",
