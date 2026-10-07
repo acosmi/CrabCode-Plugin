@@ -84,7 +84,7 @@
   },
   "findings": [
     { "id": "F1", "severity": "P1", "title": "Bun runtime auto-install fetches unpinned dependencies on tool calls", "status": "open" },
-    { "id": "F2", "severity": "P1", "title": "html-video render fails when ffmpeg comes from PATH (bare name resolved against plugin root)", "status": "open" },
+    { "id": "F2", "severity": "P1", "title": "html-video local MP4 render fails with PATH ffmpeg (observed renderFrames; previewFrame render:true shares the path; render:false HTML preview unaffected)", "status": "open" },
     { "id": "F3", "severity": "P2", "title": "html-video renderer logs to stdout on the MCP stdio channel", "status": "open" },
     { "id": "F4", "severity": "P2", "title": "No installed-form end-to-end gate (empty cache, real render/QA call)", "status": "open" },
     { "id": "F5", "severity": "P2", "title": "mediaops tools publish no annotations", "status": "open" },
@@ -92,7 +92,7 @@
     { "id": "F7", "severity": "P3", "title": "Bundle reproducibility pinned to Bun 1.3.11 without packageManager/stale hint in media-ops", "status": "open" },
     { "id": "F8", "severity": "P3", "title": "mediaops outbound fetch ignores HTTP(S) proxy", "status": "open" },
     { "id": "F9", "severity": "P3", "title": "crablaw-cn claims Python 3.9+ without a 3.9 CI leg", "status": "open" },
-    { "id": "F10", "severity": "P3", "title": "Installed-form full QA dependency setup undocumented", "status": "open" },
+    { "id": "F10", "severity": "P3", "title": "Full QA setup and installed-root qa:installed already documented in README; original undocumented claim withdrawn", "status": "withdrawn" },
     { "id": "F11", "severity": "P3", "title": "Channel bridge plugins lack lockfiles and CI coverage", "status": "open" }
   ],
   "notVerified": [
